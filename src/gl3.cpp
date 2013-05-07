@@ -11,6 +11,25 @@
 
 #include "context.h"
 
+#define CONTEXT_EXEC(func)                                  \
+	Context * context = Context::GetCurrentContext();		\
+	if (context)                                            \
+	{														\
+		context->func;										\
+	}
+
+
+#define CONTEXT_EXEC_RETURN(func)                           \
+	Context * context = Context::GetCurrentContext();		\
+	if (context)                                            \
+	{														\
+		return context->func;								\
+	}                                                       \
+	else                                                    \
+	{														\
+		return 0;											\
+	}
+
 GL_APICALL void GL_APIENTRY glActiveTexture (GLenum texture)
 {
 
@@ -228,7 +247,7 @@ GL_APICALL void GL_APIENTRY glEnable (GLenum cap)
 
 GL_APICALL void GL_APIENTRY glEnableVertexAttribArray (GLuint index)
 {
-
+    CONTEXT_EXEC(EnableVertexAttribArray(index));
 }
 
 GL_APICALL void GL_APIENTRY glFinish (void)
@@ -713,7 +732,7 @@ GL_APICALL void GL_APIENTRY glVertexAttrib4fv (GLuint indx, const GLfloat* value
 
 GL_APICALL void GL_APIENTRY glVertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr)
 {
-
+    CONTEXT_EXEC(VertexAttribPointer(indx, size, type, normalized, stride, ptr));
 }
 
 GL_APICALL void GL_APIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei height)

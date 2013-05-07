@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <GLES3/gl3.h>
+#include "context.h"
 
-using namespace std;
+//using namespace std;
 
 int main()
 {
+    //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.
+    Context::SetCurrentContext(new Context());
+
     GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f,
                              1.0f, -1.0f, 0.0f,
                              1.0f,  1.0f, 0.0f,

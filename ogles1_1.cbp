@@ -31,6 +31,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add directory="src" />
 		</Compiler>
 		<Unit filename="main.cpp" />
 		<Unit filename="src/GLES3/gl3.h" />
