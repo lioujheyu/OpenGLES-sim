@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <GLES3/gl3.h>
 
-struct ArrayPointer
+struct AttribPointer
 {
     GLboolean   enable;
     GLint       size;
@@ -34,6 +34,7 @@ public:
     static Context *    GetCurrentContext();
     void                RecordError(GLenum error);
 
+//OpenGL ES 2.0 API
     void DrawArrays(GLenum mode, GLint first, GLsizei count);
     void EnableVertexAttribArray(GLuint index);
     void VertexAttribPointer(GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
@@ -44,13 +45,10 @@ private:
     char *  draw_buffer0;
     char *  draw_buffer1;
 
-    ArrayPointer VertexAttrib[8];
+    AttribPointer VertexAttrib[8];
     DrawCommand DrawCmd;
 
 };
-
-
-
 
 
 #endif // CONTEXT_H_INCLUDED

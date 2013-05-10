@@ -1,0 +1,13 @@
+#ifndef GPU_CONFIG_H_INCLUDED
+#define GPU_CONFIG_H_INCLUDED
+
+#define MAX_RESOLUTION_WIDTH    1024
+#define MAX_RESOLUTION_HEIGHT   1024
+
+#define MAX_ATTRIBUTE_NUMBER    8
+#define MAX_VARYING_NUMBER      8
+
+#define VPNEAR 	    0.0
+#define VPFAR 	    1.0
+
+#endif // GPU_CONFIG_H_INCLUDED

@@ -31,11 +31,20 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
-			<Add directory="src" />
+			<Add directory="include" />
 		</Compiler>
+		<Unit filename="include/GLES3/gl3.h" />
+		<Unit filename="include/GLES3/gl3platform.h" />
+		<Unit filename="include/KHR/khrplatform.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="src/GLES3/gl3.h" />
-		<Unit filename="src/GLES3/gl3platform.h" />
+		<Unit filename="src/GPU/geometry.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/GPU/geometry.h" />
+		<Unit filename="src/GPU/gpu_config.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/GPU/gpu_type.h" />
 		<Unit filename="src/context.cpp" />
 		<Unit filename="src/context.h" />
 		<Unit filename="src/gl3.cpp" />

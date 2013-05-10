@@ -74,7 +74,7 @@ void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
         case GL_LINES:
         case GL_LINE_LOOP:
         case GL_LINE_STRIP:
-            printf("draw modes in points and lines are not finished yet");
+            printf("draw modes in points and lines are not implemented yet");
             return;
         default:
             RecordError(GL_INVALID_ENUM);
@@ -88,14 +88,7 @@ void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
 
     }
 
-    /*  Init GL state table  */
-    draw_init_table();
 
-    /*  Perform DrawArrays command  */
-    drawarrays_fixed_pipeline();
-
-    /*  Update the Tiled linked-list  */
-    refresh_display_list();
 }
 
 void Context::EnableVertexAttribArray(GLuint index)
