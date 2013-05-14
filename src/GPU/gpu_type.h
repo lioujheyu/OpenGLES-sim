@@ -51,16 +51,19 @@ public:
     }
 };
 
-typedef struct floatVector4{
+struct floatVec4{
     GLfloat a,b,c,d;
-}floatVec4;
-
-class vertex{
-public:
-    unsigned char posIndex;
-    floatVec4 varying[MAX_VARYING_NUMBER];
-
-    vertex():posIndex(0){}
 };
+
+struct vertex{
+    floatVec4   varying[MAX_VARYING_NUMBER];
+};
+
+struct pixel{
+    floatVec4   pos4;
+    floatVec4   varying[MAX_VARYING_NUMBER-1];
+};
+
+
 
 #endif // GPU_TYPE_H_INCLUDED

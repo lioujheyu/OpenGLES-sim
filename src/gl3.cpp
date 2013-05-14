@@ -212,7 +212,7 @@ GL_APICALL void GL_APIENTRY glDepthMask (GLboolean flag)
 
 GL_APICALL void GL_APIENTRY glDepthRangef (GLfloat n, GLfloat f)
 {
-
+    CONTEXT_EXEC(DepthRangef(n, f));
 }
 
 GL_APICALL void GL_APIENTRY glDetachShader (GLuint program, GLuint shader)
@@ -232,7 +232,7 @@ GL_APICALL void GL_APIENTRY glDisableVertexAttribArray (GLuint index)
 
 GL_APICALL void GL_APIENTRY glDrawArrays (GLenum mode, GLint first, GLsizei count)
 {
-
+    CONTEXT_EXEC(DrawArrays(mode, first, count));
 }
 
 GL_APICALL void GL_APIENTRY glDrawElements (GLenum mode, GLsizei count, GLenum type, const GLvoid* indices)
@@ -737,7 +737,7 @@ GL_APICALL void GL_APIENTRY glVertexAttribPointer (GLuint indx, GLint size, GLen
 
 GL_APICALL void GL_APIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei height)
 {
-
+    CONTEXT_EXEC(Viewport(x, y, width, height));
 }
 
 

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <GLES3/gl3.h>
-#include "context.h"
+#include "src/context.h"
 
 //using namespace std;
 
@@ -19,6 +19,9 @@ int main()
     int v_coord_loc = 0;
     glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, vertexPos);
     glEnableVertexAttribArray(v_coord_loc);
+    glViewport(0,0,1024,512);
+
+    glDrawArrays(GL_TRIANGLES,0,3);
 
 
     return 0;

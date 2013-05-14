@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <GLES3/gl3.h>
 
-struct AttribPointer
+struct attribute
 {
     GLboolean   enable;
     GLint       size;
@@ -14,12 +14,31 @@ struct AttribPointer
     const GLvoid * ptr;
 };
 
-struct DrawCommand
+struct drawCommand
 {
     GLenum      mode;
     GLint       first;
     GLsizei     count;
     const GLvoid  * indices;
+};
+
+struct ViewPort
+{
+    GLint       x,y;
+    GLint       w,h;
+
+    GLfloat     n;
+    GLfloat     f;
+
+    ViewPort()
+    {
+        w = 640;
+        h = 480;
+        x = 0;
+        y = 0;
+        n = 0.f;
+        f = 1.0f;
+    }
 };
 
 class Context{
@@ -35,18 +54,22 @@ public:
     void                RecordError(GLenum error);
 
 //OpenGL ES 2.0 API
+    void DepthRangef(GLfloat n, GLfloat f);
     void DrawArrays(GLenum mode, GLint first, GLsizei count);
     void EnableVertexAttribArray(GLuint index);
     void VertexAttribPointer(GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
+    void Viewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
-private:
-    bool    m_current;
 
-    char *  draw_buffer0;
-    char *  draw_buffer1;
+    bool            m_current;
 
-    AttribPointer VertexAttrib[8];
-    DrawCommand DrawCmd;
+    char *          draw_buffer0;
+    char *          draw_buffer1;
+
+    ViewPort        vp;
+
+    attribute       vertexAttrib[8];
+    drawCommand     drawCmd;
 
 };
 

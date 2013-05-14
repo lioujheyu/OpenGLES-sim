@@ -1,27 +1,106 @@
 #include "geometry.h"
 
-Geometry gm;
-
 Geometry::Geometry()
 {
-    depthRangeNear = VPNEAR;
-    depthRangefar = VPFAR;
+    depthRangeN = VPNEAR;
+    depthRangeF = VPFAR;
+    drawMode = GL_TRIANGLES;
+}
+
+void Geometry::InitVCD()
+{
+    switch (drawMode) {
+    case GL_TRIANGLES:
+    case GL_TRIANGLE_FAN:
+    case GL_TRIANGLE_STRIP:
+        vtxCntDwn = 3;
+        break;
+    case GL_LINES:
+    case GL_LINE_LOOP:
+    case GL_LINE_STRIP:
+        vtxCntDwn = 2;
+        break;
+    default:
+        vtxCntDwn = 1;
+    }
+}
+
+void Geometry::Initialize()
+{
+    primitiveReady = false;
+    fanCnt = false;
+    stripCnt = 0;
+    InitVCD();
+}
+
+
+/****** Grahphic Related Function ******/
+
+void Geometry::ShaderEXE()
+{
+
 }
 
 void Geometry::ViewPort()
 {
     float x,y,z,w;
-    for (int i=0;i<3;i++){
-        x = VtxPrimitive[i].attribute[VtxPrimitive[i].posIndex].a;
-        y = VtxPrimitive[i].attribute[VtxPrimitive[i].posIndex].b;
-        z = VtxPrimitive[i].attribute[VtxPrimitive[i].posIndex].c;
 
-        x = x*viewPortWidth/2 + viewPortLX + viewPortWidth/2;
-        y = y*viewPortHeight/2 + viewPortLY + viewPortHeight/2;
-        z = z*(depthRangeFar-depthRangeNear)/2 + (depthRangeFar+depthRangeNear)/2;
+    x = vtxInput.varying[vtxPosIndx].a;
+    y = vtxInput.varying[vtxPosIndx].b;
+    z = vtxInput.varying[vtxPosIndx].c;
 
-        VtxPrimitive[i].attribute[VtxPrimitive[i].posIndex].a = x;
-        VtxPrimitive[i].attribute[VtxPrimitive[i].posIndex].b = y;
-        VtxPrimitive[i].attribute[VtxPrimitive[i].posIndex].c = z;
+    x = x*viewPortW/2 + viewPortLX + viewPortW/2;
+    y = y*viewPortH/2 + viewPortLY + viewPortH/2;
+    z = z*(depthRangeF-depthRangeN)/2 + (depthRangeF+depthRangeN)/2;
+
+    vtxInput.varying[vtxPosIndx].a = x;
+    vtxInput.varying[vtxPosIndx].b = y;
+    vtxInput.varying[vtxPosIndx].c = z;
+}
+
+void Geometry::PrimitiveAssembly()
+{
+    switch (drawMode) {
+    case GL_TRIANGLES:
+            vtxPrimitive[vtxCntDwn-1] = vtxInput;
+        break;
+
+    case GL_TRIANGLE_STRIP:
+        vtxPrimitive[stripCnt] = vtxInput;
+        stripCnt = (stripCnt==0)?2:stripCnt--;
+        break;
+
+    case GL_TRIANGLE_FAN:
+        if (vtxCntDwn == 1) {
+            vtxPrimitive[fanCnt] = vtxInput;
+            fanCnt = !fanCnt;
+        }
+        else
+            vtxPrimitive[vtxCntDwn-1] = vtxInput;
+        break;
+
+    default:
+        break;
+    }
+
+    vtxCntDwn--;
+
+    if (vtxCntDwn == 0)
+    {
+        primitiveReady = true;
+
+        switch (drawMode) {
+        case GL_TRIANGLES:
+            vtxCntDwn = 3;
+            break;
+        case GL_TRIANGLE_STRIP:
+        case GL_TRIANGLE_FAN:
+            vtxCntDwn = 1;
+            break;
+        default:
+            break;
+        }
     }
 }
+
+

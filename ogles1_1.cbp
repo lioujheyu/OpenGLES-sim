@@ -37,14 +37,22 @@
 		<Unit filename="include/GLES3/gl3platform.h" />
 		<Unit filename="include/KHR/khrplatform.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/GPU/driver.cpp">
+			<Option target="Debug" />
+		</Unit>
+		<Unit filename="src/GPU/driver.h" />
 		<Unit filename="src/GPU/geometry.cpp">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Debug" />
 		</Unit>
 		<Unit filename="src/GPU/geometry.h" />
 		<Unit filename="src/GPU/gpu_config.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Debug" />
 		</Unit>
+		<Unit filename="src/GPU/gpu_core.cpp" />
+		<Unit filename="src/GPU/gpu_core.h" />
 		<Unit filename="src/GPU/gpu_type.h" />
+		<Unit filename="src/GPU/rasterizer.cpp" />
+		<Unit filename="src/GPU/rasterizer.h" />
 		<Unit filename="src/context.cpp" />
 		<Unit filename="src/context.h" />
 		<Unit filename="src/gl3.cpp" />

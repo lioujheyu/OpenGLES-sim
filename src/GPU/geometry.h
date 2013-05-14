@@ -6,16 +6,33 @@
 
 class Geometry{
 public:
-    vertex      VtxInput;
-    vertex      VtxPrimitive[3];
-    int         vtxIndex;
-    GLenum      DrawMode;
-    float       depthRangeNear, depthRangeFar;
+    vertex      vtxInput;
+    vertex      vtxPrimitive[3];
+    GLenum      drawMode;
 
-    int viewPortLX, viewPortLY, viewPortWidth, viewPortHeight;
+    float       depthRangeN, depthRangeF;
+    int         viewPortLX, viewPortLY,
+                viewPortW, viewPortH;
 
-    void        initialize();
+    bool        primitiveReady;
+    int         vtxPosIndx;
+
+                Geometry();
+    void        Initialize();
+
+    void        ShaderEXE();
+    void        PerspectiveCorrection();
     void        ViewPort();
+    void        PrimitiveAssembly();
+    void        Clipping();
+    void        Culling();
+
+    void        InitVCD();    //vtxCntDown
+
+private:
+    int         vtxCntDwn; // VCD
+    int         stripCnt;
+    bool        fanCnt;
 
 
 
