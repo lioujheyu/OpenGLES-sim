@@ -50,14 +50,14 @@ void Rasterizer::PixelGenerate()
 		for (x = LX; x <= RX; x++) {
 
 			//First edge test
-			EdgeTest[0] = (x + 0.5 - vertexREG[1].pos4[0]) * Edge[0][0]-
-						  (y + 0.5 - vertexREG[1].pos4[1]) * Edge[0][1];
+			EdgeTest[0] = (x + 0.5 - vtxPrimitive[1].varying.a) * Edge[0][0]-
+						  (y + 0.5 - vtxPrimitive[1].varying.b) * Edge[0][1];
 			//Second edge test
-			EdgeTest[1] = (x + 0.5 - vertexREG[2].pos4[0]) * Edge[1][0]-
-						  (y + 0.5 - vertexREG[2].pos4[1]) * Edge[1][1];
+			EdgeTest[1] = (x + 0.5 - vtxPrimitive[2].varying.a) * Edge[1][0]-
+						  (y + 0.5 - vtxPrimitive[2].varying.b) * Edge[1][1];
 			//Third edge test
-			EdgeTest[2] = (x + 0.5 - vertexREG[0].pos4[0]) * Edge[2][0]-
-						  (y + 0.5 - vertexREG[0].pos4[1]) * Edge[2][1];
+			EdgeTest[2] = (x + 0.5 - vtxPrimitive[0].varying.a) * Edge[2][0]-
+						  (y + 0.5 - vtxPrimitive[0].varying.b) * Edge[2][1];
 
 			effectStatus = (EdgeTest[0]>=0) & (EdgeTest[1]>=0) & (EdgeTest[2]>=0);
 
@@ -69,24 +69,24 @@ void Rasterizer::PixelGenerate()
 				pixBuffer[pixBufferP].baryCentricPos3[1] = EdgeTest[0]*area2Reciprocal;
 				pixBuffer[pixBufferP].baryCentricPos3[2] = EdgeTest[1]*area2Reciprocal;
 
-				pixBuffer[pixBufferP].pos4[2] = vertexREG[0].pos4[2]
-                                                + pixBuffer[pixBufferP].baryCentricPos3[0] * (vertexREG[1].pos4[2] - vertexREG[0].pos4[2])
-                                                + pixBuffer[pixBufferP].baryCentricPos3[1] * (vertexREG[2].pos4[2] - vertexREG[0].pos4[2]);
-				pixBuffer[pixBufferP].pos4[3] = vertexREG[0].pos4[3]
-                                                + pixBuffer[pixBufferP].baryCentricPos3[0] * (vertexREG[1].pos4[3] - vertexREG[0].pos4[3])
-												+ pixBuffer[pixBufferP].baryCentricPos3[1] * (vertexREG[2].pos4[3] - vertexREG[0].pos4[3]);
-				pixBuffer[pixBufferP].texU[0] = vertexREG[0].TexU[0]
-                                                + pixBuffer[pixBufferP].baryCentricPos3[0] * (vertexREG[1].TexU[0] - vertexREG[0].TexU[0])
-												+ pixBuffer[pixBufferP].baryCentricPos3[1] * (vertexREG[2].TexU[0] - vertexREG[0].TexU[0]);
+				pixBuffer[pixBufferP].pos4[2] = vtxPrimitive[0].varying[2]
+                                                + pixBuffer[pixBufferP].baryCentricPos3[0] * (vtxPrimitive[1].varying[2] - vertexREG[0].pos4[2])
+                                                + pixBuffer[pixBufferP].baryCentricPos3[1] * (vtxPrimitive[2].varying[2] - vertexREG[0].pos4[2]);
+				pixBuffer[pixBufferP].pos4[3] = vtxPrimitive[0].varying[3]
+                                                + pixBuffer[pixBufferP].baryCentricPos3[0] * (vtxPrimitive[1].varying[3] - vertexREG[0].pos4[3])
+												+ pixBuffer[pixBufferP].baryCentricPos3[1] * (vtxPrimitive[2].varying[3] - vertexREG[0].pos4[3]);
+				pixBuffer[pixBufferP].texU[0] = vtxPrimitive[0].TexU[0]
+                                                + pixBuffer[pixBufferP].baryCentricPos3[0] * (vtxPrimitive[1].TexU[0] - vertexREG[0].TexU[0])
+												+ pixBuffer[pixBufferP].baryCentricPos3[1] * (vtxPrimitive[2].TexU[0] - vertexREG[0].TexU[0]);
 				pixBuffer[pixBufferP].texU[0] = pixBuffer[pixBufferP].texU[0] / pixBuffer[pixBufferP].pos4[3];
-				pixBuffer[pixBufferP].texV[0] = vertexREG[0].TexV[0]
-                                                + pixBuffer[pixBufferP].baryCentricPos3[0] * (vertexREG[1].TexV[0] - vertexREG[0].TexV[0])
-												+ pixBuffer[pixBufferP].baryCentricPos3[1] * (vertexREG[2].TexV[0] - vertexREG[0].TexV[0]);
+				pixBuffer[pixBufferP].texV[0] = vtxPrimitive[0].TexV[0]
+                                                + pixBuffer[pixBufferP].baryCentricPos3[0] * (vtxPrimitive[1].TexV[0] - vertexREG[0].TexV[0])
+												+ pixBuffer[pixBufferP].baryCentricPos3[1] * (vtxPrimitive[2].TexV[0] - vertexREG[0].TexV[0]);
 				pixBuffer[pixBufferP].texV[0] = pixBuffer[pixBufferP].texV[0] / pixBuffer[pixBufferP].pos4[3];
 				for (a=0; a<4; a++) {
-					pixBuffer[pixBufferP].color[a] = vertexREG[0].color[a]
-                                                     + pixBuffer[pixBufferP].baryCentricPos3[0]*(vertexREG[1].color[a] - vertexREG[0].color[a])
-													 + pixBuffer[pixBufferP].baryCentricPos3[1]*(vertexREG[2].color[a] - vertexREG[0].color[a]);
+					pixBuffer[pixBufferP].color[a] = vtxPrimitive[0].color[a]
+                                                     + pixBuffer[pixBufferP].baryCentricPos3[0]*(vtxPrimitive[1].color[a] - vertexREG[0].color[a])
+													 + pixBuffer[pixBufferP].baryCentricPos3[1]*(vtxPrimitive[2].color[a] - vertexREG[0].color[a]);
 					//pixBuffer[pixBufferP].color[a] = pixBuffer[pixBufferP].color[a] / pixBuffer[pixBufferP].pos4[3];
 				}
 
@@ -136,12 +136,12 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 	fprintf(PIXEL_GENERATE_DEBUGfp,"-------(%d,%d),Level:%d-----\n",x,y,level);
 #endif
 
-	centralTest[0] = (x+(1<<level)-vertexREG[1].pos4[0])*Edge[0][0]-
-					 (y+(1<<level)-vertexREG[1].pos4[1])*Edge[0][1];
-	centralTest[1] = (x+(1<<level)-vertexREG[2].pos4[0])*Edge[1][0]-
-					 (y+(1<<level)-vertexREG[2].pos4[1])*Edge[1][1];
-	centralTest[2] = (x+(1<<level)-vertexREG[0].pos4[0])*Edge[2][0]-
-					 (y+(1<<level)-vertexREG[0].pos4[1])*Edge[2][1];
+	centralTest[0] = (x+(1<<level)-vtxPrimitive[1].varying.a)*Edge[0][0]-
+					 (y+(1<<level)-vtxPrimitive[1].varying.b)*Edge[0][1];
+	centralTest[1] = (x+(1<<level)-vtxPrimitive[2].varying.a)*Edge[1][0]-
+					 (y+(1<<level)-vtxPrimitive[2].varying.b)*Edge[1][1];
+	centralTest[2] = (x+(1<<level)-vtxPrimitive[0].varying.a)*Edge[2][0]-
+					 (y+(1<<level)-vtxPrimitive[0].varying.b)*Edge[2][1];
 
 	if (level == 0) {
 		/*m
@@ -162,17 +162,17 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		pixelStamp[0].baryCentricPos3[0] = cornerTest[0][2]*area2Reciprocal;
 		pixelStamp[0].baryCentricPos3[1] = cornerTest[0][0]*area2Reciprocal;
 		pixelStamp[0].baryCentricPos3[2] = cornerTest[0][1]*area2Reciprocal;
-		pixelStamp[0].pos4[2] = vertexREG[0].pos4[2] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].pos4[2] - vertexREG[0].pos4[2])
-								+ pixelStamp[0].baryCentricPos3[1]*(vertexREG[2].pos4[2] - vertexREG[0].pos4[2]);
-		pixelStamp[0].pos4[3] = vertexREG[0].pos4[3] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].pos4[3] - vertexREG[0].pos4[3])
-								+ pixelStamp[0].baryCentricPos3[1]*(vertexREG[2].pos4[3] - vertexREG[0].pos4[3]);
-		pixelStamp[0].texU[0] = vertexREG[0].TexU[0] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].TexU[0] - vertexREG[0].TexU[0])
-								+ pixelStamp[0].baryCentricPos3[1]*(vertexREG[2].TexU[0] - vertexREG[0].TexU[0]);
-		pixelStamp[0].texV[0] = vertexREG[0].TexV[0] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].TexV[0] - vertexREG[0].TexV[0])
-								+ pixelStamp[0].baryCentricPos3[1]*(vertexREG[2].TexV[0] - vertexREG[0].TexV[0]);
+		pixelStamp[0].pos4[2] = vtxPrimitive[0].varying[2] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].pos4[2] - vertexREG[0].pos4[2])
+								+ pixelStamp[0].baryCentricPos3[1]*(vtxPrimitive[2].varying[2] - vertexREG[0].pos4[2]);
+		pixelStamp[0].pos4[3] = vtxPrimitive[0].varying[3] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].pos4[3] - vertexREG[0].pos4[3])
+								+ pixelStamp[0].baryCentricPos3[1]*(vtxPrimitive[2].varying[3] - vertexREG[0].pos4[3]);
+		pixelStamp[0].texU[0] = vtxPrimitive[0].TexU[0] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].TexU[0] - vertexREG[0].TexU[0])
+								+ pixelStamp[0].baryCentricPos3[1]*(vtxPrimitive[2].TexU[0] - vertexREG[0].TexU[0]);
+		pixelStamp[0].texV[0] = vtxPrimitive[0].TexV[0] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].TexV[0] - vertexREG[0].TexV[0])
+								+ pixelStamp[0].baryCentricPos3[1]*(vtxPrimitive[2].TexV[0] - vertexREG[0].TexV[0]);
 		for (lc=0; lc<4; lc++) {
-			pixelStamp[0].color[lc] = vertexREG[0].color[lc] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].color[lc] - vertexREG[0].color[lc])
-									  + pixelStamp[0].baryCentricPos3[1]*(vertexREG[2].color[lc] - vertexREG[0].color[lc]);
+			pixelStamp[0].color[lc] = vtxPrimitive[0].color[lc] + pixelStamp[0].baryCentricPos3[0]*(vertexREG[1].color[lc] - vertexREG[0].color[lc])
+									  + pixelStamp[0].baryCentricPos3[1]*(vtxPrimitive[2].color[lc] - vertexREG[0].color[lc]);
 			//pixelStamp[0].color[lc] = pixelStamp[0].color[lc] / pixelStamp[0].pos4[3];
 		}
 
@@ -181,17 +181,17 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		pixelStamp[1].baryCentricPos3[0] = cornerTest[2][2]*area2Reciprocal;
 		pixelStamp[1].baryCentricPos3[1] = cornerTest[2][0]*area2Reciprocal;
 		pixelStamp[1].baryCentricPos3[2] = cornerTest[2][1]*area2Reciprocal;
-		pixelStamp[1].pos4[2] = vertexREG[0].pos4[2] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].pos4[2] - vertexREG[0].pos4[2])
-								+ pixelStamp[1].baryCentricPos3[1]*(vertexREG[2].pos4[2] - vertexREG[0].pos4[2]);
-		pixelStamp[1].pos4[3] = vertexREG[0].pos4[3] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].pos4[3] - vertexREG[0].pos4[3])
-								+ pixelStamp[1].baryCentricPos3[1]*(vertexREG[2].pos4[3] - vertexREG[0].pos4[3]);
-		pixelStamp[1].texU[0] = vertexREG[0].TexU[0] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].TexU[0] - vertexREG[0].TexU[0])
-								+ pixelStamp[1].baryCentricPos3[1]*(vertexREG[2].TexU[0] - vertexREG[0].TexU[0]);
-		pixelStamp[1].texV[0] = vertexREG[0].TexV[0] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].TexV[0] - vertexREG[0].TexV[0])
-								+ pixelStamp[1].baryCentricPos3[1]*(vertexREG[2].TexV[0] - vertexREG[0].TexV[0]);
+		pixelStamp[1].pos4[2] = vtxPrimitive[0].varying[2] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].pos4[2] - vertexREG[0].pos4[2])
+								+ pixelStamp[1].baryCentricPos3[1]*(vtxPrimitive[2].varying[2] - vertexREG[0].pos4[2]);
+		pixelStamp[1].pos4[3] = vtxPrimitive[0].varying[3] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].pos4[3] - vertexREG[0].pos4[3])
+								+ pixelStamp[1].baryCentricPos3[1]*(vtxPrimitive[2].varying[3] - vertexREG[0].pos4[3]);
+		pixelStamp[1].texU[0] = vtxPrimitive[0].TexU[0] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].TexU[0] - vertexREG[0].TexU[0])
+								+ pixelStamp[1].baryCentricPos3[1]*(vtxPrimitive[2].TexU[0] - vertexREG[0].TexU[0]);
+		pixelStamp[1].texV[0] = vtxPrimitive[0].TexV[0] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].TexV[0] - vertexREG[0].TexV[0])
+								+ pixelStamp[1].baryCentricPos3[1]*(vtxPrimitive[2].TexV[0] - vertexREG[0].TexV[0]);
 		for (lc=0; lc<4; lc++) {
-			pixelStamp[1].color[lc] = vertexREG[0].color[lc] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].color[lc] - vertexREG[0].color[lc])
-									  + pixelStamp[1].baryCentricPos3[1]*(vertexREG[2].color[lc] - vertexREG[0].color[lc]);
+			pixelStamp[1].color[lc] = vtxPrimitive[0].color[lc] + pixelStamp[1].baryCentricPos3[0]*(vertexREG[1].color[lc] - vertexREG[0].color[lc])
+									  + pixelStamp[1].baryCentricPos3[1]*(vtxPrimitive[2].color[lc] - vertexREG[0].color[lc]);
 			//pixelStamp[1].color[lc] = pixelStamp[1].color[lc] / pixelStamp[1].pos4[3];
 		}
 
@@ -200,17 +200,17 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		pixelStamp[2].baryCentricPos3[0] = cornerTest[5][2]*area2Reciprocal;
 		pixelStamp[2].baryCentricPos3[1] = cornerTest[5][0]*area2Reciprocal;
 		pixelStamp[2].baryCentricPos3[2] = cornerTest[5][1]*area2Reciprocal;
-		pixelStamp[2].pos4[2] = vertexREG[0].pos4[2] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].pos4[2] - vertexREG[0].pos4[2])
-								+ pixelStamp[2].baryCentricPos3[1]*(vertexREG[2].pos4[2] - vertexREG[0].pos4[2]);
-		pixelStamp[2].pos4[3] = vertexREG[0].pos4[3] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].pos4[3] - vertexREG[0].pos4[3])
-								+ pixelStamp[2].baryCentricPos3[1]*(vertexREG[2].pos4[3] - vertexREG[0].pos4[3]);
-		pixelStamp[2].texU[0] = vertexREG[0].TexU[0] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].TexU[0] - vertexREG[0].TexU[0])
-								+ pixelStamp[2].baryCentricPos3[1]*(vertexREG[2].TexU[0] - vertexREG[0].TexU[0]);
-		pixelStamp[2].texV[0] = vertexREG[0].TexV[0] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].TexV[0] - vertexREG[0].TexV[0])
-								+ pixelStamp[2].baryCentricPos3[1]*(vertexREG[2].TexV[0] - vertexREG[0].TexV[0]);
+		pixelStamp[2].pos4[2] = vtxPrimitive[0].varying[2] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].pos4[2] - vertexREG[0].pos4[2])
+								+ pixelStamp[2].baryCentricPos3[1]*(vtxPrimitive[2].varying[2] - vertexREG[0].pos4[2]);
+		pixelStamp[2].pos4[3] = vtxPrimitive[0].varying[3] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].pos4[3] - vertexREG[0].pos4[3])
+								+ pixelStamp[2].baryCentricPos3[1]*(vtxPrimitive[2].varying[3] - vertexREG[0].pos4[3]);
+		pixelStamp[2].texU[0] = vtxPrimitive[0].TexU[0] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].TexU[0] - vertexREG[0].TexU[0])
+								+ pixelStamp[2].baryCentricPos3[1]*(vtxPrimitive[2].TexU[0] - vertexREG[0].TexU[0]);
+		pixelStamp[2].texV[0] = vtxPrimitive[0].TexV[0] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].TexV[0] - vertexREG[0].TexV[0])
+								+ pixelStamp[2].baryCentricPos3[1]*(vtxPrimitive[2].TexV[0] - vertexREG[0].TexV[0]);
 		for (lc=0; lc<4; lc++) {
-			pixelStamp[2].color[lc] = vertexREG[0].color[lc] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].color[lc] - vertexREG[0].color[lc])
-									  + pixelStamp[2].baryCentricPos3[1]*(vertexREG[2].color[lc] - vertexREG[0].color[lc]);
+			pixelStamp[2].color[lc] = vtxPrimitive[0].color[lc] + pixelStamp[2].baryCentricPos3[0]*(vertexREG[1].color[lc] - vertexREG[0].color[lc])
+									  + pixelStamp[2].baryCentricPos3[1]*(vtxPrimitive[2].color[lc] - vertexREG[0].color[lc]);
 			//pixelStamp[2].color[lc] = pixelStamp[2].color[lc] / pixelStamp[2].pos4[3];
 		}
 
@@ -219,17 +219,17 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		pixelStamp[3].baryCentricPos3[0] = cornerTest[7][2]*area2Reciprocal;
 		pixelStamp[3].baryCentricPos3[1] = cornerTest[7][0]*area2Reciprocal;
 		pixelStamp[3].baryCentricPos3[2] = cornerTest[7][1]*area2Reciprocal;
-		pixelStamp[3].pos4[2] = vertexREG[0].pos4[2] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].pos4[2] - vertexREG[0].pos4[2])
-								+ pixelStamp[3].baryCentricPos3[1]*(vertexREG[2].pos4[2] - vertexREG[0].pos4[2]);
-		pixelStamp[3].pos4[3] = vertexREG[0].pos4[3] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].pos4[3] - vertexREG[0].pos4[3])
-								+ pixelStamp[3].baryCentricPos3[1]*(vertexREG[2].pos4[3] - vertexREG[0].pos4[3]);
-		pixelStamp[3].texU[0] = vertexREG[0].TexU[0] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].TexU[0] - vertexREG[0].TexU[0])
-								+ pixelStamp[3].baryCentricPos3[1]*(vertexREG[2].TexU[0] - vertexREG[0].TexU[0]);
-		pixelStamp[3].texV[0] = vertexREG[0].TexV[0] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].TexV[0] - vertexREG[0].TexV[0])
-								+ pixelStamp[3].baryCentricPos3[1]*(vertexREG[2].TexV[0] - vertexREG[0].TexV[0]);
+		pixelStamp[3].pos4[2] = vtxPrimitive[0].varying[2] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].pos4[2] - vertexREG[0].pos4[2])
+								+ pixelStamp[3].baryCentricPos3[1]*(vtxPrimitive[2].varying[2] - vertexREG[0].pos4[2]);
+		pixelStamp[3].pos4[3] = vtxPrimitive[0].varying[3] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].pos4[3] - vertexREG[0].pos4[3])
+								+ pixelStamp[3].baryCentricPos3[1]*(vtxPrimitive[2].varying[3] - vertexREG[0].pos4[3]);
+		pixelStamp[3].texU[0] = vtxPrimitive[0].TexU[0] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].TexU[0] - vertexREG[0].TexU[0])
+								+ pixelStamp[3].baryCentricPos3[1]*(vtxPrimitive[2].TexU[0] - vertexREG[0].TexU[0]);
+		pixelStamp[3].texV[0] = vtxPrimitive[0].TexV[0] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].TexV[0] - vertexREG[0].TexV[0])
+								+ pixelStamp[3].baryCentricPos3[1]*(vtxPrimitive[2].TexV[0] - vertexREG[0].TexV[0]);
 		for (lc=0; lc<4; lc++) {
-			pixelStamp[3].color[lc] = vertexREG[0].color[lc] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].color[lc] - vertexREG[0].color[lc])
-									  + pixelStamp[3].baryCentricPos3[1]*(vertexREG[2].color[lc] - vertexREG[0].color[lc]);
+			pixelStamp[3].color[lc] = vtxPrimitive[0].color[lc] + pixelStamp[3].baryCentricPos3[0]*(vertexREG[1].color[lc] - vertexREG[0].color[lc])
+									  + pixelStamp[3].baryCentricPos3[1]*(vtxPrimitive[2].color[lc] - vertexREG[0].color[lc]);
 			//pixelStamp[3].color[lc] = pixelStamp[3].color[lc] / pixelStamp[3].pos4[3];
 		}
 
