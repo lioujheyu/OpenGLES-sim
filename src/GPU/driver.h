@@ -6,6 +6,5 @@
 
 void ActiveGPU();
 
-//void set_register(unsigned short id, unsigned int value);
 
 #endif // DRIVER_H_INCLUDED

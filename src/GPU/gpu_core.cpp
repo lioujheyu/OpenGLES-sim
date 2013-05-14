@@ -13,7 +13,7 @@ GPU_Core gpu;
 void GPU_Core::Run()
 {
 #ifdef PIXEL_GENERATE_DEBUG
-	rm.PIXEL_GENERATE_DEBUGfp = fopen("Result/PixelGenerateDebug.txt","w");
+	rm.PIXEL_GENERATE_DEBUGfp = fopen("PixelGenerateDebug.txt","w");
 #endif
 
     gm.Initialize();
@@ -40,10 +40,7 @@ void GPU_Core::Run()
                         *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 3 );
                 else
                     gm.vtxInput.attr[attrCnt].w = 1.0;
-
-                //printf("")
             }
-
         }
 
         gm.ShaderEXE();

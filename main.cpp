@@ -2,8 +2,6 @@
 #include <GLES3/gl3.h>
 #include "src/context.h"
 
-//using namespace std;
-
 int main()
 {
     //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.

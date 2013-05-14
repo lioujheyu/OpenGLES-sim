@@ -394,7 +394,7 @@ Rasterizer::Rasterizer()
 void Rasterizer::DumpImage()
 {
 	FILE *CLRfp;
-	CLRfp = fopen("Result/colormap.bmp","wb");
+	CLRfp = fopen("colormap.bmp","wb");
 
 	int x,y,i;
 
