@@ -5,9 +5,10 @@
 #define MAX_RESOLUTION_HEIGHT   1024
 
 #define MAX_ATTRIBUTE_NUMBER    8
-#define MAX_VARYING_NUMBER      8
 
 #define VPNEAR 	    0.0
 #define VPFAR 	    1.0
+
+#define PIXEL_GENERATE_DEBUG
 
 #endif // GPU_CONFIG_H_INCLUDED

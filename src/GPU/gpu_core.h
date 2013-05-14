@@ -17,14 +17,14 @@ class GPU_Core
 {
 public:
     Geometry    gm;
-    Rasterizer rm;
+    Rasterizer  rm;
 
     int         vtxCount;
     int         vtxFirst;
-    const void  *vtxPointer[MAX_VARYING_NUMBER];
-    int         attribSize[MAX_VARYING_NUMBER];
-    bool        varyingEnable[MAX_VARYING_NUMBER];
-    int         vtxPosIndx;
+    const void  *vtxPointer[MAX_ATTRIBUTE_NUMBER];
+    int         attrSize[MAX_ATTRIBUTE_NUMBER];
+    bool        attrEnable[MAX_ATTRIBUTE_NUMBER];
+    int         posIndx;
 
     void        Run();
 };

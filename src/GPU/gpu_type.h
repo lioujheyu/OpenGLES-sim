@@ -51,19 +51,36 @@ public:
     }
 };
 
-struct floatVec4{
-    GLfloat a,b,c,d;
+union floatVec4
+{
+    struct { float x, y, z, w; };
+    struct { float r, g, b, a; };
+    struct { float s, t, p, q; };
 };
 
 struct vertex{
-    floatVec4   varying[MAX_VARYING_NUMBER];
+    floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
 };
 
 struct pixel{
-    floatVec4   pos4;
-    floatVec4   varying[MAX_VARYING_NUMBER-1];
+    //but the position will always be in 1st attribute slot in whole rm design.
+    floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
+    floatVec4   scaleFacDX[MAX_ATTRIBUTE_NUMBER-1];
+    floatVec4   scaleFacDY[MAX_ATTRIBUTE_NUMBER-1];
+    float       baryCenPos3[3];
 };
 
+struct primitive{
+    vertex v[3];
+};
+
+template <class T> const T& min3 (const T& a, const T& b, const T& c) {
+  return (b<a)?((c<b)?c:b):((c<a)?c:a);
+}
+
+template <class T> const T& max3 (const T& a, const T& b, const T& c) {
+  return (b>a)?((c>b)?c:b):((c>a)?c:a);
+}
 
 
 #endif // GPU_TYPE_H_INCLUDED

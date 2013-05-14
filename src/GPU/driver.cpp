@@ -5,9 +5,10 @@ void ActiveGPU()
     Context * ctx = Context::GetCurrentContext();
 
     for (int i=0;i<8;i++){
+        gpu.attrEnable[i] = ctx->vertexAttrib[i].enable;
         if(ctx->vertexAttrib[i].enable){
             gpu.vtxPointer[i] = ctx->vertexAttrib[i].ptr;
-            gpu.attribSize[i] = ctx->vertexAttrib[i].size;
+            gpu.attrSize[i] = ctx->vertexAttrib[i].size;
         }
     }
 

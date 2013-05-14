@@ -28,27 +28,28 @@ public:
 
     Rasterizer();
 
-    vertex  vtxPrimitive[3];
+    primitive   prim;
 
-    float   Edge[3][3];
-    float   area2Reciprocal;
-    int     LX, RX;
-    int     LY, HY;
-    pixel   pixBuffer[4];
-    GLubyte ColorBuffer[1024][512][4];
-    float   DepthBuffer[1024][512];
-    int     pixBufferP;
-    bool    varyingEnable[MAX_VARYING_NUMBER];
-    int     vtxPosIndx;
+    float       Edge[3][3];
+    float       area2Reciprocal;
+    int         LX, RX;
+    int         LY, HY;
+    pixel       pixBuffer[4];
+    GLubyte     ColorBuffer[512][1024][4];
+    float       DepthBuffer[512][1024];
+    int         pixBufferP;
+    bool        attrEnable[MAX_ATTRIBUTE_NUMBER];
+    int         posIndx;
+    int         colIndx;
 
-    bool    TexMappingEn,AlphaBlendingEn,FogEn;
-    int     TexMinFilterMode, TexMaxFilterMode;  //Texture filtering mode
-    int     TexWrapModeS,TexWrapModeT;
-    int     AlphaTestMode,DepthTestMode;
-    int     AlphaBlendingMode;
-    float   AlphaRef,DepthRef;
-    float   ColorClearVal[4];
-    int     FogColor[4];
+    bool        TexMappingEn,AlphaBlendingEn,FogEn;
+    int         TexMinFilterMode, TexMaxFilterMode;  //Texture filtering mode
+    int         TexWrapModeS,TexWrapModeT;
+    int         AlphaTestMode,DepthTestMode;
+    int         AlphaBlendingMode;
+    float       AlphaRef,DepthRef;
+    float       ColorClearVal[4];
+    int         FogColor[4];
 
     void        TriangleSetup();
     void        PixelGenerate();
@@ -57,6 +58,7 @@ public:
     int         CalcTexAdd(short int us,short int ub,short int uo,short int vs,short int vb,short int vo,int level);
     fixColor4   GetTexColor(const unsigned short u, const unsigned short v, const unsigned int level);
     void        TextureMapping();
+    void        ShaderEXE();
     void        PerFragmentOp();
     void        DumpImage();
 

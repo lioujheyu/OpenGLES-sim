@@ -59,7 +59,7 @@ void Context::RecordError(GLenum error)
 void Context::DepthRangef(GLfloat n, GLfloat f)
 {
     vp.n = (n<0)?0:(n>1)?1:n;
-    vp.f = (f<0)?0:(f>1)?1:f;;
+    vp.f = (f<0)?0:(f>1)?1:f;
 }
 
 void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)

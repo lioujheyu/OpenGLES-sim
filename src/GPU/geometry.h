@@ -7,7 +7,8 @@
 class Geometry{
 public:
     vertex      vtxInput;
-    vertex      vtxPrimitive[3];
+    bool        attrEnable[MAX_ATTRIBUTE_NUMBER];
+    primitive   prim;
     GLenum      drawMode;
 
     float       depthRangeN, depthRangeF;
@@ -15,7 +16,7 @@ public:
                 viewPortW, viewPortH;
 
     bool        primitiveReady;
-    int         vtxPosIndx;
+    int         posIndx;
 
                 Geometry();
     void        Initialize();
