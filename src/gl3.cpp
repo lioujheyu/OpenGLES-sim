@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @file OpenGL ES 3.0 API mapping layer
  *
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
