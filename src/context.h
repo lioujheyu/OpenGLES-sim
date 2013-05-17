@@ -63,8 +63,8 @@ public:
 
     bool            m_current;
 
-    char *          draw_buffer0;
-    char *          draw_buffer1;
+    unsigned char *draw_buffer0;
+    unsigned char *draw_buffer1;
 
     ViewPort        vp;
 
