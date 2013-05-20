@@ -8,7 +8,7 @@ class fixColor4{
 public:
     GLubyte r,g,b,a;
 
-    inline fixColor4():r(0xff), g(0xff), b(0xff), a(0xff){}
+    inline fixColor4():r(0x0), g(0x0), b(0x0), a(0xff){}
 
     inline fixColor4(GLubyte rv, GLubyte gv, GLubyte bv, GLubyte av):
         r(rv), g(gv), b(bv), a(av) {}
@@ -63,7 +63,7 @@ struct vertex{
 };
 
 struct pixel{
-    //but the position will always be in 1st attribute slot in whole rm design.
+    //The position will always be in 1st attribute slot in whole rm design.
     floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
     floatVec4   scaleFacDX[MAX_ATTRIBUTE_NUMBER-1];
     floatVec4   scaleFacDY[MAX_ATTRIBUTE_NUMBER-1];
