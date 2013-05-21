@@ -19,14 +19,16 @@ public:
     Geometry    gm;
     Rasterizer  rm;
 
-    int         vtxCount;
-    int         vtxFirst;
-    const void  *vtxPointer[MAX_ATTRIBUTE_NUMBER];
-    int         attrSize[MAX_ATTRIBUTE_NUMBER];
-    bool        attrEnable[MAX_ATTRIBUTE_NUMBER];
-    int         posIndx;
+    int         	vtxCount;
+    int         	vtxFirst;
+    const void  	*vtxPointer[MAX_ATTRIBUTE_NUMBER];
+    int         	attrSize[MAX_ATTRIBUTE_NUMBER];
+    bool        	attrEnable[MAX_ATTRIBUTE_NUMBER];
+    int         	posIndx;
+    unsigned int	clearMask;
+    bool			clearStat;
 
-    void        Run();
+    void        	Run();
 };
 
 extern GPU_Core gpu;

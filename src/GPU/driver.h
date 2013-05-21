@@ -6,5 +6,4 @@
 
 void ActiveGPU();
 
-
 #endif // DRIVER_H_INCLUDED

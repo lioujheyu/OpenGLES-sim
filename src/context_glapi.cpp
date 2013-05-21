@@ -7,6 +7,34 @@
 
 *****************************************/
 
+void Context::Clear(GLbitfield mask)
+{
+	if ((mask & (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) != mask) {
+        RecordError(GL_INVALID_VALUE);
+        return;
+    }
+
+    clearMask = mask;
+    clearStat = true;
+
+    ActiveGPU();
+    clearStat = false;
+}
+
+void Context::ClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+{
+    // Set RM's registers
+    clearColor.r = red;
+    clearColor.g = green;
+    clearColor.b = blue;
+    clearColor.a = alpha;
+}
+
+void Context::ClearDepthf (GLfloat depth)
+{
+	clearDepth = depth;
+}
+
 void Context::DepthRangef(GLfloat n, GLfloat f)
 {
     vp.n = (n<0)?0:(n>1)?1:n;
@@ -43,7 +71,7 @@ void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
     }
 
     ActiveGPU();
-
+    DumpImage();
 }
 
 void Context::EnableVertexAttribArray(GLuint index)
@@ -102,4 +130,8 @@ void Context::Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
     vp.y = y;
     vp.w = width;
     vp.h = height;
+
+// @fixme (elvis#1#): dirty buffer setting before buffer management is ready
+    drawBuffer[0] = new unsigned char [width*height*4];
+    drawBuffer[1] = new float [width*height];
 }

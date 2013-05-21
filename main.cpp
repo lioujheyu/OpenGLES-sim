@@ -19,6 +19,10 @@ int main()
                         255, 255, 255
                       };
 
+    glViewport(0,0,1024,512);
+	glClearColor(1.0,0,0,1.0);
+	glClearDepthf(1.0);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     //int v_coord_loc = glGetAttribLocation(shader.id(), "v_coord_in");
     int v_coord_loc = 0;
     int v_color_loc = 1;
@@ -27,7 +31,6 @@ int main()
 
     glVertexAttribPointer(v_color_loc, 3, GL_FLOAT, GL_FALSE, 0, color);
     glEnableVertexAttribArray(v_color_loc);
-    glViewport(0,0,1024,512);
 
     glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 

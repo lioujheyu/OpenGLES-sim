@@ -107,17 +107,17 @@ GL_APICALL GLenum GL_APIENTRY glCheckFramebufferStatus (GLenum target)
 
 GL_APICALL void GL_APIENTRY glClear (GLbitfield mask)
 {
-
+	CONTEXT_EXEC(Clear(mask));
 }
 
 GL_APICALL void GL_APIENTRY glClearColor (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
 {
-
+	CONTEXT_EXEC(ClearColor(red, green, blue, alpha));
 }
 
 GL_APICALL void GL_APIENTRY glClearDepthf (GLfloat depth)
 {
-
+	CONTEXT_EXEC(ClearDepthf(depth));
 }
 
 GL_APICALL void GL_APIENTRY glClearStencil (GLint s)

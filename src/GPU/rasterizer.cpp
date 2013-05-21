@@ -316,17 +316,17 @@ void Rasterizer::PerFragmentOp()
 		if (DepthTestMode == GL_NEVER)
 			DepthTest = false;
 		else if (DepthTestMode == GL_LESS)
-			DepthTest = pixBuffer[i].attr[0].z  < DepthBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x];
+			DepthTest = pixBuffer[i].attr[0].z  < *(dBufPtr + (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x);
 		else if (DepthTestMode == GL_EQUAL)
-			DepthTest = pixBuffer[i].attr[0].z == DepthBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x];
+			DepthTest = pixBuffer[i].attr[0].z == *(dBufPtr + (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x);
 		else if (DepthTestMode == GL_LEQUAL)
-			DepthTest = pixBuffer[i].attr[0].z <= DepthBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x];
+			DepthTest = pixBuffer[i].attr[0].z <= *(dBufPtr + (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x);
 		else if (DepthTestMode == GL_GREATER)
-			DepthTest = pixBuffer[i].attr[0].z  > DepthBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x];
+			DepthTest = pixBuffer[i].attr[0].z  > *(dBufPtr + (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x);
 		else if (DepthTestMode == GL_NOTEQUAL)
-			DepthTest = pixBuffer[i].attr[0].z != DepthBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x];
+			DepthTest = pixBuffer[i].attr[0].z != *(dBufPtr + (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x);
 		else if (DepthTestMode == GL_GEQUAL)
-			DepthTest = pixBuffer[i].attr[0].z >= DepthBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x];
+			DepthTest = pixBuffer[i].attr[0].z >= *(dBufPtr + (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x);
 		else if (DepthTestMode == GL_ALWAYS)
 			DepthTest = true;
 		else
@@ -334,35 +334,48 @@ void Rasterizer::PerFragmentOp()
 		if (DepthTest == false)
 			continue;
 		else
-			DepthBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x] = pixBuffer[i].attr[0].z;
+			*(dBufPtr + (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x) = pixBuffer[i].attr[0].z;
 
 		//Alpha blending
 
-		ColorBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x][0]
-			= (int)pixBuffer[i].attr[colIndx].r;// R
-		ColorBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x][1]
-			= (int)pixBuffer[i].attr[colIndx].g;// G
-		ColorBuffer[(int)pixBuffer[i].attr[0].y][(int)pixBuffer[i].attr[0].x][2]
-			= (int)pixBuffer[i].attr[colIndx].b;// B
+		*(cBufPtr + ( (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x )*4)
+			= (unsigned char)pixBuffer[i].attr[colIndx].r;// R
+		*(cBufPtr + ( (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x )*4 + 1)
+			= (unsigned char)pixBuffer[i].attr[colIndx].g;// G
+		*(cBufPtr + ( (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x )*4 + 2)
+			= (unsigned char)pixBuffer[i].attr[colIndx].b;// B
 	}
+}
+
+void Rasterizer::ClearBuffer(unsigned int mask)
+{
+	int i;
+	if (mask & GL_COLOR_BUFFER_BIT) {
+		for (i = 0; i<viewPortW*viewPortH; i++){
+
+			*(cBufPtr + i*4 + 0) = clearColor.r*255;
+			*(cBufPtr + i*4 + 1) = clearColor.g*255;
+			*(cBufPtr + i*4 + 2) = clearColor.b*255;
+			*(cBufPtr + i*4 + 3) = clearColor.a*255;
+		}
+	}
+
+	if (mask & GL_DEPTH_BUFFER_BIT)
+		for (i = 0; i<viewPortW*viewPortH; i++)
+			*(dBufPtr + i) = clearDepth;
+
+//        if (mask & GL_STENCIL_BUFFER_BIT)
+//            for (int i = 0; i<TILEHEIGHT*2; i++)
+//                for (int j = 0; j<TILEWIDTH*2; j++)
+//                    TStencilBuffer[i][j] = StencilClearVal;
 }
 
 Rasterizer::Rasterizer()
 {
-	int i,j;
+	int i;
 
-	for (j = 0; j < 512; j++)
-		for (i = 0; i < 1024; i++) {
-			ColorBuffer[j][i][0] = 0;
-			ColorBuffer[j][i][1] = 0;
-			ColorBuffer[j][i][2] = 0;
-			ColorBuffer[j][i][3] = 0;
-			DepthBuffer[j][i] = 255;
-		}
-
-	for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
 		FogColor[i] = 0;
-		ColorClearVal[i] = 0;
 	}
 
 	AlphaRef = 0;
@@ -389,90 +402,3 @@ Rasterizer::Rasterizer()
 	PIXEL_GENERATE_DEBUGfp = fopen("Result/PixelGenerateDebug.txt","w");
 #endif
 }
-
-//this bmp format doesn't include compression method and palette
-void Rasterizer::DumpImage()
-{
-	FILE *CLRfp;
-	CLRfp = fopen("colormap.bmp","wb");
-
-	int x,y,i;
-
-	for (i=0; i<54; i++) {
-		switch (i) {
-		default:
-			putc (0x00, CLRfp);
-			break;
-		case 0:
-			putc (0x42, CLRfp);
-			break;
-		case 1:
-			putc (0x4D, CLRfp);
-			break;
-		case 2:
-			putc (0x38, CLRfp);
-			break;
-		case 3:
-			putc (0x10, CLRfp);
-			break;
-		case 0xA:
-			putc (0x36, CLRfp);
-			break;
-		case 0xE:
-			putc (0x28, CLRfp);
-			break;
-		case 0x12:
-			putc (1024&0x000000FF, CLRfp);
-			break;
-		case 0x13:
-			putc ((1024>>8)&0x000000FF, CLRfp);
-			break;
-		case 0x14:
-			putc ((1024>>16)&0x000000FF, CLRfp);
-			break;
-		case 0x15:
-			putc ((1024>>24)&0x000000FF, CLRfp);
-			break;
-		case 0x16:
-			putc (512&0x000000FF, CLRfp);
-			break;
-		case 0x17:
-			putc ((512>>8)&0x000000FF, CLRfp);
-			break;
-		case 0x18:
-			putc ((512>>16)&0x000000FF, CLRfp);
-			break;
-		case 0x19:
-			putc ((512>>24)&0x000000FF, CLRfp);
-			break;
-		case 0x1A:
-			putc (0x01, CLRfp);
-			break;
-		case 0x1C:
-			putc (0x18, CLRfp);
-			break;
-		case 0x26:
-			putc (0x12, CLRfp);
-			break;
-		case 0x27:
-			putc (0x0B, CLRfp);
-			break;
-		case 0x2A:
-			putc (0x12, CLRfp);
-			break;
-		case 0x2B:
-			putc (0x0B, CLRfp);
-			break;
-		}
-	}
-
-	for (y=0; y<512; y++)
-		for (x=0; x<1024; x++) {
-			putc((int)ColorBuffer[y][x][2], CLRfp);// B
-			putc((int)ColorBuffer[y][x][1], CLRfp);// G
-			putc((int)ColorBuffer[y][x][0], CLRfp);// R
-		}
-
-	fclose(CLRfp);
-}
-

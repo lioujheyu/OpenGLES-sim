@@ -30,37 +30,39 @@ public:
 
     primitive   prim;
 
-    float       Edge[3][3];
-    float       area2Reciprocal;
-    int         LX, RX;
-    int         LY, HY;
-    pixel       pixBuffer[4];
-    GLubyte     ColorBuffer[512][1024][4];
-    float       DepthBuffer[512][1024];
-    int         pixBufferP;
-    bool        attrEnable[MAX_ATTRIBUTE_NUMBER];
-    int         posIndx;
-    int         colIndx;
+    float           Edge[3][3];
+    float           area2Reciprocal;
+    int             LX, RX;
+    int             LY, HY;
+    pixel           pixBuffer[4];
+    unsigned char*  cBufPtr;
+    float*          dBufPtr;
+    int             pixBufferP;
+    bool            attrEnable[MAX_ATTRIBUTE_NUMBER];
+    int             posIndx;
+    int             colIndx;
 
-    bool        TexMappingEn,AlphaBlendingEn,FogEn;
-    int         TexMinFilterMode, TexMaxFilterMode;  //Texture filtering mode
-    int         TexWrapModeS,TexWrapModeT;
-    int         AlphaTestMode,DepthTestMode;
-    int         AlphaBlendingMode;
-    float       AlphaRef,DepthRef;
-    float       ColorClearVal[4];
-    int         FogColor[4];
+    int             viewPortW, viewPortH;
+    bool            TexMappingEn,AlphaBlendingEn,FogEn;
+    int             TexMinFilterMode, TexMaxFilterMode;  //Texture filtering mode
+    int             TexWrapModeS,TexWrapModeT;
+    int             AlphaTestMode,DepthTestMode;
+    int             AlphaBlendingMode;
+    float           AlphaRef,DepthRef;
+    floatVec4		clearColor;
+    float			clearDepth;
+    int             FogColor[4];
 
-    void        TriangleSetup();
-    void        PixelGenerate();
-    void        PixelGenerateHiber();
-    void        pixelSplit(int x, int y, int level);
-    int         CalcTexAdd(short int us,short int ub,short int uo,short int vs,short int vb,short int vo,int level);
-    fixColor4   GetTexColor(const unsigned short u, const unsigned short v, const unsigned int level);
-    void        TextureMapping();
-    void        ShaderEXE();
-    void        PerFragmentOp();
-    void        DumpImage();
+    void            TriangleSetup();
+    void            PixelGenerate();
+    void            PixelGenerateHiber();
+    void            pixelSplit(int x, int y, int level);
+    int             CalcTexAdd(short int us,short int ub,short int uo,short int vs,short int vb,short int vo,int level);
+    fixColor4       GetTexColor(const unsigned short u, const unsigned short v, const unsigned int level);
+    void            TextureMapping();
+    void            ShaderEXE();
+    void            PerFragmentOp();
+    void 			ClearBuffer(unsigned int mask);
 
 
     //FILE *TEXfp;

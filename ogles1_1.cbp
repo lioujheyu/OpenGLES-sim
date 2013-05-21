@@ -49,11 +49,21 @@
 		<Unit filename="src/GPU/rasterizer.h" />
 		<Unit filename="src/context.cpp" />
 		<Unit filename="src/context.h" />
+		<Unit filename="src/context_glapi.cpp" />
 		<Unit filename="src/gl3.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
 			<debugger />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

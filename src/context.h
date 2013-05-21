@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <GLES3/gl3.h>
+#include "GPU/gpu_type.h"
 
 struct attribute
 {
@@ -52,8 +53,12 @@ public:
     static void         SetCurrentContext(Context * context);
     static Context *    GetCurrentContext();
     void                RecordError(GLenum error);
+    void                DumpImage();
 
 //OpenGL ES 2.0 API
+    void Clear(GLbitfield mask);
+    void ClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+    void ClearDepthf (GLfloat depth);
     void DepthRangef(GLfloat n, GLfloat f);
     void DrawArrays(GLenum mode, GLint first, GLsizei count);
     void EnableVertexAttribArray(GLuint index);
@@ -63,10 +68,14 @@ public:
 
     bool            m_current;
 
-    unsigned char *draw_buffer0;
-    unsigned char *draw_buffer1;
+// @fixme (elvis#1#): dirty buffer setting before buffer management is ready
+    void           *drawBuffer[2]; //0 - color buffer, 1 - depth buffer
 
     ViewPort        vp;
+    floatVec4		clearColor;
+    float			clearDepth;
+    bool			clearStat;
+    unsigned int 	clearMask;
 
     attribute       vertexAttrib[8];
     drawCommand     drawCmd;

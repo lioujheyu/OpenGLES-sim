@@ -18,6 +18,12 @@ void GPU_Core::Run()
 
     gm.Initialize();
 
+    if (clearStat) {
+		rm.ClearBuffer(clearMask);
+		clearStat = false;
+		return;
+	}
+
     //Each vertex will be injected into Geometry's vtxInput here
     for (int vCnt=0;vCnt<vtxCount;vCnt++) {
 
@@ -58,9 +64,7 @@ void GPU_Core::Run()
             rm.TriangleSetup();
             rm.PixelGenerateHiber();
 
-            rm.DumpImage();
         }
-
 
     }
 }
