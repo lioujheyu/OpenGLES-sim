@@ -86,113 +86,91 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		pixelStamp[0].attr[0].y = y;
 		pixelStamp[0].baryCenPos3[0] = cornerTest[0][2]*area2Reciprocal;
 		pixelStamp[0].baryCenPos3[1] = cornerTest[0][0]*area2Reciprocal;
-		pixelStamp[0].baryCenPos3[2] = cornerTest[0][1]*area2Reciprocal;
-		pixelStamp[0].attr[0].z = prim.v[0].attr[posIndx].z +
-                               pixelStamp[0].baryCenPos3[0]*(prim.v[1].attr[posIndx].z - prim.v[0].attr[posIndx].z) +
-                               pixelStamp[0].baryCenPos3[1]*(prim.v[2].attr[posIndx].z - prim.v[0].attr[posIndx].z);
-		pixelStamp[0].attr[0].w = prim.v[0].attr[posIndx].w +
-                               pixelStamp[0].baryCenPos3[0]*(prim.v[1].attr[posIndx].w - prim.v[0].attr[posIndx].w) +
-                               pixelStamp[0].baryCenPos3[1]*(prim.v[2].attr[posIndx].w - prim.v[0].attr[posIndx].w);
-        for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
-            if (!attrEnable[attrCnt])
-                continue;
-            pixelStamp[0].attr[attrCnt].s = prim.v[0].attr[attrCnt].s +
-                                            pixelStamp[0].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].s - prim.v[0].attr[attrCnt+1].s) +
-                                            pixelStamp[0].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].s - prim.v[0].attr[attrCnt+1].s);
-            pixelStamp[0].attr[attrCnt].t = prim.v[0].attr[attrCnt].t +
-                                            pixelStamp[0].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].t - prim.v[0].attr[attrCnt+1].t) +
-                                            pixelStamp[0].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].t - prim.v[0].attr[attrCnt+1].t);
-            pixelStamp[0].attr[attrCnt].p = prim.v[0].attr[attrCnt].p +
-                                            pixelStamp[0].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].p - prim.v[0].attr[attrCnt+1].s) +
-                                            pixelStamp[0].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].p - prim.v[0].attr[attrCnt+1].s);
-            pixelStamp[0].attr[attrCnt].q = prim.v[0].attr[attrCnt].q +
-                                            pixelStamp[0].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].q - prim.v[0].attr[attrCnt+1].q) +
-                                            pixelStamp[0].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].q - prim.v[0].attr[attrCnt+1].q);
-        }
-
 		pixelStamp[1].attr[0].x = x+1;
 		pixelStamp[1].attr[0].y = y;
-		pixelStamp[1].baryCenPos3[0] = cornerTest[0][2]*area2Reciprocal;
-		pixelStamp[1].baryCenPos3[1] = cornerTest[0][0]*area2Reciprocal;
-		pixelStamp[1].baryCenPos3[2] = cornerTest[0][1]*area2Reciprocal;
-		pixelStamp[1].attr[0].z = prim.v[0].attr[posIndx].z +
-                               pixelStamp[1].baryCenPos3[0]*(prim.v[1].attr[posIndx].z - prim.v[0].attr[posIndx].z) +
-                               pixelStamp[1].baryCenPos3[1]*(prim.v[2].attr[posIndx].z - prim.v[0].attr[posIndx].z);
-		pixelStamp[1].attr[0].w = prim.v[0].attr[posIndx].w +
-                               pixelStamp[1].baryCenPos3[0]*(prim.v[1].attr[posIndx].w - prim.v[0].attr[posIndx].w) +
-                               pixelStamp[1].baryCenPos3[1]*(prim.v[2].attr[posIndx].w - prim.v[0].attr[posIndx].w);
-        for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
-            if (!attrEnable[attrCnt])
-                continue;
-            pixelStamp[1].attr[attrCnt].s = prim.v[0].attr[attrCnt].s +
-                                            pixelStamp[1].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].s - prim.v[0].attr[attrCnt+1].s) +
-                                            pixelStamp[1].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].s - prim.v[0].attr[attrCnt+1].s);
-            pixelStamp[1].attr[attrCnt].t = prim.v[0].attr[attrCnt].t +
-                                            pixelStamp[1].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].t - prim.v[0].attr[attrCnt+1].t) +
-                                            pixelStamp[1].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].t - prim.v[0].attr[attrCnt+1].t);
-            pixelStamp[1].attr[attrCnt].p = prim.v[0].attr[attrCnt].p +
-                                            pixelStamp[1].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].p - prim.v[0].attr[attrCnt+1].s) +
-                                            pixelStamp[1].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].p - prim.v[0].attr[attrCnt+1].s);
-            pixelStamp[1].attr[attrCnt].q = prim.v[0].attr[attrCnt].q +
-                                            pixelStamp[1].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].q - prim.v[0].attr[attrCnt+1].q) +
-                                            pixelStamp[1].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].q - prim.v[0].attr[attrCnt+1].q);
-        }
-
+		pixelStamp[1].baryCenPos3[0] = cornerTest[2][2]*area2Reciprocal;
+		pixelStamp[1].baryCenPos3[1] = cornerTest[2][0]*area2Reciprocal;
 		pixelStamp[2].attr[0].x = x;
 		pixelStamp[2].attr[0].y = y+1;
-		pixelStamp[2].baryCenPos3[0] = cornerTest[0][2]*area2Reciprocal;
-		pixelStamp[2].baryCenPos3[1] = cornerTest[0][0]*area2Reciprocal;
-		pixelStamp[2].baryCenPos3[2] = cornerTest[0][1]*area2Reciprocal;
-		pixelStamp[2].attr[0].z = prim.v[0].attr[posIndx].z +
-                               pixelStamp[2].baryCenPos3[0]*(prim.v[1].attr[posIndx].z - prim.v[0].attr[posIndx].z) +
-                               pixelStamp[2].baryCenPos3[1]*(prim.v[2].attr[posIndx].z - prim.v[0].attr[posIndx].z);
-		pixelStamp[2].attr[0].w = prim.v[0].attr[posIndx].w +
-                               pixelStamp[2].baryCenPos3[0]*(prim.v[1].attr[posIndx].w - prim.v[0].attr[posIndx].w) +
-                               pixelStamp[2].baryCenPos3[1]*(prim.v[2].attr[posIndx].w - prim.v[0].attr[posIndx].w);
-        for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
-            if (!attrEnable[attrCnt])
-                continue;
-            pixelStamp[2].attr[attrCnt].s = prim.v[0].attr[attrCnt].s +
-                                            pixelStamp[2].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].s - prim.v[0].attr[attrCnt+1].s) +
-                                            pixelStamp[2].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].s - prim.v[0].attr[attrCnt+1].s);
-            pixelStamp[2].attr[attrCnt].t = prim.v[0].attr[attrCnt].t +
-                                            pixelStamp[2].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].t - prim.v[0].attr[attrCnt+1].t) +
-                                            pixelStamp[2].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].t - prim.v[0].attr[attrCnt+1].t);
-            pixelStamp[2].attr[attrCnt].p = prim.v[0].attr[attrCnt].p +
-                                            pixelStamp[2].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].p - prim.v[0].attr[attrCnt+1].s) +
-                                            pixelStamp[2].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].p - prim.v[0].attr[attrCnt+1].s);
-            pixelStamp[2].attr[attrCnt].q = prim.v[0].attr[attrCnt].q +
-                                            pixelStamp[2].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].q - prim.v[0].attr[attrCnt+1].q) +
-                                            pixelStamp[2].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].q - prim.v[0].attr[attrCnt+1].q);
-        }
-
+		pixelStamp[2].baryCenPos3[0] = cornerTest[5][2]*area2Reciprocal;
+		pixelStamp[2].baryCenPos3[1] = cornerTest[5][0]*area2Reciprocal;
 		pixelStamp[3].attr[0].x = x+1;
 		pixelStamp[3].attr[0].y = y+1;
-		pixelStamp[3].baryCenPos3[0] = cornerTest[0][2]*area2Reciprocal;
-		pixelStamp[3].baryCenPos3[1] = cornerTest[0][0]*area2Reciprocal;
-		pixelStamp[3].baryCenPos3[2] = cornerTest[0][1]*area2Reciprocal;
-		pixelStamp[3].attr[0].z = prim.v[0].attr[posIndx].z +
-                               pixelStamp[3].baryCenPos3[0]*(prim.v[1].attr[posIndx].z - prim.v[0].attr[posIndx].z) +
-                               pixelStamp[3].baryCenPos3[1]*(prim.v[2].attr[posIndx].z - prim.v[0].attr[posIndx].z);
-		pixelStamp[3].attr[0].w = prim.v[0].attr[posIndx].w +
-                               pixelStamp[3].baryCenPos3[0]*(prim.v[1].attr[posIndx].w - prim.v[0].attr[posIndx].w) +
-                               pixelStamp[3].baryCenPos3[1]*(prim.v[2].attr[posIndx].w - prim.v[0].attr[posIndx].w);
-        for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
-            if (!attrEnable[attrCnt])
-                continue;
-            pixelStamp[3].attr[attrCnt].s = prim.v[0].attr[attrCnt].s +
-                                            pixelStamp[3].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].s - prim.v[0].attr[attrCnt+1].s) +
-                                            pixelStamp[3].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].s - prim.v[0].attr[attrCnt+1].s);
-            pixelStamp[3].attr[attrCnt].t = prim.v[0].attr[attrCnt].t +
-                                            pixelStamp[3].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].t - prim.v[0].attr[attrCnt+1].t) +
-                                            pixelStamp[3].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].t - prim.v[0].attr[attrCnt+1].t);
-            pixelStamp[3].attr[attrCnt].p = prim.v[0].attr[attrCnt].p +
-                                            pixelStamp[3].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].p - prim.v[0].attr[attrCnt+1].s) +
-                                            pixelStamp[3].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].p - prim.v[0].attr[attrCnt+1].s);
-            pixelStamp[3].attr[attrCnt].q = prim.v[0].attr[attrCnt].q +
-                                            pixelStamp[3].baryCenPos3[0]*(prim.v[1].attr[attrCnt+1].q - prim.v[0].attr[attrCnt+1].q) +
-                                            pixelStamp[3].baryCenPos3[1]*(prim.v[2].attr[attrCnt+1].q - prim.v[0].attr[attrCnt+1].q);
-        }
+		pixelStamp[3].baryCenPos3[0] = cornerTest[7][2]*area2Reciprocal;
+		pixelStamp[3].baryCenPos3[1] = cornerTest[7][0]*area2Reciprocal;
+
+		//Interpolate the 4 pixel's all attributes, include perspective correction
+		for (int i=0;i<4;i++){
+			pixelStamp[i].attr[0].z = prim.v[0].attr[posIndx].z +
+								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[posIndx].z - prim.v[0].attr[posIndx].z) +
+								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[posIndx].z - prim.v[0].attr[posIndx].z);
+			pixelStamp[i].attr[0].w = prim.v[0].attr[posIndx].w +
+								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[posIndx].w - prim.v[0].attr[posIndx].w) +
+								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[posIndx].w - prim.v[0].attr[posIndx].w);
+
+			for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
+				if (!attrEnable[attrCnt])
+					continue;
+				pixelStamp[i].attr[attrCnt].s = prim.v[0].attr[attrCnt].s +
+												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].s - prim.v[0].attr[attrCnt].s) +
+												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].s - prim.v[0].attr[attrCnt].s);
+				pixelStamp[i].attr[attrCnt].s = pixelStamp[i].attr[attrCnt].s / pixelStamp[i].attr[0].w;
+				pixelStamp[i].attr[attrCnt].t = prim.v[0].attr[attrCnt].t +
+												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].t - prim.v[0].attr[attrCnt].t) +
+												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].t - prim.v[0].attr[attrCnt].t);
+				pixelStamp[i].attr[attrCnt].t = pixelStamp[i].attr[attrCnt].t / pixelStamp[i].attr[0].w;
+				pixelStamp[i].attr[attrCnt].p = prim.v[0].attr[attrCnt].p +
+												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].p - prim.v[0].attr[attrCnt].s) +
+												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].p - prim.v[0].attr[attrCnt].s);
+				pixelStamp[i].attr[attrCnt].p = pixelStamp[i].attr[attrCnt].p / pixelStamp[i].attr[0].w;
+				pixelStamp[i].attr[attrCnt].q = prim.v[0].attr[attrCnt].q +
+												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].q - prim.v[0].attr[attrCnt].q) +
+												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].q - prim.v[0].attr[attrCnt].q);
+				pixelStamp[i].attr[attrCnt].q = pixelStamp[i].attr[attrCnt].q / pixelStamp[i].attr[0].w;
+			}
+		}
+		//Caculate 4 pixel's attributes' scale factor
+		for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
+			if (!attrEnable[attrCnt])
+				continue;
+			pixelStamp[0].scaleFacDX[attrCnt].s = pixelStamp[1].scaleFacDX[attrCnt].s
+												= pixelStamp[1].attr[attrCnt].s-pixelStamp[0].attr[attrCnt].s;
+			pixelStamp[0].scaleFacDX[attrCnt].t = pixelStamp[1].scaleFacDX[attrCnt].t
+												= pixelStamp[1].attr[attrCnt].t-pixelStamp[0].attr[attrCnt].t;
+			pixelStamp[0].scaleFacDX[attrCnt].p = pixelStamp[1].scaleFacDX[attrCnt].p
+												= pixelStamp[1].attr[attrCnt].p-pixelStamp[0].attr[attrCnt].p;
+			pixelStamp[0].scaleFacDX[attrCnt].q = pixelStamp[1].scaleFacDX[attrCnt].q
+												= pixelStamp[1].attr[attrCnt].q-pixelStamp[0].attr[attrCnt].q;
+
+			pixelStamp[2].scaleFacDX[attrCnt].s = pixelStamp[3].scaleFacDX[attrCnt].s
+												= pixelStamp[3].attr[attrCnt].s-pixelStamp[2].attr[attrCnt].s;
+			pixelStamp[2].scaleFacDX[attrCnt].t = pixelStamp[3].scaleFacDX[attrCnt].t
+												= pixelStamp[3].attr[attrCnt].t-pixelStamp[2].attr[attrCnt].t;
+			pixelStamp[2].scaleFacDX[attrCnt].p = pixelStamp[3].scaleFacDX[attrCnt].p
+												= pixelStamp[3].attr[attrCnt].p-pixelStamp[2].attr[attrCnt].p;
+			pixelStamp[2].scaleFacDX[attrCnt].q = pixelStamp[3].scaleFacDX[attrCnt].q
+												= pixelStamp[3].attr[attrCnt].q-pixelStamp[2].attr[attrCnt].q;
+
+			pixelStamp[0].scaleFacDY[attrCnt].s = pixelStamp[2].scaleFacDY[attrCnt].s
+												= pixelStamp[2].attr[attrCnt].s-pixelStamp[0].attr[attrCnt].s;
+			pixelStamp[0].scaleFacDY[attrCnt].t = pixelStamp[2].scaleFacDY[attrCnt].t
+												= pixelStamp[2].attr[attrCnt].t-pixelStamp[0].attr[attrCnt].t;
+			pixelStamp[0].scaleFacDY[attrCnt].p = pixelStamp[2].scaleFacDY[attrCnt].p
+												= pixelStamp[2].attr[attrCnt].p-pixelStamp[0].attr[attrCnt].p;
+			pixelStamp[0].scaleFacDY[attrCnt].q = pixelStamp[2].scaleFacDY[attrCnt].q
+												= pixelStamp[2].attr[attrCnt].q-pixelStamp[0].attr[attrCnt].q;
+
+			pixelStamp[1].scaleFacDY[attrCnt].s = pixelStamp[3].scaleFacDY[attrCnt].s
+												= pixelStamp[3].attr[attrCnt].s-pixelStamp[1].attr[attrCnt].s;
+			pixelStamp[1].scaleFacDY[attrCnt].t = pixelStamp[3].scaleFacDY[attrCnt].t
+												= pixelStamp[3].attr[attrCnt].t-pixelStamp[1].attr[attrCnt].t;
+			pixelStamp[1].scaleFacDY[attrCnt].p = pixelStamp[3].scaleFacDY[attrCnt].p
+												= pixelStamp[3].attr[attrCnt].p-pixelStamp[1].attr[attrCnt].p;
+			pixelStamp[1].scaleFacDY[attrCnt].q = pixelStamp[3].scaleFacDY[attrCnt].q
+												= pixelStamp[3].attr[attrCnt].q-pixelStamp[1].attr[attrCnt].q;
+		}
+
+
 
 		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)|
             (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
@@ -234,6 +212,7 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 			pixBufferP++;
 		}
 
+//		ShaderEXE();
 		PerFragmentOp();
 	} else {
 		/*
@@ -277,6 +256,259 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		if (Zone[2][0] == true && Zone[2][1] == true && Zone[2][2] == true )    pixelSplit(x           ,y+(1<<level),level-1);
 		if (Zone[3][0] == true && Zone[3][1] == true && Zone[3][2] == true )    pixelSplit(x+(1<<level),y+(1<<level),level-1);
 	}
+}
+
+/*
+ * u,v - Texture coodinate in 2 dimension directions.
+ * s,b,o - 3 block-based hirachy level, Super block, Block, Offset, in textrue coordinate.
+ *
+ * The following two function are to calculate 1D address and fetch data
+ * in system memory from 6D block-based texture address.
+ */
+int Rasterizer::CalcTexAdd(short int us,short int ub,short int uo,short int vs,short int vb,short int vo,int level)
+{
+	return (vs*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_Y+vb*TEX_CACHE_BLOCK_SIZE_ROOT+vo)*(texImage.width>>level)+
+		   us*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_X+ub*TEX_CACHE_BLOCK_SIZE_ROOT+uo;
+}
+
+fixColor4 Rasterizer::GetTexColor(const unsigned short u, const unsigned short v, const unsigned int level)
+{
+	int i,j;
+	unsigned short tag, pos_cache, pos_block, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
+	unsigned char *texTmpPtr = NULL;
+	unsigned char texel[4];
+
+#ifdef MIPMAPLEVELTEST
+	fixColor4 mipmaplevel;
+	mipmaplevel = fixColor4(0xff-level*30, 0xff-level*30, 0xff-level*30, 0xff);
+	return mipmaplevel;
+#endif //MIPMAPLEVELTEST
+
+	U_Super = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_X_LOG);
+	V_Super = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_Y_LOG);
+	U_Block = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_X - 1);
+	V_Block = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_Y - 1);
+	U_Offset = u & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
+	V_Offset = v & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
+	tag = (int)(((V_Super << 8)|(U_Super&0x00ff))<<4)|(level&0xf);
+	pos_cache = V_Block * TEX_CACHE_ENTRY_X + U_Block;
+	pos_block = V_Offset * TEX_CACHE_BLOCK_SIZE_ROOT + U_Offset;
+
+	///*************** Texture cache hit *************
+	if ((TexCache.valid[pos_cache] == true) && (TexCache.pos[pos_cache] == tag)) {
+		TexCache.TexCacheHit++;
+		return TexCache.color[pos_cache][pos_block];
+	} else { ///*********** Texture cache miss *************
+		TexCache.TexCacheMiss++;
+
+		if (TexCache.valid[pos_cache] == false)
+			TexCache.TexCacheColdMiss++;
+
+		TexCache.valid[pos_cache] = true;
+		TexCache.pos[pos_cache] = tag;
+
+		fprintf(TEXDEBUGfp,"Texture Cache miss!! \n");
+
+		for (j = 0; j < TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
+			for (i = 0; i < TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
+				texTmpPtr = texImage.data[level] + CalcTexAdd(U_Super,U_Block,i,V_Super,V_Block,j,level)*3;
+
+				//printf("%d %x (%d,%d)\n",level,texImage.data[level],u,v);
+
+				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].r = *texTmpPtr++;
+				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].g = *texTmpPtr++;
+				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].b = *texTmpPtr++;
+				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].a = 0xff;
+			}
+		}
+		return TexCache.color[pos_cache][pos_block];
+	}
+}
+
+fixColor4 Rasterizer::BilinearFilter(float texU,float texV,int level)
+{
+	float texULevel, texVLevel;
+	unsigned short texUC, texVC;
+	float u_ratio, v_ratio;
+	fixColor4 color;
+	fixColor4 TexColor[4];
+
+	texULevel = texU / (1<<level);
+	texULevel = (texULevel - 0.5)>0?texULevel - 0.5:0;
+	texVLevel = texV / (1<<level);
+	texVLevel = (texVLevel - 0.5)>0?texVLevel - 0.5:0;
+
+	texUC = (unsigned short)floor(texULevel);
+	texVC = (unsigned short)floor(texVLevel);
+
+	u_ratio = texULevel - texUC;
+	v_ratio = texVLevel - texVC;
+
+	TexColor[0] = GetTexColor(texUC, texVC, level);
+	TexColor[1] = GetTexColor((texUC+1>=texImage.width>>level)?texUC:texUC+1, texVC, level);
+	TexColor[2] = GetTexColor(texUC, (texVC+1>=texImage.height>>level)?texVC:texVC+1, level);
+	TexColor[3] = GetTexColor((texUC+1>=texImage.width>>level)?texUC:texUC+1, (texVC+1>=texImage.height>>level)?texVC:texVC+1, level);
+
+	color = (TexColor[0]*(1-u_ratio) + TexColor[1]*u_ratio)*(1-v_ratio) + (TexColor[2]*(1-u_ratio) + TexColor[3]*u_ratio)*v_ratio;
+
+	return color;
+}
+
+fixColor4  Rasterizer::TrilinearFilter(float texU, float texV, int level, float w_ratio)
+{
+	fixColor4 color[2];
+	color[0] = BilinearFilter(texU,texV,level);
+	color[1] = BilinearFilter(texU,texV,(level+1)<texImage.level?level+1:texImage.level);
+
+	color[0] = color[0]*(1-w_ratio) + color[1]*w_ratio;
+
+	return color[0];
+}
+
+fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int texPtr, int attrIndx, pixel pixelInput)
+{
+	int i;
+	float TexU, TexV;
+	unsigned short TexUC, TexVC;
+	float u_ratio, v_ratio, wx_ratio, wy_ratio, w_ratio;
+	float maxScaleFac;
+	fixColor4 TexColor[8];  // 1st 2 3  2nd  6 7
+							//     0 1       4 5
+	fixColor4 color, colorNextLevel;
+	int LoDx,LoDy,LoD;
+
+#ifdef TEXDEBUG
+	fprintf(TEXDEBUGfp,"\nXXX--YYY--UUU.UU--VVV.VV----------------\n");
+#endif
+	//find absolutely position in texture image
+	TexU = TexUin*texImage.width;
+	TexV = TexVin*texImage.height;
+
+	maxScaleFac = std::max(
+					std::max(pixelInput.scaleFacDX[attrIndx].s*texImage.width , pixelInput.scaleFacDX[attrIndx].t*texImage.height),
+					std::max(pixelInput.scaleFacDY[attrIndx].s*texImage.width , pixelInput.scaleFacDY[attrIndx].t*texImage.height)
+				);
+
+	w_ratio = frexp(maxScaleFac, &LoD);
+	w_ratio = w_ratio*2-1;
+	LoD--;
+
+
+///********* Texture Wrap mode ***************************
+	if (TexWrapModeS == GL_REPEAT)
+		TexU = fmod(TexU,texImage.width);
+	//fmod: mod in floating point format, %(mod) can only be used under integer format
+	else if (TexWrapModeS == GL_CLAMP_TO_EDGE)
+		TexU = (TexU < texImage.width-1)?((TexU > 0)?TexU:0):texImage.width-1;
+	//0 <= TexU <= TexWidth-1
+	else
+		fprintf(stderr,"Wrong Texture Wrap mode in x-axis!!");
+
+	if (TexWrapModeT == GL_REPEAT)
+		TexV = fmod(TexV,texImage.height);
+	else if (TexWrapModeT == GL_CLAMP_TO_EDGE)
+		TexV = (TexV < texImage.height-1)?((TexV > 0)?TexV:0):texImage.height-1;
+	//0 <= TexV <= TexHeight-1
+	else
+		fprintf(stderr,"Wrong Texture Wrap mode %x in y-axis!!\n",TexWrapModeT);
+///*******************************************************
+
+	TexUC = (unsigned short)floor(TexU);// floor: Round down value
+	TexVC = (unsigned short)floor(TexV);
+
+	if(LoD>0) {
+		switch (TexMinFilterMode) {
+		case GL_NEAREST:    //u,v nearest filter
+			TexColor[0] = GetTexColor(TexUC, TexVC, 0);
+			color = TexColor[0];
+			break;
+		case GL_LINEAR:     //u,v bilinear filter
+			color = BilinearFilter(TexU, TexV, 0);
+			break;
+		case GL_NEAREST_MIPMAP_NEAREST: //u,v,w nearest filter
+			TexUC = TexUC >> LoD;
+			TexVC = TexVC >> LoD;
+
+			TexColor[0] = GetTexColor(TexUC, TexVC, LoD);
+
+			color = TexColor[0];
+			break;
+		case GL_LINEAR_MIPMAP_NEAREST:  //u,v bilinear, w nearest filter
+			color = BilinearFilter(TexU,TexV,LoD);
+			break;
+		case GL_NEAREST_MIPMAP_LINEAR:  //u,v nearest, w linear filter
+			TexUC = TexUC >> LoD;
+			TexVC = TexVC >> LoD;
+
+			TexColor[0] = GetTexColor(TexUC, TexVC, LoD);
+			TexColor[1] = GetTexColor(TexUC>>1, TexVC>>1, LoD+1);
+
+			color = TexColor[0]*(1-w_ratio) + TexColor[1]*w_ratio;
+			break;
+		case GL_LINEAR_MIPMAP_LINEAR:   //u,v,w trilinear filter
+			color = TrilinearFilter(TexU, TexV, LoD, w_ratio);
+			break;
+//		case GL_ANISOTROPIC:
+//			float r1,r2,r3,r4;
+//
+//			r1 = sqrt(pixBuffer[i].scaleFactorDuDx[0]*pixBuffer[i].scaleFactorDuDx[0]+pixBuffer[i].scaleFactorDvDx[0]*pixBuffer[i].scaleFactorDvDx[0]);
+//			r2 = sqrt(pixBuffer[i].scaleFactorDuDy[0]*pixBuffer[i].scaleFactorDuDy[0]+pixBuffer[i].scaleFactorDvDy[0]*pixBuffer[i].scaleFactorDvDy[0]);
+//
+//			r3 = max(r1,r2);
+//			r4 = min(r1,r2);
+//			if ((r3/r4) > 2.0f) {
+//				LoD = (LoD - 1)>0?LoD - 1:0;
+//
+//				color = TrilinearFilter(fabs(TexU-(pixBuffer[i].scaleFactorDuDx[0]+pixBuffer[i].scaleFactorDuDy[0])/2),
+//										fabs(TexV-(pixBuffer[i].scaleFactorDvDx[0]+pixBuffer[i].scaleFactorDvDy[0])/2),LoD,w_ratio);
+//				colorNextLevel = TrilinearFilter(fabs(TexU+(pixBuffer[i].scaleFactorDuDx[0]+pixBuffer[i].scaleFactorDuDy[0])/2),
+//												 fabs(TexV+(pixBuffer[i].scaleFactorDvDx[0]+pixBuffer[i].scaleFactorDvDy[0])/2),LoD,w_ratio);
+//
+//				color = color/2 + colorNextLevel/2;
+//			} else
+//				color = TrilinearFilter(TexU, TexV, LoD, w_ratio);
+//
+//			break;
+		default:
+			fprintf(stderr,"Texture filter mode is not supported!!");
+			break;
+		}
+	} else {
+		switch (TexMaxFilterMode) {
+		case GL_NEAREST:    //u,v nearest filter
+			TexColor[0] = GetTexColor(TexUC, TexVC ,0);
+			color = TexColor[0];
+			break;
+		case GL_LINEAR:     //u,v bilinear filter
+			color = BilinearFilter(TexU,TexV,0);
+			break;
+		case GL_NEAREST_MIPMAP_NEAREST: //u,v,w nearest filter
+			TexUC = TexUC >> LoD;
+			TexVC = TexVC >> LoD;
+
+			TexColor[0] = GetTexColor(TexUC, TexVC ,LoD);
+
+			color = TexColor[0];
+			break;
+		}
+	}
+
+	return color;
+
+#ifdef TEXDEBUG
+	fprintf(TEXDEBUGfp,"%3d  %3d  %6.2f  %6.2f",(int)pixBuffer[i].pos4[0],(int)pixBuffer[i].pos4[1],TexU,TexV);
+	fprintf(TEXDEBUGfp,"  %2x %2x %2x %2x",color.r,color.g,color.b,color.a);
+	fprintf(TEXDEBUGfp,"  %2d %3.2f\n",LoD, w_ratio);
+#endif
+}
+
+//Dirty Shader simulator which only performs texture replacement
+pixel Rasterizer::ShaderEXE(pixel pixelInput)
+{
+	fixColor4 texColor = TextureMapping(pixelInput.attr[texIndx].s, pixelInput.attr[texIndx].t, 0, texIndx, pixelInput);
+	pixelInput.attr[colIndx].r = texColor.r;
+	pixelInput.attr[colIndx].g = texColor.g;
+	pixelInput.attr[colIndx].b = texColor.b;
 }
 
 void Rasterizer::PerFragmentOp()
@@ -393,6 +625,7 @@ Rasterizer::Rasterizer()
 
 	posIndx = 0;
 	colIndx = 1;
+	texIndx = 4;
 
 #ifdef TEXDEBUG
 	TEXDEBUGfp = fopen("Result/TexDebug.txt","w");

@@ -65,8 +65,8 @@ struct vertex{
 struct pixel{
     //The position will always be in 1st attribute slot in whole rm design.
     floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
-    floatVec4   scaleFacDX[MAX_ATTRIBUTE_NUMBER-1];
-    floatVec4   scaleFacDY[MAX_ATTRIBUTE_NUMBER-1];
+    floatVec4   scaleFacDX[MAX_ATTRIBUTE_NUMBER];//scalefactor[0] is unused.
+    floatVec4   scaleFacDY[MAX_ATTRIBUTE_NUMBER];//scalefactor[0] is unused.
     float       baryCenPos3[3];
 };
 
@@ -81,6 +81,5 @@ template <class T> const T& min3 (const T& a, const T& b, const T& c) {
 template <class T> const T& max3 (const T& a, const T& b, const T& c) {
   return (b>a)?((c>b)?c:b):((c>a)?c:a);
 }
-
 
 #endif // GPU_TYPE_H_INCLUDED

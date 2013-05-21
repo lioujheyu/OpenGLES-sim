@@ -5,6 +5,8 @@ static Context *currentContext = NULL;
 Context::Context()
 {
     m_current = false;
+    activeTexture = 0;
+    textureTotalSeq = 0;
 
     for (int i=0;i<8;i++)
         vertexAttrib[i].enable = false;

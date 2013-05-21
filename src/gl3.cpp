@@ -32,7 +32,7 @@
 
 GL_APICALL void GL_APIENTRY glActiveTexture (GLenum texture)
 {
-
+	CONTEXT_EXEC(ActiveTexture(texture));
 }
 
 GL_APICALL void GL_APIENTRY glAttachShader (GLuint program, GLuint shader)
@@ -62,7 +62,7 @@ GL_APICALL void GL_APIENTRY glBindRenderbuffer (GLenum target, GLuint renderbuff
 
 GL_APICALL void GL_APIENTRY glBindTexture (GLenum target, GLuint texture)
 {
-
+	CONTEXT_EXEC(BindTexture(target, texture));
 }
 
 GL_APICALL void GL_APIENTRY glBlendColor (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)

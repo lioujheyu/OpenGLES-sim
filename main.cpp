@@ -23,6 +23,7 @@ int main()
 	glClearColor(1.0,0,0,1.0);
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
     //int v_coord_loc = glGetAttribLocation(shader.id(), "v_coord_in");
     int v_coord_loc = 0;
     int v_color_loc = 1;

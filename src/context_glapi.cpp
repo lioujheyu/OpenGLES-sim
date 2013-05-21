@@ -3,9 +3,29 @@
 
 /*****************************************
 
-    OpenGL ES 3.0 API Layer Implemention
+    OpenGL ES 2.0 API Layer Implemention
 
 *****************************************/
+
+void Context::ActiveTexture(GLenum texture)
+{
+    if (texture < GL_TEXTURE0) {
+        RecordError(GL_INVALID_ENUM);
+    }
+
+    activeTexture = texture - GL_TEXTURE0;
+}
+
+void Context::BindTexture(GLenum target, GLuint texture)
+{
+	if (target != GL_TEXTURE_2D)
+    {
+        RecordError(GL_INVALID_ENUM);
+        return;
+    }
+
+    textureContext[activeTexture].textureBindID = texture;
+}
 
 void Context::Clear(GLbitfield mask)
 {
@@ -82,6 +102,95 @@ void Context::EnableVertexAttribArray(GLuint index)
     }
 
     vertexAttrib[index].enable = GL_TRUE;
+}
+
+void Context::GenTextures(GLsizei n, GLuint* textures)
+{
+	if (n < 0) {
+        RecordError(GL_INVALID_VALUE);
+        return;
+    }
+
+    TextureState *texObj = new TextureState[n];
+
+    for(int i=0;i<n;i++) {
+        texDataVec.push_back(texObj[i]);
+        *textures = textureTotalSeq;
+        *textures++;
+        textureTotalSeq++;
+    }
+
+    delete []texObj;
+}
+
+void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels)
+{
+	if (target != GL_TEXTURE_2D) {
+        RecordError(GL_INVALID_ENUM);
+        return;
+    }
+
+    if (level < 0 || level > 12)
+    {
+        RecordError(GL_INVALID_ENUM);
+        return;
+    }
+
+    if (border != 0 || width < 0 || height < 0 )
+    {
+        RecordError(GL_INVALID_VALUE);
+        return;
+    }
+
+    GLint externalFormat = (GLint)format;
+
+    // @todo : check type between internalformat and externalformat
+    if (internalformat != externalFormat)
+    {
+        RecordError(GL_INVALID_OPERATION);
+        return;
+    }
+
+    // @todo : image data should be copied into buffer of mipmap arrays
+    TextureImage *temp = new TextureImage();
+    temp->border = border;
+    temp->internalFormat = internalformat;
+    temp->format = format;
+    temp->level = level;
+    temp->type = type;
+    temp->width = width;
+    temp->height = height;
+
+    int biSizeImage = 0;
+
+    switch (format)
+    {
+    case GL_RGB:                biSizeImage = width*height*3;   break;
+    case GL_RGBA:               biSizeImage = width*height*4;   break;
+    case GL_ALPHA:
+    case GL_LUMINANCE:          biSizeImage = width*height*1;   break;
+    case GL_LUMINANCE_ALPHA:    biSizeImage = width*height*2;   break;
+
+    default:                    biSizeImage = width*height*3;   break;
+    }
+
+    unsigned char * image = new unsigned char[biSizeImage];
+
+    for (int i=0; i<biSizeImage; i++)
+        image[i] = *((unsigned char *)pixels+i);
+
+    temp->data[0] = image;
+
+    //Create default texture object for texture2D if GenTexture() is not be called.
+    if(texDataVec.empty())
+    {
+        TextureState texObj;
+        texDataVec.push_back(texObj);
+        textureTotalSeq++;
+        textureContext[activeTexture].textureBindID = 0;
+    }
+
+    texDataVec[textureContext[activeTexture].textureBindID].texImage = temp;
 }
 
 void Context::VertexAttribPointer(GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr)
