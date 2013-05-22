@@ -72,6 +72,8 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		/*m
 		 * pixel stamp: 2 3
 		 *              0 1
+		 * We need to calculating 4 pixels in quad concurrently nomatter if
+		 * they are both falling into a triangle or not for scale factor calculation
 		 */
 		pixBufferP = 0;
 
@@ -358,7 +360,7 @@ fixColor4  Rasterizer::TrilinearFilter(float texU, float texV, int level, float 
 {
 	fixColor4 color[2];
 	color[0] = BilinearFilter(texU,texV,level);
-	color[1] = BilinearFilter(texU,texV,(level+1)<texImage.level?level+1:texImage.level);
+	color[1] = BilinearFilter(texU,texV,(level+1)<texImage.maxLevel?level+1:texImage.maxLevel);
 
 	color[0] = color[0]*(1-w_ratio) + color[1]*w_ratio;
 
@@ -395,29 +397,29 @@ fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int texPtr, int
 
 
 ///********* Texture Wrap mode ***************************
-	if (TexWrapModeS == GL_REPEAT)
+	if (wrapS == GL_REPEAT)
 		TexU = fmod(TexU,texImage.width);
 	//fmod: mod in floating point format, %(mod) can only be used under integer format
-	else if (TexWrapModeS == GL_CLAMP_TO_EDGE)
+	else if (wrapS == GL_CLAMP_TO_EDGE)
 		TexU = (TexU < texImage.width-1)?((TexU > 0)?TexU:0):texImage.width-1;
 	//0 <= TexU <= TexWidth-1
 	else
-		fprintf(stderr,"Wrong Texture Wrap mode in x-axis!!");
+		fprintf(stderr,"Wrong Texture Wrap mode in x-axis!!\n");
 
-	if (TexWrapModeT == GL_REPEAT)
+	if (wrapT == GL_REPEAT)
 		TexV = fmod(TexV,texImage.height);
-	else if (TexWrapModeT == GL_CLAMP_TO_EDGE)
+	else if (wrapT == GL_CLAMP_TO_EDGE)
 		TexV = (TexV < texImage.height-1)?((TexV > 0)?TexV:0):texImage.height-1;
 	//0 <= TexV <= TexHeight-1
 	else
-		fprintf(stderr,"Wrong Texture Wrap mode %x in y-axis!!\n",TexWrapModeT);
+		fprintf(stderr,"Wrong Texture Wrap mode  in y-axis!!\n");
 ///*******************************************************
 
 	TexUC = (unsigned short)floor(TexU);// floor: Round down value
 	TexVC = (unsigned short)floor(TexV);
 
 	if(LoD>0) {
-		switch (TexMinFilterMode) {
+		switch (minFilter) {
 		case GL_NEAREST:    //u,v nearest filter
 			TexColor[0] = GetTexColor(TexUC, TexVC, 0);
 			color = TexColor[0];
@@ -474,7 +476,7 @@ fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int texPtr, int
 			break;
 		}
 	} else {
-		switch (TexMaxFilterMode) {
+		switch (magFilter) {
 		case GL_NEAREST:    //u,v nearest filter
 			TexColor[0] = GetTexColor(TexUC, TexVC ,0);
 			color = TexColor[0];
@@ -517,11 +519,6 @@ void Rasterizer::PerFragmentOp()
 	bool AlphaTest = true;
 	bool DepthTest = true;
 	for (i = 0; i < pixBufferP; i++) {
-		///**********Fog**********************
-		if (FogEn) {
-
-		}
-
 		///**********Alpha Test*****************
 		if (AlphaTestMode == GL_NEVER)
 			AlphaTest = false;
@@ -613,15 +610,14 @@ Rasterizer::Rasterizer()
 	AlphaRef = 0;
 	DepthRef = 255;
 
-	TexMinFilterMode = GL_NEAREST;
-	TexMaxFilterMode = GL_NEAREST;
-	TexWrapModeS = GL_REPEAT;
-	TexWrapModeT = GL_REPEAT;
+	minFilter = GL_NEAREST;
+	magFilter = GL_NEAREST;
+	wrapS = GL_REPEAT;
+	wrapT = GL_REPEAT;
 	AlphaTestMode = GL_ALWAYS;
 	DepthTestMode = GL_LESS;
-	TexMappingEn = false;
+	texMappingEn = false;
 	AlphaBlendingEn = false;
-	FogEn = false;
 
 	posIndx = 0;
 	colIndx = 1;

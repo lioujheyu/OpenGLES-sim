@@ -27,7 +27,6 @@ void GPU_Core::Run()
     //Each vertex will be injected into Geometry's vtxInput here
     for (int vCnt=0;vCnt<vtxCount;vCnt++) {
 
-
         for (int attrCnt=0;attrCnt<8;attrCnt++) {
             if (attrEnable[attrCnt]) {
                 gm.attrEnable[attrCnt] = true;

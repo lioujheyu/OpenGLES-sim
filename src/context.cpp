@@ -48,7 +48,7 @@ Context* Context::GetCurrentContext()
 
 void Context::RecordError(GLenum error)
 {
-
+	printf("Bug pop out!!!\n");
 }
 
 

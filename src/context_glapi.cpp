@@ -1,6 +1,7 @@
 #include "context.h"
 #include "GPU/driver.h"
 
+
 /*****************************************
 
     OpenGL ES 2.0 API Layer Implemention
@@ -24,7 +25,7 @@ void Context::BindTexture(GLenum target, GLuint texture)
         return;
     }
 
-    textureContext[activeTexture].textureBindID = texture;
+    texContextBindID[activeTexture] = texture;
 }
 
 void Context::Clear(GLbitfield mask)
@@ -59,6 +60,31 @@ void Context::DepthRangef(GLfloat n, GLfloat f)
 {
     vp.n = (n<0)?0:(n>1)?1:n;
     vp.f = (f<0)?0:(f>1)?1:f;
+}
+
+void Context::DeleteTextures(GLsizei n, const GLuint *textures)
+{
+    // @todo : build a complete data structure of texture object
+    //        -> garbage collection mechanism
+    if (n < 0)
+    {
+        RecordError(GL_INVALID_VALUE);
+        return;
+    }
+
+    printf("DeleteTextures-> base:[%d] (VEC size:[%d])\n", *textures, texDataVec.size());
+
+    std::vector<textureState>::iterator startIterator;
+
+    for (int i=0; i<n; ++i)
+    {
+        startIterator = texDataVec.begin()+ textures[i];
+        texDataVec.erase(startIterator);
+    }
+    printf("DeleteTextures-> VEC size:[%d], capacity:[%d]\n", texDataVec.size(), texDataVec.capacity());
+//    delete[] texobj->teximage->data;
+//    delete   texobj->teximage;
+//    delete[] texobj;
 }
 
 void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
@@ -111,7 +137,7 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
         return;
     }
 
-    TextureState *texObj = new TextureState[n];
+    textureState *texObj = new textureState[n];
 
     for(int i=0;i<n;i++) {
         texDataVec.push_back(texObj[i]);
@@ -130,14 +156,12 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
         return;
     }
 
-    if (level < 0 || level > 12)
-    {
+    if (level < 0 || level > 12) {
         RecordError(GL_INVALID_ENUM);
         return;
     }
 
-    if (border != 0 || width < 0 || height < 0 )
-    {
+    if (border != 0 || width < 64 || height < 64 ) {
         RecordError(GL_INVALID_VALUE);
         return;
     }
@@ -145,52 +169,207 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
     GLint externalFormat = (GLint)format;
 
     // @todo : check type between internalformat and externalformat
-    if (internalformat != externalFormat)
-    {
+    if (internalformat != externalFormat) {
         RecordError(GL_INVALID_OPERATION);
         return;
     }
 
-    // @todo : image data should be copied into buffer of mipmap arrays
-    TextureImage *temp = new TextureImage();
-    temp->border = border;
-    temp->internalFormat = internalformat;
-    temp->format = format;
-    temp->level = level;
-    temp->type = type;
-    temp->width = width;
-    temp->height = height;
+    int biSizeImage = width*height;
+    unsigned char * image = new unsigned char[biSizeImage*4];
 
-    int biSizeImage = 0;
+// @note (elvis#1#): Unsure format conversion is performed in API implementation or not
+	for (int i=0; i<biSizeImage;i++){
+		switch (format) {
+		case GL_ALPHA:
+			switch (type){
+			case GL_UNSIGNED_BYTE:
+				image[i*4] = image[i*4+1] = image[i*4+2] = image[i*4+3] = *((unsigned char *)pixels+i);
+				break;
 
-    switch (format)
-    {
-    case GL_RGB:                biSizeImage = width*height*3;   break;
-    case GL_RGBA:               biSizeImage = width*height*4;   break;
-    case GL_ALPHA:
-    case GL_LUMINANCE:          biSizeImage = width*height*1;   break;
-    case GL_LUMINANCE_ALPHA:    biSizeImage = width*height*2;   break;
+			default:
+				RecordError(GL_INVALID_OPERATION);
+				return;
+			}
+			break;
 
-    default:                    biSizeImage = width*height*3;   break;
+		case GL_RGB:
+			switch (type){
+			case GL_UNSIGNED_BYTE:
+				image[i*4]   = *((unsigned char *)pixels+i*3);
+				image[i*4+1] = *((unsigned char *)pixels+i*3+1);
+				image[i*4+2] = *((unsigned char *)pixels+i*3+2);
+				image[i*4+3] = 255;
+				break;
+
+			default:
+				RecordError(GL_INVALID_OPERATION);
+				return;
+			}
+			break;
+
+		case GL_RGBA:
+			switch (type){
+			case GL_UNSIGNED_BYTE:
+				image[i*4]   = *((unsigned char *)pixels+i*4);
+				image[i*4+1] = *((unsigned char *)pixels+i*4+1);
+				image[i*4+2] = *((unsigned char *)pixels+i*4+2);
+				image[i*4+3] = *((unsigned char *)pixels+i*4+3);
+				break;
+
+			default:
+				RecordError(GL_INVALID_OPERATION);
+				return;
+			}
+			break;
+
+		case GL_LUMINANCE:
+			switch (type){
+			case GL_UNSIGNED_BYTE:
+				image[i*4] = image[i*4+1] = image[i*4+2] = *((unsigned char *)pixels+i);
+				image[i*4+3] = 255;
+				break;
+
+			default:
+				RecordError(GL_INVALID_OPERATION);
+				return;
+			}
+			break;
+
+		case GL_LUMINANCE_ALPHA:
+			switch (type){
+			case GL_UNSIGNED_BYTE:
+				image[i*4] = image[i*4+1] = image[i*4+2] = *((unsigned char *)pixels+i*2);
+				image[i*4+3] = *((unsigned char *)pixels+i*2+1);
+				break;
+
+			default:
+				RecordError(GL_INVALID_OPERATION);
+				return;
+			}
+			break;
+
+		default:
+			RecordError(GL_INVALID_ENUM);
+			return;
+		}
     }
-
-    unsigned char * image = new unsigned char[biSizeImage];
-
-    for (int i=0; i<biSizeImage; i++)
-        image[i] = *((unsigned char *)pixels+i);
-
-    temp->data[0] = image;
 
     //Create default texture object for texture2D if GenTexture() is not be called.
     if(texDataVec.empty())
     {
-        TextureState texObj;
+        textureState texObj;
         texDataVec.push_back(texObj);
         textureTotalSeq++;
-        textureContext[activeTexture].textureBindID = 0;
+        texContextBindID[activeTexture] = 0;
     }
 
-    texDataVec[textureContext[activeTexture].textureBindID].texImage = temp;
+	// @todo : image data should be copied into buffer of mipmap arrays
+	textureImage *temp;
+    if (texDataVec[texContextBindID[activeTexture]].texImage == NULL)
+		temp = new textureImage();
+	else
+		temp = texDataVec[texContextBindID[activeTexture]].texImage;
+
+    temp->border = border;
+//    temp->internalFormat = internalformat;
+//    temp->format = format;
+//    temp->level = level;
+//    temp->type = type;
+    temp->width = width;
+    temp->height = height;
+
+    temp->data[level] = image;
+
+    texDataVec[texContextBindID[activeTexture]].texImage = temp;
+
+}
+
+void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
+{
+	if (target != GL_TEXTURE_2D) {
+        RecordError(GL_INVALID_ENUM);
+        return;
+    }
+
+    switch (pname)
+    {
+    case GL_TEXTURE_MIN_FILTER:
+        /*****************************************************
+            GL_NEAREST or GL_LINEAR mode : Not apply mipmap
+
+            GL_NEAREST_MIPMAP_NEAREST
+            GL_NEAREST_MIPMAP_LINEAR     apply mipmap
+            GL_LINEAR_MIPMAP_NEAREST
+            GL_LINEAR_MIPMAP_LINEAR
+        /****************************************************/
+        switch (param){
+        case GL_NEAREST:
+		case GL_LINEAR:
+		case GL_NEAREST_MIPMAP_NEAREST:
+		case GL_NEAREST_MIPMAP_LINEAR:
+		case GL_LINEAR_MIPMAP_NEAREST:
+		case GL_LINEAR_MIPMAP_LINEAR:
+			texDataVec[texContextBindID[activeTexture]].minFilter = param;
+			break;
+		default:
+			RecordError(GL_INVALID_OPERATION);
+			return;
+        }
+
+        break;
+
+    case GL_TEXTURE_MAG_FILTER:
+        /*****************************************************
+            support GL_NEAREST or GL_LINEAR mode
+        /****************************************************/
+        switch (param){
+        case GL_NEAREST:
+		case GL_LINEAR:
+			texDataVec[texContextBindID[activeTexture]].magFilter = param;
+			break;
+		default:
+			RecordError(GL_INVALID_OPERATION);
+			return;
+        }
+
+        break;
+
+    case GL_TEXTURE_WRAP_S:
+        texDataVec[texContextBindID[activeTexture]].wrapS = param;
+        break;
+
+    case GL_TEXTURE_WRAP_T:
+        texDataVec[texContextBindID[activeTexture]].wrapT = param;
+        break;
+
+/********  OpenGL ES 3.0 ***********/
+	case GL_TEXTURE_BASE_LEVEL:
+		texDataVec[texContextBindID[activeTexture]].baseLevel = param;
+		break;
+
+	case GL_TEXTURE_MAX_LEVEL:
+		texDataVec[texContextBindID[activeTexture]].maxLevel = param;
+		break;
+
+	case GL_TEXTURE_MIN_LOD:
+		break;
+
+	case GL_TEXTURE_MAX_LOD:
+		break;
+
+	case GL_TEXTURE_SWIZZLE_R:
+	case GL_TEXTURE_SWIZZLE_G:
+	case GL_TEXTURE_SWIZZLE_B:
+	case GL_TEXTURE_SWIZZLE_A:
+		break;
+
+	case GL_TEXTURE_WRAP_R:
+		break;
+
+    default:
+        RecordError(GL_INVALID_ENUM);
+        break;
+    }
 }
 
 void Context::VertexAttribPointer(GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr)

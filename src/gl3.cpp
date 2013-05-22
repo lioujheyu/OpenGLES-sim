@@ -197,7 +197,7 @@ GL_APICALL void GL_APIENTRY glDeleteShader (GLuint shader)
 
 GL_APICALL void GL_APIENTRY glDeleteTextures (GLsizei n, const GLuint* textures)
 {
-
+	CONTEXT_EXEC(DeleteTextures(n,textures));
 }
 
 GL_APICALL void GL_APIENTRY glDepthFunc (GLenum func)
@@ -557,7 +557,7 @@ GL_APICALL void GL_APIENTRY glStencilOpSeparate (GLenum face, GLenum fail, GLenu
 
 GL_APICALL void GL_APIENTRY glTexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels)
 {
-
+	CONTEXT_EXEC(TexImage2D(target, level, internalformat, width, height, border, format, type, pixels));
 }
 
 GL_APICALL void GL_APIENTRY glTexParameterf (GLenum target, GLenum pname, GLfloat param)
@@ -572,7 +572,7 @@ GL_APICALL void GL_APIENTRY glTexParameterfv (GLenum target, GLenum pname, const
 
 GL_APICALL void GL_APIENTRY glTexParameteri (GLenum target, GLenum pname, GLint param)
 {
-
+	CONTEXT_EXEC(TexParameteri(target, pname, param));
 }
 
 GL_APICALL void GL_APIENTRY glTexParameteriv (GLenum target, GLenum pname, const GLint* params)

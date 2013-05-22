@@ -10,6 +10,7 @@
 
 #include "geometry.h"
 #include "rasterizer.h"
+#include "gpu_config.h"
 
 #endif // GPU_CORE_H_INCLUDED
 

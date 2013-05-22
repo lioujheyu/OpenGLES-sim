@@ -12,12 +12,12 @@ void ActiveGPU()
         }
     }
 
-    gpu.gm.drawMode = ctx->drawCmd.mode;
     gpu.vtxCount = ctx->drawCmd.count;
     gpu.vtxFirst = ctx->drawCmd.first;
 	gpu.clearStat = ctx->clearStat;
 	gpu.clearMask = ctx->clearMask;
 
+	gpu.gm.drawMode = ctx->drawCmd.mode;
 	gpu.gm.viewPortLX = ctx->vp.x;
     gpu.gm.viewPortLY = ctx->vp.y;
     gpu.rm.viewPortW = gpu.gm.viewPortW = ctx->vp.w;
@@ -29,6 +29,16 @@ void ActiveGPU()
     gpu.rm.dBufPtr = (float*)ctx->drawBuffer[1];
     gpu.rm.clearColor = ctx->clearColor;
     gpu.rm.clearDepth = ctx->clearDepth;
+
+    //Statement of Texture 0
+    gpu.rm.minFilter = ctx->texDataVec[ctx->texContextBindID[0]].minFilter;
+    gpu.rm.magFilter = ctx->texDataVec[ctx->texContextBindID[0]].magFilter;
+    gpu.rm.texImage.width = ctx->texDataVec[ctx->texContextBindID[0]].texImage->width;
+    gpu.rm.texImage.height = ctx->texDataVec[ctx->texContextBindID[0]].texImage->height;
+    gpu.rm.texImage.maxLevel = ctx->texDataVec[ctx->texContextBindID[0]].texImage->maxLevel;
+    gpu.rm.texImage.border = ctx->texDataVec[ctx->texContextBindID[0]].texImage->border;
+    for (int i=0;i<12;i++)
+		gpu.rm.texImage.data[i] = ctx->texDataVec[ctx->texContextBindID[0]].texImage->data[i];
 
     gpu.Run();
 }

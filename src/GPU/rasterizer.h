@@ -6,22 +6,22 @@
 #include <cmath>
 #include <algorithm>
 #include <GLES3/gl3.h>
-#include "gpu_type.h"
+#include "gpu_config.h"
 
-struct textureRM
-{
-    unsigned char  *data[12]; //max: 4096, so there are 12 levels at most.
-    int             height;
-    int             width;
-
-    bool            mipmap;
-    int             level;
-
-    textureRM() {
-        data[0] = NULL;
-        level = 0;
-    }
-};
+//struct textureRM
+//{
+//    unsigned char  *data[12]; //max: 4096, so there are 12 levels at most.
+//    int             height;
+//    int             width;
+//
+//    bool            mipmap;
+//    int             level;
+//
+//    textureRM() {
+//        data[0] = NULL;
+//        level = 0;
+//    }
+//};
 
 class Rasterizer
 {
@@ -45,9 +45,9 @@ public:
     int             texIndx;
 
     int             viewPortW, viewPortH;
-    bool            TexMappingEn,AlphaBlendingEn,FogEn;
-    int             TexMinFilterMode, TexMaxFilterMode;  //Texture filtering mode
-    int             TexWrapModeS,TexWrapModeT;
+    bool            texMappingEn,AlphaBlendingEn;
+    int             minFilter, magFilter;  //Texture filtering mode
+    int             wrapS,wrapT;
     int             AlphaTestMode,DepthTestMode;
     int             AlphaBlendingMode;
     float           AlphaRef,DepthRef;
@@ -81,7 +81,7 @@ public:
         int             TexCacheColdMiss;
     } TexCache;
 
-    textureRM texImage;
+    textureImage texImage;
 };
 
 extern Rasterizer rm;

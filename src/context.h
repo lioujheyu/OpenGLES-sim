@@ -5,7 +5,7 @@
 #include <vector>
 #include <GLES3/gl3.h>
 
-#include "GPU/gpu_type.h"
+#include "type.h"
 
 struct attribute
 {
@@ -25,7 +25,7 @@ struct drawCommand
     const GLvoid  * indices;
 };
 
-struct ViewPort
+struct viewPort
 {
     GLint       x,y;
     GLint       w,h;
@@ -33,40 +33,26 @@ struct ViewPort
     GLfloat     n;
     GLfloat     f;
 
-    inline ViewPort() {
-        w = 640;
-        h = 480;
+    inline viewPort() {
+        w = 1024;
+        h = 1024;
         x = 0;
         y = 0;
-        n = 0.f;
+        n = 0.0f;
         f = 1.0f;
     }
 };
 
-struct TextureImage
+struct textureState
 {
-    GLuint      width;
-    GLuint      height;
-    GLint       internalFormat;
-    GLuint      level;
-    GLuint      border;
-    GLenum      format;
-    GLenum      type;
-
-    GLvoid     *data[12];
-};
-
-struct TextureState
-{
-    inline TextureState() {
+    inline textureState() {
         enable = GL_FALSE;
         minFilter = GL_NEAREST_MIPMAP_LINEAR;
         magFilter = GL_LINEAR;
         wrapS = GL_REPEAT;
         wrapT = GL_REPEAT;
-
-        autoGenMipmap = GL_FALSE;
-        textureBindID = 0;
+        baseLevel = 0;
+        maxLevel = 12;
     }
 
     GLboolean   	enable;
@@ -74,12 +60,26 @@ struct TextureState
     GLenum      	magFilter;
     GLenum      	wrapS;
     GLenum      	wrapT;
-
-    GLboolean   	autoGenMipmap;
-    TextureImage   *texImage;
-
+    GLubyte			baseLevel;
+    GLubyte			maxLevel;
+    textureImage   *texImage;
     GLuint      	texArrayNum;
-    GLuint      	textureBindID;
+
+    inline textureState& operator=(const textureState &rhs)
+    {
+    	if (this == &rhs)
+            return *this;
+        enable = rhs.enable;
+        minFilter = rhs.minFilter;
+        magFilter = rhs.magFilter;
+        wrapS = rhs.wrapS;
+        wrapT = rhs.wrapT;
+        baseLevel = rhs.baseLevel;
+        maxLevel = rhs.maxLevel;
+        texImage = rhs.texImage;
+        texArrayNum = rhs.texArrayNum;
+        return *this;
+    }
 };
 
 class Context
@@ -101,38 +101,37 @@ public:
     void Clear (GLbitfield mask);
     void ClearColor (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
     void ClearDepthf (GLfloat depth);
+    void DeleteTextures (GLsizei n, const GLuint* textures);
     void DepthRangef (GLfloat n, GLfloat f);
     void DrawArrays (GLenum mode, GLint first, GLsizei count);
     void EnableVertexAttribArray (GLuint index);
     void GenTextures (GLsizei n, GLuint* textures);
     void TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
+    void TexParameteri(GLenum target, GLenum pname, GLint param);
     void VertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
     void Viewport (GLint x, GLint y, GLsizei width, GLsizei height);
 
 
-
-
-// @fixme (elvis#1#): dirty buffer setting before buffer management is ready
+/// @fixme (elvis#1#): dirty buffer setting before buffer management is ready
     void           *drawBuffer[2]; //0 - color buffer, 1 - depth buffer
 
-    ViewPort        vp;
+    viewPort        vp;
     floatVec4		clearColor;
     float			clearDepth;
     bool			clearStat;
     unsigned int 	clearMask;
     GLuint 			textureTotalSeq;
 
-    TextureState	textureContext[2];
+    GLuint			texContextBindID[2];
     attribute       vertexAttrib[8];
     drawCommand     drawCmd;
 
-    std::vector<TextureState> texDataVec;
+    std::vector<textureState> texDataVec;
 
 private:
 	bool            m_current;
 	GLubyte			activeTexture;
 };
-
 
 #endif // CONTEXT_H_INCLUDED
 

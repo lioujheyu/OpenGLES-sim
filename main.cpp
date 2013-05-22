@@ -1,11 +1,42 @@
 #include <stdio.h>
 #include <GLES3/gl3.h>
 #include "src/context.h"
+#include "bitmap.h"
+
+bool LoadTexture(char *filename)
+{
+	unsigned char *bitmap;
+	_BITMAPINFO *info;
+	unsigned int texture[2];
+
+    bitmap = LoadDIBitmap(filename, &info);
+
+    if (!bitmap)
+        return false;
+
+    glGenTextures(1, texture);
+
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, info->bmiHeader.biWidth,
+                 info->bmiHeader.biHeight, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                 bitmap);
+
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    free(bitmap);
+    free(info);
+
+    return true;
+}
 
 int main()
 {
     //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.
     Context::SetCurrentContext(new Context());
+
+    LoadTexture("data/road.bmp");
 
     GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f,
                              1.0f, -1.0f, 0.0f,
@@ -38,3 +69,5 @@ int main()
 
     return 0;
 }
+
+
