@@ -95,6 +95,12 @@ struct textureImage
 
     GLubyte     *data[12];
 
+//	~textureImage()
+//	{
+//		for (int i=0;i<12;i++){
+//			delete [] data[i];
+//	}
+
     inline textureImage& operator=(const textureImage &rhs)
     {
     	if (this == &rhs)

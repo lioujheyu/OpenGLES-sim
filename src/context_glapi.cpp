@@ -25,7 +25,7 @@ void Context::BindTexture(GLenum target, GLuint texture)
         return;
     }
 
-    texContextBindID[activeTexture] = texture;
+	texContext[activeTexture].texBindID = texture;
 }
 
 void Context::Clear(GLbitfield mask)
@@ -74,11 +74,11 @@ void Context::DeleteTextures(GLsizei n, const GLuint *textures)
 
     printf("DeleteTextures-> base:[%d] (VEC size:[%d])\n", *textures, texDataVec.size());
 
-    std::vector<textureState>::iterator startIterator;
+    std::vector<textureImage>::iterator startIterator;
 
     for (int i=0; i<n; ++i)
     {
-        startIterator = texDataVec.begin()+ textures[i];
+        startIterator = texDataVec.begin() + textures[i];
         texDataVec.erase(startIterator);
     }
     printf("DeleteTextures-> VEC size:[%d], capacity:[%d]\n", texDataVec.size(), texDataVec.capacity());
@@ -137,7 +137,7 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
         return;
     }
 
-    textureState *texObj = new textureState[n];
+    textureImage *texObj = new textureImage[n];
 
     for(int i=0;i<n;i++) {
         texDataVec.push_back(texObj[i]);
@@ -257,31 +257,26 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
     //Create default texture object for texture2D if GenTexture() is not be called.
     if(texDataVec.empty())
     {
-        textureState texObj;
+        textureImage texObj;
         texDataVec.push_back(texObj);
         textureTotalSeq++;
-        texContextBindID[activeTexture] = 0;
+		texContext[activeTexture].texBindID = 0;
     }
 
 	// @todo : image data should be copied into buffer of mipmap arrays
-	textureImage *temp;
-    if (texDataVec[texContextBindID[activeTexture]].texImage == NULL)
-		temp = new textureImage();
-	else
-		temp = texDataVec[texContextBindID[activeTexture]].texImage;
+	textureImage temp;
 
-    temp->border = border;
+    temp.border = border;
 //    temp->internalFormat = internalformat;
 //    temp->format = format;
 //    temp->level = level;
 //    temp->type = type;
-    temp->width = width;
-    temp->height = height;
+    temp.width = width;
+    temp.height = height;
 
-    temp->data[level] = image;
+    temp.data[level] = image;
 
-    texDataVec[texContextBindID[activeTexture]].texImage = temp;
-
+	texDataVec[texContext[activeTexture].texBindID] = temp;
 }
 
 void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
@@ -301,7 +296,7 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
             GL_NEAREST_MIPMAP_LINEAR     apply mipmap
             GL_LINEAR_MIPMAP_NEAREST
             GL_LINEAR_MIPMAP_LINEAR
-        /****************************************************/
+        *****************************************************/
         switch (param){
         case GL_NEAREST:
 		case GL_LINEAR:
@@ -309,7 +304,7 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
 		case GL_NEAREST_MIPMAP_LINEAR:
 		case GL_LINEAR_MIPMAP_NEAREST:
 		case GL_LINEAR_MIPMAP_LINEAR:
-			texDataVec[texContextBindID[activeTexture]].minFilter = param;
+			texContext[activeTexture].minFilter = param;
 			break;
 		default:
 			RecordError(GL_INVALID_OPERATION);
@@ -321,11 +316,11 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
     case GL_TEXTURE_MAG_FILTER:
         /*****************************************************
             support GL_NEAREST or GL_LINEAR mode
-        /****************************************************/
+        *****************************************************/
         switch (param){
         case GL_NEAREST:
 		case GL_LINEAR:
-			texDataVec[texContextBindID[activeTexture]].magFilter = param;
+			texContext[activeTexture].magFilter = param;
 			break;
 		default:
 			RecordError(GL_INVALID_OPERATION);
@@ -335,20 +330,20 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
         break;
 
     case GL_TEXTURE_WRAP_S:
-        texDataVec[texContextBindID[activeTexture]].wrapS = param;
+        texContext[activeTexture].wrapS = param;
         break;
 
     case GL_TEXTURE_WRAP_T:
-        texDataVec[texContextBindID[activeTexture]].wrapT = param;
+        texContext[activeTexture].wrapT = param;
         break;
 
 /********  OpenGL ES 3.0 ***********/
 	case GL_TEXTURE_BASE_LEVEL:
-		texDataVec[texContextBindID[activeTexture]].baseLevel = param;
+		texContext[activeTexture].baseLevel = param;
 		break;
 
 	case GL_TEXTURE_MAX_LEVEL:
-		texDataVec[texContextBindID[activeTexture]].maxLevel = param;
+		texContext[activeTexture].maxLevel = param;
 		break;
 
 	case GL_TEXTURE_MIN_LOD:

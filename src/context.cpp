@@ -87,10 +87,10 @@ void Context::DumpImage()
 
 	for (y=0; y<vp.h; y++){
 		for (x=0; x<vp.w; x++) {
-//			putc(*(unsigned char*)(drawBuffer[0] + y*vp.w*4 + x*4 + 3), CLRfp);// A
-			putc(*(unsigned char*)(drawBuffer[0] + y*vp.w*4 + x*4 + 2), CLRfp);// B
-			putc(*(unsigned char*)(drawBuffer[0] + y*vp.w*4 + x*4 + 1), CLRfp);// G
-			putc(*(unsigned char*)(drawBuffer[0] + y*vp.w*4 + x*4 + 0), CLRfp);// R
+//			putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 3), CLRfp);// A
+			putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 2), CLRfp);// B
+			putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 1), CLRfp);// G
+			putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 0), CLRfp);// R
 		}
 	}
 

@@ -49,7 +49,7 @@ void Rasterizer::PixelGenerateHiber()
 
 void Rasterizer::pixelSplit(int x, int y, int level)
 {
-	int lcX, lcY, lc;
+	int lc;
 	float centralTest[3];
 	float cornerTest[8][3];
 	bool Zone[4][3];

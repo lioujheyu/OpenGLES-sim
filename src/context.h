@@ -62,7 +62,8 @@ struct textureState
     GLenum      	wrapT;
     GLubyte			baseLevel;
     GLubyte			maxLevel;
-    textureImage   *texImage;
+    GLuint			texBindID;
+
     GLuint      	texArrayNum;
 
     inline textureState& operator=(const textureState &rhs)
@@ -76,8 +77,8 @@ struct textureState
         wrapT = rhs.wrapT;
         baseLevel = rhs.baseLevel;
         maxLevel = rhs.maxLevel;
-        texImage = rhs.texImage;
         texArrayNum = rhs.texArrayNum;
+		texBindID = rhs.texBindID;
         return *this;
     }
 };
@@ -122,11 +123,11 @@ public:
     unsigned int 	clearMask;
     GLuint 			textureTotalSeq;
 
-    GLuint			texContextBindID[2];
+	textureState	texContext[2];
     attribute       vertexAttrib[8];
     drawCommand     drawCmd;
 
-    std::vector<textureState> texDataVec;
+    std::vector<textureImage> texDataVec;
 
 private:
 	bool            m_current;

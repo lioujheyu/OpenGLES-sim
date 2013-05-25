@@ -31,14 +31,9 @@ void ActiveGPU()
     gpu.rm.clearDepth = ctx->clearDepth;
 
     //Statement of Texture 0
-    gpu.rm.minFilter = ctx->texDataVec[ctx->texContextBindID[0]].minFilter;
-    gpu.rm.magFilter = ctx->texDataVec[ctx->texContextBindID[0]].magFilter;
-    gpu.rm.texImage.width = ctx->texDataVec[ctx->texContextBindID[0]].texImage->width;
-    gpu.rm.texImage.height = ctx->texDataVec[ctx->texContextBindID[0]].texImage->height;
-    gpu.rm.texImage.maxLevel = ctx->texDataVec[ctx->texContextBindID[0]].texImage->maxLevel;
-    gpu.rm.texImage.border = ctx->texDataVec[ctx->texContextBindID[0]].texImage->border;
-    for (int i=0;i<12;i++)
-		gpu.rm.texImage.data[i] = ctx->texDataVec[ctx->texContextBindID[0]].texImage->data[i];
+    gpu.rm.minFilter = ctx->texContext[0].minFilter;
+    gpu.rm.magFilter = ctx->texContext[0].magFilter;
+	gpu.rm.texImage = ctx->texDataVec[ctx->texContext[0].texBindID];
 
     gpu.Run();
 }
