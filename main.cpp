@@ -36,7 +36,11 @@ int main()
     //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.
     Context::SetCurrentContext(new Context());
 
+    glActiveTexture(GL_TEXTURE0);
     LoadTexture("data/road.bmp");
+
+    glActiveTexture(GL_TEXTURE1);
+    LoadTexture("data/chessboard.bmp");
 
     GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f,
                              1.0f, -1.0f, 0.0f,
@@ -57,7 +61,6 @@ int main()
                          };
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_TEXTURE_2D);
 
     glViewport(0,0,1024,512);
 	glClearColor(1.0,0,0,1.0);

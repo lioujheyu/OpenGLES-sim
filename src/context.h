@@ -127,7 +127,6 @@ public:
 
     GLboolean       blendEnable;
     GLboolean       depthTestEnable;
-    GLboolean       textureEnable;
 
 	textureState	texContext[2];
     attribute       vertexAttrib[8];

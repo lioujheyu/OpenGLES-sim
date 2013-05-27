@@ -90,9 +90,6 @@ void Context::DeleteTextures(GLsizei n, const GLuint *textures)
 void Context::Disable (GLenum cap)
 {
     switch (cap) {
-    case GL_TEXTURE_2D:
-        textureEnable = false;
-        break;
     case GL_BLEND:
         blendEnable = false;
         break;
@@ -158,9 +155,6 @@ void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
 void Context::Enable(GLenum cap)
 {
     switch (cap) {
-    case GL_TEXTURE_2D:
-        textureEnable = true;
-        break;
     case GL_BLEND:
         blendEnable = true;
         break;

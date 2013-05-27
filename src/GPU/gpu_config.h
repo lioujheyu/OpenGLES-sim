@@ -25,15 +25,17 @@ struct vertex{
     {
     	if (this == &rhs)
             return *this;
+
         for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++)
 			attr[i] = rhs.attr[i];
+
         return *this;
     }
 };
 
 struct pixel
 {
-    //The position will always be in 1st attribute slot in whole rm design.
+    ///The position will always be in 1st attribute slot in whole rm design.
     floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
     floatVec4   scaleFacDX[MAX_ATTRIBUTE_NUMBER];//scalefactor[0] is unused.
     floatVec4   scaleFacDY[MAX_ATTRIBUTE_NUMBER];//scalefactor[0] is unused.

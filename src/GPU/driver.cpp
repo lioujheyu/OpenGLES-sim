@@ -27,16 +27,20 @@ void ActiveGPU()
 
     gpu.rm.blendEnable = ctx->blendEnable;
     gpu.rm.depthTestEnable = ctx->depthTestEnable;
-    gpu.rm.textureEnable = ctx->textureEnable;
     gpu.rm.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
     gpu.rm.dBufPtr = (float*)ctx->drawBuffer[1];
     gpu.rm.clearColor = ctx->clearColor;
     gpu.rm.clearDepth = ctx->clearDepth;
 
     //Statement of Texture 0
-    gpu.rm.minFilter = ctx->texContext[0].minFilter;
-    gpu.rm.magFilter = ctx->texContext[0].magFilter;
-	gpu.rm.texImage = ctx->texDataVec[ctx->texContext[0].texBindID];
+    gpu.rm.minFilter[0] = ctx->texContext[0].minFilter;
+    gpu.rm.magFilter[0] = ctx->texContext[0].magFilter;
+	gpu.rm.texImage[0] = ctx->texDataVec[ctx->texContext[0].texBindID];
+
+    //Statement of Texture 0
+	gpu.rm.minFilter[1] = ctx->texContext[1].minFilter;
+    gpu.rm.magFilter[1] = ctx->texContext[1].magFilter;
+	gpu.rm.texImage[1] = ctx->texDataVec[ctx->texContext[1].texBindID];
 
     gpu.Run();
 }

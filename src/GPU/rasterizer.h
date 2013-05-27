@@ -45,28 +45,30 @@ public:
     int             texIndx;
 
     int             viewPortW, viewPortH;
-    bool            textureEnable, blendEnable, depthTestEnable;
-    int             minFilter, magFilter;  //Texture filtering mode
-    int             wrapS,wrapT;
+    bool            blendEnable, depthTestEnable;
+    int             minFilter[2], magFilter[2];  //Texture filtering mode
+    int             wrapS[2],wrapT[2];
     int             AlphaTestMode,DepthTestMode;
     int             AlphaBlendingMode;
     float           AlphaRef,DepthRef;
     floatVec4		clearColor;
     float			clearDepth;
-    int             FogColor[4];
 
     void            TriangleSetup();
     void            PixelGenerate();
     void            PixelGenerateHiber();
     void            pixelSplit(int x, int y, int level);
-    int             CalcTexAdd(short int us,short int ub,short int uo,short int vs,short int vb,short int vo,int level);
-    fixColor4       GetTexColor(const unsigned short u, const unsigned short v, const unsigned int level);
-    fixColor4       TextureMapping(float TexUin, float TexVin, int texPtr, int attrIndx, pixel pixelInput);
     pixel           ShaderEXE(pixel pixelInput);
+    int             CalcTexAdd( short int us, short int ub, short int uo,
+                                short int vs, short int vb, short int vo,
+                                int width, int level);
+
+    fixColor4       GetTexColor(const unsigned short u, const unsigned short v, const unsigned int level, unsigned char id);
+    fixColor4       TextureMapping(float TexUin, float TexVin, int attrIndx, pixel pixelInput, unsigned char id);
+    fixColor4   	BilinearFilter(float texU,float texV,int level, unsigned char id);
+    fixColor4   	TrilinearFilter(float texU,float texV,int level, float w_ratio, unsigned char id);
     void            PerFragmentOp();
     void 			ClearBuffer(unsigned int mask);
-    fixColor4   	BilinearFilter(float texU,float texV,int level);
-    fixColor4   	TrilinearFilter(float texU,float texV,int level, float w_ratio);
 
     //FILE *TEXfp;
     FILE *TEXDEBUGfp;
@@ -81,7 +83,7 @@ public:
         int             TexCacheColdMiss;
     } TexCache;
 
-    textureImage texImage;
+    textureImage texImage[2];
 };
 
 extern Rasterizer rm;
