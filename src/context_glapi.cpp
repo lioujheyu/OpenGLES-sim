@@ -87,6 +87,41 @@ void Context::DeleteTextures(GLsizei n, const GLuint *textures)
 //    delete[] texobj;
 }
 
+void Context::Disable (GLenum cap)
+{
+    switch (cap) {
+    case GL_TEXTURE_2D:
+        textureEnable = false;
+        break;
+    case GL_BLEND:
+        blendEnable = false;
+        break;
+    case GL_CULL_FACE:
+        break;
+    case GL_DEPTH_TEST:
+        depthTestEnable = false;
+        break;
+    case GL_DITHER:
+        break;
+    case GL_POLYGON_OFFSET_FILL:
+        break;
+    case GL_SAMPLE_ALPHA_TO_COVERAGE:
+        break;
+    case GL_SCISSOR_TEST:
+        break;
+    case GL_STENCIL_TEST:
+        break;
+        ///OpenGL ES 3.0
+    case GL_PRIMITIVE_RESTART_FIXED_INDEX:
+        break;
+    case GL_RASTERIZER_DISCARD:
+        break;
+    default:
+        RecordError(GL_INVALID_VALUE);
+        return;
+    }
+}
+
 void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
 {
     if (first < 0)
@@ -118,6 +153,41 @@ void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
 
     ActiveGPU();
     DumpImage();
+}
+
+void Context::Enable(GLenum cap)
+{
+    switch (cap) {
+    case GL_TEXTURE_2D:
+        textureEnable = true;
+        break;
+    case GL_BLEND:
+        blendEnable = true;
+        break;
+    case GL_CULL_FACE:
+        break;
+    case GL_DEPTH_TEST:
+        depthTestEnable = true;
+        break;
+    case GL_DITHER:
+        break;
+    case GL_POLYGON_OFFSET_FILL:
+        break;
+    case GL_SAMPLE_ALPHA_TO_COVERAGE:
+        break;
+    case GL_SCISSOR_TEST:
+        break;
+    case GL_STENCIL_TEST:
+        break;
+        ///OpenGL ES 3.0
+    case GL_PRIMITIVE_RESTART_FIXED_INDEX:
+        break;
+    case GL_RASTERIZER_DISCARD:
+        break;
+    default:
+        RecordError(GL_INVALID_VALUE);
+        return;
+    }
 }
 
 void Context::EnableVertexAttribArray(GLuint index)
@@ -267,12 +337,9 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 	textureImage temp;
 
     temp.border = border;
-//    temp->internalFormat = internalformat;
-//    temp->format = format;
-//    temp->level = level;
-//    temp->type = type;
     temp.width = width;
     temp.height = height;
+    temp.maxLevel = (level>temp.maxLevel)?level:temp.maxLevel;
 
     temp.data[level] = image;
 

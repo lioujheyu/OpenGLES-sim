@@ -25,6 +25,9 @@ void ActiveGPU()
     gpu.gm.depthRangeN = ctx->vp.n;
     gpu.gm.depthRangeF = ctx->vp.f;
 
+    gpu.rm.blendEnable = ctx->blendEnable;
+    gpu.rm.depthTestEnable = ctx->depthTestEnable;
+    gpu.rm.textureEnable = ctx->textureEnable;
     gpu.rm.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
     gpu.rm.dBufPtr = (float*)ctx->drawBuffer[1];
     gpu.rm.clearColor = ctx->clearColor;

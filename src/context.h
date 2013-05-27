@@ -104,7 +104,9 @@ public:
     void ClearDepthf (GLfloat depth);
     void DeleteTextures (GLsizei n, const GLuint* textures);
     void DepthRangef (GLfloat n, GLfloat f);
+    void Disable (GLenum cap);
     void DrawArrays (GLenum mode, GLint first, GLsizei count);
+    void Enable (GLenum cap);
     void EnableVertexAttribArray (GLuint index);
     void GenTextures (GLsizei n, GLuint* textures);
     void TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
@@ -122,6 +124,10 @@ public:
     bool			clearStat;
     unsigned int 	clearMask;
     GLuint 			textureTotalSeq;
+
+    GLboolean       blendEnable;
+    GLboolean       depthTestEnable;
+    GLboolean       textureEnable;
 
 	textureState	texContext[2];
     attribute       vertexAttrib[8];

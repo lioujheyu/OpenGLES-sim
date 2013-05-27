@@ -95,11 +95,11 @@ struct textureImage
 
     GLubyte     *data[12];
 
-//	~textureImage()
-//	{
-//		for (int i=0;i<12;i++){
-//			delete [] data[i];
-//	}
+	textureImage()
+	{
+		maxLevel = 0;
+		border = 0;
+	}
 
     inline textureImage& operator=(const textureImage &rhs)
     {

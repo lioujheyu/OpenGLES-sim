@@ -44,11 +44,20 @@ int main()
                             -1.0f,  1.0f, 0.0f
                           };
 
-    GLfloat color[] = { 255, 255, 255,
-                        255, 255, 255,
-                        255, 255, 255,
-                        255, 255, 255
+    GLfloat color[] = { 1.0f, 1.0f, 1.0f,
+                        1.0f, 1.0f, 1.0f,
+                        1.0f, 1.0f, 1.0f,
+                        1.0f, 1.0f, 1.0f
                       };
+
+    GLfloat texCoord[] = { 0.0f, 0.0f,
+                           1.0f, 0.0f,
+                           1.0f, 1.0f,
+                           0.0f, 1.0f,
+                         };
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
 
     glViewport(0,0,1024,512);
 	glClearColor(1.0,0,0,1.0);
@@ -58,13 +67,17 @@ int main()
     //int v_coord_loc = glGetAttribLocation(shader.id(), "v_coord_in");
     int v_coord_loc = 0;
     int v_color_loc = 1;
+    int v_tex0_loc = 4;
     glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, vertexPos);
     glEnableVertexAttribArray(v_coord_loc);
 
     glVertexAttribPointer(v_color_loc, 3, GL_FLOAT, GL_FALSE, 0, color);
     glEnableVertexAttribArray(v_color_loc);
 
-    glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+    glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, texCoord);
+    glEnableVertexAttribArray(v_tex0_loc);
+
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
 
     return 0;

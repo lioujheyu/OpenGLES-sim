@@ -24,7 +24,7 @@ void GPU_Core::Run()
 		return;
 	}
 
-    //Each vertex will be injected into Geometry's vtxInput here
+    ///Each vertex will be injected into Geometry's vtxInput here
     for (int vCnt=0;vCnt<vtxCount;vCnt++) {
 
         for (int attrCnt=0;attrCnt<8;attrCnt++) {
@@ -53,6 +53,7 @@ void GPU_Core::Run()
         gm.ViewPort();
         gm.PrimitiveAssembly();
 
+        ///Primitive based starts here
         if (gm.primitiveReady)
         {
             gm.primitiveReady = false;

@@ -214,7 +214,9 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 			pixBufferP++;
 		}
 
-//		ShaderEXE();
+		for (int i = 0; i < pixBufferP; i++)
+            pixBuffer[i] = ShaderEXE(pixBuffer[i]);
+
 		PerFragmentOp();
 	} else {
 		/*
@@ -313,14 +315,14 @@ fixColor4 Rasterizer::GetTexColor(const unsigned short u, const unsigned short v
 
 		for (j = 0; j < TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
 			for (i = 0; i < TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
-				texTmpPtr = texImage.data[level] + CalcTexAdd(U_Super,U_Block,i,V_Super,V_Block,j,level)*3;
+				texTmpPtr = texImage.data[level] + CalcTexAdd(U_Super,U_Block,i,V_Super,V_Block,j,level)*4;
 
 				//printf("%d %x (%d,%d)\n",level,texImage.data[level],u,v);
 
 				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].r = *texTmpPtr++;
 				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].g = *texTmpPtr++;
 				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].b = *texTmpPtr++;
-				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].a = 0xff;
+				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].a = *texTmpPtr++;
 			}
 		}
 		return TexCache.color[pos_cache][pos_block];
@@ -379,6 +381,9 @@ fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int texPtr, int
 	fixColor4 color, colorNextLevel;
 	int LoDx,LoDy,LoD;
 
+	if (textureEnable == false)
+        return color;
+
 #ifdef TEXDEBUG
 	fprintf(TEXDEBUGfp,"\nXXX--YYY--UUU.UU--VVV.VV----------------\n");
 #endif
@@ -418,6 +423,10 @@ fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int texPtr, int
 	TexUC = (unsigned short)floor(TexU);// floor: Round down value
 	TexVC = (unsigned short)floor(TexV);
 
+	///Prevent LoD number exceed the maximum allowable LoD number
+	if (LoD > texImage.maxLevel)
+        LoD = texImage.maxLevel;
+
 	if(LoD>0) {
 		switch (minFilter) {
 		case GL_NEAREST:    //u,v nearest filter
@@ -428,22 +437,17 @@ fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int texPtr, int
 			color = BilinearFilter(TexU, TexV, 0);
 			break;
 		case GL_NEAREST_MIPMAP_NEAREST: //u,v,w nearest filter
-			TexUC = TexUC >> LoD;
-			TexVC = TexVC >> LoD;
-
-			TexColor[0] = GetTexColor(TexUC, TexVC, LoD);
-
+			TexColor[0] = GetTexColor(TexUC>>LoD, TexVC>>LoD, LoD);
 			color = TexColor[0];
 			break;
 		case GL_LINEAR_MIPMAP_NEAREST:  //u,v bilinear, w nearest filter
 			color = BilinearFilter(TexU,TexV,LoD);
 			break;
 		case GL_NEAREST_MIPMAP_LINEAR:  //u,v nearest, w linear filter
-			TexUC = TexUC >> LoD;
-			TexVC = TexVC >> LoD;
+			TexColor[0] = GetTexColor(TexUC>>LoD, TexVC>>LoD, LoD);
 
-			TexColor[0] = GetTexColor(TexUC, TexVC, LoD);
-			TexColor[1] = GetTexColor(TexUC>>1, TexVC>>1, LoD+1);
+			LoD = (LoD+1 <= texImage.maxLevel)?LoD+1:texImage.maxLevel;
+			TexColor[1] = GetTexColor(TexUC>>LoD, TexVC>>LoD, LoD+LoD);
 
 			color = TexColor[0]*(1-w_ratio) + TexColor[1]*w_ratio;
 			break;
@@ -471,9 +475,7 @@ fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int texPtr, int
 //				color = TrilinearFilter(TexU, TexV, LoD, w_ratio);
 //
 //			break;
-		default:
-			fprintf(stderr,"Texture filter mode is not supported!!");
-			break;
+
 		}
 	} else {
 		switch (magFilter) {
@@ -481,15 +483,13 @@ fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int texPtr, int
 			TexColor[0] = GetTexColor(TexUC, TexVC ,0);
 			color = TexColor[0];
 			break;
+
 		case GL_LINEAR:     //u,v bilinear filter
 			color = BilinearFilter(TexU,TexV,0);
 			break;
+
 		case GL_NEAREST_MIPMAP_NEAREST: //u,v,w nearest filter
-			TexUC = TexUC >> LoD;
-			TexVC = TexVC >> LoD;
-
-			TexColor[0] = GetTexColor(TexUC, TexVC ,LoD);
-
+			TexColor[0] = GetTexColor(TexUC>>LoD, TexVC>>LoD ,LoD);
 			color = TexColor[0];
 			break;
 		}
@@ -507,40 +507,20 @@ fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int texPtr, int
 //Dirty Shader simulator which only performs texture replacement
 pixel Rasterizer::ShaderEXE(pixel pixelInput)
 {
+    texIndx = 4;
 	fixColor4 texColor = TextureMapping(pixelInput.attr[texIndx].s, pixelInput.attr[texIndx].t, 0, texIndx, pixelInput);
 	pixelInput.attr[colIndx].r = texColor.r;
 	pixelInput.attr[colIndx].g = texColor.g;
 	pixelInput.attr[colIndx].b = texColor.b;
+
+	return pixelInput;
 }
 
 void Rasterizer::PerFragmentOp()
 {
 	int i;
-	bool AlphaTest = true;
 	bool DepthTest = true;
 	for (i = 0; i < pixBufferP; i++) {
-		///**********Alpha Test*****************
-		if (AlphaTestMode == GL_NEVER)
-			AlphaTest = false;
-		else if (AlphaTestMode == GL_LESS)
-			AlphaTest = pixBuffer[i].attr[colIndx].a < AlphaRef;
-		else if (AlphaTestMode == GL_EQUAL)
-			AlphaTest = pixBuffer[i].attr[colIndx].a == AlphaRef;
-		else if (AlphaTestMode == GL_LEQUAL)
-			AlphaTest = pixBuffer[i].attr[colIndx].a <= AlphaRef;
-		else if (AlphaTestMode == GL_GREATER)
-			AlphaTest = pixBuffer[i].attr[colIndx].a > AlphaRef;
-		else if (AlphaTestMode == GL_NOTEQUAL)
-			AlphaTest = pixBuffer[i].attr[colIndx].a != AlphaRef;
-		else if (AlphaTestMode == GL_GEQUAL)
-			AlphaTest = pixBuffer[i].attr[colIndx].a >= AlphaRef;
-		else if (AlphaTestMode == GL_ALWAYS)
-			AlphaTest = true;
-		else
-			fprintf(stderr,"Wrong Alpha Test mode!!\n");
-		if (AlphaTest == false)
-			continue;
-
 		///****************Depth test*********************
 		if (DepthTestMode == GL_NEVER)
 			DepthTest = false;
@@ -565,8 +545,7 @@ void Rasterizer::PerFragmentOp()
 		else
 			*(dBufPtr + (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x) = pixBuffer[i].attr[0].z;
 
-		//Alpha blending
-
+		///Alpha blending
 		*(cBufPtr + ( (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x )*4)
 			= (unsigned char)pixBuffer[i].attr[colIndx].r;// R
 		*(cBufPtr + ( (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x )*4 + 1)
@@ -616,8 +595,10 @@ Rasterizer::Rasterizer()
 	wrapT = GL_REPEAT;
 	AlphaTestMode = GL_ALWAYS;
 	DepthTestMode = GL_LESS;
-	texMappingEn = false;
-	AlphaBlendingEn = false;
+
+	depthTestEnable = false;
+	blendEnable = false;
+	textureEnable = false;
 
 	posIndx = 0;
 	colIndx = 1;

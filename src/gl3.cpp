@@ -222,7 +222,7 @@ GL_APICALL void GL_APIENTRY glDetachShader (GLuint program, GLuint shader)
 
 GL_APICALL void GL_APIENTRY glDisable (GLenum cap)
 {
-
+    CONTEXT_EXEC(Disable(cap));
 }
 
 GL_APICALL void GL_APIENTRY glDisableVertexAttribArray (GLuint index)
@@ -242,7 +242,7 @@ GL_APICALL void GL_APIENTRY glDrawElements (GLenum mode, GLsizei count, GLenum t
 
 GL_APICALL void GL_APIENTRY glEnable (GLenum cap)
 {
-
+    CONTEXT_EXEC(Enable(cap));
 }
 
 GL_APICALL void GL_APIENTRY glEnableVertexAttribArray (GLuint index)
@@ -297,7 +297,7 @@ GL_APICALL void GL_APIENTRY glGenRenderbuffers (GLsizei n, GLuint* renderbuffers
 
 GL_APICALL void GL_APIENTRY glGenTextures (GLsizei n, GLuint* textures)
 {
-
+    CONTEXT_EXEC(GenTextures(n, textures));
 }
 
 GL_APICALL void GL_APIENTRY glGetActiveAttrib (GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, GLchar* name)

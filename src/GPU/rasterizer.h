@@ -45,7 +45,7 @@ public:
     int             texIndx;
 
     int             viewPortW, viewPortH;
-    bool            texMappingEn,AlphaBlendingEn;
+    bool            textureEnable, blendEnable, depthTestEnable;
     int             minFilter, magFilter;  //Texture filtering mode
     int             wrapS,wrapT;
     int             AlphaTestMode,DepthTestMode;
