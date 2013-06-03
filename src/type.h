@@ -1,7 +1,42 @@
-#ifndef GPU_TYPE_H_INCLUDED
-#define GPU_TYPE_H_INCLUDED
+#ifndef TYPE_H_INCLUDED
+#define TYPE_H_INCLUDED
 
 #include <GLES3/gl3.h>
+
+union floatVec4
+{
+    struct { float x, y, z, w; };
+    struct { float r, g, b, a; };
+    struct { float s, t, p, q; };
+
+    inline floatVec4& operator=(const floatVec4 &rhs)
+    {
+    	if (this == &rhs)
+            return *this;
+        x = rhs.x;
+        y = rhs.y;
+        z = rhs.z;
+        w = rhs.w;
+        return *this;
+    }
+
+    inline const floatVec4 operator+(const floatVec4 &other) const
+    {
+        floatVec4 tmp;
+        tmp.x = x + other.x;
+        tmp.y = y + other.y;
+        tmp.z = z + other.z;
+        tmp.w = w + other.w;
+        return tmp;
+    }
+
+    inline const float operator*(const floatVec4 &other)
+	{
+		float tmp;
+		tmp = (x*other.x + y*other.y + z*other.z + w*other.w);
+		return tmp;
+	}
+};
 
 class fixColor4
 {
@@ -55,45 +90,18 @@ public:
     }
 };
 
-union floatVec4
-{
-    struct { float x, y, z, w; };
-    struct { float r, g, b, a; };
-    struct { float s, t, p, q; };
-
-    inline floatVec4& operator=(const floatVec4 &rhs)
-    {
-    	if (this == &rhs)
-            return *this;
-        x = rhs.x;
-        y = rhs.y;
-        z = rhs.z;
-        w = rhs.w;
-        return *this;
-    }
-
-    inline const floatVec4 operator+(const floatVec4 &other) const
-    {
-        floatVec4 tmp;
-        tmp.x = x + other.x;
-        tmp.y = y + other.y;
-        tmp.z = z + other.z;
-        tmp.w = w + other.w;
-        return tmp;
-    }
-};
-
 struct textureImage
 {
-    GLuint      width;
-    GLuint      height;
 //    GLint       internalFormat;
     GLuint      maxLevel;
     GLuint      border;
 //    GLenum      format;
 //    GLenum      type;
 
-    GLubyte     *data[12];
+	GLuint		widthLevel[13];
+	GLuint		heightLevel[13];
+
+    GLubyte     *data[13];
 
 	textureImage()
 	{
@@ -105,26 +113,31 @@ struct textureImage
     {
     	if (this == &rhs)
             return *this;
-        width = rhs.width;
-        height = rhs.height;
         maxLevel = rhs.maxLevel;
         border = rhs.border;
 
-        for (int i=0;i<12;i++)
+        for (int i=0;i<13;i++) {
 			data[i] = rhs.data[i];
+			widthLevel[i] = rhs.widthLevel[i];
+			heightLevel[i] = rhs.heightLevel[i];
+		}
 
         return *this;
     }
 };
 
-template <class T> const T& min3 (const T& a, const T& b, const T& c)
+template <typename T> const T& MIN3(const T& a, const T& b, const T& c)
 {
   return (b<a)?((c<b)?c:b):((c<a)?c:a);
 }
 
-template <class T> const T& max3 (const T& a, const T& b, const T& c)
+template <typename T> const T& MAX3(const T& a, const T& b, const T& c)
 {
   return (b>a)?((c>b)?c:b):((c>a)?c:a);
 }
 
-#endif // GPU_TYPE_H_INCLUDED
+template <typename T> T CLAMP(const T& V, const T& L, const T& H)
+{
+  return V < L ? L : (V > H ? H : V);
+}
+#endif // TYPE_H_INCLUDED

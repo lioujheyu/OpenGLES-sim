@@ -15,6 +15,9 @@ void GPU_Core::Run()
 #ifdef PIXEL_GENERATE_DEBUG
 	rm.PIXEL_GENERATE_DEBUGfp = fopen("PixelGenerateDebug.txt","w");
 #endif
+#ifdef TEXDEBUG
+	rm.TEXDEBUGfp = fopen("TextureDebug.txt","w");
+#endif
 
     gm.Initialize();
 
@@ -28,7 +31,7 @@ void GPU_Core::Run()
     ///Each vertex will be injected into Geometry's vtxInput here
     for (int vCnt=0;vCnt<vtxCount;vCnt++) {
 
-        for (int attrCnt=0;attrCnt<8;attrCnt++) {
+        for (int attrCnt=0;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++) {
             if (attrEnable[attrCnt]) {
                 gm.attrEnable[attrCnt] = true;
                 rm.attrEnable[attrCnt] = true;
@@ -41,6 +44,7 @@ void GPU_Core::Run()
                         *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 2 );
                 else
                     gm.vtxInput.attr[attrCnt].z = 0.0;
+
                 if (attrSize[attrCnt] > 3)
                     gm.vtxInput.attr[attrCnt].w =
                         *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 3 );
@@ -50,7 +54,7 @@ void GPU_Core::Run()
         }
 
         gm.ShaderEXE();
-        //gm.PerspectiveCorrection();
+        gm.PerspectiveCorrection();
         gm.ViewPort();
         gm.PrimitiveAssembly();
 

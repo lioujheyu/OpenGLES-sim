@@ -282,7 +282,7 @@ GL_APICALL void GL_APIENTRY glGenBuffers (GLsizei n, GLuint* buffers)
 
 GL_APICALL void GL_APIENTRY glGenerateMipmap (GLenum target)
 {
-
+	CONTEXT_EXEC(GenerateMipmap(target));
 }
 
 GL_APICALL void GL_APIENTRY glGenFramebuffers (GLsizei n, GLuint* framebuffers)

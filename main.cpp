@@ -22,8 +22,14 @@ bool LoadTexture(char *filename)
                  info->bmiHeader.biHeight, 0, GL_RGB, GL_UNSIGNED_BYTE,
                  bitmap);
 
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     free(bitmap);
     free(info);
@@ -42,10 +48,10 @@ int main()
     glActiveTexture(GL_TEXTURE1);
     LoadTexture("data/chessboard.bmp");
 
-    GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f,
-                             1.0f, -1.0f, 0.0f,
-                             1.0f,  1.0f, 0.0f,
-                            -1.0f,  1.0f, 0.0f
+    GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0,
+                             1.0f, -1.0f, 0.0f, 1.0,
+                             1.0f/16,0.0f, 1.0f,16.0,
+                            -1.0f/16,0.0f, 1.0f,16.0
                           };
 
     GLfloat color[] = { 1.0f, 1.0f, 1.0f,
@@ -62,8 +68,8 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
-    glViewport(0,0,1024,512);
-	glClearColor(1.0,0,0,1.0);
+    glViewport(0,0,1024,768);
+	glClearColor(0.0,0.0,0.0,1.0);
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -71,7 +77,7 @@ int main()
     int v_coord_loc = 0;
     int v_color_loc = 1;
     int v_tex0_loc = 4;
-    glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, vertexPos);
+    glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);
     glEnableVertexAttribArray(v_coord_loc);
 
     glVertexAttribPointer(v_color_loc, 3, GL_FLOAT, GL_FALSE, 0, color);

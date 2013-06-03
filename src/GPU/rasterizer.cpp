@@ -27,10 +27,13 @@ void Rasterizer::TriangleSetup()
 	constantC = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
 	area2Reciprocal = 1/constantC;
 
-	LY = min3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
-	LX = min3(prim.v[0].attr[posIndx].x, prim.v[1].attr[posIndx].x, prim.v[2].attr[posIndx].x);
-	HY = max3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
-	RX = max3(prim.v[0].attr[posIndx].x, prim.v[1].attr[posIndx].x, prim.v[2].attr[posIndx].x);
+	//LY = MIN3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
+	LY = 150;
+	//LX = MIN3(prim.v[0].attr[posIndx].x, prim.v[1].attr[posIndx].x, prim.v[2].attr[posIndx].x);
+	//LX = 700;
+	//HY = MAX3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
+	HY = 203;
+	RX = MAX3(prim.v[0].attr[posIndx].x, prim.v[1].attr[posIndx].x, prim.v[2].attr[posIndx].x);
 }
 
 void Rasterizer::PixelGenerateHiber()
@@ -53,12 +56,14 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 	float centralTest[3];
 	float cornerTest[8][3];
 	bool Zone[4][3];
-	float texUdX, texUdY, texVdX, texVdY, WdX, WdY;
 
 	pixel pixelStamp[4];
 
 #ifdef PIXEL_GENERATE_DEBUG
 	fprintf(PIXEL_GENERATE_DEBUGfp,"-------(%d,%d),Level:%d-----\n",x,y,level);
+#endif
+#ifdef TEXDEBUG
+	fprintf(TEXDEBUGfp,"XXXX-YYYY-UUUU.UU-VVVV.VV----------------\n");
 #endif
 
 	centralTest[0] = (x+(1<<level)-prim.v[1].attr[posIndx].x)*Edge[0][0]-
@@ -69,7 +74,7 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 					 (y+(1<<level)-prim.v[0].attr[posIndx].y)*Edge[2][1];
 
 	if (level == 0) {
-		/*m
+		/**
 		 * pixel stamp: 2 3
 		 *              0 1
 		 * We need to calculating 4 pixels in quad concurrently nomatter if
@@ -101,7 +106,7 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		pixelStamp[3].baryCenPos3[0] = cornerTest[7][2]*area2Reciprocal;
 		pixelStamp[3].baryCenPos3[1] = cornerTest[7][0]*area2Reciprocal;
 
-		//Interpolate the 4 pixel's all attributes, include perspective correction
+		///Interpolate the all 4 pixel's attributes, then perform perspective correction
 		for (int i=0;i<4;i++){
 			pixelStamp[i].attr[0].z = prim.v[0].attr[posIndx].z +
 								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[posIndx].z - prim.v[0].attr[posIndx].z) +
@@ -117,68 +122,75 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].s - prim.v[0].attr[attrCnt].s) +
 												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].s - prim.v[0].attr[attrCnt].s);
 				pixelStamp[i].attr[attrCnt].s = pixelStamp[i].attr[attrCnt].s / pixelStamp[i].attr[0].w;
+
 				pixelStamp[i].attr[attrCnt].t = prim.v[0].attr[attrCnt].t +
 												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].t - prim.v[0].attr[attrCnt].t) +
 												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].t - prim.v[0].attr[attrCnt].t);
 				pixelStamp[i].attr[attrCnt].t = pixelStamp[i].attr[attrCnt].t / pixelStamp[i].attr[0].w;
+
 				pixelStamp[i].attr[attrCnt].p = prim.v[0].attr[attrCnt].p +
 												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].p - prim.v[0].attr[attrCnt].s) +
 												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].p - prim.v[0].attr[attrCnt].s);
 				pixelStamp[i].attr[attrCnt].p = pixelStamp[i].attr[attrCnt].p / pixelStamp[i].attr[0].w;
+
 				pixelStamp[i].attr[attrCnt].q = prim.v[0].attr[attrCnt].q +
 												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].q - prim.v[0].attr[attrCnt].q) +
 												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].q - prim.v[0].attr[attrCnt].q);
 				pixelStamp[i].attr[attrCnt].q = pixelStamp[i].attr[attrCnt].q / pixelStamp[i].attr[0].w;
 			}
 		}
-		//Caculate 4 pixel's attributes' scale factor
+		///each attribute needs to get its scale factor, and all 4 pixels' attribute will get theirs here.
 		for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
 			if (!attrEnable[attrCnt])
 				continue;
 			pixelStamp[0].scaleFacDX[attrCnt].s = pixelStamp[1].scaleFacDX[attrCnt].s
-												= pixelStamp[1].attr[attrCnt].s-pixelStamp[0].attr[attrCnt].s;
+												= fabs(pixelStamp[1].attr[attrCnt].s-pixelStamp[0].attr[attrCnt].s);
 			pixelStamp[0].scaleFacDX[attrCnt].t = pixelStamp[1].scaleFacDX[attrCnt].t
-												= pixelStamp[1].attr[attrCnt].t-pixelStamp[0].attr[attrCnt].t;
+												= fabs(pixelStamp[1].attr[attrCnt].t-pixelStamp[0].attr[attrCnt].t);
 			pixelStamp[0].scaleFacDX[attrCnt].p = pixelStamp[1].scaleFacDX[attrCnt].p
-												= pixelStamp[1].attr[attrCnt].p-pixelStamp[0].attr[attrCnt].p;
+												= fabs(pixelStamp[1].attr[attrCnt].p-pixelStamp[0].attr[attrCnt].p);
 			pixelStamp[0].scaleFacDX[attrCnt].q = pixelStamp[1].scaleFacDX[attrCnt].q
-												= pixelStamp[1].attr[attrCnt].q-pixelStamp[0].attr[attrCnt].q;
+												= fabs(pixelStamp[1].attr[attrCnt].q-pixelStamp[0].attr[attrCnt].q);
 
 			pixelStamp[2].scaleFacDX[attrCnt].s = pixelStamp[3].scaleFacDX[attrCnt].s
-												= pixelStamp[3].attr[attrCnt].s-pixelStamp[2].attr[attrCnt].s;
+												= fabs(pixelStamp[3].attr[attrCnt].s-pixelStamp[2].attr[attrCnt].s);
 			pixelStamp[2].scaleFacDX[attrCnt].t = pixelStamp[3].scaleFacDX[attrCnt].t
-												= pixelStamp[3].attr[attrCnt].t-pixelStamp[2].attr[attrCnt].t;
+												= fabs(pixelStamp[3].attr[attrCnt].t-pixelStamp[2].attr[attrCnt].t);
 			pixelStamp[2].scaleFacDX[attrCnt].p = pixelStamp[3].scaleFacDX[attrCnt].p
-												= pixelStamp[3].attr[attrCnt].p-pixelStamp[2].attr[attrCnt].p;
+												= fabs(pixelStamp[3].attr[attrCnt].p-pixelStamp[2].attr[attrCnt].p);
 			pixelStamp[2].scaleFacDX[attrCnt].q = pixelStamp[3].scaleFacDX[attrCnt].q
-												= pixelStamp[3].attr[attrCnt].q-pixelStamp[2].attr[attrCnt].q;
+												= fabs(pixelStamp[3].attr[attrCnt].q-pixelStamp[2].attr[attrCnt].q);
 
 			pixelStamp[0].scaleFacDY[attrCnt].s = pixelStamp[2].scaleFacDY[attrCnt].s
-												= pixelStamp[2].attr[attrCnt].s-pixelStamp[0].attr[attrCnt].s;
+												= fabs(pixelStamp[2].attr[attrCnt].s-pixelStamp[0].attr[attrCnt].s);
 			pixelStamp[0].scaleFacDY[attrCnt].t = pixelStamp[2].scaleFacDY[attrCnt].t
-												= pixelStamp[2].attr[attrCnt].t-pixelStamp[0].attr[attrCnt].t;
+												= fabs(pixelStamp[2].attr[attrCnt].t-pixelStamp[0].attr[attrCnt].t);
 			pixelStamp[0].scaleFacDY[attrCnt].p = pixelStamp[2].scaleFacDY[attrCnt].p
-												= pixelStamp[2].attr[attrCnt].p-pixelStamp[0].attr[attrCnt].p;
+												= fabs(pixelStamp[2].attr[attrCnt].p-pixelStamp[0].attr[attrCnt].p);
 			pixelStamp[0].scaleFacDY[attrCnt].q = pixelStamp[2].scaleFacDY[attrCnt].q
-												= pixelStamp[2].attr[attrCnt].q-pixelStamp[0].attr[attrCnt].q;
+												= fabs(pixelStamp[2].attr[attrCnt].q-pixelStamp[0].attr[attrCnt].q);
 
 			pixelStamp[1].scaleFacDY[attrCnt].s = pixelStamp[3].scaleFacDY[attrCnt].s
-												= pixelStamp[3].attr[attrCnt].s-pixelStamp[1].attr[attrCnt].s;
+												= fabs(pixelStamp[3].attr[attrCnt].s-pixelStamp[1].attr[attrCnt].s);
 			pixelStamp[1].scaleFacDY[attrCnt].t = pixelStamp[3].scaleFacDY[attrCnt].t
-												= pixelStamp[3].attr[attrCnt].t-pixelStamp[1].attr[attrCnt].t;
+												= fabs(pixelStamp[3].attr[attrCnt].t-pixelStamp[1].attr[attrCnt].t);
 			pixelStamp[1].scaleFacDY[attrCnt].p = pixelStamp[3].scaleFacDY[attrCnt].p
-												= pixelStamp[3].attr[attrCnt].p-pixelStamp[1].attr[attrCnt].p;
+												= fabs(pixelStamp[3].attr[attrCnt].p-pixelStamp[1].attr[attrCnt].p);
 			pixelStamp[1].scaleFacDY[attrCnt].q = pixelStamp[3].scaleFacDY[attrCnt].q
-												= pixelStamp[3].attr[attrCnt].q-pixelStamp[1].attr[attrCnt].q;
+												= fabs(pixelStamp[3].attr[attrCnt].q-pixelStamp[1].attr[attrCnt].q);
 		}
 
+		if (x == 818 && y == 158)
+		{
+			printf("test");
+		}
 
-
+        ///Write valid fragment into waiting buffer if they are truly pass the edge test.
 		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)|
             (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
 			pixBuffer[pixBufferP] = pixelStamp[0];
 #ifdef PIXEL_GENERATE_DEBUG
-			fprintf(PIXEL_GENERATE_DEBUGfp,"P:(%3d,%3d) \n",
+			fprintf(PIXEL_GENERATE_DEBUGfp,"P:(%3d,%3d)\t \n",
 					(int)pixBuffer[pixBufferP].attr[0].x,(int)pixBuffer[pixBufferP].attr[0].y);
 #endif
 			pixBufferP++;
@@ -215,9 +227,11 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		}
 
 		for (int i = 0; i < pixBufferP; i++)
+        {
             pixBuffer[i] = ShaderEXE(pixBuffer[i]);
 
-		PerFragmentOp();
+            PerFragmentOp(pixBuffer[i]);
+        }
 	} else {
 		/*
 		 * c - central
@@ -262,7 +276,7 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 	}
 }
 
-/*
+/**
  * u,v - Texture coodinate in 2 dimension directions.
  * s,b,o - 3 block-based hirachy level, Super block, Block, Offset, in textrue coordinate.
  *
@@ -275,20 +289,21 @@ int Rasterizer::CalcTexAdd(short int us,
                            short int vs,
                            short int vb,
                            short int vo,
-                           int width,
-                           int level)
+                           int width)
 {
-	return (vs*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_Y+vb*TEX_CACHE_BLOCK_SIZE_ROOT+vo)*(width>>level)+
+	return (vs*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_Y+vb*TEX_CACHE_BLOCK_SIZE_ROOT+vo)*width+
 		   us*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_X+ub*TEX_CACHE_BLOCK_SIZE_ROOT+uo;
 }
 
-fixColor4 Rasterizer::GetTexColor(const unsigned short u, const unsigned short v, const unsigned int level, unsigned char id)
+fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, unsigned char tid)
 {
 	int i,j;
+	unsigned short u, v;
 	unsigned short tag, pos_cache, pos_block, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
 	unsigned char *texTmpPtr = NULL;
-	unsigned char texel[4];
 
+	u = (unsigned short)coordIn.s;
+	v = (unsigned short)coordIn.t;
 #ifdef MIPMAPLEVELTEST
 	fixColor4 mipmaplevel;
 	mipmaplevel = fixColor4(0xff-level*30, 0xff-level*30, 0xff-level*30, 0xff);
@@ -302,9 +317,9 @@ fixColor4 Rasterizer::GetTexColor(const unsigned short u, const unsigned short v
 	U_Offset = u & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	V_Offset = v & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	tag = (int)( (V_Super << 8) | (U_Super&0x00ff) );
-    /// @fixme (elvis#1#): Simply append level and texture_id after tag bit to tell the differece of texture address
+    /// @fixme (elvis#1#): Simply append level and texture_id after tag bit to tell the differece of multi-texture address
 	tag = (tag << 4) | (level&0xf);
-	tag = (tag << 1) | (id&0x1);
+	tag = (tag << 1) | (tid&0x1);
 
 	pos_cache = V_Block * TEX_CACHE_ENTRY_X + U_Block;
 	pos_block = V_Offset * TEX_CACHE_BLOCK_SIZE_ROOT + U_Offset;
@@ -326,9 +341,9 @@ fixColor4 Rasterizer::GetTexColor(const unsigned short u, const unsigned short v
 
 		for (j = 0; j < TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
 			for (i = 0; i < TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
-				texTmpPtr = texImage[id].data[level] + CalcTexAdd(U_Super,U_Block,i,
+				texTmpPtr = texImage[tid].data[level] + CalcTexAdd(U_Super,U_Block,i,
                                                                   V_Super,V_Block,j,
-                                                                  texImage[id].width, level) * 4;
+                                                                  texImage[tid].widthLevel[level]) * 4;
 
 				//printf("%d %x (%d,%d)\n",level,texImage.data[level],u,v);
 
@@ -342,126 +357,169 @@ fixColor4 Rasterizer::GetTexColor(const unsigned short u, const unsigned short v
 	}
 }
 
-fixColor4 Rasterizer::BilinearFilter(float texU,float texV,int level, unsigned char id)
+floatVec4 Rasterizer::TexCoordWrap(floatVec4 coordIn, unsigned int level, unsigned char tid)
 {
-	float texULevel, texVLevel;
+	floatVec4 temp;
+
+	switch (wrapS[tid]){
+	case GL_REPEAT:
+		temp.s = fmod(coordIn.s,texImage[tid].widthLevel[level]);
+		break;
+	case GL_CLAMP_TO_EDGE:
+		temp.s = CLAMP(coordIn.s, 0.0f, (float)texImage[tid].widthLevel[level]-1);
+		break;
+	default:
+		fprintf(stderr,"Wrong Texture Wrap mode in x-axis!!\n");
+		break;
+	}
+
+	switch (wrapT[tid]){
+	case GL_REPEAT:
+		temp.t = fmod(coordIn.t,texImage[tid].heightLevel[level]);
+		break;
+	case GL_CLAMP_TO_EDGE:
+		temp.t = CLAMP(coordIn.t, 0.0f, (float)texImage[tid].heightLevel[level]-1);;
+		break;
+	default:
+		fprintf(stderr,"Wrong Texture Wrap mode in y-axis!!\n");
+		break;
+	}
+
+	return temp;
+}
+
+fixColor4 Rasterizer::BilinearFilter(floatVec4 coordIn,int level, unsigned char tid)
+{
+	/// coord[4]: 2 3
+	///			  0 1
+	floatVec4 coordLOD[4];
+
 	unsigned short texUC, texVC;
 	float u_ratio, v_ratio;
 	fixColor4 color;
 	fixColor4 TexColor[4];
 
-	texULevel = texU / (1<<level);
-	texULevel = (texULevel - 0.5)>0?texULevel - 0.5:0;
-	texVLevel = texV / (1<<level);
-	texVLevel = (texVLevel - 0.5)>0?texVLevel - 0.5:0;
+	coordLOD[0].s = coordIn.s / (1<<level);
+	coordLOD[0].s = (coordLOD[0].s - 0.5)>0 ? coordLOD[0].s - 0.5 : 0;
+	coordLOD[0].t = coordIn.t / (1<<level);
+	coordLOD[0].t = (coordLOD[0].t - 0.5)>0 ? coordLOD[0].t - 0.5 : 0;
 
-	texUC = (unsigned short)floor(texULevel);
-	texVC = (unsigned short)floor(texVLevel);
+	coordLOD[1] =  coordLOD[2] = coordLOD[3] = coordLOD[0];
+	coordLOD[1].s = coordLOD[1].s + 1;
+	coordLOD[2].t = coordLOD[2].t + 1;
+	coordLOD[3].s = coordLOD[3].s + 1;
+	coordLOD[3].t = coordLOD[3].t + 1;
+	coordLOD[1] = TexCoordWrap(coordLOD[1], 0, tid);
+	coordLOD[2] = TexCoordWrap(coordLOD[2], 0, tid);
+	coordLOD[3] = TexCoordWrap(coordLOD[3], 0, tid);
 
-	u_ratio = texULevel - texUC;
-	v_ratio = texVLevel - texVC;
 
-	TexColor[0] = GetTexColor(texUC, texVC, level, id);
-	TexColor[1] = GetTexColor((texUC+1>=texImage[id].width>>level)?texUC:texUC+1, texVC, level, id);
-	TexColor[2] = GetTexColor(texUC, (texVC+1>=texImage[id].height>>level)?texVC:texVC+1, level, id);
-	TexColor[3] = GetTexColor((texUC+1>=texImage[id].width>>level)?texUC:texUC+1, (texVC+1>=texImage[id].height>>level)?texVC:texVC+1, level, id);
+	TexColor[0] = GetTexColor(coordLOD[0], level, tid);
+	TexColor[1] = GetTexColor(coordLOD[1], level, tid);
+	TexColor[2] = GetTexColor(coordLOD[2], level, tid);
+	TexColor[3] = GetTexColor(coordLOD[3], level, tid);
 
-	color = (TexColor[0]*(1-u_ratio) + TexColor[1]*u_ratio)*(1-v_ratio) + (TexColor[2]*(1-u_ratio) + TexColor[3]*u_ratio)*v_ratio;
+	texUC = (unsigned short)floor(coordLOD[0].s);
+	texVC = (unsigned short)floor(coordLOD[0].t);
+	u_ratio = coordLOD[0].s - texUC;
+	v_ratio = coordLOD[0].t - texVC;
+
+	color = (TexColor[0]*(1-u_ratio) + TexColor[1]*u_ratio)*(1-v_ratio) +
+			(TexColor[2]*(1-u_ratio) + TexColor[3]*u_ratio)*v_ratio;
 
 	return color;
 }
 
-fixColor4  Rasterizer::TrilinearFilter(float texU, float texV, int level, float w_ratio, unsigned char id)
+fixColor4 Rasterizer::TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, unsigned char tid)
 {
 	fixColor4 color[2];
-	color[0] = BilinearFilter(texU, texV, level, id);
-	color[1] = BilinearFilter(texU, texV, (level+1)<texImage[id].maxLevel?level+1:texImage[id].maxLevel, id);
+	int maxLevel = texImage[tid].maxLevel;
+	color[0] = BilinearFilter(coordIn, level, tid);
+	color[1] = BilinearFilter(coordIn, ((level+1)<maxLevel)?level+1:maxLevel, tid);
 
 	color[0] = color[0]*(1-w_ratio) + color[1]*w_ratio;
 
 	return color[0];
 }
 
-fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int attrIndx, pixel pixelInput, unsigned char id)
+fixColor4 Rasterizer::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixelInput, unsigned char tid)
 {
-	float TexU, TexV;
-	unsigned short TexUC, TexVC;
-	float u_ratio, v_ratio, w_ratio;
+	floatVec4 coord;
+	float w_ratio;
 	float maxScaleFac;
-	fixColor4 TexColor[8];  // 1st level 2 3  2nd level 6 7
-							//           0 1            4 5
+	fixColor4 TexColor[2];
 	fixColor4 color, colorNextLevel;
-	int LoD;
+	int LoD, maxLevel;
 
-#ifdef TEXDEBUG
-	fprintf(TEXDEBUGfp,"\nXXX--YYY--UUU.UU--VVV.VV----------------\n");
-#endif
-	//find absolutely position in texture image
-	TexU = TexUin*texImage[id].width;
-	TexV = TexVin*texImage[id].height;
+	//find absolutely coord in texture image
+	coord.s = coordIn.s*texImage[tid].widthLevel[0];
+	coord.t = coordIn.t*texImage[tid].heightLevel[0];
+	coord.p = coordIn.p;
+	coord.q = coordIn.q;
 
 	maxScaleFac = std::max(
-					std::max(pixelInput.scaleFacDX[attrIndx].s*texImage[id].width , pixelInput.scaleFacDX[attrIndx].t*texImage[id].height),
-					std::max(pixelInput.scaleFacDY[attrIndx].s*texImage[id].width , pixelInput.scaleFacDY[attrIndx].t*texImage[id].height)
+					std::max(pixelInput.scaleFacDX[attrIndx].s*texImage[tid].widthLevel[0],
+							 pixelInput.scaleFacDX[attrIndx].t*texImage[tid].heightLevel[0]),
+					std::max(pixelInput.scaleFacDY[attrIndx].s*texImage[tid].widthLevel[0],
+							 pixelInput.scaleFacDY[attrIndx].t*texImage[tid].heightLevel[0])
 				);
 
 	w_ratio = frexp(maxScaleFac, &LoD);
 	w_ratio = w_ratio*2-1;
 	LoD--;
 
+	maxLevel = texImage[tid].maxLevel;
 
-///********* Texture Wrap mode ***************************
-	if (wrapS[id] == GL_REPEAT)
-		TexU = fmod(TexU,texImage[id].width);
-	//fmod: mod in floating point format, %(mod) can only be used under integer format
-	else if (wrapS[id] == GL_CLAMP_TO_EDGE)
-		TexU = (TexU < texImage[id].width-1)?((TexU > 0)?TexU:0):texImage[id].width-1;
-	//0 <= TexU <= TexWidth-1
-	else
-		fprintf(stderr,"Wrong Texture Wrap mode in x-axis!!\n");
-
-	if (wrapT[id] == GL_REPEAT)
-		TexV = fmod(TexV,texImage[id].height);
-	else if (wrapT[id] == GL_CLAMP_TO_EDGE)
-		TexV = (TexV < texImage[id].height-1)?((TexV > 0)?TexV:0):texImage[id].height-1;
-	//0 <= TexV <= TexHeight-1
-	else
-		fprintf(stderr,"Wrong Texture Wrap mode  in y-axis!!\n");
-///*******************************************************
-
-	TexUC = (unsigned short)floor(TexU);// floor: Round down value
-	TexVC = (unsigned short)floor(TexV);
+    ///Texture Wrap
+    coord = TexCoordWrap(coord, 0, tid);
 
 	///Prevent LoD exceed the maximum allowable LoD.
-    LoD = (LoD > texImage[id].maxLevel)?texImage[id].maxLevel:LoD;
+    LoD = (LoD > maxLevel)?maxLevel:LoD;
 
-	if(LoD>0) {
-		switch (minFilter[id]) {
+    if (LoD == 1)
+	{
+		//printf("test");
+	}
+
+	if(maxScaleFac>1) {
+		switch (minFilter[tid]) {
 		case GL_NEAREST:    //u,v nearest filter
-			TexColor[0] = GetTexColor(TexUC, TexVC, 0, id);
-			color = TexColor[0];
+			color = GetTexColor(coord, 0, tid);
 			break;
+
 		case GL_LINEAR:     //u,v bilinear filter
-			color = BilinearFilter(TexU, TexV, 0, id);
+			color = BilinearFilter(coord, 0, tid);
 			break;
+
 		case GL_NEAREST_MIPMAP_NEAREST: //u,v,w nearest filter
-			TexColor[0] = GetTexColor(TexUC>>LoD, TexVC>>LoD, LoD, id);
-			color = TexColor[0];
+			coord.s = coord.s / (1<<LoD);
+			coord.t = coord.t / (1<<LoD);
+			color = GetTexColor(coord, LoD, tid);
 			break;
+
 		case GL_LINEAR_MIPMAP_NEAREST:  //u,v bilinear, w nearest filter
-			color = BilinearFilter(TexU,TexV,LoD, id);
+			color = BilinearFilter(coord, LoD, tid);
 			break;
+
 		case GL_NEAREST_MIPMAP_LINEAR:  //u,v nearest, w linear filter
-			TexColor[0] = GetTexColor(TexUC>>LoD, TexVC>>LoD, LoD, id);
+			coord.s = coord.s / (1<<LoD);
+			coord.t = coord.t / (1<<LoD);
+			TexColor[0] = GetTexColor(coord, LoD, tid);
 
-			LoD = (LoD+1 <= texImage[id].maxLevel)?LoD+1:texImage[id].maxLevel;
-			TexColor[1] = GetTexColor(TexUC>>LoD, TexVC>>LoD, LoD, id);
-
-			color = TexColor[0]*(1-w_ratio) + TexColor[1]*w_ratio;
+			if (LoD+1 < maxLevel) {
+				coord.s = coord.s / 2;
+				coord.t = coord.t / 2;
+				TexColor[1] = GetTexColor(coord, LoD, tid);
+				color = TexColor[0]*(1-w_ratio) + TexColor[1]*w_ratio;
+			}
+			else
+				color = TexColor[0];
 			break;
+
 		case GL_LINEAR_MIPMAP_LINEAR:   //u,v,w trilinear filter
-			color = TrilinearFilter(TexU, TexV, LoD, w_ratio, id);
+			color = TrilinearFilter(coord, LoD, w_ratio, tid);
 			break;
+
 //		case GL_ANISOTROPIC:
 //			float r1,r2,r3,r4;
 //
@@ -486,97 +544,91 @@ fixColor4 Rasterizer::TextureMapping(float TexUin, float TexVin, int attrIndx, p
 
 		}
 	} else {
-		switch (magFilter[id]) {
+		switch (magFilter[tid]) {
 		case GL_NEAREST:    //u,v nearest filter
-			TexColor[0] = GetTexColor(TexUC, TexVC ,0, id);
-			color = TexColor[0];
+			color = GetTexColor(coord ,0, tid);
 			break;
 
 		case GL_LINEAR:     //u,v bilinear filter
-			color = BilinearFilter(TexU,TexV,0, id);
-			break;
-
-		case GL_NEAREST_MIPMAP_NEAREST: //u,v,w nearest filter
-			TexColor[0] = GetTexColor(TexUC>>LoD, TexVC>>LoD ,LoD, id);
-			color = TexColor[0];
+			color = BilinearFilter(coord,0, tid);
 			break;
 		}
 	}
 
-	return color;
-
 #ifdef TEXDEBUG
-	fprintf(TEXDEBUGfp,"%3d  %3d  %6.2f  %6.2f",(int)pixBuffer[i].pos4[0],(int)pixBuffer[i].pos4[1],TexU,TexV);
-	fprintf(TEXDEBUGfp,"  %2x %2x %2x %2x",color.r,color.g,color.b,color.a);
-	fprintf(TEXDEBUGfp,"  %2d %3.2f\n",LoD, w_ratio);
+	fprintf(TEXDEBUGfp,"%4d %4d %7.2f %7.2f\t",(int)pixelInput.attr[0].x,(int)pixelInput.attr[0].y,coord.s,coord.t);
+	//fprintf(TEXDEBUGfp,"  %2x %2x %2x %2x",color.r,color.g,color.b,color.a);
+	fprintf(TEXDEBUGfp,"%2d %3.2f\t\t",LoD, w_ratio);
+	fprintf(TEXDEBUGfp,"%3.2f %3.2f %3.2f %3.2f\n",pixelInput.scaleFacDX[attrIndx].s*texImage[tid].widthLevel[0],
+												   pixelInput.scaleFacDX[attrIndx].t*texImage[tid].heightLevel[0],
+												   pixelInput.scaleFacDY[attrIndx].s*texImage[tid].widthLevel[0],
+												   pixelInput.scaleFacDY[attrIndx].t*texImage[tid].heightLevel[0]);
 #endif
+
+	return color;
 }
 
-// @fixme (elvis#1#): Dirty Shader simulator
+/// @fixme (elvis#1#): Dirty Shader simulator
 pixel Rasterizer::ShaderEXE(pixel pixInput)
 {
     texIndx = 4;
 
-	fixColor4 texColor0 = TextureMapping(pixInput.attr[texIndx].s, pixInput.attr[texIndx].t, texIndx, pixInput, 0);
-	fixColor4 texColor1 = TextureMapping(pixInput.attr[texIndx].s, pixInput.attr[texIndx].t, texIndx, pixInput, 1);
+	fixColor4 texColor0 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 0);
+//	fixColor4 texColor1 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 1);
 
 	pixInput.attr[colIndx].r = texColor0.r;
 	pixInput.attr[colIndx].g = texColor0.g;
 	pixInput.attr[colIndx].b = texColor0.b;
 
-//	pixInput.attr[colIndx].r = texColor0.r * texColor1.r / 256;
-//	pixInput.attr[colIndx].g = texColor0.g * texColor1.g / 256;
-//	pixInput.attr[colIndx].b = texColor0.b * texColor1.b / 256;
+//	pixInput.attr[colIndx].r = texColor0.r*0.8 + texColor1.r*0.2;
+//	pixInput.attr[colIndx].g = texColor0.g*0.8 + texColor1.g*0.2;
+//	pixInput.attr[colIndx].b = texColor0.b*0.8 + texColor1.b*0.2;
 
 	return pixInput;
 }
 
-void Rasterizer::PerFragmentOp()
+void Rasterizer::PerFragmentOp(pixel pixInput)
 {
-	int i;
 	bool DepthTest = true;
 	int bufOffset;
 
-	for (i = 0; i < pixBufferP; i++) {
-		bufOffset = (int)pixBuffer[i].attr[0].y*viewPortW + (int)pixBuffer[i].attr[0].x;
+	bufOffset = (int)pixInput.attr[0].y*viewPortW + (int)pixInput.attr[0].x;
 
-        ///Depth test
-		if (depthTestEnable){
-            if (DepthTestMode == GL_NEVER)
-                DepthTest = false;
-            else if (DepthTestMode == GL_LESS)
-                DepthTest = pixBuffer[i].attr[0].z  < *(dBufPtr + bufOffset);
-            else if (DepthTestMode == GL_EQUAL)
-                DepthTest = pixBuffer[i].attr[0].z == *(dBufPtr + bufOffset);
-            else if (DepthTestMode == GL_LEQUAL)
-                DepthTest = pixBuffer[i].attr[0].z <= *(dBufPtr + bufOffset);
-            else if (DepthTestMode == GL_GREATER)
-                DepthTest = pixBuffer[i].attr[0].z  > *(dBufPtr + bufOffset);
-            else if (DepthTestMode == GL_NOTEQUAL)
-                DepthTest = pixBuffer[i].attr[0].z != *(dBufPtr + bufOffset);
-            else if (DepthTestMode == GL_GEQUAL)
-                DepthTest = pixBuffer[i].attr[0].z >= *(dBufPtr + bufOffset);
-            else if (DepthTestMode == GL_ALWAYS)
-                DepthTest = true;
-            else
-                fprintf(stderr,"Wrong Depth Test mode!!\n");
-            if (DepthTest == false)
-                continue;
-            else
-                *(dBufPtr + bufOffset) = pixBuffer[i].attr[0].z;
-		}
+    ///Depth test
+    if (depthTestEnable){
+        if (DepthTestMode == GL_NEVER)
+            DepthTest = false;
+        else if (DepthTestMode == GL_LESS)
+            DepthTest = pixInput.attr[0].z  < *(dBufPtr + bufOffset);
+        else if (DepthTestMode == GL_EQUAL)
+            DepthTest = pixInput.attr[0].z == *(dBufPtr + bufOffset);
+        else if (DepthTestMode == GL_LEQUAL)
+            DepthTest = pixInput.attr[0].z <= *(dBufPtr + bufOffset);
+        else if (DepthTestMode == GL_GREATER)
+            DepthTest = pixInput.attr[0].z  > *(dBufPtr + bufOffset);
+        else if (DepthTestMode == GL_NOTEQUAL)
+            DepthTest = pixInput.attr[0].z != *(dBufPtr + bufOffset);
+        else if (DepthTestMode == GL_GEQUAL)
+            DepthTest = pixInput.attr[0].z >= *(dBufPtr + bufOffset);
+        else if (DepthTestMode == GL_ALWAYS)
+            DepthTest = true;
 
-		///Alpha blending
-		if (blendEnable){
+        if (DepthTest == false)
+            return;
+        else
+            *(dBufPtr + bufOffset) = pixInput.attr[0].z;
+    }
 
-		}
+    ///Alpha blending
+    if (blendEnable){
 
-		///Color buffer write back
-		*(cBufPtr + bufOffset*4 + 0) = (unsigned char)pixBuffer[i].attr[colIndx].r;// R
-		*(cBufPtr + bufOffset*4 + 1) = (unsigned char)pixBuffer[i].attr[colIndx].g;// G
-		*(cBufPtr + bufOffset*4 + 2) = (unsigned char)pixBuffer[i].attr[colIndx].b;// B
-		*(cBufPtr + bufOffset*4 + 3) = (unsigned char)pixBuffer[i].attr[colIndx].a;// A
-	}
+    }
+
+    ///Color buffer write back
+    *(cBufPtr + bufOffset*4 + 0) = (unsigned char)pixInput.attr[colIndx].r;// R
+    *(cBufPtr + bufOffset*4 + 1) = (unsigned char)pixInput.attr[colIndx].g;// G
+    *(cBufPtr + bufOffset*4 + 2) = (unsigned char)pixInput.attr[colIndx].b;// B
+    *(cBufPtr + bufOffset*4 + 3) = (unsigned char)pixInput.attr[colIndx].a;// A
 }
 
 void Rasterizer::ClearBuffer(unsigned int mask)
@@ -604,8 +656,6 @@ void Rasterizer::ClearBuffer(unsigned int mask)
 
 Rasterizer::Rasterizer()
 {
-	int i;
-
 	AlphaRef = 0;
 	DepthRef = 255;
 

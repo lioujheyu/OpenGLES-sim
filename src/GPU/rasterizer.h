@@ -8,21 +8,6 @@
 #include <GLES3/gl3.h>
 #include "gpu_config.h"
 
-//struct textureRM
-//{
-//    unsigned char  *data[12]; //max: 4096, so there are 12 levels at most.
-//    int             height;
-//    int             width;
-//
-//    bool            mipmap;
-//    int             level;
-//
-//    textureRM() {
-//        data[0] = NULL;
-//        level = 0;
-//    }
-//};
-
 class Rasterizer
 {
 public:
@@ -46,8 +31,8 @@ public:
 
     int             viewPortW, viewPortH;
     bool            blendEnable, depthTestEnable;
-    int             minFilter[2], magFilter[2];  //Texture filtering mode
-    int             wrapS[2],wrapT[2];
+    int             minFilter[MAX_TEXTURE_UNIT], magFilter[MAX_TEXTURE_UNIT];  //Texture filtering mode
+    int             wrapS[MAX_TEXTURE_UNIT],wrapT[MAX_TEXTURE_UNIT];
     int             AlphaTestMode,DepthTestMode;
     int             AlphaBlendingMode;
     float           AlphaRef,DepthRef;
@@ -61,13 +46,14 @@ public:
     pixel           ShaderEXE(pixel pixelInput);
     int             CalcTexAdd( short int us, short int ub, short int uo,
                                 short int vs, short int vb, short int vo,
-                                int width, int level);
+                                int width);
 
-    fixColor4       GetTexColor(const unsigned short u, const unsigned short v, const unsigned int level, unsigned char id);
-    fixColor4       TextureMapping(float TexUin, float TexVin, int attrIndx, pixel pixelInput, unsigned char id);
-    fixColor4   	BilinearFilter(float texU,float texV,int level, unsigned char id);
-    fixColor4   	TrilinearFilter(float texU,float texV,int level, float w_ratio, unsigned char id);
-    void            PerFragmentOp();
+    fixColor4       GetTexColor(floatVec4 coordIn, const unsigned int level, unsigned char tid);
+    fixColor4       TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixelInput, unsigned char tid);
+    floatVec4		TexCoordWrap(floatVec4 coordIn, unsigned int level, unsigned char tid);
+    fixColor4   	BilinearFilter(floatVec4 coordIn, int level, unsigned char tid);
+    fixColor4   	TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, unsigned char tid);
+    void            PerFragmentOp(pixel pixInput);
     void 			ClearBuffer(unsigned int mask);
 
     //FILE *TEXfp;
@@ -83,7 +69,7 @@ public:
         int             TexCacheColdMiss;
     } TexCache;
 
-    textureImage texImage[2];
+    textureImage texImage[MAX_TEXTURE_UNIT];
 };
 
 extern Rasterizer rm;

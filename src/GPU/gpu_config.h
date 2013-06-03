@@ -4,11 +4,15 @@
 #define GPU_CONFIG_H_INCLUDED
 
 #define MAX_ATTRIBUTE_NUMBER    8
+#define MAX_TEXTURE_UNIT	    2
 
 #define VPNEAR 	    0.0
 #define VPFAR 	    1.0
 
+#define MIPMAPLEVELTEST
+
 #define PIXEL_GENERATE_DEBUG
+#define TEXDEBUG
 
 #define TEX_CACHE_BLOCK_SIZE_ROOT_LOG 2
 #define TEX_CACHE_BLOCK_SIZE_ROOT 4
@@ -18,7 +22,9 @@
 #define TEX_CACHE_ENTRY_Y_LOG 2
 #define TEX_CACHE_ENTRY_Y 4
 
-struct vertex{
+
+struct vertex
+{
     floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
 
     inline vertex& operator=(const vertex &rhs)
@@ -73,5 +79,6 @@ struct primitive{
         return *this;
     }
 };
+
 
 #endif // GPU_CONFIG_H_INCLUDED

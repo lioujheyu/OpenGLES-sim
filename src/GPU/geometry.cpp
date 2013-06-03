@@ -40,7 +40,33 @@ void Geometry::Initialize()
 
 void Geometry::ShaderEXE()
 {
+//	floatVec4 temp = vtxInput.attr[posIndx];
+//	floatVec4 row[4];
+//	row[0].x =  1; row[0].y =  0; row[0].z =     1; row[0].w = 0;
+//	row[1].x =  0; row[1].y =  1; row[1].z =     1; row[1].w = 0;
+//	row[2].x =  0; row[2].y =  0; row[2].z = (float)-3; row[2].w = (float)-20;
+//	row[3].x =  0; row[3].y =  0; row[3].z =    -1; row[3].w = 0;
+//
+//	vtxInput.attr[posIndx].x = row[0]*temp;
+//	vtxInput.attr[posIndx].y = row[1]*temp;
+//	vtxInput.attr[posIndx].z = row[2]*temp;
+//	vtxInput.attr[posIndx].w = row[3]*temp;
+}
 
+void Geometry::PerspectiveCorrection()
+{
+	float w = vtxInput.attr[posIndx].w;
+	vtxInput.attr[posIndx].w = (float)1/w;
+	for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++){
+		if (i == posIndx || attrEnable[i] == false)
+			continue;
+		else{
+			vtxInput.attr[i].s = vtxInput.attr[i].s / w;
+			vtxInput.attr[i].t = vtxInput.attr[i].t / w;
+			vtxInput.attr[i].p = vtxInput.attr[i].p / w;
+			vtxInput.attr[i].q = vtxInput.attr[i].q / w;
+		}
+	}
 }
 
 void Geometry::ViewPort()
@@ -60,6 +86,7 @@ void Geometry::ViewPort()
     vtxInput.attr[posIndx].z = z;
 }
 
+/// @fixme (elvis#1#): the vertex order has been compromised.
 void Geometry::PrimitiveAssembly()
 {
     switch (drawMode) {

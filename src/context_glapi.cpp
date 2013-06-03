@@ -79,12 +79,15 @@ void Context::DeleteTextures(GLsizei n, const GLuint *textures)
     for (int i=0; i<n; ++i)
     {
         startIterator = texDataVec.begin() + textures[i];
+
+        for (int j =0;j<13;j++)
+			delete[] texDataVec[i].data[j];
+
         texDataVec.erase(startIterator);
     }
     printf("DeleteTextures-> VEC size:[%d], capacity:[%d]\n", texDataVec.size(), texDataVec.capacity());
 //    delete[] texobj->teximage->data;
-//    delete   texobj->teximage;
-//    delete[] texobj;
+
 }
 
 void Context::Disable (GLenum cap)
@@ -173,7 +176,7 @@ void Context::Enable(GLenum cap)
         break;
     case GL_STENCIL_TEST:
         break;
-        ///OpenGL ES 3.0
+	///OpenGL ES 3.0
     case GL_PRIMITIVE_RESTART_FIXED_INDEX:
         break;
     case GL_RASTERIZER_DISCARD:
@@ -192,6 +195,11 @@ void Context::EnableVertexAttribArray(GLuint index)
     }
 
     vertexAttrib[index].enable = GL_TRUE;
+}
+
+void Context::GenerateMipmap(GLenum target)
+{
+	texContext[activeTexture].genMipmap = GL_TRUE;
 }
 
 void Context::GenTextures(GLsizei n, GLuint* textures)
@@ -220,7 +228,7 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
         return;
     }
 
-    if (level < 0 || level > 12) {
+    if (level < 0 || level > 13) {
         RecordError(GL_INVALID_ENUM);
         return;
     }
@@ -232,7 +240,7 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 
     GLint externalFormat = (GLint)format;
 
-    // @todo : check type between internalformat and externalformat
+    /// @todo : check type between internalformat and externalformat
     if (internalformat != externalFormat) {
         RecordError(GL_INVALID_OPERATION);
         return;
@@ -241,7 +249,7 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
     int biSizeImage = width*height;
     unsigned char * image = new unsigned char[biSizeImage*4];
 
-// @note (elvis#1#): Unsure format conversion is performed in API implementation or not
+	/// @note (elvis#1#): Unsure format conversion is performed in API implementation or in Hardware
 	for (int i=0; i<biSizeImage;i++){
 		switch (format) {
 		case GL_ALPHA:
@@ -331,8 +339,8 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 	textureImage temp;
 
     temp.border = border;
-    temp.width = width;
-    temp.height = height;
+    temp.widthLevel[level] = width;
+    temp.heightLevel[level] = height;
     temp.maxLevel = (level>temp.maxLevel)?level:temp.maxLevel;
 
     temp.data[level] = image;

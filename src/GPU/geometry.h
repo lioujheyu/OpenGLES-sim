@@ -22,7 +22,7 @@ public:
                 Geometry();
     void        Initialize();
 
-    void        ShaderEXE();
+    void 		ShaderEXE();
     void        PerspectiveCorrection();
     void        ViewPort();
     void        PrimitiveAssembly();

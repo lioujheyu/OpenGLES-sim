@@ -46,7 +46,7 @@ struct viewPort
 struct textureState
 {
     inline textureState() {
-        enable = GL_FALSE;
+        genMipmap = GL_FALSE;
         minFilter = GL_NEAREST_MIPMAP_LINEAR;
         magFilter = GL_LINEAR;
         wrapS = GL_REPEAT;
@@ -55,7 +55,7 @@ struct textureState
         maxLevel = 12;
     }
 
-    GLboolean   	enable;
+    GLboolean		genMipmap;
     GLenum      	minFilter;
     GLenum      	magFilter;
     GLenum      	wrapS;
@@ -70,7 +70,7 @@ struct textureState
     {
     	if (this == &rhs)
             return *this;
-        enable = rhs.enable;
+		genMipmap = rhs.genMipmap;
         minFilter = rhs.minFilter;
         magFilter = rhs.magFilter;
         wrapS = rhs.wrapS;
@@ -108,6 +108,7 @@ public:
     void DrawArrays (GLenum mode, GLint first, GLsizei count);
     void Enable (GLenum cap);
     void EnableVertexAttribArray (GLuint index);
+    void GenerateMipmap(GLenum target);
     void GenTextures (GLsizei n, GLuint* textures);
     void TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
     void TexParameteri(GLenum target, GLenum pname, GLint param);
