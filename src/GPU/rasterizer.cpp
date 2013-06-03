@@ -27,12 +27,9 @@ void Rasterizer::TriangleSetup()
 	constantC = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
 	area2Reciprocal = 1/constantC;
 
-	//LY = MIN3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
-	LY = 150;
-	//LX = MIN3(prim.v[0].attr[posIndx].x, prim.v[1].attr[posIndx].x, prim.v[2].attr[posIndx].x);
-	//LX = 700;
-	//HY = MAX3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
-	HY = 203;
+	LY = MIN3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
+	LX = MIN3(prim.v[0].attr[posIndx].x, prim.v[1].attr[posIndx].x, prim.v[2].attr[posIndx].x);
+	HY = MAX3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
 	RX = MAX3(prim.v[0].attr[posIndx].x, prim.v[1].attr[posIndx].x, prim.v[2].attr[posIndx].x);
 }
 
@@ -178,11 +175,6 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 												= fabs(pixelStamp[3].attr[attrCnt].p-pixelStamp[1].attr[attrCnt].p);
 			pixelStamp[1].scaleFacDY[attrCnt].q = pixelStamp[3].scaleFacDY[attrCnt].q
 												= fabs(pixelStamp[3].attr[attrCnt].q-pixelStamp[1].attr[attrCnt].q);
-		}
-
-		if (x == 818 && y == 158)
-		{
-			printf("test");
 		}
 
         ///Write valid fragment into waiting buffer if they are truly pass the edge test.
@@ -475,11 +467,6 @@ fixColor4 Rasterizer::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixe
 
 	///Prevent LoD exceed the maximum allowable LoD.
     LoD = (LoD > maxLevel)?maxLevel:LoD;
-
-    if (LoD == 1)
-	{
-		//printf("test");
-	}
 
 	if(maxScaleFac>1) {
 		switch (minFilter[tid]) {
