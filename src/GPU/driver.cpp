@@ -33,7 +33,7 @@ void ActiveGPU2GenMipMap(int tid)
 //
 //    gpu.rm.minFilter[0] = GL_LINEAR_MIPMAP_NEAREST;
 //    gpu.rm.magFilter[0] = GL_LINEAR;
-//    gpu.rm.texImage[0] = ctx->texDataVec[ctx->texContext[tid].texBindID];
+//    gpu.rm.texImage[0] = ctx->texImagepool[ctx->texContext[tid].texBindID];
 }
 
 void GenMipMap(int tid)
@@ -47,7 +47,7 @@ void GenMipMap(int tid)
 
 	fixColor4 texel[4], texelAvg;
 
-	textureImage tempImg = ctx->texDataVec[ctx->texContext[tid].texBindID];
+	textureImage tempImg = ctx->texImagePool[ctx->texContext[tid].texBindID];
 	width = tempImg.widthLevel[0];
 	height = tempImg.heightLevel[0];
 
@@ -102,7 +102,7 @@ void GenMipMap(int tid)
 		height = nextHeight;
 	}
 
-	ctx->texDataVec[ctx->texContext[tid].texBindID] = tempImg;
+	ctx->texImagePool[ctx->texContext[tid].texBindID] = tempImg;
 
 	printf("\nMip-map generation complete!!!\n");
 	printf("Base level width:%d, height:%d\n",tempImg.widthLevel[0], tempImg.heightLevel[0]);
@@ -154,7 +154,7 @@ void ActiveGPU()
     for (int i=0;i<MAX_TEXTURE_UNIT;i++){
 		gpu.rm.minFilter[i] = ctx->texContext[i].minFilter;
 		gpu.rm.magFilter[i] = ctx->texContext[i].magFilter;
-		gpu.rm.texImage[i] = ctx->texDataVec[ctx->texContext[i].texBindID];
+		gpu.rm.texImage[i] = ctx->texImagePool[ctx->texContext[i].texBindID];
     }
 
 

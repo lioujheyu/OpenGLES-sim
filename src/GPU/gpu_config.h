@@ -1,7 +1,9 @@
-#include "../type.h"
-
 #ifndef GPU_CONFIG_H_INCLUDED
 #define GPU_CONFIG_H_INCLUDED
+
+
+#include "../type.h"
+
 
 #define MAX_ATTRIBUTE_NUMBER    8
 #define MAX_TEXTURE_UNIT	    2
@@ -9,10 +11,10 @@
 #define VPNEAR 	    0.0
 #define VPFAR 	    1.0
 
-#define MIPMAPLEVELTEST
+//#define MIPMAPLEVELTEST
 
-#define PIXEL_GENERATE_DEBUG
-#define TEXDEBUG
+//#define PIXEL_GENERATE_DEBUG
+//#define TEXDEBUG
 
 #define TEX_CACHE_BLOCK_SIZE_ROOT_LOG 2
 #define TEX_CACHE_BLOCK_SIZE_ROOT 4

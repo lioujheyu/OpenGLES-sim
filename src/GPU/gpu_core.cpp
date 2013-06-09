@@ -12,13 +12,6 @@ GPU_Core gpu;
 
 void GPU_Core::Run()
 {
-#ifdef PIXEL_GENERATE_DEBUG
-	rm.PIXEL_GENERATE_DEBUGfp = fopen("PixelGenerateDebug.txt","w");
-#endif
-#ifdef TEXDEBUG
-	rm.TEXDEBUGfp = fopen("TextureDebug.txt","w");
-#endif
-
     gm.Initialize();
 
     ///If frame buffer clearing is enable, perform it.
@@ -53,12 +46,13 @@ void GPU_Core::Run()
             }
         }
 
+		///Vertex-based operation starts here
         gm.ShaderEXE();
         gm.PerspectiveCorrection();
         gm.ViewPort();
         gm.PrimitiveAssembly();
 
-        ///Primitive based starts here
+        ///Primitive-based operation starts here
         if (gm.primitiveReady)
         {
             gm.primitiveReady = false;
@@ -67,6 +61,8 @@ void GPU_Core::Run()
             rm.prim = gm.prim;
 
             rm.TriangleSetup();
+
+            ///Fragment-based operation starts here
             rm.PixelGenerateHiber();
 
         }

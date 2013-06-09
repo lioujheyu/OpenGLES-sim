@@ -1,13 +1,7 @@
 /**********************************************************
 //  The rendering module simulator
-//  Writed by Jhe-Yu Liu
-//  Email: elvis@casmail.ee.ncku.edu.tw
-//
-//  Basically it has four function for rendering.
-//  They are <TriangleSetup>, <PixelGenerate>, <TextureMapping>,
-//  and <PerfragmentOP>.
-//
-//
+//  Writed by Liou Jhe-Yu
+//  Email: lioujheyu@gmail.com
 **********************************************************/
 #include "rasterizer.h"
 
@@ -296,12 +290,12 @@ fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, u
 
 	u = (unsigned short)coordIn.s;
 	v = (unsigned short)coordIn.t;
+
 #ifdef MIPMAPLEVELTEST
 	fixColor4 mipmaplevel;
 	mipmaplevel = fixColor4(0xff-level*30, 0xff-level*30, 0xff-level*30, 0xff);
 	return mipmaplevel;
-#endif //MIPMAPLEVELTEST
-
+#else
 	U_Super = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_X_LOG);
 	V_Super = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_Y_LOG);
 	U_Block = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_X - 1);
@@ -347,6 +341,8 @@ fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, u
 		}
 		return TexCache.color[pos_cache][pos_block];
 	}
+
+#endif //MIPMAPLEVELTEST
 }
 
 floatVec4 Rasterizer::TexCoordWrap(floatVec4 coordIn, unsigned int level, unsigned char tid)
@@ -560,16 +556,30 @@ pixel Rasterizer::ShaderEXE(pixel pixInput)
 {
     texIndx = 4;
 
+    floatVec4 temp;
+    float eyevector[] = {0.0, 0.0, 1,0};
+    float dotresult;
+
 	fixColor4 texColor0 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 0);
-//	fixColor4 texColor1 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 1);
+	fixColor4 texColor1 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 1);
 
-	pixInput.attr[colIndx].r = texColor0.r;
-	pixInput.attr[colIndx].g = texColor0.g;
-	pixInput.attr[colIndx].b = texColor0.b;
+//	pixInput.attr[colIndx].r = texColor0.r;
+//	pixInput.attr[colIndx].g = texColor0.g;
+//	pixInput.attr[colIndx].b = texColor0.b;
 
-//	pixInput.attr[colIndx].r = texColor0.r*0.8 + texColor1.r*0.2;
-//	pixInput.attr[colIndx].g = texColor0.g*0.8 + texColor1.g*0.2;
-//	pixInput.attr[colIndx].b = texColor0.b*0.8 + texColor1.b*0.2;
+	temp.r = ((float)texColor1.r / 255)*2 - 1;
+	temp.g = ((float)texColor1.g / 255)*2 - 1;
+	temp.b = ((float)texColor1.b / 255)*2 - 1;
+
+	dotresult = eyevector[0]*temp.r + eyevector[1]*temp.g + eyevector[2]*temp.b;
+
+	pixInput.attr[colIndx].r = texColor0.r * dotresult;
+	pixInput.attr[colIndx].g = texColor0.g * dotresult;
+	pixInput.attr[colIndx].b = texColor0.b * dotresult;
+
+//	pixInput.attr[colIndx].r = texColor0.r + texColor1.r;
+//	pixInput.attr[colIndx].g = texColor0.g + texColor1.g;
+//	pixInput.attr[colIndx].b = texColor0.b + texColor1.b;
 
 	return pixInput;
 }

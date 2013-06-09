@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <vector>
+#include <map>
 #include <GLES3/gl3.h>
 
 #include "type.h"
@@ -83,6 +84,21 @@ struct textureState
     }
 };
 
+struct shaderObject
+{
+	FILE shaderSource;
+	FILE compiledShaderSource;
+	bool isCompiled;
+	unsigned int shaderLength;
+	unsigned char shader;
+	unsigned int sid;
+};
+
+struct programObject
+{
+
+};
+
 class Context
 {
 public:
@@ -133,7 +149,10 @@ public:
     attribute       vertexAttrib[8];
     drawCommand     drawCmd;
 
-    std::vector<textureImage> texDataVec;
+    std::map<unsigned int,textureImage> texImagePool;
+
+	std::map<unsigned int, programObject> programPool;
+    std::map<unsigned int, shaderObject> shaderPool;
 
 private:
 	bool            m_current;

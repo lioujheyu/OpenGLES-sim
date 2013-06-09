@@ -36,6 +36,7 @@ union floatVec4
 		tmp = (x*other.x + y*other.y + z*other.z + w*other.w);
 		return tmp;
 	}
+
 };
 
 class fixColor4
@@ -43,10 +44,10 @@ class fixColor4
 public:
     GLubyte r,g,b,a;
 
-    inline fixColor4():r(0x0), g(0x0), b(0x0), a(0xff){}
-
-    inline fixColor4(GLubyte rv, GLubyte gv, GLubyte bv, GLubyte av):
-        r(rv), g(gv), b(bv), a(av) {}
+//    inline fixColor4(){}
+//
+//    inline fixColor4(GLubyte rv, GLubyte gv, GLubyte bv, GLubyte av):
+//        r(rv), g(gv), b(bv), a(av) {}
 
     inline fixColor4& operator=(const fixColor4 &rhs)
     {
@@ -103,11 +104,7 @@ struct textureImage
 
     GLubyte     *data[13];
 
-	textureImage()
-	{
-		maxLevel = 0;
-		border = 0;
-	}
+	inline textureImage():maxLevel(0),border(0){}
 
     inline textureImage& operator=(const textureImage &rhs)
     {

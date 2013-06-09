@@ -72,22 +72,18 @@ void Context::DeleteTextures(GLsizei n, const GLuint *textures)
         return;
     }
 
-    printf("DeleteTextures-> base:[%d] (VEC size:[%d])\n", *textures, texDataVec.size());
-
-    std::vector<textureImage>::iterator startIterator;
-
-    for (int i=0; i<n; ++i)
+        for (int i=0; i<n; ++i)
     {
-        startIterator = texDataVec.begin() + textures[i];
+        if (texImagePool.find(*(textures+i)) == texImagePool.end())
+			continue;
 
         for (int j =0;j<13;j++)
-			delete[] texDataVec[i].data[j];
+			delete[] texImagePool[*(textures+i)].data[j];
 
-        texDataVec.erase(startIterator);
+        texImagePool.erase(*(textures+i));
+
+        printf("Del texture ID: %d\n",*(textures+i));
     }
-    printf("DeleteTextures-> VEC size:[%d], capacity:[%d]\n", texDataVec.size(), texDataVec.capacity());
-//    delete[] texobj->teximage->data;
-
 }
 
 void Context::Disable (GLenum cap)
@@ -211,12 +207,20 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
 
     textureImage *texObj = new textureImage[n];
 
-    for(int i=0;i<n;i++) {
-        texDataVec.push_back(texObj[i]);
-        *textures = textureTotalSeq;
-        *textures++;
-        textureTotalSeq++;
-    }
+	int i = 0;
+	unsigned int key = 0;
+	while(i<n) {
+		if (texImagePool.find(key) == texImagePool.end()){
+			texImagePool[key] = texObj[i];
+			*(textures+i) = key;
+			printf("Gen Texture ID: %d\n",key);
+
+			i++;
+			key++;
+		}
+		else
+			key++;
+	}
 
     delete []texObj;
 }
@@ -326,12 +330,11 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 		}
     }
 
-    //Create default texture object for texture2D if GenTexture() is not be called.
-    if(texDataVec.empty())
+    //Create default texture object for texture2D if GenTexture() has not be called.
+    if(texImagePool.empty())
     {
         textureImage texObj;
-        texDataVec.push_back(texObj);
-        textureTotalSeq++;
+        texImagePool[0] = texObj;
 		texContext[activeTexture].texBindID = 0;
     }
 
@@ -345,7 +348,7 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 
     temp.data[level] = image;
 
-	texDataVec[texContext[activeTexture].texBindID] = temp;
+	texImagePool[texContext[activeTexture].texBindID] =temp;
 }
 
 void Context::TexParameteri(GLenum target, GLenum pname, GLint param)

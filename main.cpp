@@ -3,11 +3,10 @@
 #include "src/context.h"
 #include "bitmap.h"
 
-bool LoadTexture(char *filename)
+bool LoadTexture(char *filename, unsigned int *texture)
 {
 	unsigned char *bitmap;
 	_BITMAPINFO *info;
-	unsigned int texture[2];
 
     bitmap = LoadDIBitmap(filename, &info);
 
@@ -22,11 +21,36 @@ bool LoadTexture(char *filename)
                  info->bmiHeader.biHeight, 0, GL_RGB, GL_UNSIGNED_BYTE,
                  bitmap);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    free(bitmap);
+    free(info);
+
+    return true;
+}
+
+bool LoadRGBATexture(char *filename, unsigned int *texture)
+{
+	unsigned char *bitmap;
+	_BITMAPINFO *info;
+
+    bitmap = LoadDIBitmap(filename, &info);
+
+    if (!bitmap)
+        return false;
+
+    glGenTextures(1, texture);
+
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info->bmiHeader.biWidth,
+                 info->bmiHeader.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 bitmap);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -42,16 +66,25 @@ int main()
     //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.
     Context::SetCurrentContext(new Context());
 
+    unsigned int texture[2];
+
     glActiveTexture(GL_TEXTURE0);
-    LoadTexture("data/road.bmp");
+    LoadTexture("data/wood.bmp", &texture[0]);
 
     glActiveTexture(GL_TEXTURE1);
-    LoadTexture("data/chessboard.bmp");
+    LoadRGBATexture("data/four_NM_height.bmp", &texture[1]);
 
-    GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0,
-                             1.0f, -1.0f, 0.0f, 1.0,
-                             1.0f/16,0.0f, 1.0f,16.0,
-                            -1.0f/16,0.0f, 1.0f,16.0
+	//The projection transformation in vertex shader has not yet implementation.
+//    GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0,
+//                             1.0f, -1.0f, 0.0f, 1.0,
+//                             1.0f/16,0.0f, 1.0f,16.0,
+//                            -1.0f/16,0.0f, 1.0f,16.0
+//                          };
+
+	GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f,
+                             1.0f, -1.0f, 0.0f,
+                             1.0f,  1.0f, 0.0f,
+                            -1.0f,  1.0f, 0.0f
                           };
 
     GLfloat color[] = { 1.0f, 1.0f, 1.0f,
@@ -77,7 +110,7 @@ int main()
     int v_coord_loc = 0;
     int v_color_loc = 1;
     int v_tex0_loc = 4;
-    glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);
+    glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, vertexPos);
     glEnableVertexAttribArray(v_coord_loc);
 
     glVertexAttribPointer(v_color_loc, 3, GL_FLOAT, GL_FALSE, 0, color);
@@ -88,6 +121,7 @@ int main()
 
     glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
+	glDeleteTextures(2, texture);
 
     return 0;
 }
