@@ -198,6 +198,7 @@ void Context::GenerateMipmap(GLenum target)
 	texContext[activeTexture].genMipmap = GL_TRUE;
 }
 
+/// @note (elvis#1#): Searching the free texture id under std map container is not efficient.
 void Context::GenTextures(GLsizei n, GLuint* textures)
 {
 	if (n < 0) {
@@ -205,13 +206,13 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
         return;
     }
 
-    textureImage *texObj = new textureImage[n];
+    textureImage texObj;
 
 	int i = 0;
 	unsigned int key = 0;
 	while(i<n) {
 		if (texImagePool.find(key) == texImagePool.end()){
-			texImagePool[key] = texObj[i];
+			texImagePool[key] = texObj;
 			*(textures+i) = key;
 			printf("Gen Texture ID: %d\n",key);
 
@@ -222,7 +223,7 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
 			key++;
 	}
 
-    delete []texObj;
+    //delete []texObj;
 }
 
 void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels)

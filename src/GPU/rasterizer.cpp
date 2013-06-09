@@ -397,9 +397,9 @@ fixColor4 Rasterizer::BilinearFilter(floatVec4 coordIn,int level, unsigned char 
 	coordLOD[2].t = coordLOD[2].t + 1;
 	coordLOD[3].s = coordLOD[3].s + 1;
 	coordLOD[3].t = coordLOD[3].t + 1;
-	coordLOD[1] = TexCoordWrap(coordLOD[1], 0, tid);
-	coordLOD[2] = TexCoordWrap(coordLOD[2], 0, tid);
-	coordLOD[3] = TexCoordWrap(coordLOD[3], 0, tid);
+	coordLOD[1] = TexCoordWrap(coordLOD[1], level, tid);
+	coordLOD[2] = TexCoordWrap(coordLOD[2], level, tid);
+	coordLOD[3] = TexCoordWrap(coordLOD[3], level, tid);
 
 
 	TexColor[0] = GetTexColor(coordLOD[0], level, tid);
