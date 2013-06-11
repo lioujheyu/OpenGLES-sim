@@ -157,12 +157,12 @@ GL_APICALL void GL_APIENTRY glCopyTexSubImage2D (GLenum target, GLint level, GLi
 
 GL_APICALL GLuint GL_APIENTRY glCreateProgram (void)
 {
-
+	CONTEXT_EXEC_RETURN(CreateProgram());
 }
 
 GL_APICALL GLuint GL_APIENTRY glCreateShader (GLenum type)
 {
-
+	CONTEXT_EXEC_RETURN(CreateShader(type));
 }
 
 GL_APICALL void GL_APIENTRY glCullFace (GLenum mode)
@@ -182,7 +182,7 @@ GL_APICALL void GL_APIENTRY glDeleteFramebuffers (GLsizei n, const GLuint* frame
 
 GL_APICALL void GL_APIENTRY glDeleteProgram (GLuint program)
 {
-
+	CONTEXT_EXEC(DeleteProgram(program));
 }
 
 GL_APICALL void GL_APIENTRY glDeleteRenderbuffers (GLsizei n, const GLuint* renderbuffers)
@@ -192,7 +192,7 @@ GL_APICALL void GL_APIENTRY glDeleteRenderbuffers (GLsizei n, const GLuint* rend
 
 GL_APICALL void GL_APIENTRY glDeleteShader (GLuint shader)
 {
-
+	CONTEXT_EXEC(DeleteShader(shader));
 }
 
 GL_APICALL void GL_APIENTRY glDeleteTextures (GLsizei n, const GLuint* textures)
@@ -217,7 +217,7 @@ GL_APICALL void GL_APIENTRY glDepthRangef (GLfloat n, GLfloat f)
 
 GL_APICALL void GL_APIENTRY glDetachShader (GLuint program, GLuint shader)
 {
-
+	CONTEXT_EXEC(DetachShader(program, shader));
 }
 
 GL_APICALL void GL_APIENTRY glDisable (GLenum cap)
@@ -332,7 +332,7 @@ GL_APICALL void GL_APIENTRY glGetBufferParameteriv (GLenum target, GLenum pname,
 
 GL_APICALL GLenum GL_APIENTRY glGetError (void)
 {
-
+	CONTEXT_EXEC_RETURN(GetError());
 }
 
 GL_APICALL void GL_APIENTRY glGetFloatv (GLenum pname, GLfloat* params)

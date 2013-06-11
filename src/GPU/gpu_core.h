@@ -11,6 +11,7 @@
 #include "geometry.h"
 #include "rasterizer.h"
 #include "gpu_config.h"
+#include "gpu_type.h"
 
 #endif // GPU_CORE_H_INCLUDED
 

@@ -46,6 +46,7 @@
 		<Unit filename="src/GPU/gpu_config.h" />
 		<Unit filename="src/GPU/gpu_core.cpp" />
 		<Unit filename="src/GPU/gpu_core.h" />
+		<Unit filename="src/GPU/gpu_type.h" />
 		<Unit filename="src/GPU/rasterizer.cpp" />
 		<Unit filename="src/GPU/rasterizer.h" />
 		<Unit filename="src/context.cpp" />

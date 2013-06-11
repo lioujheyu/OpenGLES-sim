@@ -2,8 +2,8 @@
 
 Geometry::Geometry()
 {
-    depthRangeN = VPNEAR;
-    depthRangeF = VPFAR;
+    depthRangeN = 0.0;
+    depthRangeF = 1.0;
     drawMode = GL_TRIANGLES;
 
     posIndx = 0;

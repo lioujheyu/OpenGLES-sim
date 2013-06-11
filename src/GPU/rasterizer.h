@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <GLES3/gl3.h>
 #include "gpu_config.h"
+#include "gpu_type.h"
 
 class Rasterizer
 {

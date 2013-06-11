@@ -44,11 +44,6 @@ class fixColor4
 public:
     GLubyte r,g,b,a;
 
-//    inline fixColor4(){}
-//
-//    inline fixColor4(GLubyte rv, GLubyte gv, GLubyte bv, GLubyte av):
-//        r(rv), g(gv), b(bv), a(av) {}
-
     inline fixColor4& operator=(const fixColor4 &rhs)
     {
         if (this == &rhs)

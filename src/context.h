@@ -2,8 +2,12 @@
 #define CONTEXT_H_INCLUDED
 
 #include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <algorithm>
 #include <vector>
 #include <map>
+#include <stack>
 #include <GLES3/gl3.h>
 
 #include "type.h"
@@ -86,17 +90,53 @@ struct textureState
 
 struct shaderObject
 {
-	FILE shaderSource;
-	FILE compiledShaderSource;
-	bool isCompiled;
-	unsigned int shaderLength;
-	unsigned char shader;
-	unsigned int sid;
+	inline shaderObject()
+	{
+		isCompiled = GL_FALSE;
+		delFlag = GL_FALSE;
+		shaderLength = 0;
+		shaderType = 0;
+	}
+
+	char *shaderSource;
+	char *compiledShaderSource;
+	GLboolean isCompiled;
+	GLboolean delFlag;
+	GLuint shaderLength;
+	GLenum shaderType;
+
+	std::vector<GLuint> attachList;
+
+	inline shaderObject& operator=(const shaderObject &rhs)
+	{
+		if (this == &rhs)
+            return *this;
+		shaderSource = rhs.shaderSource;
+		compiledShaderSource = rhs.compiledShaderSource;
+		isCompiled = rhs.isCompiled;
+		shaderLength = rhs.shaderLength;
+		shaderType = rhs.shaderType;
+
+		// STL's copy operator is efficient.
+		attachList = rhs.attachList;
+		return *this;
+	}
 };
 
 struct programObject
 {
+	inline programObject()
+	{
+		sid4VS = 0;
+		sid4FS = 0;
+		isLinked = GL_FALSE;
+		delFlag = GL_FALSE;
+	}
 
+	GLuint sid4VS;
+	GLuint sid4FS;
+	GLboolean isLinked;
+	GLboolean delFlag;
 };
 
 class Context
@@ -113,23 +153,31 @@ public:
     void                DumpImage();
 
 //OpenGL ES 2.0 API
-	void ActiveTexture(GLenum texture);
-	void BindTexture (GLenum target, GLuint texture);
-    void Clear (GLbitfield mask);
-    void ClearColor (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
-    void ClearDepthf (GLfloat depth);
-    void DeleteTextures (GLsizei n, const GLuint* textures);
-    void DepthRangef (GLfloat n, GLfloat f);
-    void Disable (GLenum cap);
-    void DrawArrays (GLenum mode, GLint first, GLsizei count);
-    void Enable (GLenum cap);
-    void EnableVertexAttribArray (GLuint index);
-    void GenerateMipmap(GLenum target);
-    void GenTextures (GLsizei n, GLuint* textures);
-    void TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
-    void TexParameteri(GLenum target, GLenum pname, GLint param);
-    void VertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
-    void Viewport (GLint x, GLint y, GLsizei width, GLsizei height);
+	void 	AttachShader(GLuint program, GLuint shader);
+	void 	ActiveTexture(GLenum texture);
+	void 	BindTexture (GLenum target, GLuint texture);
+    void 	Clear (GLbitfield mask);
+    void 	ClearColor (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+    void 	ClearDepthf (GLfloat depth);
+    GLuint 	CreateProgram (void);
+    GLint	CreateShader (GLenum type);
+    void	DeleteProgram (GLuint program);
+    void	DeleteShader (GLuint shader);
+    void 	DeleteTextures (GLsizei n, const GLuint* textures);
+    void 	DepthRangef (GLfloat n, GLfloat f);
+    void 	DetachShader (GLuint program, GLuint shader);
+    void 	Disable (GLenum cap);
+    void 	DrawArrays (GLenum mode, GLint first, GLsizei count);
+    void 	Enable (GLenum cap);
+    void 	EnableVertexAttribArray (GLuint index);
+    void 	GenerateMipmap(GLenum target);
+    void 	GenTextures (GLsizei n, GLuint* textures);
+    GLenum	GetError (void);
+    void 	ShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
+    void 	TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
+    void 	TexParameteri(GLenum target, GLenum pname, GLint param);
+    void 	VertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
+    void 	Viewport (GLint x, GLint y, GLsizei width, GLsizei height);
 
 
 /// @fixme (elvis#1#): dirty buffer setting before buffer management is ready
@@ -137,10 +185,9 @@ public:
 
     viewPort        vp;
     floatVec4		clearColor;
-    float			clearDepth;
-    bool			clearStat;
-    unsigned int 	clearMask;
-    GLuint 			textureTotalSeq;
+    GLfloat			clearDepth;
+    GLboolean		clearStat;
+    GLuint		 	clearMask;
 
     GLboolean       blendEnable;
     GLboolean       depthTestEnable;
@@ -149,14 +196,18 @@ public:
     attribute       vertexAttrib[8];
     drawCommand     drawCmd;
 
-    std::map<unsigned int,textureImage> texImagePool;
+    GLuint			useProgramID;
 
-	std::map<unsigned int, programObject> programPool;
-    std::map<unsigned int, shaderObject> shaderPool;
+    std::map<GLuint, textureImage> texImagePool;
+
+	std::map<GLuint, programObject> programPool;
+    std::map<GLuint, shaderObject> shaderPool;
 
 private:
 	bool            m_current;
 	GLubyte			activeTexture;
+
+	std::stack<GLenum> errorStack;
 };
 
 #endif // CONTEXT_H_INCLUDED

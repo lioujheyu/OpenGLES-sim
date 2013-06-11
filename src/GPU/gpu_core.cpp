@@ -14,7 +14,7 @@ void GPU_Core::Run()
 {
     gm.Initialize();
 
-    ///If frame buffer clearing is enable, perform it.
+    ///clear frame buffer if needed
     if (clearStat) {
 		rm.ClearBuffer(clearMask);
 		clearStat = false;

@@ -291,7 +291,7 @@ fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, u
 	u = (unsigned short)coordIn.s;
 	v = (unsigned short)coordIn.t;
 
-#ifdef MIPMAPLEVELTEST
+#ifdef MIPMAP_LEVEL_TEST
 	fixColor4 mipmaplevel;
 	mipmaplevel = fixColor4(0xff-level*30, 0xff-level*30, 0xff-level*30, 0xff);
 	return mipmaplevel;
@@ -303,7 +303,8 @@ fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, u
 	U_Offset = u & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	V_Offset = v & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	tag = (int)( (V_Super << 8) | (U_Super&0x00ff) );
-    /// @fixme (elvis#1#): Simply append level and texture_id after tag bit to tell the differece of multi-texture address
+    /// @fixme (elvis#1#): Simply append level and texture_id after tag bit to
+    ///					   tell the differece between multi-textures' address
 	tag = (tag << 4) | (level&0xf);
 	tag = (tag << 1) | (tid&0x1);
 
@@ -327,9 +328,10 @@ fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, u
 
 		for (j = 0; j < TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
 			for (i = 0; i < TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
-				texTmpPtr = texImage[tid].data[level] + CalcTexAdd(U_Super,U_Block,i,
-                                                                  V_Super,V_Block,j,
-                                                                  texImage[tid].widthLevel[level]) * 4;
+				texTmpPtr = texImage[tid].data[level] +
+							CalcTexAdd(U_Super,U_Block,i,
+									   V_Super,V_Block,j,
+									   texImage[tid].widthLevel[level]) * 4;
 
 				//printf("%d %x (%d,%d)\n",level,texImage.data[level],u,v);
 
@@ -342,7 +344,7 @@ fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, u
 		return TexCache.color[pos_cache][pos_block];
 	}
 
-#endif //MIPMAPLEVELTEST
+#endif //MIPMAP_LEVEL_TEST
 }
 
 floatVec4 Rasterizer::TexCoordWrap(floatVec4 coordIn, unsigned int level, unsigned char tid)

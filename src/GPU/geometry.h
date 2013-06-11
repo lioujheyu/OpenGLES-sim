@@ -3,7 +3,7 @@
 
 #include <GLES3/gl3.h>
 #include "gpu_config.h"
-#include "../type.h"
+#include "gpu_type.h"
 
 class Geometry{
 public:

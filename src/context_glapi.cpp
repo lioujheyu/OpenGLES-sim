@@ -56,29 +56,19 @@ void Context::ClearDepthf (GLfloat depth)
 	clearDepth = depth;
 }
 
-void Context::DepthRangef(GLfloat n, GLfloat f)
-{
-    vp.n = (n<0)?0:(n>1)?1:n;
-    vp.f = (f<0)?0:(f>1)?1:f;
-}
-
 void Context::DeleteTextures(GLsizei n, const GLuint *textures)
 {
-    // @todo : build a complete data structure of texture object
-    //        -> garbage collection mechanism
-    if (n < 0)
-    {
+    if (n < 0) {
         RecordError(GL_INVALID_VALUE);
         return;
     }
 
-        for (int i=0; i<n; ++i)
-    {
+    for (int i=0; i<n; ++i) {
         if (texImagePool.find(*(textures+i)) == texImagePool.end())
 			continue;
 
-        for (int j =0;j<13;j++)
-			delete[] texImagePool[*(textures+i)].data[j];
+        for (unsigned int l=0;l<texImagePool[*(textures+i)].maxLevel;l++)
+			delete[] texImagePool[*(textures+i)].data[l];
 
         texImagePool.erase(*(textures+i));
 
@@ -86,7 +76,13 @@ void Context::DeleteTextures(GLsizei n, const GLuint *textures)
     }
 }
 
-void Context::Disable (GLenum cap)
+void Context::DepthRangef(GLfloat n, GLfloat f)
+{
+    vp.n = (n<0)?0:(n>1)?1:n;
+    vp.f = (f<0)?0:(f>1)?1:f;
+}
+
+void Context::Disable(GLenum cap)
 {
     switch (cap) {
     case GL_BLEND:
@@ -198,7 +194,7 @@ void Context::GenerateMipmap(GLenum target)
 	texContext[activeTexture].genMipmap = GL_TRUE;
 }
 
-/// @note (elvis#1#): Searching the free texture id under std map container is not efficient.
+/// @note (elvis#1#): Searching the free texture id under std::map container is not efficient.
 void Context::GenTextures(GLsizei n, GLuint* textures)
 {
 	if (n < 0) {
@@ -226,6 +222,19 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
     //delete []texObj;
 }
 
+GLenum Context::GetError(void)
+{
+	GLenum errorFlag;
+
+	if (errorStack.empty())
+		return GL_NO_ERROR;
+	else{
+		errorFlag = errorStack.top();
+		errorStack.pop();
+		return errorFlag;
+	}
+}
+
 void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels)
 {
 	if (target != GL_TEXTURE_2D) {
@@ -233,7 +242,7 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
         return;
     }
 
-    if (level < 0 || level > 13) {
+    if (level < 0 || (float)level > log2f((float)std::max(width,height))) {
         RecordError(GL_INVALID_ENUM);
         return;
     }

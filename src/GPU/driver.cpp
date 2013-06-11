@@ -62,8 +62,8 @@ void GenMipMap(int tid)
 
 		image = new unsigned char[nextWidth * nextHeight * 4];
 
-		for (int y=0;y<nextHeight;y++){
-			for (int x=0;x<nextWidth;x++){
+		for (unsigned int y=0;y<nextHeight;y++){
+			for (unsigned int x=0;x<nextWidth;x++){
 				texel[0].r = *(tempImg.data[i] + (2*y*width + 2*x)*4    );
 				texel[0].g = *(tempImg.data[i] + (2*y*width + 2*x)*4 + 1);
 				texel[0].b = *(tempImg.data[i] + (2*y*width + 2*x)*4 + 2);

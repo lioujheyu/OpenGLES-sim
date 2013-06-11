@@ -2,7 +2,7 @@
 #include <GLES3/gl3.h>
 #include "src/context.h"
 #include "bitmap.h"
-
+//#include "shader.h"
 bool LoadTexture(char *filename, unsigned int *texture)
 {
 	unsigned char *bitmap;
@@ -69,7 +69,7 @@ int main()
     unsigned int texture[2];
 
     glActiveTexture(GL_TEXTURE0);
-    LoadTexture("data/wood.bmp", &texture[0]);
+    LoadTexture("data/road.bmp", &texture[0]);
 
     glActiveTexture(GL_TEXTURE1);
     LoadRGBATexture("data/four_NM_height.bmp", &texture[1]);
@@ -119,7 +119,7 @@ int main()
     glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, texCoord);
     glEnableVertexAttribArray(v_tex0_loc);
 
-    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+    //glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
 	glDeleteTextures(2, texture);
 

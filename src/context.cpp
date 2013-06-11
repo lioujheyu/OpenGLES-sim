@@ -6,7 +6,7 @@ Context::Context()
 {
     m_current = false;
     activeTexture = 0;
-    textureTotalSeq = 0;
+//    textureTotalSeq = 0;
 
     for (int i=0;i<8;i++)
         vertexAttrib[i].enable = false;
@@ -48,7 +48,25 @@ Context* Context::GetCurrentContext()
 
 void Context::RecordError(GLenum error)
 {
-	printf("Bug pop out!!!\n");
+	if (error == GL_OUT_OF_MEMORY) {
+		printf("GL_OUT_OF_MEMORY!!! \n");
+		exit(EXIT_FAILURE);
+	}
+	else {
+		errorStack.push(error);
+
+		switch(error){
+		case GL_INVALID_ENUM:
+			printf("GL_INVALID_ENUM \n");
+			break;
+		case GL_INVALID_VALUE:
+			printf("GL_INVALID_VALUE \n");
+			break;
+		case GL_INVALID_OPERATION:
+			printf("GL_INVALID_OPERATION \n");
+			break;
+		}
+	}
 }
 
 
