@@ -34,9 +34,9 @@ void Rasterizer::PixelGenerateHiber()
 	for(y=LY; y<HY; y+=16)
 		for(x=LX; x<RX; x+=16) {
 			pixBufferP = 0;
-#ifdef PIXEL_GENERATE_DEBUG
-			fprintf(PIXEL_GENERATE_DEBUGfp,"Recursive Entry:-------(%d,%d)-----\n",x,y);
-#endif
+
+			PIXPRINTF("Recursive Entry:-------(%d,%d)-----\n",x,y);
+
 			pixelSplit(x,y,3);
 		}
 }
@@ -50,12 +50,9 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 
 	pixel pixelStamp[4];
 
-#ifdef PIXEL_GENERATE_DEBUG
-	fprintf(PIXEL_GENERATE_DEBUGfp,"-------(%d,%d),Level:%d-----\n",x,y,level);
-#endif
-#ifdef TEXDEBUG
-	fprintf(TEXDEBUGfp,"XXXX-YYYY-UUUU.UU-VVVV.VV----------------\n");
-#endif
+
+	PIXPRINTF("-------(%d,%d),Level:%d-----\n",x,y,level);
+	TEXPRINTF("XXXX-YYYY-UUUU.UU-VVVV.VV----------------\n");
 
 	centralTest[0] = (x+(1<<level)-prim.v[1].attr[posIndx].x)*Edge[0][0]-
 					 (y+(1<<level)-prim.v[1].attr[posIndx].y)*Edge[0][1];
@@ -175,50 +172,52 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)|
             (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
 			pixBuffer[pixBufferP] = pixelStamp[0];
-#ifdef PIXEL_GENERATE_DEBUG
-			fprintf(PIXEL_GENERATE_DEBUGfp,"P:(%3d,%3d)\t \n",
-					(int)pixBuffer[pixBufferP].attr[0].x,(int)pixBuffer[pixBufferP].attr[0].y);
-#endif
+
+			PIXPRINTF("P:(%3d,%3d)\t \n",
+					   (int)pixBuffer[pixBufferP].attr[0].x,
+					   (int)pixBuffer[pixBufferP].attr[0].y);
+
 			pixBufferP++;
 		}
 
 		if ((cornerTest[2][0]>=0 && cornerTest[2][1]>=0 && cornerTest[2][2]>=0)|
             (cornerTest[2][0]<=0 && cornerTest[2][1]<=0 && cornerTest[2][2]<=0)) {
 			pixBuffer[pixBufferP] = pixelStamp[1];
-#ifdef PIXEL_GENERATE_DEBUG
-			fprintf(PIXEL_GENERATE_DEBUGfp,"P:(%3d,%3d) \n",
-					(int)pixBuffer[pixBufferP].attr[0].x,(int)pixBuffer[pixBufferP].attr[0].y);
-#endif
+
+			PIXPRINTF("P:(%3d,%3d)\t \n",
+					   (int)pixBuffer[pixBufferP].attr[0].x,
+					   (int)pixBuffer[pixBufferP].attr[0].y);
+
 			pixBufferP++;
 		}
 
 		if ((cornerTest[5][0]>=0 && cornerTest[5][1]>=0 && cornerTest[5][2]>=0)|
             (cornerTest[5][0]<=0 && cornerTest[5][1]<=0 && cornerTest[5][2]<=0)) {
 			pixBuffer[pixBufferP] = pixelStamp[2];
-#ifdef PIXEL_GENERATE_DEBUG
-			fprintf(PIXEL_GENERATE_DEBUGfp,"P:(%3d,%3d) \n",
-					(int)pixBuffer[pixBufferP].attr[0].x,(int)pixBuffer[pixBufferP].attr[0].y);
-#endif
+
+			PIXPRINTF("P:(%3d,%3d)\t \n",
+					   (int)pixBuffer[pixBufferP].attr[0].x,
+					   (int)pixBuffer[pixBufferP].attr[0].y);
+
 			pixBufferP++;
 		}
 
 		if ((cornerTest[7][0]>=0 && cornerTest[7][1]>=0 && cornerTest[7][2]>=0)|
             (cornerTest[7][0]<=0 && cornerTest[7][1]<=0 && cornerTest[7][2]<=0)) {
 			pixBuffer[pixBufferP] = pixelStamp[3];
-#ifdef PIXEL_GENERATE_DEBUG
-			fprintf(PIXEL_GENERATE_DEBUGfp,"P:(%3d,%3d) \n",
-					(int)pixBuffer[pixBufferP].attr[0].x,(int)pixBuffer[pixBufferP].attr[0].y);
-#endif
+
+			PIXPRINTF("P:(%3d,%3d)\t \n",
+					   (int)pixBuffer[pixBufferP].attr[0].x,
+					   (int)pixBuffer[pixBufferP].attr[0].y);
 			pixBufferP++;
 		}
 
-		for (int i = 0; i < pixBufferP; i++)
-        {
+		for (int i = 0; i < pixBufferP; i++) {
             pixBuffer[i] = ShaderEXE(pixBuffer[i]);
-
             PerFragmentOp(pixBuffer[i]);
         }
-	} else {
+	}
+	else {
 		/*
 		 * c - central
 		 * n - corner
@@ -277,16 +276,23 @@ int Rasterizer::CalcTexAdd(short int us,
                            short int vo,
                            int width)
 {
-	return (vs*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_Y+vb*TEX_CACHE_BLOCK_SIZE_ROOT+vo)*width+
-		   us*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_X+ub*TEX_CACHE_BLOCK_SIZE_ROOT+uo;
+	return (vs*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_SIZE_ROOT
+			+ vb*TEX_CACHE_BLOCK_SIZE_ROOT
+			+ vo ) * width
+			+ us*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_SIZE_ROOT
+			+ ub*TEX_CACHE_BLOCK_SIZE_ROOT
+			+ uo;
 }
 
 fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, unsigned char tid)
 {
 	int i,j;
 	unsigned short u, v;
-	unsigned short tag, pos_cache, pos_block, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
+	unsigned short tag, entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
 	unsigned char *texTmpPtr = NULL;
+	bool isHit = false;
+	unsigned char hitWay = 0;
+	unsigned char LRUbiggest = 0;
 
 	u = (unsigned short)coordIn.s;
 	v = (unsigned short)coordIn.t;
@@ -296,38 +302,62 @@ fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, u
 	mipmaplevel = fixColor4(0xff-level*30, 0xff-level*30, 0xff-level*30, 0xff);
 	return mipmaplevel;
 #else
-	U_Super = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_X_LOG);
-	V_Super = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_Y_LOG);
-	U_Block = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_X - 1);
-	V_Block = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_Y - 1);
+	U_Super = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_SIZE_ROOT_LOG);
+	V_Super = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_SIZE_ROOT_LOG);
+	U_Block = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_SIZE_ROOT - 1);
+	V_Block = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_SIZE_ROOT - 1);
 	U_Offset = u & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	V_Offset = v & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	tag = (int)( (V_Super << 8) | (U_Super&0x00ff) );
     /// @fixme (elvis#1#): Simply append level and texture_id after tag bit to
     ///					   tell the differece between multi-textures' address
+    ///					   It now has a HUGE impact to system performance.
 	tag = (tag << 4) | (level&0xf);
 	tag = (tag << 1) | (tid&0x1);
 
-	pos_cache = V_Block * TEX_CACHE_ENTRY_X + U_Block;
-	pos_block = V_Offset * TEX_CACHE_BLOCK_SIZE_ROOT + U_Offset;
+	entry = V_Block * TEX_CACHE_ENTRY_SIZE_ROOT + U_Block;
+	offset = V_Offset * TEX_CACHE_BLOCK_SIZE_ROOT + U_Offset;
+
+	if (TexCache.valid[entry] == true) {
+		for (i=0; i<TEX_WAY_ASSOCIATION; i++) {
+			if (TexCache.tag[entry][i] == tag) {
+				isHit = true;
+				hitWay = i;
+			}
+		}
+	}
 
 	///*************** Texture cache hit *************
-	if ((TexCache.valid[pos_cache] == true) && (TexCache.pos[pos_cache] == tag)) {
+	if (isHit == true) {
 		TexCache.TexCacheHit++;
-		return TexCache.color[pos_cache][pos_block];
-	} else { ///*********** Texture cache miss *************
+		TexCache.LRU[entry][hitWay] = 0;
+
+		return TexCache.color[entry][offset][hitWay];
+	}
+	///*********** Texture cache miss ****************
+	else {
 		TexCache.TexCacheMiss++;
 
-		if (TexCache.valid[pos_cache] == false)
+		if (TexCache.valid[entry] == false)
 			TexCache.TexCacheColdMiss++;
 
-		TexCache.valid[pos_cache] = true;
-		TexCache.pos[pos_cache] = tag;
+		TexCache.valid[entry] = true;
 
-		fprintf(TEXDEBUGfp,"Texture Cache miss!! \n");
+		//printf("Texture Cache miss!! \n");
 
-		for (j = 0; j < TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
-			for (i = 0; i < TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
+		for (i=0; i<TEX_WAY_ASSOCIATION; i++) {
+			TexCache.LRU[entry][i]++;
+
+			if (LRUbiggest < TexCache.LRU[entry][i]) {
+				LRUbiggest = TexCache.LRU[entry][i];
+				hitWay = i;
+			}
+		}
+		TexCache.LRU[entry][hitWay] = 0;
+		TexCache.tag[entry][hitWay] = tag;
+
+		for (j=0; j<TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
+			for (i=0; i<TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
 				texTmpPtr = texImage[tid].data[level] +
 							CalcTexAdd(U_Super,U_Block,i,
 									   V_Super,V_Block,j,
@@ -335,13 +365,13 @@ fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, u
 
 				//printf("%d %x (%d,%d)\n",level,texImage.data[level],u,v);
 
-				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].r = *texTmpPtr++;
-				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].g = *texTmpPtr++;
-				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].b = *texTmpPtr++;
-				TexCache.color[pos_cache][j*TEX_CACHE_BLOCK_SIZE_ROOT+i].a = *texTmpPtr++;
+				TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][hitWay].r = *texTmpPtr++;
+				TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][hitWay].g = *texTmpPtr++;
+				TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][hitWay].b = *texTmpPtr++;
+				TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][hitWay].a = *texTmpPtr++;
 			}
 		}
-		return TexCache.color[pos_cache][pos_block];
+		return TexCache.color[entry][offset][hitWay];
 	}
 
 #endif //MIPMAP_LEVEL_TEST
@@ -359,7 +389,7 @@ floatVec4 Rasterizer::TexCoordWrap(floatVec4 coordIn, unsigned int level, unsign
 		temp.s = CLAMP(coordIn.s, 0.0f, (float)texImage[tid].widthLevel[level]-1);
 		break;
 	default:
-		fprintf(stderr,"Wrong Texture Wrap mode in x-axis!!\n");
+		//DPRINTF(stderr,"Wrong Texture Wrap mode in x-axis!!\n");
 		break;
 	}
 
@@ -371,7 +401,7 @@ floatVec4 Rasterizer::TexCoordWrap(floatVec4 coordIn, unsigned int level, unsign
 		temp.t = CLAMP(coordIn.t, 0.0f, (float)texImage[tid].heightLevel[level]-1);;
 		break;
 	default:
-		fprintf(stderr,"Wrong Texture Wrap mode in y-axis!!\n");
+		//DPRINTF(stderr,"Wrong Texture Wrap mode in y-axis!!\n");
 		break;
 	}
 
@@ -390,9 +420,9 @@ fixColor4 Rasterizer::BilinearFilter(floatVec4 coordIn,int level, unsigned char 
 	fixColor4 TexColor[4];
 
 	coordLOD[0].s = coordIn.s / (1<<level);
-	coordLOD[0].s = (coordLOD[0].s - 0.5)>0 ? coordLOD[0].s - 0.5 : 0;
+	coordLOD[0].s = coordLOD[0].s - 0.5;
 	coordLOD[0].t = coordIn.t / (1<<level);
-	coordLOD[0].t = (coordLOD[0].t - 0.5)>0 ? coordLOD[0].t - 0.5 : 0;
+	coordLOD[0].t = coordLOD[0].t - 0.5;
 
 	coordLOD[1] =  coordLOD[2] = coordLOD[3] = coordLOD[0];
 	coordLOD[1].s = coordLOD[1].s + 1;
@@ -460,15 +490,13 @@ fixColor4 Rasterizer::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixe
 
 	maxLevel = texImage[tid].maxLevel;
 
-    ///Texture Wrap
-    coord = TexCoordWrap(coord, 0, tid);
-
-	///Prevent LoD exceed the maximum allowable LoD.
+	///Prevent LoD exceeds the maximum allowable level.
     LoD = (LoD > maxLevel)?maxLevel:LoD;
 
 	if(maxScaleFac>1) {
 		switch (minFilter[tid]) {
 		case GL_NEAREST:    //u,v nearest filter
+			coord = TexCoordWrap(coord, 0, tid);
 			color = GetTexColor(coord, 0, tid);
 			break;
 
@@ -477,6 +505,7 @@ fixColor4 Rasterizer::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixe
 			break;
 
 		case GL_NEAREST_MIPMAP_NEAREST: //u,v,w nearest filter
+			coord = TexCoordWrap(coord, 0, tid);
 			coord.s = coord.s / (1<<LoD);
 			coord.t = coord.t / (1<<LoD);
 			color = GetTexColor(coord, LoD, tid);
@@ -487,6 +516,7 @@ fixColor4 Rasterizer::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixe
 			break;
 
 		case GL_NEAREST_MIPMAP_LINEAR:  //u,v nearest, w linear filter
+			coord = TexCoordWrap(coord, 0, tid);
 			coord.s = coord.s / (1<<LoD);
 			coord.t = coord.t / (1<<LoD);
 			TexColor[0] = GetTexColor(coord, LoD, tid);
@@ -540,15 +570,18 @@ fixColor4 Rasterizer::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixe
 		}
 	}
 
-#ifdef TEXDEBUG
-	fprintf(TEXDEBUGfp,"%4d %4d %7.2f %7.2f\t",(int)pixelInput.attr[0].x,(int)pixelInput.attr[0].y,coord.s,coord.t);
-	//fprintf(TEXDEBUGfp,"  %2x %2x %2x %2x",color.r,color.g,color.b,color.a);
-	fprintf(TEXDEBUGfp,"%2d %3.2f\t\t",LoD, w_ratio);
-	fprintf(TEXDEBUGfp,"%3.2f %3.2f %3.2f %3.2f\n",pixelInput.scaleFacDX[attrIndx].s*texImage[tid].widthLevel[0],
-												   pixelInput.scaleFacDX[attrIndx].t*texImage[tid].heightLevel[0],
-												   pixelInput.scaleFacDY[attrIndx].s*texImage[tid].widthLevel[0],
-												   pixelInput.scaleFacDY[attrIndx].t*texImage[tid].heightLevel[0]);
-#endif
+	TEXPRINTF("%4d %4d %7.2f %7.2f\t",
+			  (int)pixelInput.attr[0].x,
+			  (int)pixelInput.attr[0].y,
+			  coord.s,
+			  coord.t);
+	//TEXPRINTF("  %2x %2x %2x %2x",color.r,color.g,color.b,color.a);
+	TEXPRINTF("%2d %3.2f\t\t",LoD, w_ratio);
+	TEXPRINTF("%3.2f %3.2f %3.2f %3.2f\n",
+			  pixelInput.scaleFacDX[attrIndx].s*texImage[tid].widthLevel[0],
+			  pixelInput.scaleFacDX[attrIndx].t*texImage[tid].heightLevel[0],
+			  pixelInput.scaleFacDY[attrIndx].s*texImage[tid].widthLevel[0],
+			  pixelInput.scaleFacDY[attrIndx].t*texImage[tid].heightLevel[0]);
 
 	return color;
 }
@@ -677,6 +710,7 @@ Rasterizer::Rasterizer()
 #endif
 
 #ifdef PIXEL_GENERATE_DEBUG
-	PIXEL_GENERATE_DEBUGfp = fopen("Result/PixelGenerateDebug.txt","w");
+	PIXEL_INFO_FILE = fopen("Result/PixelGenerateDebug.txt","w");
 #endif
 }
+

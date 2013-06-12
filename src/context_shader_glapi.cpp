@@ -29,7 +29,7 @@ void Context::AttachShader(GLuint program, GLuint shader)
 		return;
 	}
 
-	switch (shaderPool[shader].shaderType){
+	switch (shaderPool[shader].type){
 	case GL_VERTEX_SHADER:
 		if (programPool[program].sid4VS == 0) {
 			programPool[program].sid4VS = shader;
@@ -57,7 +57,7 @@ GLuint Context::CreateProgram(void)
 {
 	programObject t_program;
 
-	for (int pid=0;;pid++){
+	for (int pid=1;;pid++){
 		if (programPool.find(pid) == programPool.end()) {
 			programPool[pid] = t_program;
 			return pid;
@@ -75,9 +75,9 @@ GLint Context::CreateShader(GLenum type)
 	}
 
 	shaderObject t_shader;
-	t_shader.shaderType = type;
+	t_shader.type = type;
 
-	for (int sid=0;;sid++) {
+	for (int sid=1;;sid++) {
 		if (shaderPool.find(sid) == shaderPool.end()) {
 			shaderPool[sid] = t_shader;
 			return sid;
@@ -161,5 +161,36 @@ void Context::ShaderSource(GLuint shader, GLsizei count, const GLchar* const* st
 		return;
 	}
 
+	shaderObject t_shader = shaderPool[shader];
+	t_shader.source = new GLchar* [count];
+	t_shader.length = new GLint[count];
 
+	if (length == NULL) {
+		for (int i=0;i < count;i++) {
+			t_shader.length[i] = 0;
+
+			while (*(string+i)[t_shader.length[i]] != '\0')
+				t_shader.length[i]++;
+
+			*(t_shader.source+i) = new GLchar[t_shader.length[i]];
+ 			strcpy(*(t_shader.source+i), *(string+i));
+		}
+	}
+	else {
+		for (int i = 0;i < count;i++) {
+			if (length[i] == NULL) {
+				t_shader.length[i] = 0;
+
+				while (*(string+i)[t_shader.length[i]] != '\0')
+					t_shader.length[i]++;
+
+				*(t_shader.source+i) = new GLchar[t_shader.length[i]];
+				strcpy(*(t_shader.source+i), *(string+i));
+			}
+			else {
+				t_shader.length[i] = length[i];
+				strncpy(*(t_shader.source+i), *(string+i), length[i]);
+			}
+		}
+	}
 }

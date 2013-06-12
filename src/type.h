@@ -88,18 +88,14 @@ public:
 
 struct textureImage
 {
-//    GLint       internalFormat;
-    GLuint      maxLevel;
-    GLuint      border;
-//    GLenum      format;
-//    GLenum      type;
+	inline textureImage():maxLevel(-1),border(0){}
 
+    GLint		maxLevel;
+    GLuint		border;
 	GLuint		widthLevel[13];
 	GLuint		heightLevel[13];
 
     GLubyte     *data[13];
-
-	inline textureImage():maxLevel(0),border(0){}
 
     inline textureImage& operator=(const textureImage &rhs)
     {

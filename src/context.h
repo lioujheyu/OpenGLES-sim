@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <cmath>
 #include <algorithm>
 #include <vector>
@@ -11,6 +12,7 @@
 #include <GLES3/gl3.h>
 
 #include "type.h"
+#include "GPU/driver.h"
 
 struct attribute
 {
@@ -94,16 +96,17 @@ struct shaderObject
 	{
 		isCompiled = GL_FALSE;
 		delFlag = GL_FALSE;
-		shaderLength = 0;
-		shaderType = 0;
+		count = 0;
+		type = 0;
 	}
 
-	char *shaderSource;
-	char *compiledShaderSource;
+	GLchar **source;
+	GLchar **compiledSource;
 	GLboolean isCompiled;
 	GLboolean delFlag;
-	GLuint shaderLength;
-	GLenum shaderType;
+	GLint *length;
+	GLsizei count;
+	GLenum type;
 
 	std::vector<GLuint> attachList;
 
@@ -111,11 +114,12 @@ struct shaderObject
 	{
 		if (this == &rhs)
             return *this;
-		shaderSource = rhs.shaderSource;
-		compiledShaderSource = rhs.compiledShaderSource;
+		source = rhs.source;
+		compiledSource = rhs.compiledSource;
 		isCompiled = rhs.isCompiled;
-		shaderLength = rhs.shaderLength;
-		shaderType = rhs.shaderType;
+		length = rhs.length;
+		type = rhs.type;
+		count = rhs.count;
 
 		// STL's copy operator is efficient.
 		attachList = rhs.attachList;

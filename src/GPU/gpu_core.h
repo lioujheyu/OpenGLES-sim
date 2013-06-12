@@ -13,11 +13,12 @@
 #include "gpu_config.h"
 #include "gpu_type.h"
 
-#endif // GPU_CORE_H_INCLUDED
-
 class GPU_Core
 {
 public:
+
+	FILE *GPUINFOfp;
+
     Geometry    gm;
     Rasterizer  rm;
 
@@ -34,3 +35,5 @@ public:
 };
 
 extern GPU_Core gpu;
+
+#endif // GPU_CORE_H_INCLUDED

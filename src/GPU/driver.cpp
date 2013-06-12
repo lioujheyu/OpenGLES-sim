@@ -51,7 +51,7 @@ void GenMipMap(int tid)
 	width = tempImg.widthLevel[0];
 	height = tempImg.heightLevel[0];
 
-	for (int i = 0;i<12;i++) {
+	for (int i = 0;i<13;i++) {
 		if ((width < 1) || (height < 1)){
 			tempImg.maxLevel = i-1;
 			break;

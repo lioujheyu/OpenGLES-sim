@@ -9,9 +9,18 @@
 #include "gpu_config.h"
 #include "gpu_type.h"
 
+const int TEX_CACHE_BLOCK_SIZE_ROOT = (int)sqrt(TEX_CACHE_BLOCK_SIZE);
+const int TEX_CACHE_BLOCK_SIZE_ROOT_LOG = (int)log2(TEX_CACHE_BLOCK_SIZE_ROOT);
+
+const int TEX_CACHE_ENTRY_SIZE_ROOT = (int)sqrt(TEX_CACHE_ENTRY_SIZE);
+const int TEX_CACHE_ENTRY_SIZE_ROOT_LOG = (int)log2(TEX_CACHE_ENTRY_SIZE_ROOT);
+
 class Rasterizer
 {
 public:
+
+	FILE *PIXELINFOfp;
+	FILE *TEXELINFOfp;
 
     Rasterizer();
 
@@ -57,18 +66,16 @@ public:
     void            PerFragmentOp(pixel pixInput);
     void 			ClearBuffer(unsigned int mask);
 
-    //FILE *TEXfp;
-    FILE *TEXDEBUGfp;
-    FILE *PIXEL_GENERATE_DEBUGfp;
-
-	struct {
-        bool            valid[TEX_CACHE_ENTRY_X*TEX_CACHE_ENTRY_Y];
-        int             pos[TEX_CACHE_ENTRY_X*TEX_CACHE_ENTRY_Y];
-        fixColor4       color[TEX_CACHE_ENTRY_X*TEX_CACHE_ENTRY_Y][TEX_CACHE_BLOCK_SIZE];
+	struct
+	{
+        bool            valid[TEX_CACHE_ENTRY_SIZE];
+        unsigned int	tag[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
+        fixColor4       color[TEX_CACHE_ENTRY_SIZE][TEX_CACHE_BLOCK_SIZE][TEX_WAY_ASSOCIATION];
+		unsigned char	LRU[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         int             TexCacheHit;
         int             TexCacheMiss;
         int             TexCacheColdMiss;
-    } TexCache;
+    }TexCache;
 
     textureImage texImage[MAX_TEXTURE_UNIT];
 };

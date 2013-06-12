@@ -1,5 +1,4 @@
 #include "context.h"
-#include "GPU/driver.h"
 
 
 /*****************************************
@@ -67,7 +66,7 @@ void Context::DeleteTextures(GLsizei n, const GLuint *textures)
         if (texImagePool.find(*(textures+i)) == texImagePool.end())
 			continue;
 
-        for (unsigned int l=0;l<texImagePool[*(textures+i)].maxLevel;l++)
+        for (int l=0;l<=texImagePool[*(textures+i)].maxLevel;l++)
 			delete[] texImagePool[*(textures+i)].data[l];
 
         texImagePool.erase(*(textures+i));
@@ -205,7 +204,7 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
     textureImage texObj;
 
 	int i = 0;
-	unsigned int key = 0;
+	unsigned int key = 1;
 	while(i<n) {
 		if (texImagePool.find(key) == texImagePool.end()){
 			texImagePool[key] = texObj;
@@ -218,8 +217,6 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
 		else
 			key++;
 	}
-
-    //delete []texObj;
 }
 
 GLenum Context::GetError(void)

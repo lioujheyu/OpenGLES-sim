@@ -12,6 +12,18 @@ GPU_Core gpu;
 
 void GPU_Core::Run()
 {
+#ifdef GPU_INFO_FILE
+	GPUINFOfp = fopen(GPU_INFO_FILE,"w");
+#endif // GPU_INFO
+
+#ifdef PIXEL_INFO_FILE
+	rm.PIXELINFOfp = fopen(PIXEL_INFO_FILE,"w");
+#endif // PIXEL_INFO_FILE
+
+#ifdef TEXEL_INFO_FILE
+	rm.TEXELINFOfp = fopen(TEXEL_INFO_FILE,"w");
+#endif // TEXEL_INFO_FILE
+
     gm.Initialize();
 
     ///clear frame buffer if needed
@@ -68,4 +80,20 @@ void GPU_Core::Run()
         }
 
     }
+
+    GPUPRINTF("Texture cache hit: %d\n",rm.TexCache.TexCacheHit);
+    GPUPRINTF("Texture cache miss: %d\n",rm.TexCache.TexCacheMiss);
+
+#ifdef GPU_INFO_FILE
+	fclose(GPUINFOfp);
+#endif // GPU_INFO
+
+#ifdef PIXEL_INFO_FILE
+	fclose(rm.PIXELINFOfp);
+#endif // PIXEL_INFO_FILE
+
+#ifdef TEXEL_INFO_FILE
+	fclose(rm.TEXELINFOfp);
+#endif // TEXEL_INFO_FILE
+
 }

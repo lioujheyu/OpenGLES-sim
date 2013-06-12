@@ -2,7 +2,7 @@
 #include <GLES3/gl3.h>
 #include "src/context.h"
 #include "bitmap.h"
-//#include "shader.h"
+#include "shader.h"
 bool LoadTexture(char *filename, unsigned int *texture)
 {
 	unsigned char *bitmap;
@@ -119,9 +119,15 @@ int main()
     glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, texCoord);
     glEnableVertexAttribArray(v_tex0_loc);
 
-    //glDrawArrays(GL_TRIANGLE_FAN,0,4);
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
 	glDeleteTextures(2, texture);
+
+//	GLuint shader_id;
+//
+//	shader_id = glCreateProgram();
+//
+//	printf("create program id %d \n", shader_id);
 
     return 0;
 }
