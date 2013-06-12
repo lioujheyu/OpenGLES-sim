@@ -232,6 +232,11 @@ GLenum Context::GetError(void)
 	}
 }
 
+GLboolean Context::IsTexture(GLuint texture)
+{
+	return (texImagePool.find(texture) != texImagePool.end());
+}
+
 void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels)
 {
 	if (target != GL_TEXTURE_2D) {

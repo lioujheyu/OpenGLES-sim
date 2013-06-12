@@ -60,13 +60,9 @@ bool LoadRGBATexture(char *filename, unsigned int *texture)
 
     return true;
 }
-
-int main()
+void TextureExample()
 {
-    //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.
-    Context::SetCurrentContext(new Context());
-
-    unsigned int texture[2];
+	unsigned int texture[2];
 
     glActiveTexture(GL_TEXTURE0);
     LoadTexture("data/road.bmp", &texture[0]);
@@ -122,12 +118,26 @@ int main()
     glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
 	glDeleteTextures(2, texture);
+}
 
-//	GLuint shader_id;
-//
-//	shader_id = glCreateProgram();
-//
-//	printf("create program id %d \n", shader_id);
+void ShaderExample()
+{
+	Shader p1;
+
+	p1.init("shader_src/TransformVertexShader.vertexshader",
+			"shader_src/TextureFragmentShader.fragmentshader");
+}
+
+int main()
+{
+    //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.
+    Context::SetCurrentContext(new Context());
+
+    //TextureExample();
+
+    ShaderExample();
+
+
 
     return 0;
 }

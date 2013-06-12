@@ -218,7 +218,7 @@ void Rasterizer::pixelSplit(int x, int y, int level)
         }
 	}
 	else {
-		/*
+		/**
 		 * c - central
 		 * n - corner
 		 *                                  5 6 7
@@ -309,9 +309,8 @@ fixColor4 Rasterizer::GetTexColor(floatVec4 coordIn, const unsigned int level, u
 	U_Offset = u & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	V_Offset = v & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	tag = (int)( (V_Super << 8) | (U_Super&0x00ff) );
-    /// @fixme (elvis#1#): Simply append level and texture_id after tag bit to
-    ///					   tell the differece between multi-textures' address
-    ///					   It now has a HUGE impact to system performance.
+
+	///@note (elvis#1#): Simply append level and texture_id after tag bit
 	tag = (tag << 4) | (level&0xf);
 	tag = (tag << 1) | (tid&0x1);
 

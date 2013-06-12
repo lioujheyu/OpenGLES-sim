@@ -4,6 +4,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
+#include <fstream>
+#include <sstream>
 #include <cmath>
 #include <algorithm>
 #include <vector>
@@ -100,28 +103,26 @@ struct shaderObject
 		type = 0;
 	}
 
-	GLchar **source;
-	GLchar **compiledSource;
 	GLboolean isCompiled;
 	GLboolean delFlag;
-	GLint *length;
 	GLsizei count;
 	GLenum type;
 
+	std::vector<std::string> sourcePool;
+	std::vector<std::string> compiledSourcePool;
 	std::vector<GLuint> attachList;
 
 	inline shaderObject& operator=(const shaderObject &rhs)
 	{
 		if (this == &rhs)
             return *this;
-		source = rhs.source;
-		compiledSource = rhs.compiledSource;
 		isCompiled = rhs.isCompiled;
-		length = rhs.length;
 		type = rhs.type;
 		count = rhs.count;
 
 		// STL's copy operator is efficient.
+		sourcePool = rhs.sourcePool;
+		compiledSourcePool = rhs.compiledSourcePool;
 		attachList = rhs.attachList;
 		return *this;
 	}
@@ -157,31 +158,35 @@ public:
     void                DumpImage();
 
 //OpenGL ES 2.0 API
-	void 	AttachShader(GLuint program, GLuint shader);
-	void 	ActiveTexture(GLenum texture);
-	void 	BindTexture (GLenum target, GLuint texture);
-    void 	Clear (GLbitfield mask);
-    void 	ClearColor (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
-    void 	ClearDepthf (GLfloat depth);
-    GLuint 	CreateProgram (void);
-    GLint	CreateShader (GLenum type);
-    void	DeleteProgram (GLuint program);
-    void	DeleteShader (GLuint shader);
-    void 	DeleteTextures (GLsizei n, const GLuint* textures);
-    void 	DepthRangef (GLfloat n, GLfloat f);
-    void 	DetachShader (GLuint program, GLuint shader);
-    void 	Disable (GLenum cap);
-    void 	DrawArrays (GLenum mode, GLint first, GLsizei count);
-    void 	Enable (GLenum cap);
-    void 	EnableVertexAttribArray (GLuint index);
-    void 	GenerateMipmap(GLenum target);
-    void 	GenTextures (GLsizei n, GLuint* textures);
-    GLenum	GetError (void);
-    void 	ShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
-    void 	TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
-    void 	TexParameteri(GLenum target, GLenum pname, GLint param);
-    void 	VertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
-    void 	Viewport (GLint x, GLint y, GLsizei width, GLsizei height);
+	void 		AttachShader(GLuint program, GLuint shader);
+	void 		ActiveTexture(GLenum texture);
+	void 		BindTexture (GLenum target, GLuint texture);
+    void 		Clear (GLbitfield mask);
+    void 		ClearColor (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+    void 		ClearDepthf (GLfloat depth);
+    void		CompileShader(GLuint shader);
+    GLuint 		CreateProgram (void);
+    GLint		CreateShader (GLenum type);
+    void		DeleteProgram (GLuint program);
+    void		DeleteShader (GLuint shader);
+    void 		DeleteTextures (GLsizei n, const GLuint* textures);
+    void 		DepthRangef (GLfloat n, GLfloat f);
+    void 		DetachShader (GLuint program, GLuint shader);
+    void 		Disable (GLenum cap);
+    void 		DrawArrays (GLenum mode, GLint first, GLsizei count);
+    void 		Enable (GLenum cap);
+    void 		EnableVertexAttribArray (GLuint index);
+    void 		GenerateMipmap(GLenum target);
+    void 		GenTextures (GLsizei n, GLuint* textures);
+    GLenum		GetError (void);
+    GLboolean	IsProgram (GLuint program);
+    GLboolean	IsShader (GLuint shader);
+    GLboolean	IsTexture (GLuint texture);
+    void 		ShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
+    void 		TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
+    void 		TexParameteri(GLenum target, GLenum pname, GLint param);
+    void 		VertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
+    void 		Viewport (GLint x, GLint y, GLsizei width, GLsizei height);
 
 
 /// @fixme (elvis#1#): dirty buffer setting before buffer management is ready

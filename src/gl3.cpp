@@ -37,7 +37,7 @@ GL_APICALL void GL_APIENTRY glActiveTexture (GLenum texture)
 
 GL_APICALL void GL_APIENTRY glAttachShader (GLuint program, GLuint shader)
 {
-
+	CONTEXT_EXEC(AttachShader(program, shader));
 }
 
 GL_APICALL void GL_APIENTRY glBindAttribLocation (GLuint program, GLuint index, const GLchar* name)
@@ -132,7 +132,7 @@ GL_APICALL void GL_APIENTRY glColorMask (GLboolean red, GLboolean green, GLboole
 
 GL_APICALL void GL_APIENTRY glCompileShader (GLuint shader)
 {
-
+	CONTEXT_EXEC(CompileShader(shader));
 }
 
 GL_APICALL void GL_APIENTRY glCompressedTexImage2D (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data)
@@ -522,7 +522,7 @@ GL_APICALL void GL_APIENTRY glShaderBinary (GLsizei n, const GLuint* shaders, GL
 
 GL_APICALL void GL_APIENTRY glShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length)
 {
-
+	CONTEXT_EXEC(ShaderSource(shader, count, string, length));
 }
 
 GL_APICALL void GL_APIENTRY glStencilFunc (GLenum func, GLint ref, GLuint mask)
