@@ -1,4 +1,5 @@
 #include "context.h"
+#include "context_link.tab.h"
 
 /*******************************************************
 
@@ -23,7 +24,6 @@ void Context::AttachShader(GLuint program, GLuint shader)
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
-
 	if (programPool[program].sid4FS == shader){
 		RecordError(GL_INVALID_OPERATION);
 		return;
@@ -123,7 +123,6 @@ void Context::CompileShader(GLuint shader)
 		else
 			compileCmd.append(" -profile gp4fp ");
 		compileCmd+=fileName;
-		printf("%s \n",compileCmd.c_str());
 		system(compileCmd.c_str());
 
 		///Get Assembly code
@@ -159,7 +158,7 @@ void Context::DeleteProgram(GLuint program)
 		programPool.erase(program);
 	}
 
-	printf("Delete Program id: %d",program);
+	printf("Delete Program id: %d\n",program);
 }
 
 void Context::DeleteShader(GLuint shader)
@@ -174,6 +173,8 @@ void Context::DeleteShader(GLuint shader)
 		else
 			shaderPool[shader].delFlag = GL_TRUE;
 	}
+
+	printf("Delete Shader id: %d\n",shader);
 }
 
 void Context::DetachShader(GLuint program, GLuint shader)

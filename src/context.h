@@ -29,6 +29,7 @@ struct attribute
 
 struct drawCommand
 {
+    char		name[20];
     GLenum      mode;
     GLint       first;
     GLsizei     count;
@@ -117,6 +118,7 @@ struct shaderObject
 		if (this == &rhs)
             return *this;
 		isCompiled = rhs.isCompiled;
+		delFlag = rhs.delFlag;
 		type = rhs.type;
 		count = rhs.count;
 
@@ -125,6 +127,23 @@ struct shaderObject
 		compiledSourcePool = rhs.compiledSourcePool;
 		attachList = rhs.attachList;
 		return *this;
+	}
+};
+
+struct symbol
+{
+	std::string name;
+	std::string declareType;
+	unsigned char ioType;
+	unsigned char idx;
+
+	void print()
+	{
+		printf("%s %s IO:%d Idx:%d \n",
+				declareType.c_str(),
+				name.c_str(),
+				ioType,
+				idx	);
 	}
 };
 
@@ -142,6 +161,9 @@ struct programObject
 	GLuint sid4FS;
 	GLboolean isLinked;
 	GLboolean delFlag;
+
+	std::map<std::string, symbol> symTableVS;
+	std::map<std::string, symbol> symTableFS;
 };
 
 class Context
@@ -182,6 +204,7 @@ public:
     GLboolean	IsProgram (GLuint program);
     GLboolean	IsShader (GLuint shader);
     GLboolean	IsTexture (GLuint texture);
+	void 		LinkProgram (GLuint program);
     void 		ShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
     void 		TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
     void 		TexParameteri(GLenum target, GLenum pname, GLint param);

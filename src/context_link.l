@@ -1,0 +1,109 @@
+%option noyywrap
+%option yylineno
+%option prefix="context_link_"
+%option always-interactive
+
+D	[0-9]
+L	[a-zA-Z_]
+
+%{
+#include "context_link.tab.h"
+#include "context.h"
+#include "context_link_glapi.h"
+
+#define COL_NO context_link_col+=strlen(yytext)
+
+unsigned int context_link_col = 1;
+int context_link_parse();
+%}
+
+%%
+
+^[ ]*[^#!].*$		/* Non-# or ! begin sentence, means real instruction */
+"!!"[a-zA-Z0-9.]*	/* Compiler's name */
+#[ ].*$				/* Comment */
+#version.*$
+#vendor.*$
+
+"#profile"	COL_NO; return PROFILE;
+"#program"	COL_NO; return PROG;
+"#semantic"	COL_NO; return SEMT;
+"#var"		COL_NO; return VAR;
+((float)|(int)){D}?	{ COL_NO;
+		strcpy(context_link_lval.sval,context_link_text);
+		return TYPE;
+	}
+((float)|(int)){D}x{D}	{ COL_NO;
+		strcpy(context_link_lval.sval,context_link_text);
+		return TYPE;
+	}
+"sampler2D"	{ COL_NO;
+		strcpy(context_link_lval.sval,context_link_text);
+		return TYPE;
+	}
+"vin"	COL_NO;	return VIN;
+"vout"	COL_NO;	return VOUT;
+{L}({L}|{D})* { COL_NO;
+		strcpy(context_link_lval.sval,context_link_text);
+		return IDENTIFIER;
+	}
+[-+]?{D}+ { COL_NO;
+		context_link_lval.ival = atoi(context_link_text);
+		return INTEGER;
+	}
+":"		COL_NO;	return ':';
+"["		COL_NO;	return '[';
+"]"		COL_NO;	return ']';
+"."		COL_NO;	return '.';
+"$"		COL_NO;	return '$';
+","		COL_NO;	return ',';
+
+[ \t]*	COL_NO;		/* remove all space-related char */
+\n		context_link_col = 1;
+%%
+
+extern programObject currentProgram;
+extern unsigned int currentSTYPE;
+
+void context_link_error(char *s)
+{
+    printf("(%d,%d)syntax error:%s\n",
+			context_link_lineno,
+			context_link_col,
+			context_link_text);
+}
+
+void Context::LinkProgram(GLuint program)
+{
+	if (programPool.find(program) == programPool.end()) {
+		RecordError(GL_INVALID_VALUE);
+		return;
+	}
+	
+	currentProgram = programPool[program];
+
+	shaderObject VS, FS;
+	VS = shaderPool[programPool[program].sid4VS];
+	FS = shaderPool[programPool[program].sid4FS];
+
+	for (int i=0; i<VS.count; i++) {
+		context_link_lineno = 1;
+		currentSTYPE = 0;
+		context_link__scan_string(VS.compiledSourcePool[i].c_str());
+		context_link_parse();
+	}
+
+	for (int i=0; i<FS.count; i++) {
+		context_link_lineno = 1;
+		currentSTYPE = 1;
+		context_link__scan_string(FS.compiledSourcePool[i].c_str());
+		context_link_parse();
+	}
+	
+	
+	
+	programPool[program] = currentProgram;
+	programPool[program].isLinked = GL_TRUE;
+}
+
+

@@ -1,0 +1,17 @@
+#ifndef CONTEXT_LINK_GLAPI_H_INCLUDED
+#define CONTEXT_LINK_GLAPI_H_INCLUDED
+
+
+#define CG_IN	1
+#define CG_OUT	2
+
+#define CG_IN_ATTR 				1
+#define CG_IN_UNIFORM 			2
+#define CG_IN_UNIFORM_TEXTURE 	3
+#define CG_OUT_ATTR 			11
+#define CG_OUT_POSITION 		12
+#define CG_OUT_COLOR 			13
+
+
+
+#endif // CONTEXT_LINK_GLAPI_H_INCLUDED

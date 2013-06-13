@@ -452,7 +452,7 @@ GL_APICALL GLboolean GL_APIENTRY glIsFramebuffer (GLuint framebuffer)
 
 GL_APICALL GLboolean GL_APIENTRY glIsProgram (GLuint program)
 {
-
+	CONTEXT_EXEC_RETURN(IsProgram(program));
 }
 
 GL_APICALL GLboolean GL_APIENTRY glIsRenderbuffer (GLuint renderbuffer)
@@ -462,12 +462,12 @@ GL_APICALL GLboolean GL_APIENTRY glIsRenderbuffer (GLuint renderbuffer)
 
 GL_APICALL GLboolean GL_APIENTRY glIsShader (GLuint shader)
 {
-
+	CONTEXT_EXEC_RETURN(IsShader(shader));
 }
 
 GL_APICALL GLboolean GL_APIENTRY glIsTexture (GLuint texture)
 {
-
+	CONTEXT_EXEC_RETURN(IsTexture(texture));
 }
 
 GL_APICALL void GL_APIENTRY glLineWidth (GLfloat width)
@@ -477,7 +477,7 @@ GL_APICALL void GL_APIENTRY glLineWidth (GLfloat width)
 
 GL_APICALL void GL_APIENTRY glLinkProgram (GLuint program)
 {
-
+	CONTEXT_EXEC(LinkProgram(program));
 }
 
 GL_APICALL void GL_APIENTRY glPixelStorei (GLenum pname, GLint param)
