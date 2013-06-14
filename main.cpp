@@ -51,7 +51,7 @@ bool LoadRGBATexture(char *filename, unsigned int *texture)
                  bitmap);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -71,17 +71,17 @@ void TextureExample()
     LoadRGBATexture("data/four_NM_height.bmp", &texture[1]);
 
 	//The projection transformation in vertex shader has not yet implementation.
-//    GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0,
-//                             1.0f, -1.0f, 0.0f, 1.0,
-//                             1.0f/16,0.0f, 1.0f,16.0,
-//                            -1.0f/16,0.0f, 1.0f,16.0
-//                          };
-
-	GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f,
-                             1.0f, -1.0f, 0.0f,
-                             1.0f,  1.0f, 0.0f,
-                            -1.0f,  1.0f, 0.0f
+    GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0,
+                             1.0f, -1.0f, 0.0f, 1.0,
+                          1.0f/16,  0.0f, 1.0f,16.0,
+                         -1.0f/16,  0.0f, 1.0f,16.0
                           };
+
+//	GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f,
+//                             1.0f, -1.0f, 0.0f,
+//                             1.0f,  1.0f, 0.0f,
+//                            -1.0f,  1.0f, 0.0f
+//                          };
 
     GLfloat color[] = { 1.0f, 1.0f, 1.0f,
                         1.0f, 1.0f, 1.0f,
@@ -106,7 +106,7 @@ void TextureExample()
     int v_coord_loc = 0;
     int v_color_loc = 1;
     int v_tex0_loc = 4;
-    glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, vertexPos);
+    glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);
     glEnableVertexAttribArray(v_coord_loc);
 
     glVertexAttribPointer(v_color_loc, 3, GL_FLOAT, GL_FALSE, 0, color);
@@ -126,6 +126,9 @@ void ShaderExample()
 
 	p1.init("shader_src/TransformVertexShader.vertexshader",
 			"shader_src/TextureFragmentShader.fragmentshader");
+
+//	p1.init("shader_src/POM.vert",
+//			"shader_src/POM.frag");
 }
 
 int main()
@@ -141,5 +144,3 @@ int main()
 
     return 0;
 }
-
-

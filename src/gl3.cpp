@@ -352,7 +352,7 @@ GL_APICALL void GL_APIENTRY glGetIntegerv (GLenum pname, GLint* params)
 
 GL_APICALL void GL_APIENTRY glGetProgramiv (GLuint program, GLenum pname, GLint* params)
 {
-
+	CONTEXT_EXEC(GetProgramiv(program, pname, params));
 }
 
 GL_APICALL void GL_APIENTRY glGetProgramInfoLog (GLuint program, GLsizei bufsize, GLsizei* length, GLchar* infolog)
@@ -367,7 +367,7 @@ GL_APICALL void GL_APIENTRY glGetRenderbufferParameteriv (GLenum target, GLenum 
 
 GL_APICALL void GL_APIENTRY glGetShaderiv (GLuint shader, GLenum pname, GLint* params)
 {
-
+	CONTEXT_EXEC(GetShaderiv(shader, pname, params));
 }
 
 GL_APICALL void GL_APIENTRY glGetShaderInfoLog (GLuint shader, GLsizei bufsize, GLsizei* length, GLchar* infolog)
@@ -687,7 +687,7 @@ GL_APICALL void GL_APIENTRY glUseProgram (GLuint program)
 
 GL_APICALL void GL_APIENTRY glValidateProgram (GLuint program)
 {
-
+	CONTEXT_EXEC(ValidateProgram(program));
 }
 
 GL_APICALL void GL_APIENTRY glVertexAttrib1f (GLuint indx, GLfloat x)

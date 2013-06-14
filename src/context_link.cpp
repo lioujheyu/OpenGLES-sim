@@ -53,7 +53,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types.
+ * if you want the limit (max/min) macros for int types. 
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -70,7 +70,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t;
+typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 
@@ -191,7 +191,7 @@ extern FILE *context_link_in, *context_link_out;
 
     /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
      *       access to the local variable yy_act. Since yyless() is a macro, it would break
-     *       existing scanners that call yyless() from OUTSIDE context_link_lex.
+     *       existing scanners that call yyless() from OUTSIDE context_link_lex. 
      *       One obvious solution it to make yy_act a global. I tried that, and saw
      *       a 5% performance hit in a non-context_link_lineno scanner, because yy_act is
      *       normally declared as a register variable-- so it is not worth it.
@@ -203,7 +203,7 @@ extern FILE *context_link_in, *context_link_out;
                     if ( context_link_text[yyl] == '\n' )\
                         --context_link_lineno;\
             }while(0)
-
+    
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
 	do \
@@ -265,7 +265,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-
+    
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -404,8 +404,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 25
-#define YY_END_OF_BUFFER 26
+#define YY_NUM_RULES 20
+#define YY_END_OF_BUFFER 21
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -413,20 +413,19 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[135] =
+static yyconst flex_int16_t yy_accept[125] =
     {   0,
-       23,   23,   26,   25,   23,   24,   25,   25,   21,   25,
-       22,   20,   16,   17,   15,   18,   19,   15,   15,   15,
-       15,   25,   23,   24,   23,   21,   25,   22,   20,   16,
-       17,   15,   18,   19,   15,   15,   15,   15,   23,    2,
+       18,   18,   21,   20,   18,   19,   20,   20,   17,   20,
+       16,   15,   15,   15,   15,   15,   20,   18,   19,   18,
+       17,   20,   16,   15,   15,   15,   15,   15,   18,    2,
         0,    0,    0,    0,   16,   15,   15,   15,   15,   15,
-       15,    0,    1,   23,    0,   23,    1,   23,   16,   15,
+       15,    0,    1,   18,    0,   18,    1,   18,   16,   15,
        15,   15,   15,   15,   15,    2,    0,    3,    0,    0,
         0,    0,   15,   10,   15,   13,   15,   15,   10,   15,
        13,   15,    0,    0,    9,    0,    0,   15,   10,   15,
        14,   15,   10,   15,   14,    0,    0,    0,    0,    0,
-
        15,   15,   15,   15,    0,    0,    0,    0,    0,   11,
+
        15,   11,   15,    0,    0,    0,    0,    0,   15,   15,
         6,    7,    0,    0,    5,    0,   15,   15,    8,    0,
         4,   12,   12,    0
@@ -438,16 +437,16 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    4,    5,    1,    6,    7,    1,    1,    1,    1,
-        1,    1,    8,    9,    8,   10,    1,   11,   11,   12,
-       11,   11,   11,   11,   11,   11,   11,   13,    1,    1,
-        1,    1,    1,    1,   14,   14,   14,   15,   14,   14,
-       14,   14,   14,   14,   14,   14,   14,   14,   14,   14,
-       14,   14,   14,   14,   14,   14,   14,   14,   14,   14,
-       16,    1,   17,    1,   18,    1,   19,   14,   20,   21,
+        1,    1,    8,    7,    8,    9,    1,   10,   10,   11,
+       10,   10,   10,   10,   10,   10,   10,    7,    1,    1,
+        1,    1,    1,    1,   12,   12,   12,   13,   12,   12,
+       12,   12,   12,   12,   12,   12,   12,   12,   12,   12,
+       12,   12,   12,   12,   12,   12,   12,   12,   12,   12,
+        7,    1,    7,    1,   14,    1,   15,   12,   16,   17,
 
-       22,   23,   24,   14,   25,   14,   14,   26,   27,   28,
-       29,   30,   14,   31,   32,   33,   34,   35,   14,   36,
-       14,   14,    1,    1,    1,    1,    1,    1,    1,    1,
+       18,   19,   20,   12,   21,   12,   12,   22,   23,   24,
+       25,   26,   12,   27,   28,   29,   30,   31,   12,   32,
+       12,   12,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -464,139 +463,131 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int32_t yy_meta[37] =
+static yyconst flex_int32_t yy_meta[33] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    2,
-        3,    3,    1,    3,    3,    1,    1,    4,    3,    3,
+        1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
+        3,    3,    3,    4,    3,    3,    3,    3,    3,    3,
         3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
-        3,    3,    3,    3,    3,    3
+        3,    3
     } ;
 
-static yyconst flex_int16_t yy_base[143] =
+static yyconst flex_int16_t yy_base[133] =
     {   0,
-        0,   36,  288,  289,   71,  289,  282,   70,  289,   65,
-      289,  289,   67,  289,    0,  289,  289,  260,  257,  265,
-       55,  280,   79,  279,   83,  278,   87,  277,  276,   92,
-      275,  105,  274,  273,  122,   65,   75,   91,  132,    0,
-      272,  243,  251,  118,   85,    0,  243,  238,  243,  241,
-      234,  264,  289,  139,  263,  142,  262,  147,  144,  238,
-      128,  132,  133,  135,  136,    0,  260,  289,  233,  234,
-      229,  136,  240,  157,  228,    0,  224,  147,  160,  148,
-      230,  149,  153,  236,  289,  233,  221,  219,  215,  224,
-        0,  154,  153,  223,  222,  222,  215,  217,  215,  218,
+        0,   32,  267,  268,   63,  268,  261,   62,  268,   58,
+       60,    0,  243,  240,  248,   51,  259,   71,  258,   92,
+      257,   74,   76,   98,  107,   56,   67,   96,   79,    0,
+      256,  231,  239,  104,   81,    0,  231,  226,  231,  229,
+      222,  248,  268,  121,  247,  124,  246,  128,  132,  226,
+      114,  115,  118,  123,  116,    0,  244,  268,  221,  222,
+      217,  124,  228,  139,  216,    0,  212,  137,  143,  134,
+      218,  133,  138,  224,  268,  221,  209,  207,  203,  212,
+        0,  139,  141,  211,  210,  210,  203,  205,  203,  206,
+      156,  208,  159,  153,  203,  209,  194,  195,  196,    0,
 
-      172,  220,  179,  159,  215,  221,  206,  207,  208,    0,
-      205,  209,  162,  212,  177,  177,  198,  172,  187,  107,
-      289,  289,  178,  194,  289,  193,  180,  177,  289,  191,
-      289,    0,   66,  289,  203,  207,  211,  215,  218,  221,
-      225,  229
+      193,  197,  150,  200,  194,  195,  183,  160,  172,  163,
+      268,  268,  166,  177,  268,  176,  163,  165,  268,  161,
+      268,    0,   98,  268,  185,  189,  193,  197,  200,  203,
+      207,  211
     } ;
 
-static yyconst flex_int16_t yy_def[143] =
+static yyconst flex_int16_t yy_def[133] =
     {   0,
-      134,  134,  134,  134,  134,  134,  134,  134,  134,  134,
-      134,  134,  134,  134,  135,  134,  134,  135,  135,  135,
-      135,  136,  136,  136,  137,  136,  136,  136,  136,  136,
-      136,  138,  136,  136,  138,   35,   35,   35,  134,  139,
-      140,  134,  134,  134,  134,  135,  135,  135,  135,  135,
-      135,  136,  134,  136,  136,  136,  136,  137,  136,   35,
-       35,   35,   35,   35,   35,  139,  140,  134,  134,  134,
-      134,  134,  135,  135,  135,  135,  135,   35,   35,   35,
-       35,   35,  134,  134,  134,  134,  134,  135,  135,  135,
-      135,   35,   35,   35,   35,  134,  134,  134,  134,  134,
+      124,  124,  124,  124,  124,  124,  124,  124,  124,  124,
+      124,  125,  125,  125,  125,  125,  126,  126,  126,  127,
+      126,  126,  126,  128,  128,   25,   25,   25,  124,  129,
+      130,  124,  124,  124,  124,  125,  125,  125,  125,  125,
+      125,  126,  124,  126,  126,  126,  126,  127,  126,   25,
+       25,   25,   25,   25,   25,  129,  130,  124,  124,  124,
+      124,  124,  125,  125,  125,  125,  125,   25,   25,   25,
+       25,   25,  124,  124,  124,  124,  124,  125,  125,  125,
+      125,   25,   25,   25,   25,  124,  124,  124,  124,  124,
+      125,  125,   25,   25,  124,  124,  124,  124,  124,  125,
 
-      135,  135,   35,   35,  134,  134,  134,  134,  134,  135,
-      135,   35,   35,  134,  134,  134,  141,  134,  135,   35,
-      134,  134,  134,  141,  134,  142,  135,   35,  134,  142,
-      134,  135,   35,    0,  134,  134,  134,  134,  134,  134,
-      134,  134
+      125,   25,   25,  124,  124,  124,  131,  124,  125,   25,
+      124,  124,  124,  131,  124,  132,  125,   25,  124,  132,
+      124,  125,   25,    0,  124,  124,  124,  124,  124,  124,
+      124,  124
     } ;
 
-static yyconst flex_int16_t yy_nxt[326] =
+static yyconst flex_int16_t yy_nxt[301] =
     {   0,
-        4,    5,    6,    5,    7,    8,    9,   10,   11,   12,
-       13,   13,   14,   15,   15,   16,   17,   15,   15,   15,
-       15,   15,   18,   15,   19,   15,   15,   15,   15,   15,
-       15,   20,   15,   15,   21,   15,   22,   23,   24,   25,
-        7,    8,   26,   27,   28,   29,   30,   30,   31,   32,
-       32,   33,   34,   32,   32,   32,   32,   32,   35,   32,
-       36,   32,   32,   32,   32,   32,   32,   37,   32,   32,
-       38,   32,   39,   41,   39,   45,   45,   45,   45,   50,
-       54,   53,   54,   51,   56,   57,   58,   52,   52,   53,
-       60,   60,   62,   63,   53,   45,   45,   59,   59,   42,
+        4,    5,    6,    5,    7,    8,    9,   10,    9,   11,
+       11,   12,   12,   12,   12,   12,   12,   12,   13,   12,
+       14,   12,   12,   12,   12,   12,   12,   15,   12,   12,
+       16,   12,   17,   18,   19,   20,    7,    8,   21,   22,
+       21,   23,   23,   24,   24,   24,   24,   24,   24,   24,
+       25,   24,   26,   24,   24,   24,   24,   24,   24,   27,
+       24,   24,   28,   24,   29,   31,   29,   35,   35,   35,
+       35,   40,   44,   43,   44,   41,   43,   50,   43,   52,
+       29,   53,   29,   49,   49,   49,   49,   32,   50,   33,
+       35,   35,   34,   46,   47,   48,   42,   42,   42,   42,
 
-       60,   43,   59,   59,   44,   52,   52,   53,   52,   52,
-       52,   52,   52,   52,   52,   64,   60,   52,  128,   65,
-       52,   52,   52,   52,   53,   52,   52,   52,   52,   52,
-       52,   52,   60,   39,   52,   39,   71,   52,   52,   72,
-       54,   53,   54,   54,   53,   54,   53,   61,   56,   57,
-       58,   52,   52,   60,   59,   59,   78,   60,   60,   80,
-       60,   60,   81,   86,   79,   92,   87,   89,   89,   82,
-       93,   93,   60,   60,   60,   96,   97,   94,   60,   60,
-      113,   95,  110,  110,   60,   60,   79,   60,  103,  112,
-      112,  133,  120,  131,  132,  131,  125,  129,  127,  126,
+       43,   42,   42,   42,   42,   42,   42,   42,   42,   43,
+       42,   42,   42,   42,   42,   42,   54,   50,   61,   50,
+       55,   62,   44,   43,   44,   44,   43,   44,   51,   46,
+       47,   48,   42,   42,   43,   50,   50,   50,   68,   50,
+       70,   49,   49,   69,   50,   72,   71,   76,   79,   79,
+       77,   82,   83,   83,   50,   50,   86,   87,   50,   84,
+       50,   85,   50,  121,   50,  100,  100,   69,  102,  102,
+      103,   50,   93,  118,   50,  122,  110,  123,  121,  115,
+       50,  119,  117,  116,   50,  115,   50,   36,   36,   42,
+       42,   42,   42,   45,   45,   45,   45,   50,   50,   50,
 
-      125,  123,   60,  122,   60,   46,   46,   52,   52,   52,
-       52,   55,   55,   55,   55,   60,   60,   60,   60,   66,
-       66,   67,   67,   67,   67,  124,  124,  124,  124,  130,
-      130,  130,  130,  121,   60,  119,  118,  117,  116,  115,
-      114,  111,  109,  108,  107,  106,  105,   60,  104,  102,
-      101,   74,  100,   99,   98,   60,   91,   90,   88,   85,
-       84,   83,   68,   60,   53,   53,   53,   77,   76,   75,
-       74,   73,   70,   69,   68,   53,   53,   53,   53,   53,
-       53,   53,   53,   49,   48,   47,   40,  134,    3,  134,
-      134,  134,  134,  134,  134,  134,  134,  134,  134,  134,
+       50,   56,   56,   57,   57,   57,   57,  114,  114,  114,
+      114,  120,  120,  120,  120,  113,  112,  111,   50,  109,
+      108,  107,  106,  105,  104,  101,   99,   98,   97,   96,
+       95,   50,   94,   92,   91,   64,   90,   89,   88,   50,
+       81,   80,   78,   75,   74,   73,   58,   50,   43,   43,
+       43,   67,   66,   65,   64,   63,   60,   59,   58,   43,
+       43,   43,   39,   38,   37,   30,  124,    3,  124,  124,
+      124,  124,  124,  124,  124,  124,  124,  124,  124,  124,
+      124,  124,  124,  124,  124,  124,  124,  124,  124,  124,
+      124,  124,  124,  124,  124,  124,  124,  124,  124,  124
 
-      134,  134,  134,  134,  134,  134,  134,  134,  134,  134,
-      134,  134,  134,  134,  134,  134,  134,  134,  134,  134,
-      134,  134,  134,  134,  134
     } ;
 
-static yyconst flex_int16_t yy_chk[326] =
+static yyconst flex_int16_t yy_chk[301] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    2,    2,    2,    2,
+        1,    1,    2,    2,    2,    2,    2,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    5,    8,    5,   10,   10,   13,   13,   21,
-       23,   23,   23,   21,   25,   25,   25,   25,   25,   27,
-       36,  133,   36,   37,   30,   45,   45,   27,   27,    8,
+        2,    2,    2,    2,    5,    8,    5,   10,   10,   11,
+       11,   16,   18,   18,   18,   16,   22,   26,   23,   26,
+       29,   27,   29,   22,   22,   23,   23,    8,   27,    8,
+       35,   35,    8,   20,   20,   20,   20,   20,   24,   24,
 
-       37,    8,   30,   30,    8,   32,   32,   32,   32,   32,
-       32,   32,   32,   32,   32,   38,   38,   32,  120,   38,
-       32,   32,   35,   35,   35,   35,   35,   35,   35,   35,
-       35,   35,  120,   39,   35,   39,   44,   35,   35,   44,
-       54,   54,   54,   56,   56,   56,   59,   35,   58,   58,
-       58,   58,   58,   61,   59,   59,   61,   62,   63,   63,
-       64,   65,   64,   72,   62,   78,   72,   74,   74,   65,
-       79,   79,   78,   80,   82,   83,   83,   80,   93,   92,
-      104,   82,  101,  101,  104,   79,   92,  113,   93,  103,
-      103,  128,  113,  130,  127,  126,  124,  123,  119,  118,
+       24,   24,   24,   24,   24,   24,   24,   25,   25,   25,
+       25,   25,   25,   25,   25,   25,   28,   28,   34,  123,
+       28,   34,   44,   44,   44,   46,   46,   46,   25,   48,
+       48,   48,   48,   48,   49,   51,   52,   55,   51,   53,
+       53,   49,   49,   52,   54,   55,   54,   62,   64,   64,
+       62,   68,   69,   69,   72,   70,   73,   73,   68,   70,
+       82,   72,   83,  120,   69,   91,   91,   82,   93,   93,
+       94,  103,   83,  110,   94,  117,  103,  118,  116,  114,
+       93,  113,  109,  108,  110,  107,  118,  125,  125,  126,
+      126,  126,  126,  127,  127,  127,  127,  128,  128,  128,
 
-      117,  116,  128,  115,  103,  135,  135,  136,  136,  136,
-      136,  137,  137,  137,  137,  138,  138,  138,  138,  139,
-      139,  140,  140,  140,  140,  141,  141,  141,  141,  142,
-      142,  142,  142,  114,  112,  111,  109,  108,  107,  106,
-      105,  102,  100,   99,   98,   97,   96,   95,   94,   90,
-       89,   88,   87,   86,   84,   81,   77,   75,   73,   71,
-       70,   69,   67,   60,   57,   55,   52,   51,   50,   49,
-       48,   47,   43,   42,   41,   34,   33,   31,   29,   28,
-       26,   24,   22,   20,   19,   18,    7,    3,  134,  134,
-      134,  134,  134,  134,  134,  134,  134,  134,  134,  134,
+      128,  129,  129,  130,  130,  130,  130,  131,  131,  131,
+      131,  132,  132,  132,  132,  106,  105,  104,  102,  101,
+       99,   98,   97,   96,   95,   92,   90,   89,   88,   87,
+       86,   85,   84,   80,   79,   78,   77,   76,   74,   71,
+       67,   65,   63,   61,   60,   59,   57,   50,   47,   45,
+       42,   41,   40,   39,   38,   37,   33,   32,   31,   21,
+       19,   17,   15,   14,   13,    7,    3,  124,  124,  124,
+      124,  124,  124,  124,  124,  124,  124,  124,  124,  124,
+      124,  124,  124,  124,  124,  124,  124,  124,  124,  124,
+      124,  124,  124,  124,  124,  124,  124,  124,  124,  124
 
-      134,  134,  134,  134,  134,  134,  134,  134,  134,  134,
-      134,  134,  134,  134,  134,  134,  134,  134,  134,  134,
-      134,  134,  134,  134,  134
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static yyconst flex_int32_t yy_rule_can_match_eol[26] =
+static yyconst flex_int32_t yy_rule_can_match_eol[21] =
     {   0,
-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 1, 0,     };
+1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -623,9 +614,9 @@ char *context_link_text;
 unsigned int context_link_col = 1;
 
 extern int context_link_parse();
-extern programObject currentProgram;
+extern programObject t_program;
 extern unsigned int shaderType;
-#line 629 "context_link.cpp"
+#line 620 "context_link.cpp"
 
 #define INITIAL 0
 
@@ -685,7 +676,7 @@ extern int context_link_wrap (void );
 #endif
 
     static void yyunput (int c,char *buf_ptr  );
-
+    
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int );
 #endif
@@ -814,11 +805,11 @@ YY_DECL
 	register yy_state_type yy_current_state;
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
-
+    
 #line 23 "context_link.l"
 
 
-#line 822 "context_link.cpp"
+#line 813 "context_link.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -872,13 +863,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 135 )
+				if ( yy_current_state >= 125 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 289 );
+		while ( yy_base[yy_current_state] != 268 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -896,7 +887,7 @@ yy_find_action:
 			int yyl;
 			for ( yyl = 0; yyl < context_link_leng; ++yyl )
 				if ( context_link_text[yyl] == '\n' )
-
+					   
     context_link_lineno++;
 ;
 			}
@@ -1023,50 +1014,25 @@ YY_RULE_SETUP
 case 17:
 YY_RULE_SETUP
 #line 57 "context_link.l"
-COL_NO;	return ':';
+return *context_link_text;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 58 "context_link.l"
-COL_NO;	return '[';
+#line 59 "context_link.l"
+COL_NO;		/* remove all space-related char */
 	YY_BREAK
 case 19:
+/* rule 19 can match eol */
 YY_RULE_SETUP
-#line 59 "context_link.l"
-COL_NO;	return ']';
+#line 60 "context_link.l"
+context_link_col = 1;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 60 "context_link.l"
-COL_NO;	return '.';
-	YY_BREAK
-case 21:
-YY_RULE_SETUP
 #line 61 "context_link.l"
-COL_NO;	return '$';
-	YY_BREAK
-case 22:
-YY_RULE_SETUP
-#line 62 "context_link.l"
-COL_NO;	return ',';
-	YY_BREAK
-case 23:
-YY_RULE_SETUP
-#line 64 "context_link.l"
-COL_NO;		/* remove all space-related char */
-	YY_BREAK
-case 24:
-/* rule 24 can match eol */
-YY_RULE_SETUP
-#line 65 "context_link.l"
-context_link_col = 1;
-	YY_BREAK
-case 25:
-YY_RULE_SETUP
-#line 66 "context_link.l"
 ECHO;
 	YY_BREAK
-#line 1070 "context_link.cpp"
+#line 1036 "context_link.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1344,7 +1310,7 @@ static int yy_get_next_buffer (void)
 {
 	register yy_state_type yy_current_state;
 	register char *yy_cp;
-
+    
 	yy_current_state = (yy_start);
 	yy_current_state += YY_AT_BOL();
 
@@ -1359,7 +1325,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 135 )
+			if ( yy_current_state >= 125 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1387,11 +1353,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 135 )
+		if ( yy_current_state >= 125 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 134);
+	yy_is_jam = (yy_current_state == 124);
 
 	return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1399,7 +1365,7 @@ static int yy_get_next_buffer (void)
     static void yyunput (int c, register char * yy_bp )
 {
 	register char *yy_cp;
-
+    
     yy_cp = (yy_c_buf_p);
 
 	/* undo effects of setting up context_link_text */
@@ -1446,7 +1412,7 @@ static int yy_get_next_buffer (void)
 
 {
 	int c;
-
+    
 	*(yy_c_buf_p) = (yy_hold_char);
 
 	if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
@@ -1509,7 +1475,7 @@ static int yy_get_next_buffer (void)
 
 	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (c == '\n');
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_at_bol )
-
+		   
     context_link_lineno++;
 ;
 
@@ -1519,12 +1485,12 @@ static int yy_get_next_buffer (void)
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
- *
+ * 
  * @note This function does not reset the start condition to @c INITIAL .
  */
     void context_link_restart  (FILE * input_file )
 {
-
+    
 	if ( ! YY_CURRENT_BUFFER ){
         context_link_ensure_buffer_stack ();
 		YY_CURRENT_BUFFER_LVALUE =
@@ -1537,11 +1503,11 @@ static int yy_get_next_buffer (void)
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
- *
+ * 
  */
     void context_link__switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
 {
-
+    
 	/* TODO. We should be able to replace this entire function body
 	 * with
 	 *		context_link_pop_buffer_state();
@@ -1581,13 +1547,13 @@ static void context_link__load_buffer_state  (void)
 /** Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
- *
+ * 
  * @return the allocated buffer state.
  */
     YY_BUFFER_STATE context_link__create_buffer  (FILE * file, int  size )
 {
 	YY_BUFFER_STATE b;
-
+    
 	b = (YY_BUFFER_STATE) context_link_alloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in context_link__create_buffer()" );
@@ -1610,11 +1576,11 @@ static void context_link__load_buffer_state  (void)
 
 /** Destroy the buffer.
  * @param b a buffer created with context_link__create_buffer()
- *
+ * 
  */
     void context_link__delete_buffer (YY_BUFFER_STATE  b )
 {
-
+    
 	if ( ! b )
 		return;
 
@@ -1635,7 +1601,7 @@ static void context_link__load_buffer_state  (void)
 
 {
 	int oerrno = errno;
-
+    
 	context_link__flush_buffer(b );
 
 	b->yy_input_file = file;
@@ -1657,7 +1623,7 @@ static void context_link__load_buffer_state  (void)
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
- *
+ * 
  */
     void context_link__flush_buffer (YY_BUFFER_STATE  b )
 {
@@ -1686,7 +1652,7 @@ static void context_link__load_buffer_state  (void)
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
- *
+ *  
  */
 void context_link_push_buffer_state (YY_BUFFER_STATE new_buffer )
 {
@@ -1716,7 +1682,7 @@ void context_link_push_buffer_state (YY_BUFFER_STATE new_buffer )
 
 /** Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
- *
+ *  
  */
 void context_link_pop_buffer_state (void)
 {
@@ -1740,7 +1706,7 @@ void context_link_pop_buffer_state (void)
 static void context_link_ensure_buffer_stack (void)
 {
 	int num_to_alloc;
-
+    
 	if (!(yy_buffer_stack)) {
 
 		/* First allocation is just for 2 elements, since we don't know if this
@@ -1753,9 +1719,9 @@ static void context_link_ensure_buffer_stack (void)
 								);
 		if ( ! (yy_buffer_stack) )
 			YY_FATAL_ERROR( "out of dynamic memory in context_link_ensure_buffer_stack()" );
-
+								  
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
-
+				
 		(yy_buffer_stack_max) = num_to_alloc;
 		(yy_buffer_stack_top) = 0;
 		return;
@@ -1783,13 +1749,13 @@ static void context_link_ensure_buffer_stack (void)
 /** Setup the input buffer state to scan directly from a user-specified character buffer.
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
- *
- * @return the newly allocated buffer state object.
+ * 
+ * @return the newly allocated buffer state object. 
  */
 YY_BUFFER_STATE context_link__scan_buffer  (char * base, yy_size_t  size )
 {
 	YY_BUFFER_STATE b;
-
+    
 	if ( size < 2 ||
 	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
 	     base[size-1] != YY_END_OF_BUFFER_CHAR )
@@ -1818,14 +1784,14 @@ YY_BUFFER_STATE context_link__scan_buffer  (char * base, yy_size_t  size )
 /** Setup the input buffer state to scan a string. The next call to context_link_lex() will
  * scan from a @e copy of @a str.
  * @param yystr a NUL-terminated string to scan
- *
+ * 
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       context_link__scan_bytes() instead.
  */
 YY_BUFFER_STATE context_link__scan_string (yyconst char * yystr )
 {
-
+    
 	return context_link__scan_bytes(yystr,strlen(yystr) );
 }
 
@@ -1833,7 +1799,7 @@ YY_BUFFER_STATE context_link__scan_string (yyconst char * yystr )
  * scan from a @e copy of @a bytes.
  * @param yybytes the byte buffer to scan
  * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
- *
+ * 
  * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE context_link__scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
@@ -1842,7 +1808,7 @@ YY_BUFFER_STATE context_link__scan_bytes  (yyconst char * yybytes, int  _yybytes
 	char *buf;
 	yy_size_t n;
 	int i;
-
+    
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
 	buf = (char *) context_link_alloc(n  );
@@ -1896,16 +1862,16 @@ static void yy_fatal_error (yyconst char* msg )
 /* Accessor  methods (get/set functions) to struct members. */
 
 /** Get the current line number.
- *
+ * 
  */
 int context_link_get_lineno  (void)
 {
-
+        
     return context_link_lineno;
 }
 
 /** Get the input stream.
- *
+ * 
  */
 FILE *context_link_get_in  (void)
 {
@@ -1913,7 +1879,7 @@ FILE *context_link_get_in  (void)
 }
 
 /** Get the output stream.
- *
+ * 
  */
 FILE *context_link_get_out  (void)
 {
@@ -1921,7 +1887,7 @@ FILE *context_link_get_out  (void)
 }
 
 /** Get the length of the current token.
- *
+ * 
  */
 int context_link_get_leng  (void)
 {
@@ -1929,7 +1895,7 @@ int context_link_get_leng  (void)
 }
 
 /** Get the current token.
- *
+ * 
  */
 
 char *context_link_get_text  (void)
@@ -1939,18 +1905,18 @@ char *context_link_get_text  (void)
 
 /** Set the current line number.
  * @param line_number
- *
+ * 
  */
 void context_link_set_lineno (int  line_number )
 {
-
+    
     context_link_lineno = line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
  * @param in_str A readable stream.
- *
+ * 
  * @see context_link__switch_to_buffer
  */
 void context_link_set_in (FILE *  in_str )
@@ -1981,7 +1947,7 @@ static int yy_init_globals (void)
 
     /* We do not touch context_link_lineno unless the option is enabled. */
     context_link_lineno =  1;
-
+    
     (yy_buffer_stack) = 0;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
@@ -2007,7 +1973,7 @@ static int yy_init_globals (void)
 /* context_link_lex_destroy is for both reentrant and non-reentrant scanners. */
 int context_link_lex_destroy  (void)
 {
-
+    
     /* Pop the buffer stack, destroying each element. */
 	while(YY_CURRENT_BUFFER){
 		context_link__delete_buffer(YY_CURRENT_BUFFER  );
@@ -2074,7 +2040,7 @@ void context_link_free (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 66 "context_link.l"
+#line 61 "context_link.l"
 
 
 
@@ -2091,29 +2057,33 @@ void Context::LinkProgram(GLuint program)
 	shaderObject VS, FS;
 	VS = shaderPool[programPool[program].sid4VS];
 	FS = shaderPool[programPool[program].sid4FS];
-
+	
 	if (programPool.find(program) == programPool.end()) {
 		RecordError(GL_INVALID_VALUE);
 		return;
 	}
-
+	
 	if ((programPool[program].sid4VS == 0) || (programPool[program].sid4FS == 0)) {
 		programPool[program].linkStatus = LS_SHADER_MISSING;
+		programPool[program].linkInfo = "A vertex shader and a fragment shader are not both present in the program object.";
 		return;
 	}
 	else if ((VS.isCompiled == GL_FALSE) || (FS.isCompiled == GL_FALSE)) {
-		programPool[program].linkStatus = LS_SHADER_ISNOTCOMPILED;
+		programPool[program].linkStatus = LS_SHADER_IS_NOT_COMPILED;
+		programPool[program].linkInfo = "One or more of the attached shader objects has not been successfully compiled or loaded with a pre-compiled shader binary.";
 		return;
 	}
-
-	currentProgram = programPool[program];
-
+	
+	t_program = programPool[program];
+		
 	for (int i=0; i<VS.count; i++) {
 		context_link_lineno = 1;
 		shaderType = 0;
 		context_link__scan_string(VS.compiledSourcePool[i].c_str());
 		context_link_parse();
 	}
+	
+	printf("\n");
 
 	for (int i=0; i<FS.count; i++) {
 		context_link_lineno = 1;
@@ -2121,14 +2091,32 @@ void Context::LinkProgram(GLuint program)
 		context_link__scan_string(FS.compiledSourcePool[i].c_str());
 		context_link_parse();
 	}
-
+	
 	///Check both's shader's in/output are matched.
-
-
-	programPool[program] = currentProgram;
+	std::map<std::string, symbol>::iterator it;
+	for (it = t_program.symTableVS.begin(); it!=t_program.symTableVS.end(); it++) {
+		if (it->second.ioType == CG_OUT_ATTR) {
+			if (t_program.symTableFS.find(it->first) == t_program.symTableFS.end()) {
+				programPool[program].linkStatus = LS_VS_FS_VARRYING_UNMATCH;
+				printf("%s \n",it->first.c_str());
+				return;
+			}
+			else {
+				if (t_program.symTableFS[it->first].ioType != CG_IN_ATTR ||
+					t_program.symTableFS[it->first].declareType.compare(it->second.declareType) != 0) {
+					programPool[program].linkStatus = LS_VS_FS_VARRYING_UNMATCH;
+					printf("%s \n",it->first.c_str());
+					return;
+				}
+			}
+		}
+	}
+	
+	t_program.linkInfo.clear();
+	
+	programPool[program] = t_program;
 	programPool[program].linkStatus = LS_NO_ERROR;
 	programPool[program].isLinked = GL_TRUE;
+	
 }
-
-
 

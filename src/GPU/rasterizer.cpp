@@ -263,10 +263,11 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 
 /**
  * u,v - Texture coodinate in 2 dimension directions.
- * s,b,o - 3 block-based hirachy level, Super block, Block, Offset, in textrue coordinate.
+ * s,b,o - 3 block-based hirachy level, Super block, Block, Offset, in textrue
+ * coordinate.
  *
- * The following two function are to calculate 1D address and fetch data
- * in system memory from 6D block-based texture address.
+ * The following two function are to calculate 1D address and fetch data in
+ * system memory from 6D block-based texture address.
  */
 int Rasterizer::CalcTexAdd(short int us,
                            short int ub,
@@ -425,6 +426,7 @@ fixColor4 Rasterizer::BilinearFilter(floatVec4 coordIn,int level, unsigned char 
 	coordLOD[2].t = coordLOD[2].t + 1;
 	coordLOD[3].s = coordLOD[3].s + 1;
 	coordLOD[3].t = coordLOD[3].t + 1;
+	coordLOD[0] = TexCoordWrap(coordLOD[0], level, tid);
 	coordLOD[1] = TexCoordWrap(coordLOD[1], level, tid);
 	coordLOD[2] = TexCoordWrap(coordLOD[2], level, tid);
 	coordLOD[3] = TexCoordWrap(coordLOD[3], level, tid);
@@ -466,6 +468,11 @@ fixColor4 Rasterizer::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixe
 	fixColor4 TexColor[2];
 	fixColor4 color, colorNextLevel;
 	int LoD, maxLevel;
+
+	if (pixelInput.attr[0].x == 536 && pixelInput.attr[0].y == 378)
+	{
+		printf("test");
+	}
 
 	//find absolutely coord in texture image
 	coord.s = coordIn.s*texImage[tid].widthLevel[0];

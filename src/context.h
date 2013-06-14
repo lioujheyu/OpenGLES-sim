@@ -175,6 +175,8 @@ struct programObject
 	GLuint linkStatus;
 	GLboolean delFlag;
 
+	std::string	linkInfo;
+
 	std::map<std::string, symbol> symTableVS;
 	std::map<std::string, symbol> symTableFS;
 };
@@ -214,13 +216,16 @@ public:
     void 		GenerateMipmap(GLenum target);
     void 		GenTextures (GLsizei n, GLuint* textures);
     GLenum		GetError (void);
+    void		GetProgramiv (GLuint program, GLenum pname, GLint* params);
+    void		GetShaderiv (GLuint shader, GLenum pname, GLint* params);
     GLboolean	IsProgram (GLuint program);
     GLboolean	IsShader (GLuint shader);
     GLboolean	IsTexture (GLuint texture);
 	void 		LinkProgram (GLuint program);
     void 		ShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
     void 		TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
-    void 		TexParameteri(GLenum target, GLenum pname, GLint param);
+    void 		TexParameteri (GLenum target, GLenum pname, GLint param);
+    void 		ValidateProgram (GLuint program);
     void 		VertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
     void 		Viewport (GLint x, GLint y, GLsizei width, GLsizei height);
 

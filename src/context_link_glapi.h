@@ -22,6 +22,6 @@
 #define LS_VS_FS_VARRYING_UNMATCH	6
 #define LS_DECLARATION_UNRESOLVED	7
 //#define /*shared global is declared in two different type */
-#define LS_SHADER_ISNOTCOMPILED		9
+#define LS_SHADER_IS_NOT_COMPILED	9
 
 #endif // CONTEXT_LINK_GLAPI_H_INCLUDED

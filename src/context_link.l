@@ -16,7 +16,7 @@ L	[a-zA-Z_]
 unsigned int context_link_col = 1;
 
 extern int context_link_parse();
-extern programObject currentProgram;
+extern programObject t_program;
 extern unsigned int shaderType;
 %}
 
@@ -54,12 +54,7 @@ extern unsigned int shaderType;
 		context_link_lval.ival = atoi(context_link_text);
 		return INTEGER;
 	}
-":"		COL_NO;	return ':';
-"["		COL_NO;	return '[';
-"]"		COL_NO;	return ']';
-"."		COL_NO;	return '.';
-"$"		COL_NO;	return '$';
-","		COL_NO;	return ',';
+[:\[\].$,]  return *context_link_text;
 
 [ \t]*	COL_NO;		/* remove all space-related char */
 \n		context_link_col = 1;
@@ -86,14 +81,16 @@ void Context::LinkProgram(GLuint program)
 	
 	if ((programPool[program].sid4VS == 0) || (programPool[program].sid4FS == 0)) {
 		programPool[program].linkStatus = LS_SHADER_MISSING;
+		programPool[program].linkInfo = "A vertex shader and a fragment shader are not both present in the program object.";
 		return;
 	}
 	else if ((VS.isCompiled == GL_FALSE) || (FS.isCompiled == GL_FALSE)) {
-		programPool[program].linkStatus = LS_SHADER_ISNOTCOMPILED;
+		programPool[program].linkStatus = LS_SHADER_IS_NOT_COMPILED;
+		programPool[program].linkInfo = "One or more of the attached shader objects has not been successfully compiled or loaded with a pre-compiled shader binary.";
 		return;
 	}
 	
-	currentProgram = programPool[program];
+	t_program = programPool[program];
 		
 	for (int i=0; i<VS.count; i++) {
 		context_link_lineno = 1;
@@ -101,6 +98,8 @@ void Context::LinkProgram(GLuint program)
 		context_link__scan_string(VS.compiledSourcePool[i].c_str());
 		context_link_parse();
 	}
+	
+	printf("\n");
 
 	for (int i=0; i<FS.count; i++) {
 		context_link_lineno = 1;
@@ -110,11 +109,29 @@ void Context::LinkProgram(GLuint program)
 	}
 	
 	///Check both's shader's in/output are matched.
+	std::map<std::string, symbol>::iterator it;
+	for (it = t_program.symTableVS.begin(); it!=t_program.symTableVS.end(); it++) {
+		if (it->second.ioType == CG_OUT_ATTR) {
+			if (t_program.symTableFS.find(it->first) == t_program.symTableFS.end()) {
+				programPool[program].linkStatus = LS_VS_FS_VARRYING_UNMATCH;
+				printf("%s \n",it->first.c_str());
+				return;
+			}
+			else {
+				if (t_program.symTableFS[it->first].ioType != CG_IN_ATTR ||
+					t_program.symTableFS[it->first].declareType.compare(it->second.declareType) != 0) {
+					programPool[program].linkStatus = LS_VS_FS_VARRYING_UNMATCH;
+					printf("%s \n",it->first.c_str());
+					return;
+				}
+			}
+		}
+	}
 	
+	t_program.linkInfo.clear();
 	
-	programPool[program] = currentProgram;
+	programPool[program] = t_program;
 	programPool[program].linkStatus = LS_NO_ERROR;
 	programPool[program].isLinked = GL_TRUE;
+	
 }
-
-

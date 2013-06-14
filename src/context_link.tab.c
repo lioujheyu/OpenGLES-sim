@@ -1,20 +1,20 @@
 /* A Bison parser, made by GNU Bison 2.4.2.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
-
+   
       Copyright (C) 1984, 1989-1990, 2000-2006, 2009-2010 Free Software
    Foundation, Inc.
-
+   
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -27,7 +27,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -77,19 +77,22 @@
 /* Line 189 of yacc.c  */
 #line 1 "context_link.y"
 
+#include <string>
 #include "context_link_glapi.h"
 #include "context.h"
+
 
 int context_link_lex(void);
 void context_link_error(char *s);
 
-programObject currentProgram;
+programObject t_program;
 unsigned int shaderType;
-symbol t_symbol;
+unsigned int element;
+unsigned int idx;
 
 
 /* Line 189 of yacc.c  */
-#line 93 "context_link.tab.c"
+#line 96 "context_link.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -135,15 +138,15 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 13 "context_link.y"
+#line 16 "context_link.y"
 
-	int 	ival;
+	int		ival;
 	char	sval[30];
 
 
 
 /* Line 214 of yacc.c  */
-#line 147 "context_link.tab.c"
+#line 150 "context_link.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -155,7 +158,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 159 "context_link.tab.c"
+#line 162 "context_link.tab.c"
 
 #ifdef short
 # undef short
@@ -444,8 +447,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    33,    33,    34,    37,    38,    39,    40,    44,    46,
-      48,    50,    90,    91,    92,    93,    97,    98,    99
+       0,    36,    36,    37,    40,    41,    42,    43,    47,    49,
+      52,    55,   103,   104,   105,   106,   110,   111,   112
 };
 #endif
 
@@ -1370,9 +1373,10 @@ yyreduce:
         case 11:
 
 /* Line 1464 of yacc.c  */
-#line 50 "context_link.y"
+#line 55 "context_link.y"
     {
 			/* printf("name: %s ",$3); */
+			symbol t_symbol;
 
 			t_symbol.name = (yyvsp[(3) - (11)].sval);
 			t_symbol.declareType = (yyvsp[(2) - (11)].sval);
@@ -1380,6 +1384,7 @@ yyreduce:
 			if (strcmp((yyvsp[(7) - (11)].sval),"HPOS") == 0) {
 				t_symbol.ioType = CG_OUT_POSITION;
 				t_symbol.idx = 0;
+				t_symbol.element = element;
 			}
 			else if (strncmp((yyvsp[(7) - (11)].sval),"ATTR",4) == 0) {
 				if ((yyvsp[(5) - (11)].ival) == CG_IN)
@@ -1388,81 +1393,87 @@ yyreduce:
 					t_symbol.ioType = CG_OUT_ATTR;
 
 				t_symbol.idx = (unsigned int)(yyvsp[(7) - (11)].sval)[4] - 48;
+				t_symbol.element = element;
 			}
 			else if (strncmp((yyvsp[(7) - (11)].sval),"texunit",7) == 0) {
 				t_symbol.ioType = CG_IN_UNIFORM_TEXTURE;
+				t_symbol.idx = idx;
+				t_symbol.element = element;
 			}
+			//Need to care the multi color situation
 			else if (strncmp((yyvsp[(7) - (11)].sval),"COL",3) == 0) {
 				t_symbol.ioType = CG_OUT_COLOR;
 				t_symbol.idx = 0;
+				t_symbol.element = element;
 			}
 			else if ((yyvsp[(7) - (11)].sval)[0] == 'c') {
 				t_symbol.ioType = CG_IN_UNIFORM;
-				t_symbol.idx = 0;
+				t_symbol.idx = idx;
+				t_symbol.element = element;
 			}
 
 			t_symbol.print();
 
 			if (shaderType == 0)
-				currentProgram.symTableVS[t_symbol.name] = t_symbol;
+				t_program.symTableVS[t_symbol.name] = t_symbol;
 			else
-				currentProgram.symTableFS[t_symbol.name] = t_symbol;
+				t_program.symTableFS[t_symbol.name] = t_symbol;
 		;}
     break;
 
   case 12:
 
 /* Line 1464 of yacc.c  */
-#line 90 "context_link.y"
-    {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval));;}
+#line 103 "context_link.y"
+    {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval)); element = 1;;}
     break;
 
   case 13:
 
 /* Line 1464 of yacc.c  */
-#line 91 "context_link.y"
-    {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval));;}
+#line 104 "context_link.y"
+    {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval)); idx = (yyvsp[(3) - (4)].ival); element = 1;;}
     break;
 
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 92 "context_link.y"
-    {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval));;}
+#line 105 "context_link.y"
+    {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval)); element = (yyvsp[(6) - (6)].ival);;}
     break;
 
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 93 "context_link.y"
-    {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); t_symbol.idx = (yyvsp[(2) - (2)].ival);;}
+#line 106 "context_link.y"
+    {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); idx = (yyvsp[(2) - (2)].ival); element = 1;;}
     break;
 
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 97 "context_link.y"
+#line 110 "context_link.y"
     {(yyval.ival) = 0;;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 98 "context_link.y"
+#line 111 "context_link.y"
     {(yyval.ival) = CG_IN;;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 99 "context_link.y"
+#line 112 "context_link.y"
     {(yyval.ival) = CG_OUT;;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 1466 "context_link.tab.c"
+#line 1477 "context_link.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1674,7 +1685,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 102 "context_link.y"
+#line 115 "context_link.y"
 
 
 
