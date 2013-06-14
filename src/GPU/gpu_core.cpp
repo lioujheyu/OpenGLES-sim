@@ -25,6 +25,7 @@ void GPU_Core::Run()
 #endif // TEXEL_INFO_FILE
 
     gm.Initialize();
+    rm.ClearTexCache();
 
     ///clear frame buffer if needed
     if (clearStat) {
@@ -78,11 +79,10 @@ void GPU_Core::Run()
             rm.PixelGenerateHiber();
 
         }
-
     }
 
-    GPUPRINTF("Texture cache hit: %d\n",rm.TexCache.TexCacheHit);
-    GPUPRINTF("Texture cache miss: %d\n",rm.TexCache.TexCacheMiss);
+    GPUPRINTF("Texture cache hit: %d\n",rm.TexCache.hit);
+    GPUPRINTF("Texture cache miss: %d\n",rm.TexCache.miss);
 
 #ifdef GPU_INFO_FILE
 	fclose(GPUINFOfp);

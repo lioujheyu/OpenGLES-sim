@@ -6,7 +6,7 @@ int context_link_lex(void);
 void context_link_error(char *s);
 
 programObject currentProgram;
-unsigned int currentSTYPE;
+unsigned int shaderType;
 symbol t_symbol;
 %}
 
@@ -49,7 +49,8 @@ semantic: SEMT IDENTIFIER
 
 link_info: VAR TYPE IDENTIFIER ':' io_type ':' complex_id ':' INTEGER ':' INTEGER {
 			/* printf("name: %s ",$3); */
-
+			t_symbol.symbol();
+			
 			t_symbol.name = $3;
 			t_symbol.declareType = $2;
 
@@ -62,6 +63,7 @@ link_info: VAR TYPE IDENTIFIER ':' io_type ':' complex_id ':' INTEGER ':' INTEGE
 					t_symbol.ioType = CG_IN_ATTR;
 				else
 					t_symbol.ioType = CG_OUT_ATTR;
+					
 				t_symbol.idx = (unsigned int)$7[4] - 48;
 			}
 			else if (strncmp($7,"texunit",7) == 0) {
@@ -78,7 +80,7 @@ link_info: VAR TYPE IDENTIFIER ':' io_type ':' complex_id ':' INTEGER ':' INTEGE
 
 			t_symbol.print();
 
-			if (currentSTYPE == 0)
+			if (shaderType == 0)
 				currentProgram.symTableVS[t_symbol.name] = t_symbol;
 			else
 				currentProgram.symTableFS[t_symbol.name] = t_symbol;
@@ -88,7 +90,7 @@ link_info: VAR TYPE IDENTIFIER ':' io_type ':' complex_id ':' INTEGER ':' INTEGE
 complex_id
 	:	IDENTIFIER					{strcpy($$,$1);}
 	|	IDENTIFIER '[' INTEGER ']'	{strcpy($$,$1);}
-	|	IDENTIFIER '[' INTEGER ']' ',' INTEGER	{strcpy($$,$1);}
+	|	IDENTIFIER '[' INTEGER ']' ',' INTEGER	{strcpy($$,$1); t_symbol.element = $6;};
 	|	IDENTIFIER INTEGER	{strcpy($$,$1); t_symbol.idx = $2;}
 	;
 

@@ -57,7 +57,6 @@ public:
     int             CalcTexAdd( short int us, short int ub, short int uo,
                                 short int vs, short int vb, short int vo,
                                 int width);
-
     fixColor4       GetTexColor(floatVec4 coordIn, const unsigned int level, unsigned char tid);
     fixColor4       TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixelInput, unsigned char tid);
     floatVec4		TexCoordWrap(floatVec4 coordIn, unsigned int level, unsigned char tid);
@@ -65,16 +64,17 @@ public:
     fixColor4   	TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, unsigned char tid);
     void            PerFragmentOp(pixel pixInput);
     void 			ClearBuffer(unsigned int mask);
+    void 			ClearTexCache();
 
 	struct
 	{
-        bool            valid[TEX_CACHE_ENTRY_SIZE];
+        bool            valid[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         unsigned int	tag[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         fixColor4       color[TEX_CACHE_ENTRY_SIZE][TEX_CACHE_BLOCK_SIZE][TEX_WAY_ASSOCIATION];
 		unsigned char	LRU[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
-        int             TexCacheHit;
-        int             TexCacheMiss;
-        int             TexCacheColdMiss;
+        int             hit;
+        int             miss;
+        int             coldMiss;
     }TexCache;
 
     textureImage texImage[MAX_TEXTURE_UNIT];

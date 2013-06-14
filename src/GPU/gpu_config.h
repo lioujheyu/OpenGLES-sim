@@ -9,8 +9,10 @@
 #define MAX_ATTRIBUTE_NUMBER    8
 #define MAX_TEXTURE_UNIT	    2
 
+
+/******************** Texture debuging and setting ********************/
 /**
- *	Enable MIPMAP_LEVEL_TEST will replace the texture color with
+ *	Enable SHOW_MIPMAP_LEVEL will replace the texture color with
  *	level-represented luminance on the textured primitive nomatter
  *	which filter this primitive uses.
  *	level 0 - 255	maximum white
@@ -20,7 +22,7 @@
  *		  4 - .
  *		      .
  */
-//#define MIPMAP_LEVEL_TEST
+//#define SHOW_MIPMAP_LEVEL
 
 /**
  *	The whole texture cache size is determined be
@@ -40,6 +42,21 @@
 #define TEX_CACHE_ENTRY_SIZE 16
 
 /**
+ *	Enable SHOW_TEXCACHE_COLD_MISS will let texture cache return color red
+ *	rather then the origianl texel's color when texture cache cold miss is
+ *	occured. This opotion can be enable with SHOW_TEXCACHE_MISS and has no
+ *	conflict.
+ */
+//#define SHOW_TEXCACHE_COLD_MISS
+
+/**
+ *	Enable SHOW_TEXCACHE_MISS will let texture cache return color green rather
+ *	then the origianl texel's color when texture cache miss is occured. This
+ *	opotion can be enable with SHOW_TEXCACHE_COLD_MISS and has no conflict.
+ */
+//#define SHOW_TEXCACHE_MISS
+
+/**
  *	Debug information
  */
 #define DEBUG 1
@@ -49,9 +66,6 @@
 #define PIXEL_INFO_FILE "pixel_info.txt"
 //#define TEXEL_INFO
 #define TEXEL_INFO_FILE "texel_info.txt"
-
-
-
 
 /***************Debugging marco for simulator use*****************/
 

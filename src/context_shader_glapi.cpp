@@ -203,10 +203,14 @@ void Context::DetachShader(GLuint program, GLuint shader)
 		if (shaderPool[shader].delFlag == GL_TRUE)
 			DeleteShader(shader);
 
-		if (programPool[program].sid4VS == shader)
+		if (programPool[program].sid4VS == shader){
+			programPool[program].symTableVS.clear();
 			programPool[program].sid4VS = 0;
-		else
+		}
+		else {
 			programPool[program].sid4FS = 0;
+			programPool[program].symTableFS.clear();
+		}
 
 		programPool[program].isLinked = GL_FALSE;
 	}

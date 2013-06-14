@@ -14,7 +14,10 @@ L	[a-zA-Z_]
 #define COL_NO context_link_col+=strlen(yytext)
 
 unsigned int context_link_col = 1;
-int context_link_parse();
+
+extern int context_link_parse();
+extern programObject currentProgram;
+extern unsigned int shaderType;
 %}
 
 %%
@@ -62,9 +65,6 @@ int context_link_parse();
 \n		context_link_col = 1;
 %%
 
-extern programObject currentProgram;
-extern unsigned int currentSTYPE;
-
 void context_link_error(char *s)
 {
     printf("(%d,%d)syntax error:%s\n",
@@ -75,34 +75,45 @@ void context_link_error(char *s)
 
 void Context::LinkProgram(GLuint program)
 {
+	shaderObject VS, FS;
+	VS = shaderPool[programPool[program].sid4VS];
+	FS = shaderPool[programPool[program].sid4FS];
+	
 	if (programPool.find(program) == programPool.end()) {
 		RecordError(GL_INVALID_VALUE);
 		return;
 	}
 	
+	if ((programPool[program].sid4VS == 0) || (programPool[program].sid4FS == 0)) {
+		programPool[program].linkStatus = LS_SHADER_MISSING;
+		return;
+	}
+	else if ((VS.isCompiled == GL_FALSE) || (FS.isCompiled == GL_FALSE)) {
+		programPool[program].linkStatus = LS_SHADER_ISNOTCOMPILED;
+		return;
+	}
+	
 	currentProgram = programPool[program];
-
-	shaderObject VS, FS;
-	VS = shaderPool[programPool[program].sid4VS];
-	FS = shaderPool[programPool[program].sid4FS];
-
+		
 	for (int i=0; i<VS.count; i++) {
 		context_link_lineno = 1;
-		currentSTYPE = 0;
+		shaderType = 0;
 		context_link__scan_string(VS.compiledSourcePool[i].c_str());
 		context_link_parse();
 	}
 
 	for (int i=0; i<FS.count; i++) {
 		context_link_lineno = 1;
-		currentSTYPE = 1;
+		shaderType = 1;
 		context_link__scan_string(FS.compiledSourcePool[i].c_str());
 		context_link_parse();
 	}
 	
+	///Check both's shader's in/output are matched.
 	
 	
 	programPool[program] = currentProgram;
+	programPool[program].linkStatus = LS_NO_ERROR;
 	programPool[program].isLinked = GL_TRUE;
 }
 

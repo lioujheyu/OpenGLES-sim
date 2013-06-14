@@ -53,7 +53,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types. 
+ * if you want the limit (max/min) macros for int types.
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -70,7 +70,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t; 
+typedef unsigned char flex_uint8_t;
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 
@@ -191,7 +191,7 @@ extern FILE *context_link_in, *context_link_out;
 
     /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
      *       access to the local variable yy_act. Since yyless() is a macro, it would break
-     *       existing scanners that call yyless() from OUTSIDE context_link_lex. 
+     *       existing scanners that call yyless() from OUTSIDE context_link_lex.
      *       One obvious solution it to make yy_act a global. I tried that, and saw
      *       a 5% performance hit in a non-context_link_lineno scanner, because yy_act is
      *       normally declared as a register variable-- so it is not worth it.
@@ -203,7 +203,7 @@ extern FILE *context_link_in, *context_link_out;
                     if ( context_link_text[yyl] == '\n' )\
                         --context_link_lineno;\
             }while(0)
-    
+
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
 	do \
@@ -265,7 +265,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-    
+
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -595,7 +595,7 @@ static yyconst flex_int16_t yy_chk[326] =
 /* Table of booleans, true if rule could match eol. */
 static yyconst flex_int32_t yy_rule_can_match_eol[26] =
     {   0,
-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 1, 0,     };
 
 static yy_state_type yy_last_accepting_state;
@@ -621,8 +621,11 @@ char *context_link_text;
 #define COL_NO context_link_col+=strlen(context_link_text)
 
 unsigned int context_link_col = 1;
-int context_link_parse();
-#line 626 "context_link.cpp"
+
+extern int context_link_parse();
+extern programObject currentProgram;
+extern unsigned int shaderType;
+#line 629 "context_link.cpp"
 
 #define INITIAL 0
 
@@ -682,7 +685,7 @@ extern int context_link_wrap (void );
 #endif
 
     static void yyunput (int c,char *buf_ptr  );
-    
+
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int );
 #endif
@@ -811,11 +814,11 @@ YY_DECL
 	register yy_state_type yy_current_state;
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
-    
-#line 20 "context_link.l"
+
+#line 23 "context_link.l"
 
 
-#line 819 "context_link.cpp"
+#line 822 "context_link.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -893,7 +896,7 @@ yy_find_action:
 			int yyl;
 			for ( yyl = 0; yyl < context_link_leng; ++yyl )
 				if ( context_link_text[yyl] == '\n' )
-					   
+
     context_link_lineno++;
 ;
 			}
@@ -915,12 +918,12 @@ case 1:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up context_link_text again */
 YY_RULE_SETUP
-#line 22 "context_link.l"
+#line 25 "context_link.l"
 /* Non-# or ! begin sentence, means real instruction */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 23 "context_link.l"
+#line 26 "context_link.l"
 /* Compiler's name */
 	YY_BREAK
 case 3:
@@ -928,7 +931,7 @@ case 3:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up context_link_text again */
 YY_RULE_SETUP
-#line 24 "context_link.l"
+#line 27 "context_link.l"
 /* Comment */
 	YY_BREAK
 case 4:
@@ -936,7 +939,7 @@ case 4:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up context_link_text again */
 YY_RULE_SETUP
-#line 25 "context_link.l"
+#line 28 "context_link.l"
 
 	YY_BREAK
 case 5:
@@ -944,32 +947,32 @@ case 5:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up context_link_text again */
 YY_RULE_SETUP
-#line 26 "context_link.l"
+#line 29 "context_link.l"
 
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 28 "context_link.l"
+#line 31 "context_link.l"
 COL_NO; return PROFILE;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 29 "context_link.l"
+#line 32 "context_link.l"
 COL_NO; return PROG;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 30 "context_link.l"
+#line 33 "context_link.l"
 COL_NO; return SEMT;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 31 "context_link.l"
+#line 34 "context_link.l"
 COL_NO; return VAR;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 32 "context_link.l"
+#line 35 "context_link.l"
 { COL_NO;
 		strcpy(context_link_lval.sval,context_link_text);
 		return TYPE;
@@ -977,7 +980,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 36 "context_link.l"
+#line 39 "context_link.l"
 { COL_NO;
 		strcpy(context_link_lval.sval,context_link_text);
 		return TYPE;
@@ -985,7 +988,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 40 "context_link.l"
+#line 43 "context_link.l"
 { COL_NO;
 		strcpy(context_link_lval.sval,context_link_text);
 		return TYPE;
@@ -993,17 +996,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 44 "context_link.l"
+#line 47 "context_link.l"
 COL_NO;	return VIN;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 45 "context_link.l"
+#line 48 "context_link.l"
 COL_NO;	return VOUT;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 46 "context_link.l"
+#line 49 "context_link.l"
 { COL_NO;
 		strcpy(context_link_lval.sval,context_link_text);
 		return IDENTIFIER;
@@ -1011,7 +1014,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 50 "context_link.l"
+#line 53 "context_link.l"
 { COL_NO;
 		context_link_lval.ival = atoi(context_link_text);
 		return INTEGER;
@@ -1019,51 +1022,51 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 54 "context_link.l"
+#line 57 "context_link.l"
 COL_NO;	return ':';
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 55 "context_link.l"
+#line 58 "context_link.l"
 COL_NO;	return '[';
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 56 "context_link.l"
+#line 59 "context_link.l"
 COL_NO;	return ']';
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 57 "context_link.l"
+#line 60 "context_link.l"
 COL_NO;	return '.';
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 58 "context_link.l"
+#line 61 "context_link.l"
 COL_NO;	return '$';
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 59 "context_link.l"
+#line 62 "context_link.l"
 COL_NO;	return ',';
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 61 "context_link.l"
+#line 64 "context_link.l"
 COL_NO;		/* remove all space-related char */
 	YY_BREAK
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 62 "context_link.l"
+#line 65 "context_link.l"
 context_link_col = 1;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 63 "context_link.l"
+#line 66 "context_link.l"
 ECHO;
 	YY_BREAK
-#line 1067 "context_link.cpp"
+#line 1070 "context_link.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1341,7 +1344,7 @@ static int yy_get_next_buffer (void)
 {
 	register yy_state_type yy_current_state;
 	register char *yy_cp;
-    
+
 	yy_current_state = (yy_start);
 	yy_current_state += YY_AT_BOL();
 
@@ -1396,7 +1399,7 @@ static int yy_get_next_buffer (void)
     static void yyunput (int c, register char * yy_bp )
 {
 	register char *yy_cp;
-    
+
     yy_cp = (yy_c_buf_p);
 
 	/* undo effects of setting up context_link_text */
@@ -1443,7 +1446,7 @@ static int yy_get_next_buffer (void)
 
 {
 	int c;
-    
+
 	*(yy_c_buf_p) = (yy_hold_char);
 
 	if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
@@ -1506,7 +1509,7 @@ static int yy_get_next_buffer (void)
 
 	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (c == '\n');
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_at_bol )
-		   
+
     context_link_lineno++;
 ;
 
@@ -1516,12 +1519,12 @@ static int yy_get_next_buffer (void)
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
- * 
+ *
  * @note This function does not reset the start condition to @c INITIAL .
  */
     void context_link_restart  (FILE * input_file )
 {
-    
+
 	if ( ! YY_CURRENT_BUFFER ){
         context_link_ensure_buffer_stack ();
 		YY_CURRENT_BUFFER_LVALUE =
@@ -1534,11 +1537,11 @@ static int yy_get_next_buffer (void)
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
- * 
+ *
  */
     void context_link__switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
 {
-    
+
 	/* TODO. We should be able to replace this entire function body
 	 * with
 	 *		context_link_pop_buffer_state();
@@ -1578,13 +1581,13 @@ static void context_link__load_buffer_state  (void)
 /** Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
- * 
+ *
  * @return the allocated buffer state.
  */
     YY_BUFFER_STATE context_link__create_buffer  (FILE * file, int  size )
 {
 	YY_BUFFER_STATE b;
-    
+
 	b = (YY_BUFFER_STATE) context_link_alloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in context_link__create_buffer()" );
@@ -1607,11 +1610,11 @@ static void context_link__load_buffer_state  (void)
 
 /** Destroy the buffer.
  * @param b a buffer created with context_link__create_buffer()
- * 
+ *
  */
     void context_link__delete_buffer (YY_BUFFER_STATE  b )
 {
-    
+
 	if ( ! b )
 		return;
 
@@ -1632,7 +1635,7 @@ static void context_link__load_buffer_state  (void)
 
 {
 	int oerrno = errno;
-    
+
 	context_link__flush_buffer(b );
 
 	b->yy_input_file = file;
@@ -1654,7 +1657,7 @@ static void context_link__load_buffer_state  (void)
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
- * 
+ *
  */
     void context_link__flush_buffer (YY_BUFFER_STATE  b )
 {
@@ -1683,7 +1686,7 @@ static void context_link__load_buffer_state  (void)
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
- *  
+ *
  */
 void context_link_push_buffer_state (YY_BUFFER_STATE new_buffer )
 {
@@ -1713,7 +1716,7 @@ void context_link_push_buffer_state (YY_BUFFER_STATE new_buffer )
 
 /** Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
- *  
+ *
  */
 void context_link_pop_buffer_state (void)
 {
@@ -1737,7 +1740,7 @@ void context_link_pop_buffer_state (void)
 static void context_link_ensure_buffer_stack (void)
 {
 	int num_to_alloc;
-    
+
 	if (!(yy_buffer_stack)) {
 
 		/* First allocation is just for 2 elements, since we don't know if this
@@ -1750,9 +1753,9 @@ static void context_link_ensure_buffer_stack (void)
 								);
 		if ( ! (yy_buffer_stack) )
 			YY_FATAL_ERROR( "out of dynamic memory in context_link_ensure_buffer_stack()" );
-								  
+
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
-				
+
 		(yy_buffer_stack_max) = num_to_alloc;
 		(yy_buffer_stack_top) = 0;
 		return;
@@ -1780,13 +1783,13 @@ static void context_link_ensure_buffer_stack (void)
 /** Setup the input buffer state to scan directly from a user-specified character buffer.
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
- * 
- * @return the newly allocated buffer state object. 
+ *
+ * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE context_link__scan_buffer  (char * base, yy_size_t  size )
 {
 	YY_BUFFER_STATE b;
-    
+
 	if ( size < 2 ||
 	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
 	     base[size-1] != YY_END_OF_BUFFER_CHAR )
@@ -1815,14 +1818,14 @@ YY_BUFFER_STATE context_link__scan_buffer  (char * base, yy_size_t  size )
 /** Setup the input buffer state to scan a string. The next call to context_link_lex() will
  * scan from a @e copy of @a str.
  * @param yystr a NUL-terminated string to scan
- * 
+ *
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       context_link__scan_bytes() instead.
  */
 YY_BUFFER_STATE context_link__scan_string (yyconst char * yystr )
 {
-    
+
 	return context_link__scan_bytes(yystr,strlen(yystr) );
 }
 
@@ -1830,7 +1833,7 @@ YY_BUFFER_STATE context_link__scan_string (yyconst char * yystr )
  * scan from a @e copy of @a bytes.
  * @param yybytes the byte buffer to scan
  * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
- * 
+ *
  * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE context_link__scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
@@ -1839,7 +1842,7 @@ YY_BUFFER_STATE context_link__scan_bytes  (yyconst char * yybytes, int  _yybytes
 	char *buf;
 	yy_size_t n;
 	int i;
-    
+
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
 	buf = (char *) context_link_alloc(n  );
@@ -1893,16 +1896,16 @@ static void yy_fatal_error (yyconst char* msg )
 /* Accessor  methods (get/set functions) to struct members. */
 
 /** Get the current line number.
- * 
+ *
  */
 int context_link_get_lineno  (void)
 {
-        
+
     return context_link_lineno;
 }
 
 /** Get the input stream.
- * 
+ *
  */
 FILE *context_link_get_in  (void)
 {
@@ -1910,7 +1913,7 @@ FILE *context_link_get_in  (void)
 }
 
 /** Get the output stream.
- * 
+ *
  */
 FILE *context_link_get_out  (void)
 {
@@ -1918,7 +1921,7 @@ FILE *context_link_get_out  (void)
 }
 
 /** Get the length of the current token.
- * 
+ *
  */
 int context_link_get_leng  (void)
 {
@@ -1926,7 +1929,7 @@ int context_link_get_leng  (void)
 }
 
 /** Get the current token.
- * 
+ *
  */
 
 char *context_link_get_text  (void)
@@ -1936,18 +1939,18 @@ char *context_link_get_text  (void)
 
 /** Set the current line number.
  * @param line_number
- * 
+ *
  */
 void context_link_set_lineno (int  line_number )
 {
-    
+
     context_link_lineno = line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
  * @param in_str A readable stream.
- * 
+ *
  * @see context_link__switch_to_buffer
  */
 void context_link_set_in (FILE *  in_str )
@@ -1978,7 +1981,7 @@ static int yy_init_globals (void)
 
     /* We do not touch context_link_lineno unless the option is enabled. */
     context_link_lineno =  1;
-    
+
     (yy_buffer_stack) = 0;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
@@ -2004,7 +2007,7 @@ static int yy_init_globals (void)
 /* context_link_lex_destroy is for both reentrant and non-reentrant scanners. */
 int context_link_lex_destroy  (void)
 {
-    
+
     /* Pop the buffer stack, destroying each element. */
 	while(YY_CURRENT_BUFFER){
 		context_link__delete_buffer(YY_CURRENT_BUFFER  );
@@ -2071,12 +2074,9 @@ void context_link_free (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 63 "context_link.l"
+#line 66 "context_link.l"
 
 
-
-extern programObject currentProgram;
-extern unsigned int currentSTYPE;
 
 void context_link_error(char *s)
 {
@@ -2088,33 +2088,45 @@ void context_link_error(char *s)
 
 void Context::LinkProgram(GLuint program)
 {
-	if (programPool.find(program) == programPool.end()) {
-		RecordError(GL_INVALID_VALUE);
-		return;
-	}
-	
-	currentProgram = programPool[program];
-
 	shaderObject VS, FS;
 	VS = shaderPool[programPool[program].sid4VS];
 	FS = shaderPool[programPool[program].sid4FS];
 
+	if (programPool.find(program) == programPool.end()) {
+		RecordError(GL_INVALID_VALUE);
+		return;
+	}
+
+	if ((programPool[program].sid4VS == 0) || (programPool[program].sid4FS == 0)) {
+		programPool[program].linkStatus = LS_SHADER_MISSING;
+		return;
+	}
+	else if ((VS.isCompiled == GL_FALSE) || (FS.isCompiled == GL_FALSE)) {
+		programPool[program].linkStatus = LS_SHADER_ISNOTCOMPILED;
+		return;
+	}
+
+	currentProgram = programPool[program];
+
 	for (int i=0; i<VS.count; i++) {
 		context_link_lineno = 1;
-		currentSTYPE = 0;
+		shaderType = 0;
 		context_link__scan_string(VS.compiledSourcePool[i].c_str());
 		context_link_parse();
 	}
 
 	for (int i=0; i<FS.count; i++) {
 		context_link_lineno = 1;
-		currentSTYPE = 1;
+		shaderType = 1;
 		context_link__scan_string(FS.compiledSourcePool[i].c_str());
 		context_link_parse();
 	}
-	
-	programPool[program] = currentProgram;
 
+	///Check both's shader's in/output are matched.
+
+
+	programPool[program] = currentProgram;
+	programPool[program].linkStatus = LS_NO_ERROR;
 	programPool[program].isLinked = GL_TRUE;
 }
 

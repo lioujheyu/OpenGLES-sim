@@ -132,18 +132,29 @@ struct shaderObject
 
 struct symbol
 {
+	inline symbol()
+	{
+		name.clear();
+		declareType.clear();
+		ioType = 0;
+		idx = 0;
+		element = 0;
+	}
+
 	std::string name;
 	std::string declareType;
 	unsigned char ioType;
 	unsigned char idx;
+	unsigned char element;
 
 	void print()
 	{
-		printf("%s %s IO:%d Idx:%d \n",
+		printf("%s %s IO:%d Idx:%d element:%d\n",
 				declareType.c_str(),
 				name.c_str(),
 				ioType,
-				idx	);
+				idx,
+				element	);
 	}
 };
 
@@ -154,12 +165,14 @@ struct programObject
 		sid4VS = 0;
 		sid4FS = 0;
 		isLinked = GL_FALSE;
+		linkStatus = 0;
 		delFlag = GL_FALSE;
 	}
 
 	GLuint sid4VS;
 	GLuint sid4FS;
 	GLboolean isLinked;
+	GLuint linkStatus;
 	GLboolean delFlag;
 
 	std::map<std::string, symbol> symTableVS;

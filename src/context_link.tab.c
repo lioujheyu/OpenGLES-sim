@@ -1,20 +1,20 @@
 /* A Bison parser, made by GNU Bison 2.4.2.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
-   
+
       Copyright (C) 1984, 1989-1990, 2000-2006, 2009-2010 Free Software
    Foundation, Inc.
-   
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -27,7 +27,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -84,7 +84,7 @@ int context_link_lex(void);
 void context_link_error(char *s);
 
 programObject currentProgram;
-unsigned int currentSTYPE;
+unsigned int shaderType;
 symbol t_symbol;
 
 
@@ -445,7 +445,7 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    33,    33,    34,    37,    38,    39,    40,    44,    46,
-      48,    50,    89,    90,    91,    92,    96,    97,    98
+      48,    50,    90,    91,    92,    93,    97,    98,    99
 };
 #endif
 
@@ -1386,6 +1386,7 @@ yyreduce:
 					t_symbol.ioType = CG_IN_ATTR;
 				else
 					t_symbol.ioType = CG_OUT_ATTR;
+
 				t_symbol.idx = (unsigned int)(yyvsp[(7) - (11)].sval)[4] - 48;
 			}
 			else if (strncmp((yyvsp[(7) - (11)].sval),"texunit",7) == 0) {
@@ -1402,7 +1403,7 @@ yyreduce:
 
 			t_symbol.print();
 
-			if (currentSTYPE == 0)
+			if (shaderType == 0)
 				currentProgram.symTableVS[t_symbol.name] = t_symbol;
 			else
 				currentProgram.symTableFS[t_symbol.name] = t_symbol;
@@ -1412,56 +1413,56 @@ yyreduce:
   case 12:
 
 /* Line 1464 of yacc.c  */
-#line 89 "context_link.y"
+#line 90 "context_link.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval));;}
     break;
 
   case 13:
 
 /* Line 1464 of yacc.c  */
-#line 90 "context_link.y"
+#line 91 "context_link.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval));;}
     break;
 
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 91 "context_link.y"
+#line 92 "context_link.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval));;}
     break;
 
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 92 "context_link.y"
+#line 93 "context_link.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); t_symbol.idx = (yyvsp[(2) - (2)].ival);;}
     break;
 
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 96 "context_link.y"
+#line 97 "context_link.y"
     {(yyval.ival) = 0;;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 97 "context_link.y"
+#line 98 "context_link.y"
     {(yyval.ival) = CG_IN;;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 98 "context_link.y"
+#line 99 "context_link.y"
     {(yyval.ival) = CG_OUT;;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 1465 "context_link.tab.c"
+#line 1466 "context_link.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1673,7 +1674,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 101 "context_link.y"
+#line 102 "context_link.y"
 
 
 
