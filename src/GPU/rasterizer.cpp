@@ -213,8 +213,15 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 		}
 
 		for (int i = 0; i < pixBufferP; i++) {
-            pixBuffer[i] = ShaderEXE(pixBuffer[i]);
-            PerFragmentOp(pixBuffer[i]);
+			//std::thread s1(&Rasterizer::ShaderEXE, pixBuffer[i], std::ref(pixBuffer[i]));
+			//s1.join();
+			pixBuffer[i] = ShaderEXE(pixBuffer[i]);
+			PerFragmentOp(pixBuffer[i]);
+//			if ((i+1)<pixBufferP) {
+//				i++;
+//				std::thread s2(ShaderEXE, pixBuffer[i], std::ref(pixBuffer[i]));
+//				PerFragmentOp(pixBuffer[i]);
+//			}
         }
 	}
 	else {
@@ -469,11 +476,6 @@ fixColor4 Rasterizer::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixe
 	fixColor4 color, colorNextLevel;
 	int LoD, maxLevel;
 
-	if (pixelInput.attr[0].x == 536 && pixelInput.attr[0].y == 378)
-	{
-		printf("test");
-	}
-
 	//find absolutely coord in texture image
 	coord.s = coordIn.s*texImage[tid].widthLevel[0];
 	coord.t = coordIn.t*texImage[tid].heightLevel[0];
@@ -619,7 +621,6 @@ pixel Rasterizer::ShaderEXE(pixel pixInput)
 //	pixInput.attr[colIndx].g = texColor0.g + texColor1.g;
 //	pixInput.attr[colIndx].b = texColor0.b + texColor1.b;
 
-	return pixInput;
 }
 
 void Rasterizer::PerFragmentOp(pixel pixInput)

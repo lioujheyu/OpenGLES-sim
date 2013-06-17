@@ -112,9 +112,23 @@ void GenMipMap(int tid)
 	ctx->texContext[tid].genMipmap = false;
 }
 
+void ActiveGPU2CleanBuffer()
+{
+	Context * ctx = Context::GetCurrentContext();
+
+	gpu.clearStat = ctx->clearStat;
+	gpu.clearMask = ctx->clearMask;
+	gpu.rm.clearColor = ctx->clearColor;
+    gpu.rm.clearDepth = ctx->clearDepth;
+
+    gpu.Run();
+}
+
 void ActiveGPU()
 {
     Context * ctx = Context::GetCurrentContext();
+
+    shaderObject VS, FS;
 
     for (int i=0;i<MAX_TEXTURE_UNIT;i++){
 		if (ctx->texContext[i].genMipmap)
@@ -132,8 +146,8 @@ void ActiveGPU()
 
     gpu.vtxCount = ctx->drawCmd.count;
     gpu.vtxFirst = ctx->drawCmd.first;
-	gpu.clearStat = ctx->clearStat;
-	gpu.clearMask = ctx->clearMask;
+	//gpu.clearStat = ctx->clearStat;
+	//gpu.clearMask = ctx->clearMask;
 
 	gpu.gm.drawMode = ctx->drawCmd.mode;
 	gpu.gm.viewPortLX = ctx->vp.x;
@@ -147,8 +161,8 @@ void ActiveGPU()
     gpu.rm.depthTestEnable = ctx->depthTestEnable;
     gpu.rm.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
     gpu.rm.dBufPtr = (float*)ctx->drawBuffer[1];
-    gpu.rm.clearColor = ctx->clearColor;
-    gpu.rm.clearDepth = ctx->clearDepth;
+    //gpu.rm.clearColor = ctx->clearColor;
+    //gpu.rm.clearDepth = ctx->clearDepth;
 
     ///Texture Statement
     for (int i=0;i<MAX_TEXTURE_UNIT;i++){
@@ -157,6 +171,20 @@ void ActiveGPU()
 		gpu.rm.texImage[i] = ctx->texImagePool[ctx->texContext[i].texBindID];
     }
 
+	if (ctx->usePID != 0) {
+		VS = ctx->shaderPool[ctx->programPool[ctx->usePID].sid4VS];
+		FS = ctx->shaderPool[ctx->programPool[ctx->usePID].sid4FS];
+
+		gpu.gm.asmSrc = new char[VS.asmSrc.size()];
+		gpu.rm.asmSrc = new char[FS.asmSrc.size()];
+		strcpy(gpu.gm.asmSrc, VS.asmSrc.c_str());
+		strcpy(gpu.rm.asmSrc, FS.asmSrc.c_str());
+	}
 
     gpu.Run();
+
+	if (ctx->usePID != 0) {
+		delete [] gpu.gm.asmSrc;
+		delete [] gpu.rm.asmSrc;
+	}
 }

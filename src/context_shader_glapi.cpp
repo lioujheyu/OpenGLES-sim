@@ -1,5 +1,5 @@
 #include "context.h"
-#include "context_link_glapi.h"
+#include "context_link_def.h"
 #include "context_link.tab.h"
 
 /*******************************************************
@@ -21,16 +21,16 @@ void Context::AttachShader(GLuint program, GLuint shader)
 	}
 
 	///check if the shader has been already attached to the program
-	if (programPool[program].sid4VS == shader){
+	if (programPool[program].sid4VS == shader) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
-	if (programPool[program].sid4FS == shader){
+	if (programPool[program].sid4FS == shader) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
 
-	switch (shaderPool[shader].type){
+	switch (shaderPool[shader].type) {
 	case GL_VERTEX_SHADER:
 		if (programPool[program].sid4VS == 0) {
 			programPool[program].sid4VS = shader;
@@ -58,7 +58,7 @@ GLuint Context::CreateProgram(void)
 {
 	programObject t_program;
 
-	for (int pid=1;;pid++){
+	for (int pid=1;; pid++) {
 		if (programPool.find(pid) == programPool.end()) {
 			programPool[pid] = t_program;
 			return pid;
@@ -76,7 +76,7 @@ GLint Context::CreateShader(GLenum type)
 	shaderObject t_shader;
 	t_shader.type = type;
 
-	for (int sid=1;;sid++) {
+	for (int sid=1;; sid++) {
 		if (shaderPool.find(sid) == shaderPool.end()) {
 			shaderPool[sid] = t_shader;
 			return sid;
@@ -89,55 +89,54 @@ void Context::CompileShader(GLuint shader)
 	if (shaderPool.find(shader) == shaderPool.end()) {
 		RecordError(GL_INVALID_VALUE);
 		return;
-    }
+	}
+
+	if (shaderPool[shader].isCompiled == GL_TRUE)
+		return;
 
 	FILE *shaderFile;
 
 	std::string fileName, cFileName;
 	std::string compileCmd, fileIdx;
 
-	for (int i=0; i<shaderPool[shader].count; i++) {
-		fileIdx.append("shader_src/");
-		fileIdx.append(std::to_string((int)shader));
-		fileIdx.push_back('_');
-		fileIdx.append(std::to_string(i));
+	fileIdx.append("shader_src/");
+	fileIdx.append(std::to_string((int)shader));
 
-		fileName = cFileName = fileIdx;
-		if (shaderPool[shader].type == GL_VERTEX_SHADER) {
-			fileName.append(".vstemp");
-			cFileName.append(".vsasm");
-		}
-		else {
-			fileName.append(".fstemp");
-			cFileName.append(".fsasm");
-		}
+	fileName = cFileName = fileIdx;
+	if (shaderPool[shader].type == GL_VERTEX_SHADER) {
+		fileName.append(".vssrc");
+		cFileName.append(".vsasm");
+	}
+	else {
+		fileName.append(".fssrc");
+		cFileName.append(".fsasm");
+	}
 
-		shaderFile = fopen(fileName.c_str(),"w");
-		fprintf(shaderFile,shaderPool[shader].sourcePool[i].c_str());
-		fclose(shaderFile);
+	shaderFile = fopen(fileName.c_str(),"w");
+	fprintf(shaderFile,shaderPool[shader].src.c_str());
+	fclose(shaderFile);
 
-		compileCmd.erase(0,std::string::npos);
-		compileCmd.append("cgc -oglsl -o ");
-		compileCmd+=cFileName;
-		if (shaderPool[shader].type == GL_VERTEX_SHADER)
-			compileCmd.append(" -profile gp4vp ");
-		else
-			compileCmd.append(" -profile gp4fp ");
-		compileCmd+=fileName;
-		system(compileCmd.c_str());
+	compileCmd.erase(0,std::string::npos);
+	compileCmd.append("cgc -oglsl -o ");
+	compileCmd+=cFileName;
+	if (shaderPool[shader].type == GL_VERTEX_SHADER)
+		compileCmd.append(" -profile gp4vp ");
+	else
+		compileCmd.append(" -profile gp4fp ");
+	compileCmd+=fileName;
+	system(compileCmd.c_str());
 
-		///Get Assembly code
-		std::ifstream ift;
-		ift.open(cFileName, std::ifstream::in);
-		if (ift.is_open()) {
-			std::stringstream buffer;
-			buffer << ift.rdbuf();
-			shaderPool[shader].compiledSourcePool.push_back(buffer.str());
-			shaderPool[shader].isCompiled = GL_TRUE;
-		}
-		else { /// Compile error or something wrong is happened
+	///Get Assembly code
+	std::ifstream ift;
+	ift.open(cFileName, std::ifstream::in);
+	if (ift.is_open()) {
+		std::stringstream buffer;
+		buffer << ift.rdbuf();
+		shaderPool[shader].asmSrc = (buffer.str());
+		shaderPool[shader].isCompiled = GL_TRUE;
+	}
+	else { /// Compile error or something wrong is happened
 
-		}
 	}
 }
 
@@ -147,7 +146,7 @@ void Context::DeleteProgram(GLuint program)
 		RecordError(GL_INVALID_VALUE);
 		return;
 	}
-	else if (useProgramID == program)
+	else if (usePID == program)
 		programPool[program].delFlag = GL_TRUE;
 	else {
 		if (programPool[program].sid4VS != 0)
@@ -164,10 +163,10 @@ void Context::DeleteProgram(GLuint program)
 
 void Context::DeleteShader(GLuint shader)
 {
-    if (shaderPool.find(shader) == shaderPool.end()) {
+	if (shaderPool.find(shader) == shaderPool.end()) {
 		RecordError(GL_INVALID_VALUE);
 		return;
-    }
+	}
 	else {
 		if (shaderPool[shader].attachList.empty())
 			shaderPool.erase(shader);
@@ -204,22 +203,49 @@ void Context::DetachShader(GLuint program, GLuint shader)
 		if (shaderPool[shader].delFlag == GL_TRUE)
 			DeleteShader(shader);
 
-		if (programPool[program].sid4VS == shader){
-			programPool[program].symTableVS.clear();
+		if (programPool[program].sid4VS == shader)
 			programPool[program].sid4VS = 0;
-		}
-		else {
+		else
 			programPool[program].sid4FS = 0;
-			programPool[program].symTableFS.clear();
-		}
+
+		programPool[program].symbolVSin.clear();
+		programPool[program].symbolVSout.clear();
+		programPool[program].symbolFSin.clear();
+		programPool[program].symbolFSout.clear();
+		programPool[program].symbolUniform.clear();
 
 		programPool[program].isLinked = GL_FALSE;
 	}
 }
 
+int Context::GetAttribLocation (GLuint program, const GLchar* name)
+{
+	if (programPool.find(program) == programPool.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return -1;
+	}
+
+	if (programPool[program].isLinked == GL_FALSE) {
+		RecordError(GL_INVALID_OPERATION);
+		return -1;
+	}
+
+	programObject t_program = programPool[program];
+
+	if (t_program.symbolVSin.find(name) == t_program.symbolVSin.end())
+		return -1;
+	else{
+		if (t_program.symbolVSin[name].name.compare(0,3,"gl_") == 0)
+			return -1;
+		else {
+			return t_program.symbolVSin[name].idx;
+		}
+	}
+}
+
 void Context::GetProgramiv (GLuint program, GLenum pname, GLint* params)
 {
-	int value = 0;;
+	int value = 0;
 	programObject t_program;
 
 	if (programPool.find(program) == programPool.end()) {
@@ -268,7 +294,32 @@ void Context::GetShaderiv (GLuint shader, GLenum pname, GLint* params)
 	if (shaderPool.find(shader) == shaderPool.end()) {
 		RecordError(GL_INVALID_VALUE);
 		return;
-    }
+	}
+}
+
+int Context::GetUniformLocation (GLuint program, const GLchar* name)
+{
+	if (programPool.find(program) == programPool.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return -1;
+	}
+
+	if (programPool[program].isLinked == GL_FALSE) {
+		RecordError(GL_INVALID_OPERATION);
+		return -1;
+	}
+
+	programObject t_program = programPool[program];
+
+	if (t_program.symbolUniform.find(name) == t_program.symbolUniform.end())
+		return -1;
+	else{
+		if (t_program.symbolUniform[name].name.compare(0,3,"gl_") == 0)
+			return -1;
+		else {
+			return t_program.symbolUniform[name].idx;
+		}
+	}
 }
 
 GLboolean Context::IsProgram(GLuint program)
@@ -300,15 +351,15 @@ void Context::ShaderSource(GLuint shader, GLsizei count, const GLchar* const* st
 	t_shader.count = count;
 
 	if (length == NULL) {
-		for (int i=0;i < count;i++) {
+		for (int i=0; i < count; i++) {
 			for (lengthCnt[i]=0; *(*(string+i)+lengthCnt[i]) != '\0'; lengthCnt[i]++)
 				t_string.push_back(*(*(string+i)+lengthCnt[i]));
 
-			t_shader.sourcePool.push_back(t_string);
+			t_shader.src.append(t_string);
 		}
 	}
 	else {
-		for (int i = 0;i < count;i++) {
+		for (int i = 0; i < count; i++) {
 			if (length[i] == '\0') {
 				for (lengthCnt[i]=0; *(*(string+i)+lengthCnt[i]) != '\0'; lengthCnt[i]++)
 					t_string.push_back(*(*(string+i)+lengthCnt[i]));
@@ -316,14 +367,31 @@ void Context::ShaderSource(GLuint shader, GLsizei count, const GLchar* const* st
 			else
 				t_string.append(*(string+i),length[i]);
 
-			t_shader.sourcePool.push_back(t_string);
+			t_shader.src.append(t_string);
 		}
 	}
 
 	shaderPool[shader] = t_shader;
 }
 
-void Context::ValidateProgram (GLuint program)
+void Context::UseProgram(GLuint program)
+{
+	if (program != 0) {
+		if (programPool.find(program) == programPool.end()) {
+			RecordError(GL_INVALID_VALUE);
+			return;
+		}
+
+		if (programPool[program].isLinked == GL_FALSE) {
+			RecordError(GL_INVALID_OPERATION);
+			return;
+		}
+	}
+
+	usePID = program;
+}
+
+void Context::ValidateProgram(GLuint program)
 {
 	programObject t_program;
 

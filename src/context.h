@@ -109,8 +109,8 @@ struct shaderObject
 	GLsizei count;
 	GLenum type;
 
-	std::vector<std::string> sourcePool;
-	std::vector<std::string> compiledSourcePool;
+	std::string src;
+	std::string asmSrc;
 	std::vector<GLuint> attachList;
 
 	inline shaderObject& operator=(const shaderObject &rhs)
@@ -123,8 +123,8 @@ struct shaderObject
 		count = rhs.count;
 
 		// STL's copy operator is efficient.
-		sourcePool = rhs.sourcePool;
-		compiledSourcePool = rhs.compiledSourcePool;
+		src = rhs.src;
+		asmSrc = rhs.asmSrc;
 		attachList = rhs.attachList;
 		return *this;
 	}
@@ -136,25 +136,28 @@ struct symbol
 	{
 		name.clear();
 		declareType.clear();
-		ioType = 0;
 		idx = 0;
 		element = 0;
+		offset = 0;
+		value.x = value.y = value.z = value.w = 0.0;
 	}
 
 	std::string name;
 	std::string declareType;
-	unsigned char ioType;
 	unsigned char idx;
 	unsigned char element;
+	unsigned char offset;
+	floatVec4 value;
 
 	void print()
 	{
-		printf("%s %s IO:%d Idx:%d element:%d\n",
+		printf("%s %s Idx:%d element:%d offest:%d value(%4.2f,%4.2f,%4.2f,%4.2f)\n",
 				declareType.c_str(),
 				name.c_str(),
-				ioType,
 				idx,
-				element	);
+				element,
+				offset,
+				value.x, value.y, value.z, value.w );
 	}
 };
 
@@ -177,8 +180,11 @@ struct programObject
 
 	std::string	linkInfo;
 
-	std::map<std::string, symbol> symTableVS;
-	std::map<std::string, symbol> symTableFS;
+	std::map<std::string, symbol> symbolVSin;
+	std::map<std::string, symbol> symbolVSout;
+	std::map<std::string, symbol> symbolFSin;
+	std::map<std::string, symbol> symbolFSout;
+	std::map<std::string, symbol> symbolUniform;
 };
 
 class Context
@@ -215,9 +221,11 @@ public:
     void 		EnableVertexAttribArray (GLuint index);
     void 		GenerateMipmap(GLenum target);
     void 		GenTextures (GLsizei n, GLuint* textures);
+    int			GetAttribLocation (GLuint program, const GLchar* name);
     GLenum		GetError (void);
     void		GetProgramiv (GLuint program, GLenum pname, GLint* params);
     void		GetShaderiv (GLuint shader, GLenum pname, GLint* params);
+    int			GetUniformLocation (GLuint program, const GLchar* name);
     GLboolean	IsProgram (GLuint program);
     GLboolean	IsShader (GLuint shader);
     GLboolean	IsTexture (GLuint texture);
@@ -225,6 +233,7 @@ public:
     void 		ShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
     void 		TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
     void 		TexParameteri (GLenum target, GLenum pname, GLint param);
+    void		UseProgram (GLuint program);
     void 		ValidateProgram (GLuint program);
     void 		VertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
     void 		Viewport (GLint x, GLint y, GLsizei width, GLsizei height);
@@ -246,7 +255,7 @@ public:
     attribute       vertexAttrib[8];
     drawCommand     drawCmd;
 
-    GLuint			useProgramID;
+    GLuint			usePID;
 
     std::map<GLuint, textureImage> texImagePool;
 

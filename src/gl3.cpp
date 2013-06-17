@@ -317,7 +317,7 @@ GL_APICALL void GL_APIENTRY glGetAttachedShaders (GLuint program, GLsizei maxcou
 
 GL_APICALL int GL_APIENTRY glGetAttribLocation (GLuint program, const GLchar* name)
 {
-
+	CONTEXT_EXEC_RETURN(GetAttribLocation(program, name));
 }
 
 GL_APICALL void GL_APIENTRY glGetBooleanv (GLenum pname, GLboolean* params)
@@ -412,7 +412,7 @@ GL_APICALL void GL_APIENTRY glGetUniformiv (GLuint program, GLint location, GLin
 
 GL_APICALL int GL_APIENTRY glGetUniformLocation (GLuint program, const GLchar* name)
 {
-
+	CONTEXT_EXEC_RETURN(GetUniformLocation(program, name));
 }
 
 GL_APICALL void GL_APIENTRY glGetVertexAttribfv (GLuint index, GLenum pname, GLfloat* params)
@@ -682,7 +682,7 @@ GL_APICALL void GL_APIENTRY glUniformMatrix4fv (GLint location, GLsizei count, G
 
 GL_APICALL void GL_APIENTRY glUseProgram (GLuint program)
 {
-
+	CONTEXT_EXEC(UseProgram(program));
 }
 
 GL_APICALL void GL_APIENTRY glValidateProgram (GLuint program)

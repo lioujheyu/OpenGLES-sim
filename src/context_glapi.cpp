@@ -37,7 +37,7 @@ void Context::Clear(GLbitfield mask)
     clearMask = mask;
     clearStat = true;
 
-    ActiveGPU();
+    ActiveGPU2CleanBuffer();
     clearStat = false;
 }
 

@@ -1,10 +1,13 @@
 #ifndef RASTERIZER_H_INCLUDED
 #define RASTERIZER_H_INCLUDED
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstdio>
 #include <cmath>
 #include <algorithm>
+//#include <thread>
+
+
 #include <GLES3/gl3.h>
 #include "gpu_config.h"
 #include "gpu_type.h"
@@ -31,8 +34,9 @@ public:
     int             LX, RX;
     int             LY, HY;
     pixel           pixBuffer[4];
-    unsigned char*  cBufPtr;
-    float*          dBufPtr;
+    unsigned char * cBufPtr;
+    float *         dBufPtr;
+    char * 			asmSrc;
     int             pixBufferP;
     bool            attrEnable[MAX_ATTRIBUTE_NUMBER];
     int             posIndx;
@@ -53,7 +57,7 @@ public:
     void            PixelGenerate();
     void            PixelGenerateHiber();
     void            pixelSplit(int x, int y, int level);
-    pixel           ShaderEXE(pixel pixelInput);
+    pixel           ShaderEXE(pixel pixInput);
     int             CalcTexAdd( short int us, short int ub, short int uo,
                                 short int vs, short int vb, short int vo,
                                 int width);
@@ -66,8 +70,7 @@ public:
     void 			ClearBuffer(unsigned int mask);
     void 			ClearTexCache();
 
-	struct
-	{
+	struct {
         bool            valid[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         unsigned int	tag[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         fixColor4       color[TEX_CACHE_ENTRY_SIZE][TEX_CACHE_BLOCK_SIZE][TEX_WAY_ASSOCIATION];
@@ -78,6 +81,8 @@ public:
     }TexCache;
 
     textureImage texImage[MAX_TEXTURE_UNIT];
+
+    ShaderCore sCore[1];
 };
 
 extern Rasterizer rm;

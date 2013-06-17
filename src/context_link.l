@@ -9,7 +9,7 @@ L	[a-zA-Z_]
 %{
 #include "context_link.tab.h"
 #include "context.h"
-#include "context_link_glapi.h"
+#include "context_link_def.h"
 
 #define COL_NO context_link_col+=strlen(yytext)
 
@@ -79,6 +79,9 @@ void Context::LinkProgram(GLuint program)
 		return;
 	}
 	
+	if (programPool[program].isLinked == GL_TRUE)
+		return;
+	
 	if ((programPool[program].sid4VS == 0) || (programPool[program].sid4FS == 0)) {
 		programPool[program].linkStatus = LS_SHADER_MISSING;
 		programPool[program].linkInfo = "A vertex shader and a fragment shader are not both present in the program object.";
@@ -92,43 +95,54 @@ void Context::LinkProgram(GLuint program)
 	
 	t_program = programPool[program];
 		
-	for (int i=0; i<VS.count; i++) {
-		context_link_lineno = 1;
-		shaderType = 0;
-		context_link__scan_string(VS.compiledSourcePool[i].c_str());
-		context_link_parse();
-	}
+	context_link_lineno = 1;
+	shaderType = 0;
+	context_link__scan_string(VS.asmSrc.c_str());
+	context_link_parse();
 	
 	printf("\n");
 
-	for (int i=0; i<FS.count; i++) {
-		context_link_lineno = 1;
-		shaderType = 1;
-		context_link__scan_string(FS.compiledSourcePool[i].c_str());
-		context_link_parse();
-	}
+	context_link_lineno = 1;
+	shaderType = 1;
+	context_link__scan_string(FS.asmSrc.c_str());
+	context_link_parse();
 	
 	///Check both's shader's in/output are matched.
 	std::map<std::string, symbol>::iterator it;
-	for (it = t_program.symTableVS.begin(); it!=t_program.symTableVS.end(); it++) {
-		if (it->second.ioType == CG_OUT_ATTR) {
-			if (t_program.symTableFS.find(it->first) == t_program.symTableFS.end()) {
+	for (it = t_program.symbolVSout.begin(); it!=t_program.symbolVSout.end(); it++) {
+		if (t_program.symbolFSin.find(it->first) == t_program.symbolFSin.end()) {
+			programPool[program].linkStatus = LS_VS_FS_VARRYING_UNMATCH;
+			printf("%s \n",it->first.c_str());
+			return;
+		}
+		else {
+			if (t_program.symbolVSout[it->first].declareType != 
+			    t_program.symbolFSin[it->first].declareType) {
 				programPool[program].linkStatus = LS_VS_FS_VARRYING_UNMATCH;
 				printf("%s \n",it->first.c_str());
 				return;
-			}
-			else {
-				if (t_program.symTableFS[it->first].ioType != CG_IN_ATTR ||
-					t_program.symTableFS[it->first].declareType.compare(it->second.declareType) != 0) {
-					programPool[program].linkStatus = LS_VS_FS_VARRYING_UNMATCH;
-					printf("%s \n",it->first.c_str());
-					return;
-				}
 			}
 		}
 	}
 	
 	t_program.linkInfo.clear();
+	
+//	printf("\nVSin: ");
+//	for (it = t_program.symbolVSin.begin(); it!=t_program.symbolVSin.end(); it++)
+//		printf("%s ",it->first.c_str());
+//	printf("\nVSout: ");
+//	for (it = t_program.symbolVSout.begin(); it!=t_program.symbolVSout.end(); it++)
+//		printf("%s ",it->first.c_str());
+//	printf("\nVSin: ");
+//	for (it = t_program.symbolFSin.begin(); it!=t_program.symbolFSin.end(); it++)
+//		printf("%s ",it->first.c_str());
+//	printf("\nVSout: ");
+//	for (it = t_program.symbolFSout.begin(); it!=t_program.symbolFSout.end(); it++)
+//		printf("%s ",it->first.c_str());
+//	printf("\nUniform: ");
+//	for (it = t_program.symbolUniform.begin(); it!=t_program.symbolUniform.end(); it++)
+//		printf("%s ",it->first.c_str());
+//	printf("\n");
 	
 	programPool[program] = t_program;
 	programPool[program].linkStatus = LS_NO_ERROR;

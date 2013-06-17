@@ -7,34 +7,37 @@
 
 class Geometry{
 public:
-    vertex      vtxInput;
-    bool        attrEnable[MAX_ATTRIBUTE_NUMBER];
-    primitive   prim;
-    GLenum      drawMode;
+    vertex      	vtxInput;
+    bool        	attrEnable[MAX_ATTRIBUTE_NUMBER];
+    primitive   	prim;
+    GLenum      	drawMode;
+    char * 			asmSrc;
 
-    float       depthRangeN, depthRangeF;
-    int         viewPortLX, viewPortLY,
-                viewPortW, viewPortH;
+    float       	depthRangeN, depthRangeF;
+    int         	viewPortLX, viewPortLY,
+					viewPortW, viewPortH;
 
-    bool        primitiveReady;
-    int         posIndx;
+    bool        	primitiveReady;
+    int         	posIndx;
 
-                Geometry();
-    void        Initialize();
+					Geometry();
+    void        	Initialize();
 
-    void 		ShaderEXE();
-    void        PerspectiveCorrection();
-    void        ViewPort();
-    void        PrimitiveAssembly();
-    void        Clipping();
-    void        Culling();
+    void 			ShaderEXE();
+    void        	PerspectiveCorrection();
+    void        	ViewPort();
+    void        	PrimitiveAssembly();
+    void        	Clipping();
+    void        	Culling();
 
-    void        InitVCD();    //vtxCntDown
+    void        	InitVCD();    //vtxCntDown
+
+    ShaderCore		sCore[1];
 
 private:
-    int         vtxCntDwn; // VCD
-    int         stripCnt;
-    bool        fanCnt;
+    int         	vtxCntDwn; // VCD
+    int         	stripCnt;
+    bool        	fanCnt;
 
 
 

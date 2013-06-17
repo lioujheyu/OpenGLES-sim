@@ -60,9 +60,25 @@ bool LoadRGBATexture(char *filename, unsigned int *texture)
 
     return true;
 }
+
 void TextureExample()
 {
-	unsigned int texture[2];
+
+}
+
+int main()
+{
+    //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.
+    Context::SetCurrentContext(new Context());
+
+	Shader shader;
+
+	shader.init("shader_src/TransformVertexShader.vertexshader",
+			"shader_src/TextureFragmentShader.fragmentshader");
+
+	shader.bind();
+
+    unsigned int texture[2];
 
     glActiveTexture(GL_TEXTURE0);
     LoadTexture("data/road.bmp", &texture[0]);
@@ -83,12 +99,6 @@ void TextureExample()
 //                            -1.0f,  1.0f, 0.0f
 //                          };
 
-    GLfloat color[] = { 1.0f, 1.0f, 1.0f,
-                        1.0f, 1.0f, 1.0f,
-                        1.0f, 1.0f, 1.0f,
-                        1.0f, 1.0f, 1.0f
-                      };
-
     GLfloat texCoord[] = { 0.0f, 0.0f,
                            1.0f, 0.0f,
                            1.0f, 1.0f,
@@ -102,15 +112,14 @@ void TextureExample()
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    //int v_coord_loc = glGetAttribLocation(shader.id(), "v_coord_in");
-    int v_coord_loc = 0;
-    int v_color_loc = 1;
+    int v_coord_loc = glGetAttribLocation(shader.id(), "vertexPosition_modelspace");
+    int c_map = glGetUniformLocation(shader.id(), "ColorMap");
+    int n_map = glGetUniformLocation(shader.id(), "NormalMap");
+    printf("%d, %d, %d\n", v_coord_loc, c_map, n_map);
+
     int v_tex0_loc = 4;
     glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);
     glEnableVertexAttribArray(v_coord_loc);
-
-    glVertexAttribPointer(v_color_loc, 3, GL_FLOAT, GL_FALSE, 0, color);
-    glEnableVertexAttribArray(v_color_loc);
 
     glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, texCoord);
     glEnableVertexAttribArray(v_tex0_loc);
@@ -118,29 +127,8 @@ void TextureExample()
     glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
 	glDeleteTextures(2, texture);
-}
 
-void ShaderExample()
-{
-	Shader p1;
-
-	p1.init("shader_src/TransformVertexShader.vertexshader",
-			"shader_src/TextureFragmentShader.fragmentshader");
-
-//	p1.init("shader_src/POM.vert",
-//			"shader_src/POM.frag");
-}
-
-int main()
-{
-    //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.
-    Context::SetCurrentContext(new Context());
-
-    //TextureExample();
-
-    ShaderExample();
-
-
+    shader.unbind();
 
     return 0;
 }

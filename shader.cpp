@@ -99,6 +99,7 @@ void Shader::init(const char *vsFile, const char *fsFile) {
 	validateShader(shader_fp, fsFile);
 
 	shader_id = glCreateProgram();
+	printf("create program: %d\n",shader_id);
 	glAttachShader(shader_id, shader_fp);
 	glAttachShader(shader_id, shader_vp);
 	glLinkProgram(shader_id);

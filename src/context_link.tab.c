@@ -78,9 +78,8 @@
 #line 1 "context_link.y"
 
 #include <string>
-#include "context_link_glapi.h"
+#include "context_link_def.h"
 #include "context.h"
-
 
 int context_link_lex(void);
 void context_link_error(char *s);
@@ -92,7 +91,7 @@ unsigned int idx;
 
 
 /* Line 189 of yacc.c  */
-#line 96 "context_link.tab.c"
+#line 95 "context_link.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -138,7 +137,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 16 "context_link.y"
+#line 15 "context_link.y"
 
 	int		ival;
 	char	sval[30];
@@ -146,7 +145,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 150 "context_link.tab.c"
+#line 149 "context_link.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -158,7 +157,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 162 "context_link.tab.c"
+#line 161 "context_link.tab.c"
 
 #ifdef short
 # undef short
@@ -447,8 +446,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    36,    36,    37,    40,    41,    42,    43,    47,    49,
-      52,    55,   103,   104,   105,   106,   110,   111,   112
+       0,    35,    35,    36,    39,    40,    41,    42,    46,    48,
+      51,    54,   117,   118,   119,   120,   124,   125,   126
 };
 #endif
 
@@ -1373,107 +1372,122 @@ yyreduce:
         case 11:
 
 /* Line 1464 of yacc.c  */
-#line 55 "context_link.y"
+#line 54 "context_link.y"
     {
 			/* printf("name: %s ",$3); */
 			symbol t_symbol;
-
+			
 			t_symbol.name = (yyvsp[(3) - (11)].sval);
 			t_symbol.declareType = (yyvsp[(2) - (11)].sval);
+			t_symbol.offset = 0;
 
 			if (strcmp((yyvsp[(7) - (11)].sval),"HPOS") == 0) {
-				t_symbol.ioType = CG_OUT_POSITION;
 				t_symbol.idx = 0;
 				t_symbol.element = element;
+				//t_program.symbolVSout[t_symbol.name] = t_symbol;
 			}
 			else if (strncmp((yyvsp[(7) - (11)].sval),"ATTR",4) == 0) {
-				if ((yyvsp[(5) - (11)].ival) == CG_IN)
-					t_symbol.ioType = CG_IN_ATTR;
-				else
-					t_symbol.ioType = CG_OUT_ATTR;
-
 				t_symbol.idx = (unsigned int)(yyvsp[(7) - (11)].sval)[4] - 48;
 				t_symbol.element = element;
+				if (shaderType == 0) {
+					if ((yyvsp[(5) - (11)].ival) == CG_IN)
+						t_program.symbolVSin[t_symbol.name]=t_symbol;
+					else
+						t_program.symbolVSout[t_symbol.name]=t_symbol;
+				}
+				else {
+					if ((yyvsp[(5) - (11)].ival) == CG_IN)
+						t_program.symbolFSin[t_symbol.name]=t_symbol;
+					else
+						t_program.symbolFSout[t_symbol.name]=t_symbol;
+				}
 			}
 			else if (strncmp((yyvsp[(7) - (11)].sval),"texunit",7) == 0) {
-				t_symbol.ioType = CG_IN_UNIFORM_TEXTURE;
-				t_symbol.idx = idx;
+				t_symbol.idx = idx + 0x10;
 				t_symbol.element = element;
+				if (t_program.symbolUniform.find(t_symbol.name) == t_program.symbolUniform.end())
+					t_program.symbolUniform[t_symbol.name] = t_symbol;
+				else {
+					printf("%s \n",(yyvsp[(3) - (11)].sval));
+					exit(1);
+				}
 			}
-			//Need to care the multi color situation
+			//@todo: Need to care the multi output situation
 			else if (strncmp((yyvsp[(7) - (11)].sval),"COL",3) == 0) {
-				t_symbol.ioType = CG_OUT_COLOR;
 				t_symbol.idx = 0;
 				t_symbol.element = element;
+				//t_program.symbolFSout[t_symbol.name] = t_symbol;
 			}
 			else if ((yyvsp[(7) - (11)].sval)[0] == 'c') {
-				t_symbol.ioType = CG_IN_UNIFORM;
 				t_symbol.idx = idx;
 				t_symbol.element = element;
+				if (t_program.symbolUniform.find(t_symbol.name) == t_program.symbolUniform.end())
+					t_program.symbolUniform[t_symbol.name] = t_symbol;
+				else {
+					if (t_program.symbolUniform[t_symbol.name].declareType != t_symbol.declareType) {
+						printf("%s \n",(yyvsp[(3) - (11)].sval));
+						exit(1);
+					}
+				}
 			}
 
-			t_symbol.print();
-
-			if (shaderType == 0)
-				t_program.symTableVS[t_symbol.name] = t_symbol;
-			else
-				t_program.symTableFS[t_symbol.name] = t_symbol;
+			//t_symbol.print();
 		;}
     break;
 
   case 12:
 
 /* Line 1464 of yacc.c  */
-#line 103 "context_link.y"
+#line 117 "context_link.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval)); element = 1;;}
     break;
 
   case 13:
 
 /* Line 1464 of yacc.c  */
-#line 104 "context_link.y"
+#line 118 "context_link.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval)); idx = (yyvsp[(3) - (4)].ival); element = 1;;}
     break;
 
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 105 "context_link.y"
+#line 119 "context_link.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval)); element = (yyvsp[(6) - (6)].ival);;}
     break;
 
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 106 "context_link.y"
+#line 120 "context_link.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); idx = (yyvsp[(2) - (2)].ival); element = 1;;}
     break;
 
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 110 "context_link.y"
+#line 124 "context_link.y"
     {(yyval.ival) = 0;;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 111 "context_link.y"
+#line 125 "context_link.y"
     {(yyval.ival) = CG_IN;;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 112 "context_link.y"
+#line 126 "context_link.y"
     {(yyval.ival) = CG_OUT;;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 1477 "context_link.tab.c"
+#line 1491 "context_link.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1685,7 +1699,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 115 "context_link.y"
+#line 129 "context_link.y"
 
 
 
