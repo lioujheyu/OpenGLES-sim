@@ -92,20 +92,18 @@
  *                                  int arg2) KHRONOS_APIATTRIBUTES;
  */
 
- #undef _WIN32  //modified by Elvis, make sure no dllimport
-
 /*-------------------------------------------------------------------------
  * Definition of KHRONOS_APICALL
  *-------------------------------------------------------------------------
  * This precedes the return type of the function in the function prototype.
  */
-#if defined(_WIN32) && !defined(__SCITECH_SNAP__)
-#   define KHRONOS_APICALL __declspec(dllimport)
-#elif defined (__SYMBIAN32__)
-#   define KHRONOS_APICALL IMPORT_C
-#else
+//#if defined(_WIN32) && !defined(__SCITECH_SNAP__)
+//#   define KHRONOS_APICALL __declspec(dllimport)
+//#elif defined (__SYMBIAN32__)
+//#   define KHRONOS_APICALL IMPORT_C
+//#else
 #   define KHRONOS_APICALL
-#endif
+//#endif
 
 /*-------------------------------------------------------------------------
  * Definition of KHRONOS_APIENTRY
@@ -113,12 +111,12 @@
  * This follows the return type of the function  and precedes the function
  * name in the function prototype.
  */
-#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
-    /* Win32 but not WinCE */
-#   define KHRONOS_APIENTRY __stdcall
-#else
+//#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
+//    /* Win32 but not WinCE */
+//#   define KHRONOS_APIENTRY __stdcall
+//#else
 #   define KHRONOS_APIENTRY
-#endif
+//#endif
 
 /*-------------------------------------------------------------------------
  * Definition of KHRONOS_APIATTRIBUTES
