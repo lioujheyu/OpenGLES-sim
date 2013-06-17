@@ -68,7 +68,7 @@ void TextureExample()
 
 int main()
 {
-    //Dirty Context setting, need to be hidden after egl or glfw library is imported or something magic is happen.
+    //Initial a new context, need to be hidden after egl or glfw library is imported or something magic is happen.
     Context::SetCurrentContext(new Context());
 
 	Shader shader;
@@ -81,10 +81,16 @@ int main()
     unsigned int texture[2];
 
     glActiveTexture(GL_TEXTURE0);
-    LoadTexture("data/road.bmp", &texture[0]);
+    if (LoadTexture("data/road.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+    }
 
     glActiveTexture(GL_TEXTURE1);
-    LoadRGBATexture("data/four_NM_height.bmp", &texture[1]);
+    if (LoadRGBATexture("data/four_NM_height.bmp", &texture[1]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+    }
 
 	//The projection transformation in vertex shader has not yet implementation.
     GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0,
