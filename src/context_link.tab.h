@@ -38,15 +38,42 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     PROFILE = 258,
-     PROG = 259,
-     SEMT = 260,
-     VAR = 261,
-     TYPE = 262,
-     VIN = 263,
-     VOUT = 264,
-     IDENTIFIER = 265,
-     INTEGER = 266
+     PROG = 258,
+     SEMT = 259,
+     VAR = 260,
+     VIN = 261,
+     VOUT = 262,
+     TEXTURE = 263,
+     VERTEX = 264,
+     FRAGMENT = 265,
+     RESULT = 266,
+     ATTRIB = 267,
+     POSITION = 268,
+     RESULT_COLOR0 = 269,
+     TYPE = 270,
+     IDENTIFIER = 271,
+     INTEGER = 272,
+     FLOAT = 273,
+     VECTOROP = 274,
+     SCALAROP = 275,
+     BINSCOP = 276,
+     VECSCAOP = 277,
+     BINOP = 278,
+     TRIOP = 279,
+     SWZOP = 280,
+     TEXOP = 281,
+     TXDOP = 282,
+     BRAOP = 283,
+     FLOWCCOP = 284,
+     IFOP = 285,
+     REPOP = 286,
+     ENDFLOWOP = 287,
+     OPMODIFIER = 288,
+     TEXTARGET = 289,
+     CCMASKRULE = 290,
+     XYZW_SWIZZLE = 291,
+     RGBA_SWIZZLE = 292,
+     REG = 293
    };
 #endif
 
@@ -57,15 +84,16 @@ typedef union YYSTYPE
 {
 
 /* Line 1685 of yacc.c  */
-#line 15 "context_link.y"
+#line 19 "context_link.y"
 
 	int		ival;
+	float	fval;
 	char	sval[30];
 
 
 
 /* Line 1685 of yacc.c  */
-#line 69 "context_link.tab.h"
+#line 97 "context_link.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

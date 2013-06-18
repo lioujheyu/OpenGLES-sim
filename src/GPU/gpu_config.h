@@ -28,7 +28,6 @@
  *	The whole texture cache size is determined be
  *	TEX_WAY_ASSOCIATION * TEX_CACHE_BLOCK_SIZE * TEX_CACHE_ENTRY_SIZE * 4B
  */
-
 /**
  *	define how many way association texture cache will use
  *	if TEX_WAY_ASSOCIATION = 1, the cache is direct mapped.
@@ -61,13 +60,19 @@
  */
 #define DEBUG 1
 #define GPU_INFO
-#define GPU_INFO_FILE "gpu_info.txt"
 //#define PIXEL_INFO
-#define PIXEL_INFO_FILE "pixel_info.txt"
 //#define TEXEL_INFO
+
+#define GPU_INFO_FILE "gpu_info.txt"
+#define PIXEL_INFO_FILE "pixel_info.txt"
 #define TEXEL_INFO_FILE "texel_info.txt"
 
 /***************Debugging marco for simulator use*****************/
+#ifdef DEBUG
+	#define DBG_ON 1
+#else
+	#define DBG_ON 0
+#endif
 
 #ifdef GPU_INFO
 	#define GPUPRINTF(fmt, ...) \
@@ -106,12 +111,6 @@
 	#define TEXEL_INFO_PTR TEXELINFOfp
 #else
 	#define TEXEL_INFO_PTR stderr
-#endif
-
-#ifdef DEBUG
-	#define DBG_ON 1
-#else
-	#define DBG_ON 0
 #endif
 
 #endif // GPU_CONFIG_H_INCLUDED

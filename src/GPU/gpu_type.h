@@ -60,20 +60,4 @@ struct primitive{
     }
 };
 
-struct ShaderCore{
-
-	inline ShaderCore()
-	{
-		PC = 0;
-	}
-
-	char *asmSrc;
-
-	int PC;
-	floatVec4 R[16];
-	floatVec4 U[16];
-
-	void exec();
-};
-
 #endif // GPU_TYPE_H_INCLUDED

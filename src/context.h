@@ -111,6 +111,7 @@ struct shaderObject
 
 	std::string src;
 	std::string asmSrc;
+	std::vector<instruction> asmQueue;
 	std::vector<GLuint> attachList;
 
 	inline shaderObject& operator=(const shaderObject &rhs)

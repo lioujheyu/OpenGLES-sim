@@ -15,6 +15,7 @@ void main(){
 	vec3 eyeVector = vec3(0.0, 0.0, 1.0);
 	c1 = texture2D( ColorMap, UV ).rgb;
 	c2 = texture2D( NormalMap, UV ).rgb;
+	c2 = c2*2 - vec3(1.0, 1.0, 1.0);
 	
 	color = c1 * dot(c2, eyeVector);
 }

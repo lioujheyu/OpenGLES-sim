@@ -460,7 +460,7 @@ fixColor4 Rasterizer::TrilinearFilter(floatVec4 coordIn, int level, float w_rati
 	fixColor4 color[2];
 	int maxLevel = texImage[tid].maxLevel;
 	color[0] = BilinearFilter(coordIn, level, tid);
-	color[1] = BilinearFilter(coordIn, ((level+1)<maxLevel)?level+1:maxLevel, tid);
+	color[1] = BilinearFilter(coordIn, std::min(level+1, maxLevel), tid);
 
 	color[0] = color[0]*(1-w_ratio) + color[1]*w_ratio;
 

@@ -116,8 +116,7 @@ void Context::CompileShader(GLuint shader)
 	fprintf(shaderFile,shaderPool[shader].src.c_str());
 	fclose(shaderFile);
 
-	compileCmd.erase(0,std::string::npos);
-	compileCmd.append("cgc -oglsl -o ");
+	compileCmd.append("cgc -q -oglsl -o ");
 	compileCmd+=cFileName;
 	if (shaderPool[shader].type == GL_VERTEX_SHADER)
 		compileCmd.append(" -profile gp4vp ");

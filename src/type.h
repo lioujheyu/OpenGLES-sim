@@ -2,6 +2,7 @@
 #define TYPE_H_INCLUDED
 
 #include <GLES3/gl3.h>
+#include <vector>
 
 union floatVec4
 {
@@ -123,6 +124,45 @@ struct textureImage
         return *this;
     }
 };
+
+struct operand {
+	void init()
+	{
+		id = 0;
+		type = 0;
+		inverse = false;
+		for (int i=0; i<4; i++) {
+			modifier[i] = '\0';
+			val[i] = 0;
+		}
+	}
+
+	int id;
+	int type;
+	bool inverse;
+	char modifier[4];
+	float val[4];
+};
+
+struct instruction {
+	void init()
+	{
+		op = 0;
+		opModifier.clear();
+		dst.init();
+		src0.init();
+		src1.init();
+		src2.init();
+	}
+
+	int op;
+	std::vector<int> opModifier;
+
+	operand dst;
+	operand src0, src1, src2;
+};
+
+
 
 template <typename T> const T& MIN3(const T& a, const T& b, const T& c)
 {

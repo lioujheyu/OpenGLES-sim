@@ -82,7 +82,7 @@ public:
 
     textureImage texImage[MAX_TEXTURE_UNIT];
 
-    ShaderCore sCore[1];
+    //ShaderCore sCore[1];
 };
 
 extern Rasterizer rm;

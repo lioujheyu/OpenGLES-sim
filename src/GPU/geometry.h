@@ -32,7 +32,7 @@ public:
 
     void        	InitVCD();    //vtxCntDown
 
-    ShaderCore		sCore[1];
+    //ShaderCore		sCore[1];
 
 private:
     int         	vtxCntDwn; // VCD
