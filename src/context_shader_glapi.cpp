@@ -1,6 +1,5 @@
 #include "context.h"
 #include "context_link_def.h"
-#include "context_link.tab.h"
 
 /*******************************************************
 
@@ -212,6 +211,7 @@ void Context::DetachShader(GLuint program, GLuint shader)
 		programPool[program].symbolFSin.clear();
 		programPool[program].symbolFSout.clear();
 		programPool[program].symbolUniform.clear();
+		programPool[program].uniformUsage.clear();
 
 		programPool[program].isLinked = GL_FALSE;
 	}

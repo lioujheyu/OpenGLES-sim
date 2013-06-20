@@ -24,7 +24,7 @@
 #define INST_POSITION				3
 #define INST_COLOR					4
 #define INST_TEXTURE				5
-#define INST_TEMP					6
+#define INST_REG					6
 #define INST_CONSTANT				7
 
 ///Instruction OP code

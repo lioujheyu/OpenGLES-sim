@@ -140,7 +140,6 @@ struct symbol
 		idx = 0;
 		element = 0;
 		offset = 0;
-		value.x = value.y = value.z = value.w = 0.0;
 	}
 
 	std::string name;
@@ -148,17 +147,15 @@ struct symbol
 	unsigned char idx;
 	unsigned char element;
 	unsigned char offset;
-	floatVec4 value;
 
 	void print()
 	{
-		printf("%s %s Idx:%d element:%d offest:%d value(%4.2f,%4.2f,%4.2f,%4.2f)\n",
+		printf("%s %s Idx:%d element:%d offest:%d\n",
 				declareType.c_str(),
 				name.c_str(),
 				idx,
 				element,
-				offset,
-				value.x, value.y, value.z, value.w );
+				offset );
 	}
 };
 
@@ -186,6 +183,8 @@ struct programObject
 	std::map<std::string, symbol> symbolFSin;
 	std::map<std::string, symbol> symbolFSout;
 	std::map<std::string, symbol> symbolUniform;
+
+	std::map<int, std::string> uniformUsage;
 };
 
 class Context

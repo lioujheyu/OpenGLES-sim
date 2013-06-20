@@ -38,8 +38,7 @@ void Context::Clear(GLbitfield mask)
     clearMask = mask;
     clearStat = true;
 
-    ActiveGPU2CleanBuffer();
-    clearStat = false;
+    //ActiveGPU2CleanBuffer();
 }
 
 void Context::ClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
@@ -144,6 +143,7 @@ void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
     }
 
     ActiveGPU();
+    clearStat = false;
     DumpImage();
 }
 

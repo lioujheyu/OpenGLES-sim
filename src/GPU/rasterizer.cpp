@@ -128,7 +128,7 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 			}
 		}
 		///each attribute needs to get its scale factor, and all 4 pixels' attribute will get theirs here.
-		for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
+		for (int attrCnt=1; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++){
 			if (!attrEnable[attrCnt])
 				continue;
 			pixelStamp[0].scaleFacDX[attrCnt].s = pixelStamp[1].scaleFacDX[attrCnt].s
@@ -212,7 +212,7 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 			pixBufferP++;
 		}
 
-		for (int i = 0; i < pixBufferP; i++) {
+		for (int i=0; i<pixBufferP; i++) {
 			//std::thread s1(&Rasterizer::ShaderEXE, pixBuffer[i], std::ref(pixBuffer[i]));
 			//s1.join();
 			pixBuffer[i] = ShaderEXE(pixBuffer[i]);
@@ -620,7 +620,7 @@ pixel Rasterizer::ShaderEXE(pixel pixInput)
 //	pixInput.attr[colIndx].r = texColor0.r + texColor1.r;
 //	pixInput.attr[colIndx].g = texColor0.g + texColor1.g;
 //	pixInput.attr[colIndx].b = texColor0.b + texColor1.b;
-
+	return pixInput;
 }
 
 void Rasterizer::PerFragmentOp(pixel pixInput)

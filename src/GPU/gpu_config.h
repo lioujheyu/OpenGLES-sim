@@ -6,8 +6,10 @@
 /**
  *	GPU implementation config
  */
-#define MAX_ATTRIBUTE_NUMBER    8
-#define MAX_TEXTURE_UNIT	    2
+#define MAX_ATTRIBUTE_NUMBER    		8
+#define MAX_VERTEX_UNIFORM_VECTORS		128
+#define MAX_FRAGMENT_UNIFORM_VECTORS	16
+#define MAX_TEXTURE_UNIT	    		2
 
 
 /******************** Texture debuging and setting ********************/

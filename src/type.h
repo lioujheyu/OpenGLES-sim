@@ -3,6 +3,7 @@
 
 #include <GLES3/gl3.h>
 #include <vector>
+#include <cstdio>
 
 union floatVec4
 {
@@ -31,10 +32,13 @@ union floatVec4
         return tmp;
     }
 
-    inline const float operator*(const floatVec4 &other)
+    inline const floatVec4 operator*(const floatVec4 &other)
 	{
-		float tmp;
-		tmp = (x*other.x + y*other.y + z*other.z + w*other.w);
+		floatVec4 tmp;
+		tmp.x = x * other.x;
+        tmp.y = y * other.y;
+        tmp.z = z * other.z;
+        tmp.w = w * other.w;
 		return tmp;
 	}
 
@@ -125,38 +129,64 @@ struct textureImage
     }
 };
 
-struct operand {
+struct operand
+{
+	inline operand() { init(); }
+
 	void init()
 	{
 		id = 0;
 		type = 0;
+		abs = false;
 		inverse = false;
-		for (int i=0; i<4; i++) {
-			modifier[i] = '\0';
+		modifier[0] = '\0';
+		for (int i=0; i<4; i++)
 			val[i] = 0;
-		}
+	}
+
+	void print()
+	{
+		if (type == 0)
+			return;
+		printf(" %d[%d].%s", type, id, modifier);
 	}
 
 	int id;
 	int type;
+	bool abs;
 	bool inverse;
-	char modifier[4];
+	char modifier[5];
 	float val[4];
 };
 
-struct instruction {
+struct instruction
+{
+	inline instruction() { init(); }
+
 	void init()
 	{
 		op = 0;
-		opModifier.clear();
+		opModifiers.clear();
 		dst.init();
 		src0.init();
 		src1.init();
 		src2.init();
 	}
 
+	void print()
+	{
+		printf("%d",op);
+		for (int i=0; i<opModifiers.size(); i++)
+			printf(".%d",opModifiers[i]);
+		dst.print();
+		src0.print();
+		src1.print();
+		src2.print();
+		printf("\n");
+	}
+
 	int op;
-	std::vector<int> opModifier;
+	std::vector<int> opModifiers;
 
 	operand dst;
 	operand src0, src1, src2;

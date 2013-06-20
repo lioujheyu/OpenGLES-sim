@@ -146,8 +146,8 @@ void ActiveGPU()
 
     gpu.vtxCount = ctx->drawCmd.count;
     gpu.vtxFirst = ctx->drawCmd.first;
-	//gpu.clearStat = ctx->clearStat;
-	//gpu.clearMask = ctx->clearMask;
+	gpu.clearStat = ctx->clearStat;
+	gpu.clearMask = ctx->clearMask;
 
 	gpu.gm.drawMode = ctx->drawCmd.mode;
 	gpu.gm.viewPortLX = ctx->vp.x;
@@ -161,8 +161,8 @@ void ActiveGPU()
     gpu.rm.depthTestEnable = ctx->depthTestEnable;
     gpu.rm.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
     gpu.rm.dBufPtr = (float*)ctx->drawBuffer[1];
-    //gpu.rm.clearColor = ctx->clearColor;
-    //gpu.rm.clearDepth = ctx->clearDepth;
+    gpu.rm.clearColor = ctx->clearColor;
+    gpu.rm.clearDepth = ctx->clearDepth;
 
     ///Texture Statement
     for (int i=0;i<MAX_TEXTURE_UNIT;i++){

@@ -11,6 +11,8 @@ Context::Context()
 
     for (int i=0;i<8;i++)
         vertexAttrib[i].enable = false;
+
+	depthTestEnable = GL_FALSE;
 }
 
 Context::~Context()

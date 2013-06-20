@@ -38,42 +38,37 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     PROG = 258,
-     SEMT = 259,
-     VAR = 260,
-     VIN = 261,
-     VOUT = 262,
-     TEXTURE = 263,
-     VERTEX = 264,
-     FRAGMENT = 265,
-     RESULT = 266,
-     ATTRIB = 267,
-     POSITION = 268,
-     RESULT_COLOR0 = 269,
-     TYPE = 270,
-     IDENTIFIER = 271,
-     INTEGER = 272,
-     FLOAT = 273,
-     VECTOROP = 274,
-     SCALAROP = 275,
-     BINSCOP = 276,
-     VECSCAOP = 277,
-     BINOP = 278,
-     TRIOP = 279,
-     SWZOP = 280,
-     TEXOP = 281,
-     TXDOP = 282,
-     BRAOP = 283,
-     FLOWCCOP = 284,
-     IFOP = 285,
-     REPOP = 286,
-     ENDFLOWOP = 287,
-     OPMODIFIER = 288,
-     TEXTARGET = 289,
-     CCMASKRULE = 290,
-     XYZW_SWIZZLE = 291,
-     RGBA_SWIZZLE = 292,
-     REG = 293
+     TEXTURE = 258,
+     VERTEX = 259,
+     FRAGMENT = 260,
+     RESULT = 261,
+     ATTRIB = 262,
+     POSITION = 263,
+     RESULT_COLOR0 = 264,
+     TYPE = 265,
+     IDENTIFIER = 266,
+     INTEGER = 267,
+     FLOAT = 268,
+     VECTOROP = 269,
+     SCALAROP = 270,
+     BINSCOP = 271,
+     VECSCAOP = 272,
+     BINOP = 273,
+     TRIOP = 274,
+     SWZOP = 275,
+     TEXOP = 276,
+     TXDOP = 277,
+     BRAOP = 278,
+     FLOWCCOP = 279,
+     IFOP = 280,
+     REPOP = 281,
+     ENDFLOWOP = 282,
+     OPMODIFIER = 283,
+     TEXTARGET = 284,
+     CCMASKRULE = 285,
+     XYZW_SWIZZLE = 286,
+     RGBA_SWIZZLE = 287,
+     REG = 288
    };
 #endif
 
@@ -84,7 +79,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1685 of yacc.c  */
-#line 19 "context_link.y"
+#line 17 "nvgp4ASM.y"
 
 	int		ival;
 	float	fval;
@@ -93,13 +88,13 @@ typedef union YYSTYPE
 
 
 /* Line 1685 of yacc.c  */
-#line 97 "context_link.tab.h"
+#line 92 "nvgp4ASM.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
-extern YYSTYPE context_link_lval;
+extern YYSTYPE nvgp4ASM_lval;
 
 

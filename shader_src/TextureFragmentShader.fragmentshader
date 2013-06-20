@@ -6,13 +6,15 @@ in vec2 UV;
 // Ouput data
 out vec3 color;
 
+uniform mat3 MVP3;
+
 uniform sampler2D ColorMap;
 uniform sampler2D NormalMap;
 
 void main(){
 
 	vec3 c1, c2;
-	vec3 eyeVector = vec3(0.0, 0.0, 1.0);
+	vec3 eyeVector = vec3(0.0, 0.0, 1.0) * MVP3;
 	c1 = texture2D( ColorMap, UV ).rgb;
 	c2 = texture2D( NormalMap, UV ).rgb;
 	c2 = c2*2 - vec3(1.0, 1.0, 1.0);

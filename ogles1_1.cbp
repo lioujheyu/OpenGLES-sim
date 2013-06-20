@@ -56,23 +56,26 @@
 		<Unit filename="src/context.h" />
 		<Unit filename="src/context_glapi.cpp" />
 		<Unit filename="src/context_link.cpp" />
-		<Unit filename="src/context_link.l">
-			<Option weight="0" />
-			<Option compiler="gcc" use="0" buildCommand="C:\MinGW\msys\1.0\bin\flex -o context_link.cpp $file" />
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="src/context_link.tab.c">
-			<Option compilerVar="CPP" />
-		</Unit>
 		<Unit filename="src/context_link.tab.h" />
-		<Unit filename="src/context_link.y">
-			<Option weight="0" />
-			<Option compiler="gcc" use="0" buildCommand="C:\MinGW\msys\1.0\bin\bison --name-prefix=context_link_ -d $file" />
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="src/context_link_def.h" />
 		<Unit filename="src/context_shader_glapi.cpp" />
 		<Unit filename="src/gl3.cpp" />
+		<Unit filename="src/nvgp4ASM.cpp" />
+		<Unit filename="src/nvgp4ASM.l" />
+		<Unit filename="src/nvgp4ASM.tab.c">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="src/nvgp4ASM.tab.h" />
+		<Unit filename="src/nvgp4ASM.y" />
+		<Unit filename="src/nvgp4Info.cpp" />
+		<Unit filename="src/nvgp4Info.l" />
+		<Unit filename="src/nvgp4Info.tab.c">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="src/nvgp4Info.tab.h" />
+		<Unit filename="src/nvgp4Info.y">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="src/type.h" />
 		<Extensions>
 			<code_completion />

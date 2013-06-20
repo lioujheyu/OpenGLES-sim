@@ -31,7 +31,7 @@ void GPU_Core::Run()
     if (clearStat) {
 		rm.ClearBuffer(clearMask);
 		clearStat = false;
-		return;
+		//return;
 	}
 
     ///Each vertex will be injected into Geometry's vtxInput here
