@@ -9,8 +9,8 @@ void nvgp4Info_str_in(const char *s);
 
 programObject t_program;
 unsigned int shaderType;
-unsigned int t_element;
-unsigned int t_idx;
+int t_element;
+int t_idx;
 symbol t_symbol;
 %}
 
@@ -139,6 +139,7 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 			if (t_program.srcUniform.find(t_symbol.name) == t_program.srcUniform.end()) {
 				t_symbol.idx = t_program.uniformCnt;
 				t_program.uniformCnt+= t_element;
+				t_program.uniformUsage[t_symbol.idx] = t_symbol.name;
 				t_program.srcUniform[t_symbol.name] = t_symbol;
 				t_symbol.Print();
 			}

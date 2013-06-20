@@ -16,6 +16,7 @@
 
 #include "type.h"
 #include "GPU/driver.h"
+#include "GPU/gpu_config.h"
 
 struct attribute
 {
@@ -102,8 +103,8 @@ struct symbol
 {
 	std::string name;
 	std::string declareType;
-	unsigned char idx;
-	unsigned char element;
+	int idx;
+	int element;
 
 	inline symbol()
 	{
@@ -144,9 +145,12 @@ struct programObject
 	std::map<std::string, symbol> srcFSout;
 	std::map<std::string, symbol> srcUniform;
 
+	///Index Table <true uniform index, glsl variable name>
+	std::map<GLint, std::string> uniformUsage;
+
 	///Index Table <asm uniform index, asm symbol attribute>
-	std::map<int, symbol> asmVSIdx;
-	std::map<int, symbol> asmFSIdx;
+	std::map<GLint, symbol> asmVSIdx;
+	std::map<GLint, symbol> asmFSIdx;
 
 	//Building the asm texture's index table is perhaps needed.
 	//std::map<int, symbol> asmVStexIdx;
@@ -186,6 +190,7 @@ struct programObject
 		srcFSin.clear();
 		srcFSout.clear();
 		srcUniform.clear();
+		uniformUsage.clear();
 		asmVSIdx.clear();
 		asmFSIdx.clear();
 		VSinstructionPool.clear();
@@ -239,6 +244,25 @@ public:
     void 		ShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
     void 		TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
     void 		TexParameteri (GLenum target, GLenum pname, GLint param);
+    void		Uniform1f (GLint location, GLfloat x);
+    void		Uniform2f (GLint location, GLfloat x, GLfloat y);
+    void		Uniform3f (GLint location, GLfloat x, GLfloat y, GLfloat z);
+    void		Uniform4f (GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+    void		Uniform1i (GLint location, GLint x);
+    void		Uniform2i (GLint location, GLint x, GLint y);
+    void		Uniform3i (GLint location, GLint x, GLint y, GLint z);
+    void		Uniform4i (GLint location, GLint x, GLint y, GLint z, GLint w);
+    void		Uniform1fv (GLint location, GLsizei count, const GLfloat * value);
+    void		Uniform2fv (GLint location, GLsizei count, const GLfloat * value);
+    void		Uniform3fv (GLint location, GLsizei count, const GLfloat * value);
+    void		Uniform4fv (GLint location, GLsizei count, const GLfloat * value);
+    void		Uniform1iv (GLint location, GLsizei count, const GLint * value);
+    void		Uniform2iv (GLint location, GLsizei count, const GLint * value);
+    void		Uniform3iv (GLint location, GLsizei count, const GLint * value);
+    void		Uniform4iv (GLint location, GLsizei count, const GLint * value);
+    void		UniformMatrix2fv (GLint location, GLsizei count, GLboolean transpose, const GLfloat * value);
+	void		UniformMatrix3fv (GLint location, GLsizei count, GLboolean transpose, const GLfloat * value);
+    void		UniformMatrix4fv (GLint location, GLsizei count, GLboolean transpose, const GLfloat * value);
     void		UseProgram (GLuint program);
     void 		ValidateProgram (GLuint program);
     void 		VertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
@@ -257,8 +281,8 @@ public:
     GLboolean       blendEnable;
     GLboolean       depthTestEnable;
 
-	textureState	texContext[2];
-    attribute       vertexAttrib[8];
+	textureState	texContext[MAX_TEXTURE_UNIT];
+    attribute       vertexAttrib[MAX_ATTRIBUTE_NUMBER];
     drawCommand     drawCmd;
 
 	///the Program ID called in UseProgram()
@@ -277,7 +301,7 @@ public:
 	 *	All specified uniform value will be stored in uniformPool and it's ID
 	 *	queried from getLocation funtion will be used as its std::map key value.
 	 */
-    std::map<GLuint, floatVec4> uniformPool;
+    std::map<GLint, floatVec4> uniformPool;
 
 private:
 	bool            m_current;

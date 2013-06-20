@@ -587,97 +587,97 @@ GL_APICALL void GL_APIENTRY glTexSubImage2D (GLenum target, GLint level, GLint x
 
 GL_APICALL void GL_APIENTRY glUniform1f (GLint location, GLfloat x)
 {
-
+	CONTEXT_EXEC(Uniform1f(location, x));
 }
 
 GL_APICALL void GL_APIENTRY glUniform1fv (GLint location, GLsizei count, const GLfloat* v)
 {
-
+	CONTEXT_EXEC(Uniform2fv(location, count, v));
 }
 
 GL_APICALL void GL_APIENTRY glUniform1i (GLint location, GLint x)
 {
-
+	CONTEXT_EXEC(Uniform1i(location, x));
 }
 
 GL_APICALL void GL_APIENTRY glUniform1iv (GLint location, GLsizei count, const GLint* v)
 {
-
+	CONTEXT_EXEC(Uniform1iv(location, count, v));
 }
 
 GL_APICALL void GL_APIENTRY glUniform2f (GLint location, GLfloat x, GLfloat y)
 {
-
+	CONTEXT_EXEC(Uniform2f(location, x, y));
 }
 
 GL_APICALL void GL_APIENTRY glUniform2fv (GLint location, GLsizei count, const GLfloat* v)
 {
-
+	CONTEXT_EXEC(Uniform2fv(location, count, v));
 }
 
 GL_APICALL void GL_APIENTRY glUniform2i (GLint location, GLint x, GLint y)
 {
-
+	CONTEXT_EXEC(Uniform2i(location, x, y));
 }
 
 GL_APICALL void GL_APIENTRY glUniform2iv (GLint location, GLsizei count, const GLint* v)
 {
-
+	CONTEXT_EXEC(Uniform2iv(location, count, v));
 }
 
 GL_APICALL void GL_APIENTRY glUniform3f (GLint location, GLfloat x, GLfloat y, GLfloat z)
 {
-
+	CONTEXT_EXEC(Uniform3f(location, x, y, z));
 }
 
 GL_APICALL void GL_APIENTRY glUniform3fv (GLint location, GLsizei count, const GLfloat* v)
 {
-
+	CONTEXT_EXEC(Uniform3fv(location, count, v));
 }
 
 GL_APICALL void GL_APIENTRY glUniform3i (GLint location, GLint x, GLint y, GLint z)
 {
-
+	CONTEXT_EXEC(Uniform3i(location, x, y, z));
 }
 
 GL_APICALL void GL_APIENTRY glUniform3iv (GLint location, GLsizei count, const GLint* v)
 {
-
+	CONTEXT_EXEC(Uniform3iv(location, count, v));
 }
 
 GL_APICALL void GL_APIENTRY glUniform4f (GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 {
-
+	CONTEXT_EXEC(Uniform4f(location, x, y, z, w));
 }
 
 GL_APICALL void GL_APIENTRY glUniform4fv (GLint location, GLsizei count, const GLfloat* v)
 {
-
+	CONTEXT_EXEC(Uniform4fv(location, count, v));
 }
 
 GL_APICALL void GL_APIENTRY glUniform4i (GLint location, GLint x, GLint y, GLint z, GLint w)
 {
-
+	CONTEXT_EXEC(Uniform4i(location, x, y, z, w));
 }
 
 GL_APICALL void GL_APIENTRY glUniform4iv (GLint location, GLsizei count, const GLint* v)
 {
-
+	CONTEXT_EXEC(Uniform4iv(location, count, v));
 }
 
 GL_APICALL void GL_APIENTRY glUniformMatrix2fv (GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
 {
-
+	CONTEXT_EXEC(UniformMatrix2fv(location, count, transpose, value));
 }
 
 GL_APICALL void GL_APIENTRY glUniformMatrix3fv (GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
 {
-
+	CONTEXT_EXEC(UniformMatrix3fv(location, count, transpose, value));
 }
 
 GL_APICALL void GL_APIENTRY glUniformMatrix4fv (GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
 {
-
+	CONTEXT_EXEC(UniformMatrix4fv(location, count, transpose, value));
 }
 
 GL_APICALL void GL_APIENTRY glUseProgram (GLuint program)

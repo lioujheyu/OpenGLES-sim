@@ -190,7 +190,7 @@ void Context::Enable(GLenum cap)
 
 void Context::EnableVertexAttribArray(GLuint index)
 {
-    if (index > 8) {
+    if (index >= MAX_ATTRIBUTE_NUMBER) {
         RecordError(GL_INVALID_VALUE);
         return;
     }
@@ -203,7 +203,7 @@ void Context::GenerateMipmap(GLenum target)
 	texContext[activeTexture].genMipmap = GL_TRUE;
 }
 
-/// @note (elvis#1#): Searching the free texture id under std::map container is not efficient.
+/// @note (elvis#1#): Searching the free texture id under std::map is not efficient.
 void Context::GenTextures(GLsizei n, GLuint* textures)
 {
 	if (n < 0) {
@@ -461,14 +461,596 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
     }
 }
 
+void Context::Uniform1f (GLint location, GLfloat x)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	uniformPool[location].x = x;
+}
+
+void Context::Uniform2f(GLint location, GLfloat x, GLfloat y)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float2") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	uniformPool[location].x = x;
+	uniformPool[location].y = y;
+}
+
+void Context::Uniform3f(GLint location, GLfloat x, GLfloat y, GLfloat z)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float3") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	uniformPool[location].x = x;
+	uniformPool[location].y = y;
+	uniformPool[location].z = z;
+}
+
+void Context::Uniform4f(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float4") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	uniformPool[location].x = x;
+	uniformPool[location].y = y;
+	uniformPool[location].z = z;
+	uniformPool[location].w = w;
+}
+
+void Context::Uniform1i(GLint location, GLint x)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	uniformPool[location].x = (float)x;
+}
+
+void Context::Uniform2i(GLint location, GLint x, GLint y)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int2") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	uniformPool[location].x = (float)x;
+	uniformPool[location].y = (float)y;
+}
+
+void Context::Uniform3i(GLint location, GLint x, GLint y, GLint z)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int3") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	uniformPool[location].x = (float)x;
+	uniformPool[location].y = (float)y;
+	uniformPool[location].z = (float)z;
+}
+
+void Context::Uniform4i(GLint location, GLint x, GLint y, GLint z, GLint w)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int4") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	uniformPool[location].x = (float)x;
+	uniformPool[location].y = (float)y;
+	uniformPool[location].z = (float)z;
+	uniformPool[location].w = (float)w;
+}
+
+void Context::Uniform1fv(GLint location, GLsizei count, const GLfloat * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++)
+		uniformPool[location+i].x = *(value+i);
+}
+
+void Context::Uniform2fv(GLint location, GLsizei count, const GLfloat * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float2") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++) {
+		uniformPool[location+i].x = *(value + 2*i);
+		uniformPool[location+i].y = *(value + 2*i + 1);
+	}
+}
+
+void Context::Uniform3fv(GLint location, GLsizei count, const GLfloat * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float3") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++) {
+		uniformPool[location+i].x = *(value + 3*i);
+		uniformPool[location+i].y = *(value + 3*i + 1);
+		uniformPool[location+i].z = *(value + 3*i + 2);
+	}
+}
+
+void Context::Uniform4fv(GLint location, GLsizei count, const GLfloat * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float3") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++) {
+		uniformPool[location+i].x = *(value + 4*i);
+		uniformPool[location+i].y = *(value + 4*i + 1);
+		uniformPool[location+i].z = *(value + 4*i + 2);
+		uniformPool[location+i].w = *(value + 4*i + 3);
+	}
+}
+
+void Context::Uniform1iv(GLint location, GLsizei count, const GLint * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++)
+		uniformPool[location+i].x = (float)*(value + i);
+}
+
+void Context::Uniform2iv(GLint location, GLsizei count, const GLint * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int2") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++) {
+		uniformPool[location+i].x = (float)*(value + 2*i);
+		uniformPool[location+i].y = (float)*(value + 2*i + 1);
+	}
+}
+
+void Context::Uniform3iv(GLint location, GLsizei count, const GLint * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int3") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++) {
+		uniformPool[location+i].x = (float)*(value + 3*i);
+		uniformPool[location+i].y = (float)*(value + 3*i + 1);
+		uniformPool[location+i].z = (float)*(value + 3*i + 2);
+	}
+}
+
+void Context::Uniform4iv(GLint location, GLsizei count, const GLint * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int4") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++) {
+		uniformPool[location+i].x = (float)*(value + 4*i);
+		uniformPool[location+i].y = (float)*(value + 4*i + 1);
+		uniformPool[location+i].z = (float)*(value + 4*i + 2);
+		uniformPool[location+i].w = (float)*(value + 4*i + 3);
+	}
+}
+
+void Context::UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float2x2") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++) {
+		uniformPool[location+ 2*i].x     = *(value + 4*i);
+		uniformPool[location+ 2*i].y     = *(value + 4*i + 1);
+		uniformPool[location+ 2*i + 1].x = *(value + 4*i + 2);
+		uniformPool[location+ 2*i + 1].y = *(value + 4*i + 3);
+	}
+}
+
+void Context::UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float3x3") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++) {
+		uniformPool[location+ 3*i].x     = *(value + 9*i);
+		uniformPool[location+ 3*i].y     = *(value + 9*i + 1);
+		uniformPool[location+ 3*i].z     = *(value + 9*i + 2);
+		uniformPool[location+ 3*i + 1].x = *(value + 9*i + 3);
+		uniformPool[location+ 3*i + 1].y = *(value + 9*i + 4);
+		uniformPool[location+ 3*i + 1].z = *(value + 9*i + 5);
+		uniformPool[location+ 3*i + 2].x = *(value + 9*i + 6);
+		uniformPool[location+ 3*i + 2].y = *(value + 9*i + 7);
+		uniformPool[location+ 3*i + 2].z = *(value + 9*i + 8);
+	}
+}
+
+void Context::UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value)
+{
+	if (usePID == 0) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	programObject t_program = programPool[usePID];
+
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
+		printf("%d \n",t_program.uniformUsage.size());
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float4x4") {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+		RecordError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	for(int i=0; i<count; i++) {
+		uniformPool[location + 4*i].x     = *(value + 16*i);
+		uniformPool[location + 4*i].y     = *(value + 16*i + 1);
+		uniformPool[location + 4*i].z     = *(value + 16*i + 2);
+		uniformPool[location + 4*i].w     = *(value + 16*i + 3);
+		uniformPool[location + 4*i + 1].x = *(value + 16*i + 4);
+		uniformPool[location + 4*i + 1].y = *(value + 16*i + 5);
+		uniformPool[location + 4*i + 1].z = *(value + 16*i + 6);
+		uniformPool[location + 4*i + 1].w = *(value + 16*i + 7);
+		uniformPool[location + 4*i + 2].x = *(value + 16*i + 8);
+		uniformPool[location + 4*i + 2].y = *(value + 16*i + 9);
+		uniformPool[location + 4*i + 2].z = *(value + 16*i + 10);
+		uniformPool[location + 4*i + 2].w = *(value + 16*i + 11);
+		uniformPool[location + 4*i + 3].x = *(value + 16*i + 12);
+		uniformPool[location + 4*i + 3].y = *(value + 16*i + 13);
+		uniformPool[location + 4*i + 3].z = *(value + 16*i + 14);
+		uniformPool[location + 4*i + 3].w = *(value + 16*i + 15);
+	}
+}
+
 void Context::VertexAttribPointer(GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr)
 {
-    if (size < 2 || size > 5) {
+    if (size<2 || size>4) {
         RecordError(GL_INVALID_VALUE);
         return;
     }
 
-    if (indx > 8) {
+    if (indx >= MAX_ATTRIBUTE_NUMBER) {
         RecordError(GL_INVALID_VALUE);
         return;
     }
@@ -508,7 +1090,7 @@ void Context::Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
     vp.w = width;
     vp.h = height;
 
-// @fixme (elvis#1#): dirty buffer setting before buffer management is ready
+/// @fixme (elvis#1#): dirty buffer setting before buffer management is ready
     drawBuffer[0] = new unsigned char [width*height*4];
     drawBuffer[1] = new float [width*height];
 }

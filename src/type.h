@@ -176,7 +176,7 @@ struct instruction
 	void Print()
 	{
 		printf("%d",op);
-		for (int i=0; i<opModifiers.size(); i++)
+		for (unsigned int i=0; i<opModifiers.size(); i++)
 			printf(".%d",opModifiers[i]);
 		dst.print();
 		src0.print();

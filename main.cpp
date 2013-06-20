@@ -111,6 +111,12 @@ int main()
                            0.0f, 1.0f,
                          };
 
+	GLfloat mvp4x4[] = {1.0f, 0.0f, 0.0f, 0.0f,
+	                    0.0f, 1.0f, 0.0f, 0.0f,
+	                    0.0f, 0.0f, 1.0f, 0.0f,
+	                    0.0f, 0.0f, 0.0f, 1.0f
+	                   };
+
     glEnable(GL_DEPTH_TEST);
 
     glViewport(0,0,1024,768);
@@ -121,7 +127,9 @@ int main()
     int v_coord_loc = glGetAttribLocation(shader.id(), "vertexPosition_modelspace");
     int c_map = glGetUniformLocation(shader.id(), "ColorMap");
     int n_map = glGetUniformLocation(shader.id(), "NormalMap");
-    printf("%d, %d, %d\n", v_coord_loc, c_map, n_map);
+    int mvp = glGetUniformLocation(shader.id(), "MVP");
+    printf("%d, %d, %d, %d\n", v_coord_loc, c_map, n_map, mvp);
+    glUniformMatrix4fv(mvp, 1, 0, mvp4x4);
 
     int v_tex0_loc = 4;
     glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);

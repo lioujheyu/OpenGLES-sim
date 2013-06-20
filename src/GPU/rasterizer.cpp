@@ -246,18 +246,18 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 
 		if (area2Reciprocal>=0) {
             for(lc=0; lc<3; lc++) {
-                Zone[0][lc] = cornerTest[0][lc]>=0 | cornerTest[1][lc]>=0 | cornerTest[3][lc]>=0 | centralTest[lc]>=0;
-                Zone[1][lc] = cornerTest[1][lc]>=0 | cornerTest[2][lc]>=0 | centralTest[lc]>=0 | cornerTest[4][lc]>=0;
-                Zone[2][lc] = cornerTest[3][lc]>=0 | centralTest[lc]>=0 | cornerTest[5][lc]>=0 | cornerTest[6][lc]>=0;
-                Zone[3][lc] = centralTest[lc]>=0 | cornerTest[4][lc]>=0 | cornerTest[6][lc]>=0 | cornerTest[7][lc]>=0;
+                Zone[0][lc] = (cornerTest[0][lc]>=0) | (cornerTest[1][lc]>=0) | (cornerTest[3][lc]>=0) | (centralTest[lc]>=0);
+                Zone[1][lc] = (cornerTest[1][lc]>=0) | (cornerTest[2][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[4][lc]>=0);
+                Zone[2][lc] = (cornerTest[3][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[5][lc]>=0) | (cornerTest[6][lc]>=0);
+                Zone[3][lc] = (centralTest[lc]>=0) | (cornerTest[4][lc]>=0) | (cornerTest[6][lc]>=0) | (cornerTest[7][lc]>=0);
             }
         }
         else{
             for(lc=0; lc<3; lc++) {
-                Zone[0][lc] = cornerTest[0][lc]<=0 | cornerTest[1][lc]<=0 | cornerTest[3][lc]<=0 | centralTest[lc]<=0;
-                Zone[1][lc] = cornerTest[1][lc]<=0 | cornerTest[2][lc]<=0 | centralTest[lc]<=0 | cornerTest[4][lc]<=0;
-                Zone[2][lc] = cornerTest[3][lc]<=0 | centralTest[lc]<=0 | cornerTest[5][lc]<=0 | cornerTest[6][lc]<=0;
-                Zone[3][lc] = centralTest[lc]<=0 | cornerTest[4][lc]<=0 | cornerTest[6][lc]<=0 | cornerTest[7][lc]<=0;
+                Zone[0][lc] = (cornerTest[0][lc]<=0) | (cornerTest[1][lc]<=0) | (cornerTest[3][lc]<=0) | (centralTest[lc]<=0);
+                Zone[1][lc] = (cornerTest[1][lc]<=0) | (cornerTest[2][lc]<=0) | (centralTest[lc]<=0) | (cornerTest[4][lc]<=0);
+                Zone[2][lc] = (cornerTest[3][lc]<=0) | (centralTest[lc]<=0) | (cornerTest[5][lc]<=0) | (cornerTest[6][lc]<=0);
+                Zone[3][lc] = (centralTest[lc]<=0) | (cornerTest[4][lc]<=0) | (cornerTest[6][lc]<=0) | (cornerTest[7][lc]<=0);
             }
         }
 
