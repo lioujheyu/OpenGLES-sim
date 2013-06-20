@@ -128,8 +128,6 @@ void ActiveGPU()
 {
     Context * ctx = Context::GetCurrentContext();
 
-    shaderObject VS, FS;
-
     for (int i=0;i<MAX_TEXTURE_UNIT;i++){
 		if (ctx->texContext[i].genMipmap)
 			GenMipMap(i);
@@ -172,19 +170,21 @@ void ActiveGPU()
     }
 
 	if (ctx->usePID != 0) {
-		VS = ctx->shaderPool[ctx->programPool[ctx->usePID].sid4VS];
-		FS = ctx->shaderPool[ctx->programPool[ctx->usePID].sid4FS];
+		gpu.gm.instCnt = ctx->programPool[ctx->usePID].VSinstructionPool.size();
+		gpu.gm.instPool = new instruction[gpu.gm.instCnt];
+		for (int i=0; i<gpu.gm.instCnt; i++)
+			*(gpu.gm.instPool + i) = ctx->programPool[ctx->usePID].VSinstructionPool[i];
 
-		gpu.gm.asmSrc = new char[VS.asmSrc.size()];
-		gpu.rm.asmSrc = new char[FS.asmSrc.size()];
-		strcpy(gpu.gm.asmSrc, VS.asmSrc.c_str());
-		strcpy(gpu.rm.asmSrc, FS.asmSrc.c_str());
+		gpu.rm.instCnt = ctx->programPool[ctx->usePID].FSinstructionPool.size();
+		gpu.rm.instPool = new instruction[gpu.rm.instCnt];
+		for (int i=0; i<gpu.rm.instCnt; i++)
+			*(gpu.rm.instPool + i) = ctx->programPool[ctx->usePID].FSinstructionPool[i];
 	}
 
     gpu.Run();
 
 	if (ctx->usePID != 0) {
-		delete [] gpu.gm.asmSrc;
-		delete [] gpu.rm.asmSrc;
+		delete [] gpu.gm.instPool;
+		delete [] gpu.rm.instPool;
 	}
 }

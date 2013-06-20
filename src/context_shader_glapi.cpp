@@ -206,14 +206,7 @@ void Context::DetachShader(GLuint program, GLuint shader)
 		else
 			programPool[program].sid4FS = 0;
 
-		programPool[program].symbolVSin.clear();
-		programPool[program].symbolVSout.clear();
-		programPool[program].symbolFSin.clear();
-		programPool[program].symbolFSout.clear();
-		programPool[program].symbolUniform.clear();
-		programPool[program].uniformUsage.clear();
-
-		programPool[program].isLinked = GL_FALSE;
+		programPool[program].LinkInit();
 	}
 }
 
@@ -231,13 +224,13 @@ int Context::GetAttribLocation (GLuint program, const GLchar* name)
 
 	programObject t_program = programPool[program];
 
-	if (t_program.symbolVSin.find(name) == t_program.symbolVSin.end())
+	if (t_program.srcVSin.find(name) == t_program.srcVSin.end())
 		return -1;
 	else{
-		if (t_program.symbolVSin[name].name.compare(0,3,"gl_") == 0)
+		if (t_program.srcVSin[name].name.compare(0,3,"gl_") == 0)
 			return -1;
 		else {
-			return t_program.symbolVSin[name].idx;
+			return t_program.srcVSin[name].idx;
 		}
 	}
 }
@@ -310,13 +303,13 @@ int Context::GetUniformLocation (GLuint program, const GLchar* name)
 
 	programObject t_program = programPool[program];
 
-	if (t_program.symbolUniform.find(name) == t_program.symbolUniform.end())
+	if (t_program.srcUniform.find(name) == t_program.srcUniform.end())
 		return -1;
 	else{
-		if (t_program.symbolUniform[name].name.compare(0,3,"gl_") == 0)
+		if (t_program.srcUniform[name].name.compare(0,3,"gl_") == 0)
 			return -1;
 		else {
-			return t_program.symbolUniform[name].idx;
+			return t_program.srcUniform[name].idx;
 		}
 	}
 }
@@ -400,39 +393,4 @@ void Context::ValidateProgram(GLuint program)
 	}
 
 	t_program = programPool[program];
-
-	if (t_program.isLinked != GL_TRUE) {
-		switch (t_program.linkStatus) {
-		case LS_NO_ERROR:
-			t_program.linkInfo = "The Program is not yet linked";
-			break;
-		case LS_SHADER_MISSING:
-			t_program.linkInfo = "A vertex shader and a fragment shader are not both present in the program object.";
-			break;
-		case LS_ATTR_EXCEED:
-			t_program.linkInfo = "The number of active attribute variables supported by the implementation has been exceeded.";
-			break;
-		case LS_UNIFORM_EXCEED:
-			t_program.linkInfo = "The number of active uniform variables supported by the implementation has been exceeded.";
-			break;
-		case LS_MAIN_FUNCTION_MISSING:
-			t_program.linkInfo = "The main function is missing for the vertex shader or the fragment shader";
-			break;
-		case LS_VS_FS_VARRYING_UNMATCH:
-			t_program.linkInfo = "A varying variable actually used in the fragment shader is not declared in the same way (or is not declared at all) in the vertex shader.";
-			break;
-		case LS_DECLARATION_UNRESOLVED:
-			t_program.linkInfo = "A reference to a function or variable name is unresolved.";
-			break;
-		case LS_SHADER_IS_NOT_COMPILED:
-			t_program.linkInfo = "One or more of the attached shader objects has not been successfully compiled or loaded with a pre-compiled shader binary.";
-			break;
-		default:
-			break;
-		}
-	}
-	else
-		t_program.linkInfo.clear();
-
-	programPool[program] = t_program;
 }

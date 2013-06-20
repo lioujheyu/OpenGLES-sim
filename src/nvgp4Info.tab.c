@@ -77,9 +77,6 @@
 /* Line 189 of yacc.c  */
 #line 1 "nvgp4Info.y"
 
-#include <string>
-#include <cstdio>
-#include <map>
 #include "context_link_def.h"
 #include "context.h"
 #include "GPU/gpu_config.h"
@@ -90,12 +87,13 @@ void nvgp4Info_str_in(const char *s);
 
 programObject t_program;
 unsigned int shaderType;
-unsigned int element;
-unsigned int idx;
+unsigned int t_element;
+unsigned int t_idx;
+symbol t_symbol;
 
 
 /* Line 189 of yacc.c  */
-#line 99 "nvgp4Info.tab.c"
+#line 97 "nvgp4Info.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -143,7 +141,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 19 "nvgp4Info.y"
+#line 17 "nvgp4Info.y"
 
 	int		ival;
 	float	fval;
@@ -152,7 +150,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 156 "nvgp4Info.tab.c"
+#line 154 "nvgp4Info.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -164,7 +162,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 168 "nvgp4Info.tab.c"
+#line 166 "nvgp4Info.tab.c"
 
 #ifdef short
 # undef short
@@ -379,16 +377,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  15
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   34
+#define YYLAST   39
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  20
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  9
+#define YYNNTS  10
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  19
+#define YYNRULES  23
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  42
+#define YYNSTATES  47
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -435,7 +433,8 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     6,     7,     9,    11,    13,    15,    18,
-      21,    24,    36,    38,    43,    50,    53,    56,    57,    62
+      21,    24,    28,    40,    42,    47,    48,    50,    55,    62,
+      65,    68,    69,    74
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
@@ -443,18 +442,20 @@ static const yytype_int8 yyrhs[] =
 {
       21,     0,    -1,    22,    21,    -1,    -1,    23,    -1,    24,
       -1,    25,    -1,    26,    -1,     3,     9,    -1,     4,    10,
-      -1,     5,    10,    -1,     6,    13,    10,    14,    28,    14,
-      27,    14,    11,    14,    11,    -1,    10,    -1,    10,    15,
-      11,    16,    -1,    10,    15,    11,    16,    17,    11,    -1,
-      17,    11,    -1,    10,    11,    -1,    -1,    18,     7,    19,
-      10,    -1,    18,     8,    19,    10,    -1
+      -1,     5,    10,    -1,     5,    10,    10,    -1,     6,    13,
+      27,    14,    29,    14,    28,    14,    11,    14,    11,    -1,
+      10,    -1,    10,    15,    11,    16,    -1,    -1,    10,    -1,
+      10,    15,    11,    16,    -1,    10,    15,    11,    16,    17,
+      11,    -1,    17,    11,    -1,    10,    11,    -1,    -1,    18,
+       7,    19,    10,    -1,    18,     8,    19,    10,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    38,    38,    39,    42,    43,    44,    45,    48,    50,
-      53,    56,   122,   123,   124,   125,   126,   130,   131,   132
+       0,    36,    36,    37,    40,    41,    42,    43,    46,    48,
+      51,    52,    55,   174,   175,   184,   185,   186,   187,   188,
+     189,   193,   194,   195
 };
 #endif
 
@@ -466,7 +467,7 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "PROF", "PROG", "SEMT", "VAR", "VIN",
   "VOUT", "SHADERTYPE", "IDENTIFIER", "INTEGER", "FLOAT", "TYPE", "':'",
   "'['", "']'", "','", "'$'", "'.'", "$accept", "input", "line", "profile",
-  "program", "semantic", "link_info", "complex_id", "io_type", 0
+  "program", "semantic", "link_info", "complex_id", "resource", "io_type", 0
 };
 #endif
 
@@ -484,14 +485,16 @@ static const yytype_uint16 yytoknum[] =
 static const yytype_uint8 yyr1[] =
 {
        0,    20,    21,    21,    22,    22,    22,    22,    23,    24,
-      25,    26,    27,    27,    27,    27,    27,    28,    28,    28
+      25,    25,    26,    27,    27,    28,    28,    28,    28,    28,
+      28,    29,    29,    29
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     2,     0,     1,     1,     1,     1,     2,     2,
-       2,    11,     1,     4,     6,     2,     2,     0,     4,     4
+       2,     3,    11,     1,     4,     0,     1,     4,     6,     2,
+       2,     0,     4,     4
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -500,16 +503,16 @@ static const yytype_uint8 yyr2[] =
 static const yytype_uint8 yydefact[] =
 {
        3,     0,     0,     0,     0,     0,     3,     4,     5,     6,
-       7,     8,     9,    10,     0,     1,     2,     0,    17,     0,
-       0,     0,     0,     0,     0,     0,    12,     0,     0,    18,
-      19,    16,     0,    15,     0,     0,     0,    13,     0,     0,
-      11,    14
+       7,     8,     9,    10,     0,     1,     2,    11,    13,     0,
+       0,    21,     0,     0,     0,    14,     0,     0,    15,     0,
+       0,    16,     0,     0,    22,    23,    20,     0,    19,     0,
+       0,     0,    17,     0,     0,    12,    18
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     5,     6,     7,     8,     9,    10,    28,    20
+      -1,     5,     6,     7,     8,     9,    10,    19,    33,    24
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
@@ -518,16 +521,16 @@ static const yytype_int8 yydefgoto[] =
 static const yytype_int8 yypact[] =
 {
        5,    -8,    -5,     2,     0,    14,     5,   -11,   -11,   -11,
-     -11,   -11,   -11,   -11,     6,   -11,   -11,     1,    -1,    -4,
-       4,     3,     7,   -10,     9,    10,    -9,    12,    11,   -11,
-     -11,   -11,    13,   -11,    16,    15,    18,    17,    19,    22,
-     -11,   -11
+     -11,   -11,   -11,     6,     7,   -11,   -11,   -11,     3,     1,
+       8,     4,     9,    -4,    10,   -11,    11,    12,   -10,    13,
+      16,    -9,    17,    15,   -11,   -11,   -11,    21,   -11,    22,
+      18,    23,    19,    24,    27,   -11,   -11
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -11,    23,   -11,   -11,   -11,   -11,   -11,   -11,   -11
+     -11,    33,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -537,18 +540,18 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      26,    11,    31,    21,    22,    12,    32,    27,     1,     2,
-       3,     4,    13,    14,    15,    18,    17,    19,    23,    29,
-      30,     0,    24,    33,    35,    34,    25,    36,     0,    16,
-      40,    37,    38,    41,    39
+      31,    11,    36,    26,    27,    12,    37,    32,     1,     2,
+       3,     4,    13,    14,    15,    21,    17,    18,    20,    22,
+       0,     0,    23,    34,    28,    25,    35,     0,    38,    39,
+      29,    30,    40,    41,    42,    45,    44,    43,    46,    16
 };
 
 static const yytype_int8 yycheck[] =
 {
       10,     9,    11,     7,     8,    10,    15,    17,     3,     4,
-       5,     6,    10,    13,     0,    14,    10,    18,    14,    10,
-      10,    -1,    19,    11,    11,    14,    19,    11,    -1,     6,
-      11,    16,    14,    11,    17
+       5,     6,    10,    13,     0,    14,    10,    10,    15,    11,
+      -1,    -1,    18,    10,    14,    16,    10,    -1,    11,    14,
+      19,    19,    11,    11,    16,    11,    17,    14,    11,     6
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -556,10 +559,10 @@ static const yytype_int8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,     3,     4,     5,     6,    21,    22,    23,    24,    25,
-      26,     9,    10,    10,    13,     0,    21,    10,    14,    18,
-      28,     7,     8,    14,    19,    19,    10,    17,    27,    10,
-      10,    11,    15,    11,    14,    11,    11,    16,    14,    17,
-      11,    11
+      26,     9,    10,    10,    13,     0,    21,    10,    10,    27,
+      15,    14,    11,    18,    29,    16,     7,     8,    14,    19,
+      19,    10,    17,    28,    10,    10,    11,    15,    11,    14,
+      11,    11,    16,    14,    17,    11,    11
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1382,140 +1385,219 @@ yyreduce:
         case 8:
 
 /* Line 1464 of yacc.c  */
-#line 48 "nvgp4Info.y"
+#line 46 "nvgp4Info.y"
     {shaderType = (yyvsp[(2) - (2)].ival);}
-    break;
-
-  case 11:
-
-/* Line 1464 of yacc.c  */
-#line 56 "nvgp4Info.y"
-    {
-		symbol t_symbol;
-
-		t_symbol.name = (yyvsp[(3) - (11)].sval);
-		t_symbol.declareType = (yyvsp[(2) - (11)].sval);
-		t_symbol.offset = 0;
-
-		if (strcmp((yyvsp[(7) - (11)].sval),"HPOS") == 0) {
-			t_symbol.idx = 0;
-			t_symbol.element = element;
-			//t_program.symbolVSout[t_symbol.name] = t_symbol;
-		}
-		else if (strncmp((yyvsp[(7) - (11)].sval),"ATTR",4) == 0) {
-			t_symbol.idx = (unsigned int)(yyvsp[(7) - (11)].sval)[4] - 48;
-			t_symbol.element = element;
-			if (shaderType == 0) {
-				if ((yyvsp[(5) - (11)].ival) == CG_IN)
-					t_program.symbolVSin[t_symbol.name]=t_symbol;
-				else
-					t_program.symbolVSout[t_symbol.name]=t_symbol;
-			}
-			else {
-				if ((yyvsp[(5) - (11)].ival) == CG_IN)
-					t_program.symbolFSin[t_symbol.name]=t_symbol;
-				else
-					t_program.symbolFSout[t_symbol.name]=t_symbol;
-			}
-		}
-		else if (strncmp((yyvsp[(7) - (11)].sval),"texunit",7) == 0) {
-			t_symbol.idx = idx + MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS;
-			t_symbol.element = element;
-			if (t_program.symbolUniform.find(t_symbol.name) == t_program.symbolUniform.end())
-				t_program.symbolUniform[t_symbol.name] = t_symbol;
-			else {
-				printf("%s \n",(yyvsp[(3) - (11)].sval));
-				exit(1);
-			}
-		}
-		//@todo: Need to handle the multi output situation
-		else if (strncmp((yyvsp[(7) - (11)].sval),"COL",3) == 0) {
-			t_symbol.idx = 0;
-			t_symbol.element = element;
-			//t_program.symbolFSout[t_symbol.name] = t_symbol;
-		}
-		else if ((yyvsp[(7) - (11)].sval)[0] == 'c') {
-			t_symbol.idx = idx;
-			t_symbol.element = element;
-			if (t_program.symbolUniform.find(t_symbol.name) == t_program.symbolUniform.end()) {
-				int start = t_program.uniformUsage.size();
-				t_symbol.offset = t_program.uniformUsage.size() - idx;
-				for (int i=start; i<start+element; i++)
-					t_program.uniformUsage[i] = t_symbol.name;
-				t_program.symbolUniform[t_symbol.name] = t_symbol;
-			}
-			else {
-				if (t_program.symbolUniform[t_symbol.name].declareType != t_symbol.declareType) {
-					printf("%s \n",(yyvsp[(3) - (11)].sval));
-					exit(1);
-				}
-			}
-		}
-
-		t_symbol.print();
-	;}
     break;
 
   case 12:
 
 /* Line 1464 of yacc.c  */
-#line 122 "nvgp4Info.y"
-    {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval)); element = 1;;}
+#line 55 "nvgp4Info.y"
+    {
+		t_symbol.name = (yyvsp[(3) - (11)].sval);
+		t_symbol.declareType = (yyvsp[(2) - (11)].sval);
+
+		//Force position to use the first attribute slot
+		if (strcmp((yyvsp[(7) - (11)].sval),"HPOS") == 0) {
+			t_symbol.idx = 0;
+			t_symbol.element = t_element;
+			t_program.VSoutCnt+= t_element;
+			t_program.srcVSout[t_symbol.name] = t_symbol;
+			t_symbol.Print();
+		}
+		else if (strncmp((yyvsp[(7) - (11)].sval),"ATTR",4) == 0) {
+			t_idx = (unsigned int)(yyvsp[(7) - (11)].sval)[4] - 48;
+			t_symbol.element = t_element;
+			if (shaderType == 0) { //Vertex Shader
+				if ((yyvsp[(5) - (11)].ival) == CG_IN) {
+					t_symbol.idx = t_idx;
+					t_program.VSinCnt += t_element;
+					t_program.srcVSin[(yyvsp[(3) - (11)].sval)]=t_symbol;
+					t_symbol.Print();
+				}
+				else { //Varying
+					//Cause position has already occupy the attribute slot 0
+					t_symbol.idx = t_idx + 1;
+					t_symbol.element = t_element;
+					t_program.VSoutCnt+= t_element;
+					t_program.srcVSout[t_symbol.name]=t_symbol;
+					t_symbol.Print();
+				}
+			}
+			else { //Fragment Shader
+				if ((yyvsp[(5) - (11)].ival) == CG_IN) { //Varying
+					//Check whether VS.output and FS.input are matched.
+					if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
+						t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+						printf("%s \n", (yyvsp[(3) - (11)].sval));
+						YYABORT;
+					}
+					else {
+						if (t_program.srcVSout[t_symbol.name].declareType != (yyvsp[(2) - (11)].sval)) {
+							t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+							printf("%s \n", (yyvsp[(3) - (11)].sval));
+							YYABORT;
+						}
+						else {
+							//Cause position has already occupy the attribute slot 0
+							t_symbol.idx = t_idx + 1;
+							t_symbol.element = t_element;
+							t_program.FSinCnt+= t_element;
+							t_program.srcFSin[t_symbol.name]=t_symbol;
+							t_symbol.Print();
+						}
+					}
+				}
+				//else: There is no any FS.output belonging to ATTR type
+			}
+		}
+		else if (strncmp((yyvsp[(7) - (11)].sval),"texunit",7) == 0) {
+			if (t_program.srcUniform.find(t_symbol.name) == t_program.srcUniform.end()) {
+				t_symbol.idx = t_idx + MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS;
+				t_symbol.element = t_element;
+				///Texture will be added in srcUniform table but not applied in uniform counting.
+				t_program.srcUniform[t_symbol.name] = t_symbol;
+				t_symbol.Print();
+			}
+			else { // VS has already declared this texture
+				if (t_program.srcUniform[t_symbol.name].declareType != (yyvsp[(2) - (11)].sval)) {
+					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+					printf("%s \n", (yyvsp[(3) - (11)].sval));
+					YYABORT;
+				}
+			}
+		}
+		//@todo: Need to handle the multi output situation
+		else if (strncmp((yyvsp[(7) - (11)].sval),"COL",3) == 0) {
+			t_symbol.idx = 0;
+			t_symbol.element = t_element;
+			t_program.FSoutCnt+= t_element;
+			t_program.srcFSout[t_symbol.name] = t_symbol;
+			t_symbol.Print();
+		}
+		else if ((yyvsp[(7) - (11)].sval)[0] == 'c') {
+			t_symbol.element = t_element;
+			if (t_program.srcUniform.find(t_symbol.name) == t_program.srcUniform.end()) {
+				t_symbol.idx = t_program.uniformCnt;
+				t_program.uniformCnt+= t_element;
+				t_program.srcUniform[t_symbol.name] = t_symbol;
+				t_symbol.Print();
+			}
+			else {
+				if (t_program.srcUniform[t_symbol.name].declareType != t_symbol.declareType) {
+					printf("%s \n",(yyvsp[(3) - (11)].sval));
+					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+					YYABORT;
+				}
+				else
+					t_program.srcUniform[t_symbol.name].Print();
+			}
+
+			if (shaderType == 0) {
+				for (int i=0;i<t_element; i++) {
+					t_program.asmVSIdx[i + t_idx].name = t_symbol.name;
+					t_program.asmVSIdx[i + t_idx].idx = t_idx;
+				}
+				t_program.VSuniformCnt+= t_element;
+			}
+			else {
+				for (int i=0;i<t_element; i++) {
+					t_program.asmFSIdx[i + t_idx].name = t_symbol.name;
+					t_program.asmFSIdx[i + t_idx].idx = t_idx;
+				}
+				t_program.FSuniformCnt+= t_element;
+			}
+		}
+		//else:The variable is useless in current program (maybe)
+	;}
     break;
 
   case 13:
 
 /* Line 1464 of yacc.c  */
-#line 123 "nvgp4Info.y"
-    {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval)); idx = (yyvsp[(3) - (4)].ival); element = 1;;}
+#line 174 "nvgp4Info.y"
+    {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval));;}
     break;
 
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 124 "nvgp4Info.y"
-    {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval)); idx = (yyvsp[(3) - (6)].ival); element = (yyvsp[(6) - (6)].ival);;}
+#line 175 "nvgp4Info.y"
+    {
+			strcpy((yyval.sval), (yyvsp[(1) - (4)].sval)); 
+			strcat((yyval.sval), "[");
+			sprintf((yyval.sval), "%s%d", (yyval.sval), (yyvsp[(3) - (4)].ival));
+			strcat((yyval.sval),"]");
+		;}
     break;
 
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 125 "nvgp4Info.y"
+#line 184 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 126 "nvgp4Info.y"
-    {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); idx = (yyvsp[(2) - (2)].ival); element = 1;;}
+#line 185 "nvgp4Info.y"
+    {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval)); t_element = 1;;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 130 "nvgp4Info.y"
-    {(yyval.ival) = 0;;}
+#line 186 "nvgp4Info.y"
+    {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval)); t_idx = (yyvsp[(3) - (4)].ival); t_element = 1;;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 131 "nvgp4Info.y"
-    {(yyval.ival) = CG_IN;;}
+#line 187 "nvgp4Info.y"
+    {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval)); t_idx = (yyvsp[(3) - (6)].ival); t_element = (yyvsp[(6) - (6)].ival);;}
     break;
 
   case 19:
 
 /* Line 1464 of yacc.c  */
-#line 132 "nvgp4Info.y"
+#line 188 "nvgp4Info.y"
+    {(yyval.sval)[0] = '\0';;}
+    break;
+
+  case 20:
+
+/* Line 1464 of yacc.c  */
+#line 189 "nvgp4Info.y"
+    {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); t_idx = (yyvsp[(2) - (2)].ival); t_element = 1;;}
+    break;
+
+  case 21:
+
+/* Line 1464 of yacc.c  */
+#line 193 "nvgp4Info.y"
+    {(yyval.ival) = 0;;}
+    break;
+
+  case 22:
+
+/* Line 1464 of yacc.c  */
+#line 194 "nvgp4Info.y"
+    {(yyval.ival) = CG_IN;;}
+    break;
+
+  case 23:
+
+/* Line 1464 of yacc.c  */
+#line 195 "nvgp4Info.y"
     {(yyval.ival) = CG_OUT;;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 1519 "nvgp4Info.tab.c"
+#line 1601 "nvgp4Info.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1727,7 +1809,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 135 "nvgp4Info.y"
+#line 198 "nvgp4Info.y"
 
 
 

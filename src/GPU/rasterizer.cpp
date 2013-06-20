@@ -620,6 +620,7 @@ pixel Rasterizer::ShaderEXE(pixel pixInput)
 //	pixInput.attr[colIndx].r = texColor0.r + texColor1.r;
 //	pixInput.attr[colIndx].g = texColor0.g + texColor1.g;
 //	pixInput.attr[colIndx].b = texColor0.b + texColor1.b;
+
 	return pixInput;
 }
 

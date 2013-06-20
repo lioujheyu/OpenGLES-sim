@@ -17,13 +17,22 @@ unsigned int nvgp4ASM_col = 0;
 %}
 
 %%
-
-^[!#].*$				/* Comment */
+#[ ].*$				/* Comment */
+#version.*$
+#vendor.*$
+#program.*$
+#semantic.*$
+#var.*$
+^!.*$				/* Comment */
 ATTRIB.*$
 TEMP.*$
 PARAM.*$
 OUTPUT.*$
 END.*$
+
+"#profile"	COL_NO; return PROF;
+"gp4vp"		COL_NO; nvgp4ASM_lval.ival=0; return SHADERTYPE;
+"gp4fp"		COL_NO; nvgp4ASM_lval.ival=1; return SHADERTYPE;
 
 "texture"	COL_NO;	return TEXTURE;
 

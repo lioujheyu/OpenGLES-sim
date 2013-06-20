@@ -11,7 +11,8 @@ public:
     bool        	attrEnable[MAX_ATTRIBUTE_NUMBER];
     primitive   	prim;
     GLenum      	drawMode;
-    char * 			asmSrc;
+    instruction		*instPool;
+	int				instCnt;
 
     float       	depthRangeN, depthRangeF;
     int         	viewPortLX, viewPortLY,

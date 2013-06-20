@@ -173,7 +173,7 @@ struct instruction
 		src2.init();
 	}
 
-	void print()
+	void Print()
 	{
 		printf("%d",op);
 		for (int i=0; i<opModifiers.size(); i++)

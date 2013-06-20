@@ -30,22 +30,21 @@ void Context::LinkProgram(GLuint program)
 		return;
 
 	if ((programPool[program].sid4VS == 0) || (programPool[program].sid4FS == 0)) {
-		programPool[program].linkStatus = LS_SHADER_MISSING;
 		programPool[program].linkInfo = "A vertex shader and a fragment shader are not both present in the program object.";
 		return;
 	}
 	else if ((VS.isCompiled == GL_FALSE) || (FS.isCompiled == GL_FALSE)) {
-		programPool[program].linkStatus = LS_SHADER_IS_NOT_COMPILED;
 		programPool[program].linkInfo = "One or more of the attached shader objects has not been successfully compiled or loaded with a pre-compiled shader binary.";
 		return;
 	}
 
 	t_program = programPool[program];
-
+	t_program.linkInfo.clear();
 
 /**
- * 	1st pass parsing for Link information retriving. Will also perfrom linkage
- *	check.
+ * 	1st pass parsing for Link information retriving, including resource usage
+ *	check and indexing. This stage Will also chech whether VS/FS's resource is
+ *	matched.
  */
 	nvgp4Info_lineno = 1;
 	nvgp4Info_str_in(VS.asmSrc.c_str());
@@ -57,43 +56,32 @@ void Context::LinkProgram(GLuint program)
 	nvgp4Info_str_in(FS.asmSrc.c_str());
 	nvgp4Info_parse();
 
-	///Check both's shader's in/output are matched.
-	std::map<std::string, symbol>::iterator it;
-	for (it = t_program.symbolVSout.begin(); it!=t_program.symbolVSout.end(); it++) {
-		if (t_program.symbolFSin.find(it->first) == t_program.symbolFSin.end()) {
-			programPool[program].linkStatus = LS_VS_FS_VARRYING_UNMATCH;
-			programPool[program].linkInfo = "L0008: Type mismatch between vertex output and fragment input";
-			printf("%s \n",it->first.c_str());
-			return;
-		}
-		else {
-			if (t_program.symbolVSout[it->first].declareType !=
-			    t_program.symbolFSin[it->first].declareType) {
-				programPool[program].linkStatus = LS_VS_FS_VARRYING_UNMATCH;
-				programPool[program].linkInfo = "L0008: Type mismatch between vertex output and fragment input";
-				printf("%s \n",it->first.c_str());
-				return;
-			}
-		}
+	if (t_program.linkInfo.size() != 0) {
+		programPool[program].linkInfo = t_program.linkInfo;
+		printf("%s\n", t_program.linkInfo.c_str());
+		return;
 	}
-
-	t_program.linkInfo.clear();
-
-	programPool[program] = t_program;
-	programPool[program].linkStatus = LS_NO_ERROR;
-	programPool[program].isLinked = GL_TRUE;
 
 /**
  * 	2nd pass parsing for Custum instruction structure establishing from NVGP4
- *	assembly code.
+ *	assembly code. Resource remapping is performed in this stage.
  */
+ 	printf("\n");
+
 	nvgp4ASM_lineno = 1;
 	nvgp4ASM_str_in(VS.asmSrc.c_str());
 	nvgp4ASM_parse();
 
-	printf("\n");
-
 	nvgp4ASM_lineno = 1;
 	nvgp4ASM_str_in(FS.asmSrc.c_str());
 	nvgp4ASM_parse();
+
+	programPool[program] = t_program;
+	programPool[program].isLinked = GL_TRUE;
+
+	for (int i=0; i<t_program.VSinstructionPool.size(); i++)
+		t_program.VSinstructionPool[i].Print();
+	printf("\n");
+	for (int i=0; i<t_program.FSinstructionPool.size(); i++)
+		t_program.FSinstructionPool[i].Print();
 }

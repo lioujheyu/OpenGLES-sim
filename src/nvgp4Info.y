@@ -1,7 +1,4 @@
 %{
-#include <string>
-#include <cstdio>
-#include <map>
 #include "context_link_def.h"
 #include "context.h"
 #include "GPU/gpu_config.h"
@@ -12,8 +9,9 @@ void nvgp4Info_str_in(const char *s);
 
 programObject t_program;
 unsigned int shaderType;
-unsigned int element;
-unsigned int idx;
+unsigned int t_element;
+unsigned int t_idx;
+symbol t_symbol;
 %}
 
 %union {
@@ -30,7 +28,7 @@ unsigned int idx;
 %token <sval> TYPE
 
 %type <ival> io_type
-%type <sval> complex_id
+%type <sval> complex_id resource
 
 %%
 
@@ -46,84 +44,149 @@ line:	profile
 	;
 
 profile: PROF SHADERTYPE {shaderType = $2}
-	
+
 program: PROG IDENTIFIER
 
 semantic
 	: 	SEMT IDENTIFIER
+	|	SEMT IDENTIFIER IDENTIFIER
 	;
 
-link_info: VAR TYPE IDENTIFIER ':' io_type ':' complex_id ':' INTEGER ':' INTEGER {
-		symbol t_symbol;
-
+link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER {
 		t_symbol.name = $3;
 		t_symbol.declareType = $2;
-		t_symbol.offset = 0;
 
+		//Force position to use the first attribute slot
 		if (strcmp($7,"HPOS") == 0) {
 			t_symbol.idx = 0;
-			t_symbol.element = element;
-			//t_program.symbolVSout[t_symbol.name] = t_symbol;
+			t_symbol.element = t_element;
+			t_program.VSoutCnt+= t_element;
+			t_program.srcVSout[t_symbol.name] = t_symbol;
+			t_symbol.Print();
 		}
 		else if (strncmp($7,"ATTR",4) == 0) {
-			t_symbol.idx = (unsigned int)$7[4] - 48;
-			t_symbol.element = element;
-			if (shaderType == 0) {
-				if ($5 == CG_IN)
-					t_program.symbolVSin[t_symbol.name]=t_symbol;
-				else
-					t_program.symbolVSout[t_symbol.name]=t_symbol;
+			t_idx = (unsigned int)$7[4] - 48;
+			t_symbol.element = t_element;
+			if (shaderType == 0) { //Vertex Shader
+				if ($5 == CG_IN) {
+					t_symbol.idx = t_idx;
+					t_program.VSinCnt += t_element;
+					t_program.srcVSin[$3]=t_symbol;
+					t_symbol.Print();
+				}
+				else { //Varying
+					//Cause position has already occupy the attribute slot 0
+					t_symbol.idx = t_idx + 1;
+					t_symbol.element = t_element;
+					t_program.VSoutCnt+= t_element;
+					t_program.srcVSout[t_symbol.name]=t_symbol;
+					t_symbol.Print();
+				}
 			}
-			else {
-				if ($5 == CG_IN)
-					t_program.symbolFSin[t_symbol.name]=t_symbol;
-				else
-					t_program.symbolFSout[t_symbol.name]=t_symbol;
+			else { //Fragment Shader
+				if ($5 == CG_IN) { //Varying
+					//Check whether VS.output and FS.input are matched.
+					if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
+						t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+						printf("%s \n", $3);
+						YYABORT;
+					}
+					else {
+						if (t_program.srcVSout[t_symbol.name].declareType != $2) {
+							t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+							printf("%s \n", $3);
+							YYABORT;
+						}
+						else {
+							//Cause position has already occupy the attribute slot 0
+							t_symbol.idx = t_idx + 1;
+							t_symbol.element = t_element;
+							t_program.FSinCnt+= t_element;
+							t_program.srcFSin[t_symbol.name]=t_symbol;
+							t_symbol.Print();
+						}
+					}
+				}
+				//else: There is no any FS.output belonging to ATTR type
 			}
 		}
 		else if (strncmp($7,"texunit",7) == 0) {
-			t_symbol.idx = idx + MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS;
-			t_symbol.element = element;
-			if (t_program.symbolUniform.find(t_symbol.name) == t_program.symbolUniform.end())
-				t_program.symbolUniform[t_symbol.name] = t_symbol;
-			else {
-				printf("%s \n",$3);
-				exit(1);
+			if (t_program.srcUniform.find(t_symbol.name) == t_program.srcUniform.end()) {
+				t_symbol.idx = t_idx + MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS;
+				t_symbol.element = t_element;
+				///Texture will be added in srcUniform table but not applied in uniform counting.
+				t_program.srcUniform[t_symbol.name] = t_symbol;
+				t_symbol.Print();
+			}
+			else { // VS has already declared this texture
+				if (t_program.srcUniform[t_symbol.name].declareType != $2) {
+					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+					printf("%s \n", $3);
+					YYABORT;
+				}
 			}
 		}
 		//@todo: Need to handle the multi output situation
 		else if (strncmp($7,"COL",3) == 0) {
 			t_symbol.idx = 0;
-			t_symbol.element = element;
-			//t_program.symbolFSout[t_symbol.name] = t_symbol;
+			t_symbol.element = t_element;
+			t_program.FSoutCnt+= t_element;
+			t_program.srcFSout[t_symbol.name] = t_symbol;
+			t_symbol.Print();
 		}
 		else if ($7[0] == 'c') {
-			t_symbol.idx = idx;
-			t_symbol.element = element;
-			if (t_program.symbolUniform.find(t_symbol.name) == t_program.symbolUniform.end()) {
-				int start = t_program.uniformUsage.size();
-				t_symbol.offset = t_program.uniformUsage.size() - idx;
-				for (int i=start; i<start+element; i++)
-					t_program.uniformUsage[i] = t_symbol.name;
-				t_program.symbolUniform[t_symbol.name] = t_symbol;
+			t_symbol.element = t_element;
+			if (t_program.srcUniform.find(t_symbol.name) == t_program.srcUniform.end()) {
+				t_symbol.idx = t_program.uniformCnt;
+				t_program.uniformCnt+= t_element;
+				t_program.srcUniform[t_symbol.name] = t_symbol;
+				t_symbol.Print();
 			}
 			else {
-				if (t_program.symbolUniform[t_symbol.name].declareType != t_symbol.declareType) {
+				if (t_program.srcUniform[t_symbol.name].declareType != t_symbol.declareType) {
 					printf("%s \n",$3);
-					exit(1);
+					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+					YYABORT;
 				}
+				else
+					t_program.srcUniform[t_symbol.name].Print();
+			}
+
+			if (shaderType == 0) {
+				for (int i=0;i<t_element; i++) {
+					t_program.asmVSIdx[i + t_idx].name = t_symbol.name;
+					t_program.asmVSIdx[i + t_idx].idx = t_idx;
+				}
+				t_program.VSuniformCnt+= t_element;
+			}
+			else {
+				for (int i=0;i<t_element; i++) {
+					t_program.asmFSIdx[i + t_idx].name = t_symbol.name;
+					t_program.asmFSIdx[i + t_idx].idx = t_idx;
+				}
+				t_program.FSuniformCnt+= t_element;
 			}
 		}
-
-		t_symbol.print();
+		//else:The variable is useless in current program (maybe)
 	};
 
 complex_id
-	:	IDENTIFIER					{strcpy($$,$1); element = 1;}
-	|	IDENTIFIER '[' INTEGER ']'	{strcpy($$,$1); idx = $3; element = 1;}
-	|	IDENTIFIER '[' INTEGER ']' ',' INTEGER	{strcpy($$,$1); idx = $3; element = $6;}
+	:	IDENTIFIER					{strcpy($$,$1);}
+	|	IDENTIFIER '[' INTEGER ']' {
+			strcpy($$, $1); 
+			strcat($$, "[");
+			sprintf($$, "%s%d", $$, $3);
+			strcat($$,"]");
+		};
+	;
+	
+resource
+	:	/* empty */					{$$[0] = '\0';}
+	|	IDENTIFIER					{strcpy($$,$1); t_element = 1;}
+	|	IDENTIFIER '[' INTEGER ']'	{strcpy($$,$1); t_idx = $3; t_element = 1;}
+	|	IDENTIFIER '[' INTEGER ']' ',' INTEGER	{strcpy($$,$1); t_idx = $3; t_element = $6;}
 	|	',' INTEGER					{$$[0] = '\0';}
-	|	IDENTIFIER INTEGER			{strcpy($$,$1); idx = $2; element = 1;}
+	|	IDENTIFIER INTEGER			{strcpy($$,$1); t_idx = $2; t_element = 1;}
 	;
 
 io_type

@@ -36,7 +36,8 @@ public:
     pixel           pixBuffer[4];
     unsigned char * cBufPtr;
     float *         dBufPtr;
-    char * 			asmSrc;
+	instruction		*instPool;
+	int				instCnt;
     int             pixBufferP;
     bool            attrEnable[MAX_ATTRIBUTE_NUMBER];
     int             posIndx;

@@ -56,16 +56,6 @@ struct viewPort
 
 struct textureState
 {
-    inline textureState() {
-        genMipmap = GL_FALSE;
-        minFilter = GL_NEAREST_MIPMAP_LINEAR;
-        magFilter = GL_LINEAR;
-        wrapS = GL_REPEAT;
-        wrapT = GL_REPEAT;
-        baseLevel = 0;
-        maxLevel = 12;
-    }
-
     GLboolean		genMipmap;
     GLenum      	minFilter;
     GLenum      	magFilter;
@@ -77,33 +67,19 @@ struct textureState
 
     GLuint      	texArrayNum;
 
-    inline textureState& operator=(const textureState &rhs)
-    {
-    	if (this == &rhs)
-            return *this;
-		genMipmap = rhs.genMipmap;
-        minFilter = rhs.minFilter;
-        magFilter = rhs.magFilter;
-        wrapS = rhs.wrapS;
-        wrapT = rhs.wrapT;
-        baseLevel = rhs.baseLevel;
-        maxLevel = rhs.maxLevel;
-        texArrayNum = rhs.texArrayNum;
-		texBindID = rhs.texBindID;
-        return *this;
+    inline textureState() {
+        genMipmap = GL_FALSE;
+        minFilter = GL_NEAREST_MIPMAP_LINEAR;
+        magFilter = GL_LINEAR;
+        wrapS = GL_REPEAT;
+        wrapT = GL_REPEAT;
+        baseLevel = 0;
+        maxLevel = 12;
     }
 };
 
 struct shaderObject
 {
-	inline shaderObject()
-	{
-		isCompiled = GL_FALSE;
-		delFlag = GL_FALSE;
-		count = 0;
-		type = 0;
-	}
-
 	GLboolean isCompiled;
 	GLboolean delFlag;
 	GLsizei count;
@@ -111,80 +87,110 @@ struct shaderObject
 
 	std::string src;
 	std::string asmSrc;
-	std::vector<instruction> asmQueue;
 	std::vector<GLuint> attachList;
 
-	inline shaderObject& operator=(const shaderObject &rhs)
+	inline shaderObject()
 	{
-		if (this == &rhs)
-            return *this;
-		isCompiled = rhs.isCompiled;
-		delFlag = rhs.delFlag;
-		type = rhs.type;
-		count = rhs.count;
-
-		// STL's copy operator is efficient.
-		src = rhs.src;
-		asmSrc = rhs.asmSrc;
-		attachList = rhs.attachList;
-		return *this;
+		isCompiled = GL_FALSE;
+		delFlag = GL_FALSE;
+		count = 0;
+		type = 0;
 	}
 };
 
 struct symbol
 {
+	std::string name;
+	std::string declareType;
+	unsigned char idx;
+	unsigned char element;
+
 	inline symbol()
 	{
 		name.clear();
 		declareType.clear();
 		idx = 0;
 		element = 0;
-		offset = 0;
 	}
 
-	std::string name;
-	std::string declareType;
-	unsigned char idx;
-	unsigned char element;
-	unsigned char offset;
-
-	void print()
+	void Print()
 	{
-		printf("%s %s Idx:%d element:%d offest:%d\n",
+		printf("%s %s Idx:%d element:%d\n",
 				declareType.c_str(),
 				name.c_str(),
 				idx,
-				element,
-				offset );
+				element );
 	}
 };
 
 struct programObject
 {
+	GLuint sid4VS;	///Shader ID for Vertex Shader
+	GLuint sid4FS;	///Shader ID for Fragment Shader
+	GLboolean isLinked;
+	GLboolean delFlag;
+
+	///Resource Statistic
+	int VSinCnt, VSoutCnt, VSuniformCnt;
+	int FSinCnt, FSoutCnt, FSuniformCnt;
+	int uniformCnt;
+
+	std::string	linkInfo;
+
+	///Naming Table <glsl variable name, asm symbol attribute>
+	std::map<std::string, symbol> srcVSin;
+	std::map<std::string, symbol> srcVSout;
+	std::map<std::string, symbol> srcFSin;
+	std::map<std::string, symbol> srcFSout;
+	std::map<std::string, symbol> srcUniform;
+
+	///Index Table <asm uniform index, asm symbol attribute>
+	std::map<int, symbol> asmVSIdx;
+	std::map<int, symbol> asmFSIdx;
+
+	//Building the asm texture's index table is perhaps needed.
+	//std::map<int, symbol> asmVStexIdx;
+	//std::map<int, symbol> asmFStexIdx;
+
+	///Custom Instruction Format pool
+	std::vector<instruction> VSinstructionPool;
+	std::vector<instruction> FSinstructionPool;
+
 	inline programObject()
 	{
 		sid4VS = 0;
 		sid4FS = 0;
 		isLinked = GL_FALSE;
-		linkStatus = 0;
 		delFlag = GL_FALSE;
+		VSinCnt = 0;
+		VSoutCnt = 0;
+		VSuniformCnt = 0;
+		FSinCnt = 0;
+		FSoutCnt = 0;
+		FSuniformCnt = 0;
 	}
 
-	GLuint sid4VS;
-	GLuint sid4FS;
-	GLboolean isLinked;
-	GLuint linkStatus;
-	GLboolean delFlag;
-
-	std::string	linkInfo;
-
-	std::map<std::string, symbol> symbolVSin;
-	std::map<std::string, symbol> symbolVSout;
-	std::map<std::string, symbol> symbolFSin;
-	std::map<std::string, symbol> symbolFSout;
-	std::map<std::string, symbol> symbolUniform;
-
-	std::map<int, std::string> uniformUsage;
+	///Initialize the elements which is related for program linkage
+	void LinkInit()
+	{
+		isLinked = GL_FALSE;
+		VSinCnt = 0;
+		VSoutCnt = 0;
+		VSuniformCnt = 0;
+		FSinCnt = 0;
+		FSoutCnt = 0;
+		FSuniformCnt = 0;
+		linkInfo.clear();
+		srcVSin.clear();
+		srcVSout.clear();
+		srcFSin.clear();
+		srcFSout.clear();
+		srcUniform.clear();
+		asmVSIdx.clear();
+		asmFSIdx.clear();
+		VSinstructionPool.clear();
+		FSinstructionPool.clear();
+	}
 };
 
 class Context
@@ -255,12 +261,23 @@ public:
     attribute       vertexAttrib[8];
     drawCommand     drawCmd;
 
+	///the Program ID called in UseProgram()
     GLuint			usePID;
 
+	/**
+	 *	All created program/shader/texImage objects will push into
+	 *	programPool/shaderPool/texImagePool respectly. And their ID genreated
+	 *	from their created function will also be used as std::map key value.
+	 */
     std::map<GLuint, textureImage> texImagePool;
-
 	std::map<GLuint, programObject> programPool;
     std::map<GLuint, shaderObject> shaderPool;
+
+    /**
+	 *	All specified uniform value will be stored in uniformPool and it's ID
+	 *	queried from getLocation funtion will be used as its std::map key value.
+	 */
+    std::map<GLuint, floatVec4> uniformPool;
 
 private:
 	bool            m_current;

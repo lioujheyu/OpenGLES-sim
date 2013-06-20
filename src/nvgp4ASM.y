@@ -1,8 +1,7 @@
 %{
-#include <string>
-#include <cstdio>
 #include "context_link_def.h"
 #include "context.h"
+#include "GPU/gpu_config.h"
 
 int nvgp4ASM_lex(void);
 void nvgp4ASM_error(char *s);
@@ -12,6 +11,9 @@ instruction t_inst;
 operand t_operand;
 std::vector<operand> operandPool;
 std::vector<instruction> instructionPool;
+
+extern programObject t_program;
+extern unsigned int shaderType;
 %}
 
 %union {
@@ -20,9 +22,9 @@ std::vector<instruction> instructionPool;
 	char	sval[30];
 }
 
-%token TEXTURE VERTEX FRAGMENT RESULT
+%token TEXTURE VERTEX FRAGMENT RESULT PROF
 %token ATTRIB POSITION RESULT_COLOR0
-%token <sval> TYPE
+%token <ival> SHADERTYPE
 %token <sval> IDENTIFIER
 %token <ival> INTEGER
 %token <fval> FLOAT
@@ -51,7 +53,13 @@ input
 	|	/* empty */
 	;
 
-line:	instruction ';' {
+line:	profile
+	|	instruction ';' {
+			if (shaderType == 0)
+				t_program.VSinstructionPool.push_back(t_inst);
+			else
+				t_program.FSinstructionPool.push_back(t_inst);
+				
 			t_inst.init();
 			t_operand.init();
 			operandPool.clear();
@@ -59,6 +67,8 @@ line:	instruction ';' {
 	|	instLabel ':'
 /*	|	namingStatement ';'*/
 	;
+	
+profile: PROF SHADERTYPE {shaderType = $2;}
 
 instruction
 	:	ALUInstruction
@@ -93,16 +103,12 @@ VECTORop_instruction: VECTOROP opModifiers instResult ',' instOperand {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
 		t_inst.src0 = operandPool[1];
-
-		t_inst.print();
 	};
 
 SCALARop_instruction: SCALAROP opModifiers instResult ',' instOperand {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
 		t_inst.src0 = operandPool[1];
-
-		t_inst.print();
 	};
 
 BINSCop_instruction: BINSCOP opModifiers instResult ',' instOperand ',' instOperand {
@@ -110,8 +116,6 @@ BINSCop_instruction: BINSCOP opModifiers instResult ',' instOperand ',' instOper
 		t_inst.dst = operandPool[0];
 		t_inst.src0 = operandPool[1];
 		t_inst.src1 = operandPool[2];
-
-		t_inst.print();
 	};
 
 VECSCAop_instruction: VECSCAOP opModifiers instResult ',' instOperand ',' instOperand {
@@ -119,8 +123,6 @@ VECSCAop_instruction: VECSCAOP opModifiers instResult ',' instOperand ',' instOp
 		t_inst.dst = operandPool[0];
 		t_inst.src0 = operandPool[1];
 		t_inst.src1 = operandPool[2];
-
-		t_inst.print();
 	};
 
 BINop_instruction: BINOP opModifiers instResult ',' instOperand ',' instOperand {
@@ -128,8 +130,6 @@ BINop_instruction: BINOP opModifiers instResult ',' instOperand ',' instOperand 
 		t_inst.dst = operandPool[0];
 		t_inst.src0 = operandPool[1];
 		t_inst.src1 = operandPool[2];
-
-		t_inst.print();
 	};
 
 TRIop_instruction: TRIOP opModifiers instResult ',' instOperand ',' instOperand ',' instOperand {
@@ -138,16 +138,12 @@ TRIop_instruction: TRIOP opModifiers instResult ',' instOperand ',' instOperand 
 		t_inst.src0 = operandPool[1];
 		t_inst.src1 = operandPool[2];
 		t_inst.src2 = operandPool[3];
-
-		t_inst.print();
 	};
 
 SWZop_instruction: SWZOP opModifiers instResult ',' instOperand ',' extendedSwizzle {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
 		t_inst.src0 = operandPool[1];
-
-		t_inst.print();
 	};
 
 TEXop_instruction: TEXOP opModifiers instResult ',' instOperand ',' texAccess {
@@ -155,8 +151,6 @@ TEXop_instruction: TEXOP opModifiers instResult ',' instOperand ',' texAccess {
 		t_inst.dst = operandPool[0];
 		t_inst.src0 = operandPool[1];
 		t_inst.src1 = operandPool[2];
-
-		t_inst.print();
 	};
 
 TXDop_instruction: TXDOP opModifiers instResult ',' instOperand ',' instOperand ',' instOperand ',' texAccess
@@ -204,14 +198,24 @@ instOperandAbs: optSign '|' instOperandBase '|' {t_operand.abs = true;}
 
 instOperandBase
 	:	optSign primitive '.' ATTRIB '[' INTEGER ']' swizzleSuffix {
-			t_operand.id = $6;
+			if (shaderType == 0) // Vertex shader {
+				t_operand.id = $6;
+			else // Fragment shader
+				t_operand.id = $6 + 1;
 			t_operand.type = INST_ATTRIB;
 			strncpy(t_operand.modifier, $8, 5);
 			if ($1[0] == '-')
 				t_operand.inverse = true;
 		};
 	|	optSign 'c' '[' INTEGER ']' swizzleSuffix {
-			t_operand.id = $4;
+			if (shaderType == 0) { // Vertex shader {
+				int id  = $4 - t_program.asmVSIdx[$4].idx;
+				t_operand.id = t_program.srcUniform[t_program.asmVSIdx[$4].name].idx + id;
+			}
+			else {// Fragment shader
+				int id  = $4 - t_program.asmFSIdx[$4].idx;
+				t_operand.id = t_program.srcUniform[t_program.asmFSIdx[$4].name].idx + id;
+			}
 			t_operand.type = INST_UNIFORM;
 			strncpy(t_operand.modifier, $6, 5);
 			if ($1[0] == '-')
@@ -251,11 +255,12 @@ instResultBase
 			strncpy(t_operand.modifier, $2, 5);
 		};
 	|	RESULT '.' POSITION swizzleSuffix {
-			t_operand.type = INST_POSITION;
+			t_operand.id = 0;
+			t_operand.type = INST_ATTRIB;
 			strncpy(t_operand.modifier, $4, 5);
 		};
 	|	RESULT '.' ATTRIB '[' INTEGER ']' swizzleSuffix {
-			t_operand.id = $5;
+			t_operand.id = $5 + 1;
 			t_operand.type = INST_ATTRIB;
 			strncpy(t_operand.modifier, $7, 5);
 		};

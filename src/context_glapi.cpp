@@ -115,6 +115,15 @@ void Context::Disable(GLenum cap)
 
 void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
 {
+    if (usePID == 0) {
+		printf("Current program is invalid.\n");
+		return;
+    }
+    else if (programPool[usePID].isLinked == GL_FALSE) {
+		printf("Current program is invalid.\n");
+		return;
+    }
+
     if (first < 0)
         RecordError(GL_INVALID_VALUE);
     else if (count < 0)
