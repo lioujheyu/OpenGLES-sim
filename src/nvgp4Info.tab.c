@@ -454,8 +454,8 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    36,    36,    37,    40,    41,    42,    43,    46,    48,
-      51,    52,    55,   175,   176,   185,   186,   187,   188,   189,
-     190,   194,   195,   196
+      51,    52,    55,   190,   191,   200,   201,   202,   203,   204,
+     205,   209,   210,   211
 };
 #endif
 
@@ -1452,19 +1452,34 @@ yyreduce:
 			}
 		}
 		else if (strncmp((yyvsp[(7) - (11)].sval),"texunit",7) == 0) {
-			if (t_program.srcUniform.find(t_symbol.name) == t_program.srcUniform.end()) {
-				t_symbol.idx = t_idx + MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS;
+			if (t_program.srcTexture.find(t_symbol.name) == t_program.srcTexture.end()) {
+				t_symbol.idx = t_idx;
 				t_symbol.element = t_element;
-				///Texture will be added in srcUniform table but not applied in uniform counting.
-				t_program.srcUniform[t_symbol.name] = t_symbol;
+				t_program.texCnt+= t_element;
+				t_program.srcTexture[t_symbol.name] = t_symbol;
 				t_symbol.Print();
 			}
 			else { // VS has already declared this texture
-				if (t_program.srcUniform[t_symbol.name].declareType != (yyvsp[(2) - (11)].sval)) {
+				if (t_program.srcTexture[t_symbol.name].declareType != (yyvsp[(2) - (11)].sval)) {
 					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
 					printf("%s \n", (yyvsp[(3) - (11)].sval));
 					YYABORT;
 				}
+			}
+			
+			if (shaderType == 0) {
+				for (int i=0;i<t_element; i++) {
+					t_program.asmVStexIdx[i + t_idx].name = t_symbol.name;
+					t_program.asmVStexIdx[i + t_idx].idx = t_idx;
+				}
+				//t_program.VSuniformCnt+= t_element;
+			}
+			else {
+				for (int i=0;i<t_element; i++) {
+					t_program.asmFStexIdx[i + t_idx].name = t_symbol.name;
+					t_program.asmFStexIdx[i + t_idx].idx = t_idx;
+				}
+				//t_program.FSuniformCnt+= t_element;
 			}
 		}
 		//@todo: Need to handle the multi output situation
@@ -1516,14 +1531,14 @@ yyreduce:
   case 13:
 
 /* Line 1464 of yacc.c  */
-#line 175 "nvgp4Info.y"
+#line 190 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval));;}
     break;
 
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 176 "nvgp4Info.y"
+#line 191 "nvgp4Info.y"
     {
 			strcpy((yyval.sval), (yyvsp[(1) - (4)].sval)); 
 			strcat((yyval.sval), "[");
@@ -1535,70 +1550,70 @@ yyreduce:
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 185 "nvgp4Info.y"
+#line 200 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 186 "nvgp4Info.y"
+#line 201 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval)); t_element = 1;;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 187 "nvgp4Info.y"
+#line 202 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval)); t_idx = (yyvsp[(3) - (4)].ival); t_element = 1;;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 188 "nvgp4Info.y"
+#line 203 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval)); t_idx = (yyvsp[(3) - (6)].ival); t_element = (yyvsp[(6) - (6)].ival);;}
     break;
 
   case 19:
 
 /* Line 1464 of yacc.c  */
-#line 189 "nvgp4Info.y"
+#line 204 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 20:
 
 /* Line 1464 of yacc.c  */
-#line 190 "nvgp4Info.y"
+#line 205 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); t_idx = (yyvsp[(2) - (2)].ival); t_element = 1;;}
     break;
 
   case 21:
 
 /* Line 1464 of yacc.c  */
-#line 194 "nvgp4Info.y"
+#line 209 "nvgp4Info.y"
     {(yyval.ival) = 0;;}
     break;
 
   case 22:
 
 /* Line 1464 of yacc.c  */
-#line 195 "nvgp4Info.y"
+#line 210 "nvgp4Info.y"
     {(yyval.ival) = CG_IN;;}
     break;
 
   case 23:
 
 /* Line 1464 of yacc.c  */
-#line 196 "nvgp4Info.y"
+#line 211 "nvgp4Info.y"
     {(yyval.ival) = CG_OUT;;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 1602 "nvgp4Info.tab.c"
+#line 1617 "nvgp4Info.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1810,7 +1825,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 199 "nvgp4Info.y"
+#line 214 "nvgp4Info.y"
 
 
 

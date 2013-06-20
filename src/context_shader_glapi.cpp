@@ -301,17 +301,22 @@ int Context::GetUniformLocation (GLuint program, const GLchar* name)
 		return -1;
 	}
 
+	if (std::string(name).compare(0,3,"gl_") == 0)
+		return -1;
+
 	programObject t_program = programPool[program];
 
-	if (t_program.srcUniform.find(name) == t_program.srcUniform.end())
-		return -1;
-	else{
-		if (t_program.srcUniform[name].name.compare(0,3,"gl_") == 0)
+	if (t_program.srcUniform.find(name) == t_program.srcUniform.end()) {
+		if (t_program.srcTexture.find(name) == t_program.srcTexture.end())
 			return -1;
-		else {
-			return t_program.srcUniform[name].idx;
+		else{
+			return (t_program.srcTexture[name].idx +
+					MAX_VERTEX_UNIFORM_VECTORS +
+					MAX_FRAGMENT_UNIFORM_VECTORS);
 		}
 	}
+	else
+		return t_program.srcUniform[name].idx;
 }
 
 GLboolean Context::IsProgram(GLuint program)

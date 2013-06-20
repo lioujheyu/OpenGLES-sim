@@ -134,29 +134,43 @@ struct programObject
 	///Resource Statistic
 	int VSinCnt, VSoutCnt, VSuniformCnt;
 	int FSinCnt, FSoutCnt, FSuniformCnt;
-	int uniformCnt;
+	int uniformCnt, texCnt;
 
+	///Linker's error/warning message
 	std::string	linkInfo;
 
-	///Naming Table <glsl variable name, asm symbol attribute>
+/**
+ *	Naming Table <glsl variable name, asm symbol attribute> for location
+ *	retriving by user
+ */
 	std::map<std::string, symbol> srcVSin;
 	std::map<std::string, symbol> srcVSout;
 	std::map<std::string, symbol> srcFSin;
 	std::map<std::string, symbol> srcFSout;
 	std::map<std::string, symbol> srcUniform;
+	std::map<std::string, symbol> srcTexture;
 
-	///Index Table <true uniform index, glsl variable name>
+/**
+ *	Index Table <true uniform index, glsl variable name> for unifrom
+ *	function
+ */
 	std::map<GLint, std::string> uniformUsage;
 
-	///Index Table <asm uniform index, asm symbol attribute>
+/**
+ *	Index Table <asm uniform index, asm symbol attribute> for grammar check
+ *	and resource remapping.
+ */
 	std::map<GLint, symbol> asmVSIdx;
 	std::map<GLint, symbol> asmFSIdx;
 
-	//Building the asm texture's index table is perhaps needed.
-	//std::map<int, symbol> asmVStexIdx;
-	//std::map<int, symbol> asmFStexIdx;
+/**
+ *	Index Table <asm texture index, asm symbol attribute> for grammar check
+ *	and texture resource remapping.
+ */
+	std::map<int, symbol> asmVStexIdx;
+	std::map<int, symbol> asmFStexIdx;
 
-	///Custom Instruction Format pool
+	///Custom Format Instruction pool for hardware shader core simulator
 	std::vector<instruction> VSinstructionPool;
 	std::vector<instruction> FSinstructionPool;
 
@@ -172,6 +186,8 @@ struct programObject
 		FSinCnt = 0;
 		FSoutCnt = 0;
 		FSuniformCnt = 0;
+		uniformCnt = 0;
+		texCnt = 0;
 	}
 
 	///Initialize the elements which is related for program linkage
@@ -184,12 +200,15 @@ struct programObject
 		FSinCnt = 0;
 		FSoutCnt = 0;
 		FSuniformCnt = 0;
+		uniformCnt = 0;
+		texCnt = 0;
 		linkInfo.clear();
 		srcVSin.clear();
 		srcVSout.clear();
 		srcFSin.clear();
 		srcFSout.clear();
 		srcUniform.clear();
+		srcTexture.clear();
 		uniformUsage.clear();
 		asmVSIdx.clear();
 		asmFSIdx.clear();
@@ -288,20 +307,28 @@ public:
 	///the Program ID called in UseProgram()
     GLuint			usePID;
 
-	/**
-	 *	All created program/shader/texImage objects will push into
-	 *	programPool/shaderPool/texImagePool respectly. And their ID genreated
-	 *	from their created function will also be used as std::map key value.
-	 */
+/**
+ *	All created program/shader/texImage objects will push into
+ *	programPool/shaderPool/texImagePool respectly. And their ID genreated
+ *	from their created function will also be used as std::map key value.
+ */
     std::map<GLuint, textureImage> texImagePool;
 	std::map<GLuint, programObject> programPool;
     std::map<GLuint, shaderObject> shaderPool;
 
-    /**
-	 *	All specified uniform value will be stored in uniformPool and it's ID
-	 *	queried from getLocation funtion will be used as its std::map key value.
-	 */
+/**
+ *	All specified uniform value will be stored in uniformPool and it's ID
+ *	queried from getLocation funtion will be used as its std::map key value.
+ */
     std::map<GLint, floatVec4> uniformPool;
+
+/**
+ *	The specified texture context ID will be stored in smaplePool and use
+ *	the uniform sample id as the key value.
+ *	In short, <Sample ID -> texture context ID>
+ *	Sample ID here can been seem as texture unit ID.
+ */
+    std::map<GLint, GLint> samplePool;
 
 private:
 	bool            m_current;

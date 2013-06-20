@@ -112,21 +112,22 @@ void GenMipMap(int tid)
 	ctx->texContext[tid].genMipmap = false;
 }
 
-void ActiveGPU2CleanBuffer()
-{
-	Context * ctx = Context::GetCurrentContext();
-
-	gpu.clearStat = ctx->clearStat;
-	gpu.clearMask = ctx->clearMask;
-	gpu.rm.clearColor = ctx->clearColor;
-    gpu.rm.clearDepth = ctx->clearDepth;
-
-    gpu.Run();
-}
+//void ActiveGPU2CleanBuffer()
+//{
+//	Context * ctx = Context::GetCurrentContext();
+//
+//	gpu.clearStat = ctx->clearStat;
+//	gpu.clearMask = ctx->clearMask;
+//	gpu.rm.clearColor = ctx->clearColor;
+//    gpu.rm.clearDepth = ctx->clearDepth;
+//
+//    gpu.Run();
+//}
 
 void ActiveGPU()
 {
     Context * ctx = Context::GetCurrentContext();
+    programObject *t_program = &ctx->programPool[ctx->usePID];
 
     for (int i=0;i<MAX_TEXTURE_UNIT;i++){
 		if (ctx->texContext[i].genMipmap)
@@ -163,28 +164,24 @@ void ActiveGPU()
     gpu.rm.clearDepth = ctx->clearDepth;
 
     ///Texture Statement
-    for (int i=0;i<MAX_TEXTURE_UNIT;i++){
-		gpu.rm.minFilter[i] = ctx->texContext[i].minFilter;
-		gpu.rm.magFilter[i] = ctx->texContext[i].magFilter;
-		gpu.rm.texImage[i] = ctx->texImagePool[ctx->texContext[i].texBindID];
+    for (int i=0;i<t_program->texCnt;i++){
+		gpu.rm.minFilter[i] = ctx->texContext[ctx->samplePool[i]-1].minFilter;
+		gpu.rm.magFilter[i] = ctx->texContext[ctx->samplePool[i]-1].magFilter;
+		gpu.rm.texImage[i] = ctx->texImagePool[ctx->texContext[ctx->samplePool[i]-1].texBindID];
     }
 
-	if (ctx->usePID != 0) {
-		gpu.gm.instCnt = ctx->programPool[ctx->usePID].VSinstructionPool.size();
-		gpu.gm.instPool = new instruction[gpu.gm.instCnt];
-		for (int i=0; i<gpu.gm.instCnt; i++)
-			*(gpu.gm.instPool + i) = ctx->programPool[ctx->usePID].VSinstructionPool[i];
+	gpu.gm.instCnt = t_program->VSinstructionPool.size();
+	gpu.gm.instPool = new instruction[gpu.gm.instCnt];
+	for (int i=0; i<gpu.gm.instCnt; i++)
+		*(gpu.gm.instPool + i) = t_program->VSinstructionPool[i];
 
-		gpu.rm.instCnt = ctx->programPool[ctx->usePID].FSinstructionPool.size();
-		gpu.rm.instPool = new instruction[gpu.rm.instCnt];
-		for (int i=0; i<gpu.rm.instCnt; i++)
-			*(gpu.rm.instPool + i) = ctx->programPool[ctx->usePID].FSinstructionPool[i];
-	}
+	gpu.rm.instCnt = t_program->FSinstructionPool.size();
+	gpu.rm.instPool = new instruction[gpu.rm.instCnt];
+	for (int i=0; i<gpu.rm.instCnt; i++)
+		*(gpu.rm.instPool + i) = t_program->FSinstructionPool[i];
 
     gpu.Run();
 
-	if (ctx->usePID != 0) {
-		delete [] gpu.gm.instPool;
-		delete [] gpu.rm.instPool;
-	}
+	delete [] gpu.gm.instPool;
+	delete [] gpu.rm.instPool;
 }

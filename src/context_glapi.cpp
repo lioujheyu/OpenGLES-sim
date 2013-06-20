@@ -576,16 +576,21 @@ void Context::Uniform1i(GLint location, GLint x)
 
 	programObject t_program = programPool[usePID];
 
-	if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		location = location - MAX_VERTEX_UNIFORM_VECTORS - MAX_FRAGMENT_UNIFORM_VECTORS;
+		if (location >= t_program.texCnt)
+			RecordError(GL_INVALID_OPERATION);
+		else
+			samplePool[location] = x;
 	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
+	else {
+		if (location >= t_program.uniformCnt)
+			RecordError(GL_INVALID_OPERATION);
+		else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int")
+			RecordError(GL_INVALID_OPERATION);
+		else
+			uniformPool[location].x = (float)x;
 	}
-
-	uniformPool[location].x = (float)x;
 }
 
 void Context::Uniform2i(GLint location, GLint x, GLint y)
@@ -807,21 +812,30 @@ void Context::Uniform1iv(GLint location, GLsizei count, const GLint * value)
 
 	programObject t_program = programPool[usePID];
 
-	if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
 
-	for(int i=0; i<count; i++)
-		uniformPool[location+i].x = (float)*(value + i);
+	if (location >= (MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS)) {
+		location = location - MAX_VERTEX_UNIFORM_VECTORS - MAX_FRAGMENT_UNIFORM_VECTORS;
+		if (location >= t_program.texCnt)
+			RecordError(GL_INVALID_OPERATION);
+		else {
+			for(int i=0; i<count; i++)
+				samplePool[location+i] = *(value + i);
+		}
+	}
+	else {
+		if (location >= t_program.uniformCnt)
+			RecordError(GL_INVALID_OPERATION);
+		else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int")
+			RecordError(GL_INVALID_OPERATION);
+		else {
+			for(int i=0; i<count; i++)
+				uniformPool[location+i].x = (float)*(value + i);
+		}
+	}
 }
 
 void Context::Uniform2iv(GLint location, GLsizei count, const GLint * value)

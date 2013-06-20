@@ -176,6 +176,14 @@ opModifiers
 opModifierItem: '.' OPMODIFIER	{t_inst.opModifiers.push_back($2);}
 
 texAccess: texImageUnit ',' TEXTARGET {
+		if (shaderType == 0) { // Vertex shader {
+			int id  = $3 - t_program.asmVStexIdx[$3].idx;
+			t_operand.id = t_program.srcTexture[t_program.asmVStexIdx[$3].name].idx + id;
+		}
+		else {// Fragment shader
+			int id  = $3 - t_program.asmFStexIdx[$3].idx;
+			t_operand.id = t_program.srcTexture[t_program.asmFStexIdx[$3].name].idx + id;
+		}
 		t_operand.id = $1;
 		t_operand.type = INST_TEXTURE;
 		t_operand.val[0] = $3;

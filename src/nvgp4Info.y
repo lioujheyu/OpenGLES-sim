@@ -111,19 +111,34 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 			}
 		}
 		else if (strncmp($7,"texunit",7) == 0) {
-			if (t_program.srcUniform.find(t_symbol.name) == t_program.srcUniform.end()) {
-				t_symbol.idx = t_idx + MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS;
+			if (t_program.srcTexture.find(t_symbol.name) == t_program.srcTexture.end()) {
+				t_symbol.idx = t_idx;
 				t_symbol.element = t_element;
-				///Texture will be added in srcUniform table but not applied in uniform counting.
-				t_program.srcUniform[t_symbol.name] = t_symbol;
+				t_program.texCnt+= t_element;
+				t_program.srcTexture[t_symbol.name] = t_symbol;
 				t_symbol.Print();
 			}
 			else { // VS has already declared this texture
-				if (t_program.srcUniform[t_symbol.name].declareType != $2) {
+				if (t_program.srcTexture[t_symbol.name].declareType != $2) {
 					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
 					printf("%s \n", $3);
 					YYABORT;
 				}
+			}
+			
+			if (shaderType == 0) {
+				for (int i=0;i<t_element; i++) {
+					t_program.asmVStexIdx[i + t_idx].name = t_symbol.name;
+					t_program.asmVStexIdx[i + t_idx].idx = t_idx;
+				}
+				//t_program.VSuniformCnt+= t_element;
+			}
+			else {
+				for (int i=0;i<t_element; i++) {
+					t_program.asmFStexIdx[i + t_idx].name = t_symbol.name;
+					t_program.asmFStexIdx[i + t_idx].idx = t_idx;
+				}
+				//t_program.FSuniformCnt+= t_element;
 			}
 		}
 		//@todo: Need to handle the multi output situation

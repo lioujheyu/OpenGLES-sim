@@ -72,7 +72,6 @@ void Context::RecordError(GLenum error)
 	}
 }
 
-
 void Context::DumpImage()
 {
 	FILE *CLRfp;
