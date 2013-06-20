@@ -58,8 +58,21 @@ void Context::LinkProgram(GLuint program)
 	nvgp4Info_str_in(FS.asmSrc.c_str());
 	nvgp4Info_parse();
 
+	if (t_program.VSinCnt > MAX_ATTRIBUTE_NUMBER)
+		programPool[program].linkInfo = "L0003: Too many vertex input values";
+	else if (t_program.VSoutCnt > MAX_ATTRIBUTE_NUMBER)
+		programPool[program].linkInfo = "L0004: Too many vertex output values";
+	else if (t_program.VSuniformCnt > MAX_VERTEX_UNIFORM_VECTORS ||
+			 t_program.FSuniformCnt > MAX_FRAGMENT_UNIFORM_VECTORS ||
+			 t_program.texCnt > MAX_TEXTURE_UNIT)
+		programPool[program].linkInfo = "L0005: Too many uniform values";
+
 	if (t_program.linkInfo.size() != 0) {
 		programPool[program].linkInfo = t_program.linkInfo;
+		printf("%s\n", programPool[program].linkInfo.c_str());
+		return;
+	}
+	else if (programPool[program].linkInfo.size() != 0){
 		printf("%s\n", programPool[program].linkInfo.c_str());
 		return;
 	}

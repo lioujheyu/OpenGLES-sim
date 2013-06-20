@@ -87,7 +87,7 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 				if ($5 == CG_IN) { //Varying
 					//Check whether VS.output and FS.input are matched.
 					if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
-						t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+						t_program.linkInfo = "L0007: Fragment shader uses an input where there is no corresponding vertex output";
 						printf("%s \n", $3);
 						YYABORT;
 					}
