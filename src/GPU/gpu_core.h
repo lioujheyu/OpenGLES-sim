@@ -27,7 +27,10 @@ public:
     const void  	*vtxPointer[MAX_ATTRIBUTE_NUMBER];
     int         	attrSize[MAX_ATTRIBUTE_NUMBER];
     bool        	attrEnable[MAX_ATTRIBUTE_NUMBER];
-    int         	posIndx;
+
+    floatVec4		uniformPool[MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS];
+    int				VSinstCnt , FSinstCnt;
+    instruction		*VSinstPool, *FSinstPool;
     unsigned int	clearMask;
     bool			clearStat;
 

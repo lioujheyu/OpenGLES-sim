@@ -1,8 +1,7 @@
 /**
- *  @file GPU Top module
- *
+ *	@file gpu_core.cpp
+ *  @brief GPU Top module
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
- *
  */
 
 #include "gpu_core.h"
@@ -31,8 +30,15 @@ void GPU_Core::Run()
     if (clearStat) {
 		rm.ClearBuffer(clearMask);
 		clearStat = false;
-		//return;
+		return;
 	}
+
+	gm.sCore.instPool = VSinstPool;
+	gm.sCore.instCnt = VSinstCnt;
+	gm.sCore.uniformPool = uniformPool;
+	rm.sCore.instPool = FSinstPool;
+	rm.sCore.instCnt = FSinstCnt;
+	rm.sCore.uniformPool = uniformPool;
 
     ///Each vertex will be injected into Geometry's vtxInput here
     for (int vCnt=0;vCnt<vtxCount;vCnt++) {
@@ -70,7 +76,6 @@ void GPU_Core::Run()
         {
             gm.primitiveReady = false;
 
-            rm.posIndx =gm.posIndx;
             rm.prim = gm.prim;
 
             rm.TriangleSetup();

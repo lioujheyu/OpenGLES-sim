@@ -132,16 +132,16 @@ struct programObject
 	GLboolean delFlag;
 
 	///Resource Statistic
-	int VSinCnt, VSoutCnt, VSuniformCnt;
-	int FSinCnt, FSoutCnt, FSuniformCnt;
-	int uniformCnt, texCnt;
+	int VSinCnt, VSoutCnt, VSuniformCnt, FSinCnt, FSoutCnt, FSuniformCnt,
+		uniformCnt, texCnt;
 
 	///Linker's error/warning message
 	std::string	linkInfo;
 
-/**
- *	Naming Table <glsl variable name, asm symbol attribute> for location
- *	retriving by user
+/** @defgroup Naming Table
+ *	@brief <glsl variable name, asm symbol attribute> for location retriving
+ *	by user
+ *	@{
  */
 	std::map<std::string, symbol> srcVSin;
 	std::map<std::string, symbol> srcVSout;
@@ -149,30 +149,38 @@ struct programObject
 	std::map<std::string, symbol> srcFSout;
 	std::map<std::string, symbol> srcUniform;
 	std::map<std::string, symbol> srcTexture;
+/**	@} */
 
-/**
- *	Index Table <true uniform index, glsl variable name> for unifrom
+/**	@brief Index Table <true uniform index, glsl variable name> for unifrom
  *	function
  */
 	std::map<GLint, std::string> uniformUsage;
 
-/**
- *	Index Table <asm uniform index, asm symbol attribute> for grammar check
- *	and resource remapping.
+/**	@defgroup Index Table
+ *	@brief  <asm uniform index, asm symbol attribute> for grammar check and
+ *	resource remapping.
+ *	@{
  */
 	std::map<GLint, symbol> asmVSIdx;
 	std::map<GLint, symbol> asmFSIdx;
+/**	@} */
 
-/**
- *	Index Table <asm texture index, asm symbol attribute> for grammar check
- *	and texture resource remapping.
+/**	@defgroup Index Table
+ *	@brief <asm texture index, asm symbol attribute> for grammar check and
+ *	texture resource remapping.
+ *	@{
  */
 	std::map<int, symbol> asmVStexIdx;
 	std::map<int, symbol> asmFStexIdx;
+/**	@} */
 
-	///Custom Format Instruction pool for hardware shader core simulator
+/**	@defgroup Vertex/Fragment shader instruction pool
+ *	@brief Custom Format Instruction pool for hardware shader core simulator
+ *	@{
+ */
 	std::vector<instruction> VSinstructionPool;
 	std::vector<instruction> FSinstructionPool;
+/**	@} */
 
 	inline programObject()
 	{
@@ -190,7 +198,7 @@ struct programObject
 		texCnt = 0;
 	}
 
-	///Initialize the elements which is related for program linkage
+	/** @brief Initialize the elements which is related for program linkage */
 	void LinkInit()
 	{
 		isLinked = GL_FALSE;
@@ -288,7 +296,7 @@ public:
     void 		Viewport (GLint x, GLint y, GLsizei width, GLsizei height);
 
 
-/// @fixme (elvis#1#): dirty buffer setting before buffer management is ready
+/// \todo (elvis#1#): dirty buffer setting before buffer management is ready
     void           *drawBuffer[2]; //0 - color buffer, 1 - depth buffer
 
     viewPort        vp;

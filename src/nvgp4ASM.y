@@ -60,8 +60,8 @@ line:	profile
 			else
 				t_program.FSinstructionPool.push_back(t_inst);
 				
-			t_inst.init();
-			t_operand.init();
+			t_inst.Init();
+			t_operand.Init();
 			operandPool.clear();
 		};
 	|	instLabel ':'
@@ -102,62 +102,62 @@ FlowInstruction
 VECTORop_instruction: VECTOROP opModifiers instResult ',' instOperand {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
+		t_inst.src[0] = operandPool[1];
 	};
 
 SCALARop_instruction: SCALAROP opModifiers instResult ',' instOperand {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
+		t_inst.src[0] = operandPool[1];
 	};
 
 BINSCop_instruction: BINSCOP opModifiers instResult ',' instOperand ',' instOperand {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
 	};
 
 VECSCAop_instruction: VECSCAOP opModifiers instResult ',' instOperand ',' instOperand {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
 	};
 
 BINop_instruction: BINOP opModifiers instResult ',' instOperand ',' instOperand {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
 	};
 
 TRIop_instruction: TRIOP opModifiers instResult ',' instOperand ',' instOperand ',' instOperand {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
-		t_inst.src2 = operandPool[3];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
+		t_inst.src[2] = operandPool[3];
 	};
 
 SWZop_instruction: SWZOP opModifiers instResult ',' instOperand ',' extendedSwizzle {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
+		t_inst.src[0] = operandPool[1];
 	};
 
 TEXop_instruction: TEXOP opModifiers instResult ',' instOperand ',' texAccess {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
+		t_inst.src[0] = operandPool[1];
 	};
 
 TXDop_instruction: TXDOP opModifiers instResult ',' instOperand ',' instOperand ',' instOperand ',' texAccess {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
-		t_inst.src2 = operandPool[3];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
+		t_inst.src[2] = operandPool[3];
 	};
 
 BRAop_instruction: BRAOP opModifiers instTarget optBranchCond
@@ -290,23 +290,23 @@ constantVector: '{' constantVectorList '}'
 
 constantVectorList
 	:	constantScalar	{
-			t_operand.val[0] = t_operand.val[1] =
-			t_operand.val[2] = t_operand.val[3] = $1;
+			t_operand.val.x = t_operand.val.y =
+			t_operand.val.z = t_operand.val.w = $1;
 		};
 	|	constantScalar ',' constantScalar {
-			t_operand.val[0] = $1;
-			t_operand.val[1] = t_operand.val[2] = t_operand.val[3] = $3;
+			t_operand.val.x = $1;
+			t_operand.val.y = t_operand.val.z = t_operand.val.w = $3;
 		};
 	|	constantScalar ',' constantScalar ',' constantScalar {
-			t_operand.val[0] = $1;
-			t_operand.val[1] = $3;
-			t_operand.val[2] = t_operand.val[3] = $5;
+			t_operand.val.x = $1;
+			t_operand.val.y = $3;
+			t_operand.val.z = t_operand.val.w = $5;
 		};
 	|	constantScalar ',' constantScalar ',' constantScalar ',' constantScalar {
-			t_operand.val[0] = $1;
-			t_operand.val[1] = $3;
-			t_operand.val[2] = $5;
-			t_operand.val[3] = $7;
+			t_operand.val.x = $1;
+			t_operand.val.y = $3;
+			t_operand.val.z = $5;
+			t_operand.val.w = $7;
 		};
 	;
 

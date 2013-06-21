@@ -1,9 +1,7 @@
 /**
- *  @file OpenGL ES 3.0 API mapping layer
- *
+ *	@file gl3.cpp
+ *  @brief OpenGL API hook level to Context management system
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
- *
- *
  */
 
 #include <GLES3/gl3.h>
@@ -11,6 +9,9 @@
 
 #include "context.h"
 
+/**
+ *	@brief Use current context's OpenGL api which no return value is needed
+ */
 #define CONTEXT_EXEC(func)                                  \
 	Context * context = Context::GetCurrentContext();		\
 	if (context)                                            \
@@ -18,7 +19,9 @@
 		context->func;										\
 	}
 
-
+/**
+ *	@brief Use current context's OpenGL api which has return value
+ */
 #define CONTEXT_EXEC_RETURN(func)                           \
 	Context * context = Context::GetCurrentContext();		\
 	if (context)                                            \

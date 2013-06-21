@@ -1,3 +1,9 @@
+/**
+ *	@file gpu_config.h
+ *  @brief GPU simulator related config and debug setting
+ *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
+ */
+
 #ifndef GPU_CONFIG_H_INCLUDED
 #define GPU_CONFIG_H_INCLUDED
 
@@ -10,6 +16,7 @@
 #define MAX_VERTEX_UNIFORM_VECTORS		128
 #define MAX_FRAGMENT_UNIFORM_VECTORS	16
 #define MAX_TEXTURE_UNIT	    		2
+#define MAX_SHADER_REG_VECTOR			16
 
 
 /******************** Texture debuging and setting ********************/

@@ -1,30 +1,29 @@
-/**********************************************************
-//  The rendering module simulator
-//  Writed by Liou Jhe-Yu
-//  Email: lioujheyu@gmail.com
-**********************************************************/
-#include "rasterizer.h"
+/**
+ *	@file raterizer.cpp
+ *  @brief The rendering module simulator (GPU submodule)
+ *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
+ */
 
-Rasterizer rm;
+#include "rasterizer.h"
 
 void Rasterizer::TriangleSetup()
 {
 	float constantC;
 
-	Edge[0][0] = prim.v[0].attr[posIndx].y - prim.v[1].attr[posIndx].y;
-	Edge[0][1] = prim.v[0].attr[posIndx].x - prim.v[1].attr[posIndx].x;
-	Edge[1][0] = prim.v[1].attr[posIndx].y - prim.v[2].attr[posIndx].y;
-	Edge[1][1] = prim.v[1].attr[posIndx].x - prim.v[2].attr[posIndx].x;
-	Edge[2][0] = prim.v[2].attr[posIndx].y - prim.v[0].attr[posIndx].y;
-	Edge[2][1] = prim.v[2].attr[posIndx].x - prim.v[0].attr[posIndx].x;
+	Edge[0][0] = prim.v[0].attr[0].y - prim.v[1].attr[0].y;
+	Edge[0][1] = prim.v[0].attr[0].x - prim.v[1].attr[0].x;
+	Edge[1][0] = prim.v[1].attr[0].y - prim.v[2].attr[0].y;
+	Edge[1][1] = prim.v[1].attr[0].x - prim.v[2].attr[0].x;
+	Edge[2][0] = prim.v[2].attr[0].y - prim.v[0].attr[0].y;
+	Edge[2][1] = prim.v[2].attr[0].x - prim.v[0].attr[0].x;
 
 	constantC = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
 	area2Reciprocal = 1/constantC;
 
-	LY = MIN3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
-	LX = MIN3(prim.v[0].attr[posIndx].x, prim.v[1].attr[posIndx].x, prim.v[2].attr[posIndx].x);
-	HY = MAX3(prim.v[0].attr[posIndx].y, prim.v[1].attr[posIndx].y, prim.v[2].attr[posIndx].y);
-	RX = MAX3(prim.v[0].attr[posIndx].x, prim.v[1].attr[posIndx].x, prim.v[2].attr[posIndx].x);
+	LY = MIN3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
+	LX = MIN3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
+	HY = MAX3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
+	RX = MAX3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
 }
 
 void Rasterizer::PixelGenerateHiber()
@@ -54,12 +53,12 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 	PIXPRINTF("-------(%d,%d),Level:%d-----\n",x,y,level);
 	TEXPRINTF("XXXX-YYYY-UUUU.UU-VVVV.VV----------------\n");
 
-	centralTest[0] = (x+(1<<level)-prim.v[1].attr[posIndx].x)*Edge[0][0]-
-					 (y+(1<<level)-prim.v[1].attr[posIndx].y)*Edge[0][1];
-	centralTest[1] = (x+(1<<level)-prim.v[2].attr[posIndx].x)*Edge[1][0]-
-					 (y+(1<<level)-prim.v[2].attr[posIndx].y)*Edge[1][1];
-	centralTest[2] = (x+(1<<level)-prim.v[0].attr[posIndx].x)*Edge[2][0]-
-					 (y+(1<<level)-prim.v[0].attr[posIndx].y)*Edge[2][1];
+	centralTest[0] = (x+(1<<level)-prim.v[1].attr[0].x)*Edge[0][0]-
+					 (y+(1<<level)-prim.v[1].attr[0].y)*Edge[0][1];
+	centralTest[1] = (x+(1<<level)-prim.v[2].attr[0].x)*Edge[1][0]-
+					 (y+(1<<level)-prim.v[2].attr[0].y)*Edge[1][1];
+	centralTest[2] = (x+(1<<level)-prim.v[0].attr[0].x)*Edge[2][0]-
+					 (y+(1<<level)-prim.v[0].attr[0].y)*Edge[2][1];
 
 	if (level == 0) {
 		/**
@@ -96,12 +95,12 @@ void Rasterizer::pixelSplit(int x, int y, int level)
 
 		///Interpolate the all 4 pixel's attributes, then perform perspective correction
 		for (int i=0;i<4;i++){
-			pixelStamp[i].attr[0].z = prim.v[0].attr[posIndx].z +
-								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[posIndx].z - prim.v[0].attr[posIndx].z) +
-								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[posIndx].z - prim.v[0].attr[posIndx].z);
-			pixelStamp[i].attr[0].w = prim.v[0].attr[posIndx].w +
-								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[posIndx].w - prim.v[0].attr[posIndx].w) +
-								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[posIndx].w - prim.v[0].attr[posIndx].w);
+			pixelStamp[i].attr[0].z = prim.v[0].attr[0].z +
+								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[0].z - prim.v[0].attr[0].z) +
+								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[0].z - prim.v[0].attr[0].z);
+			pixelStamp[i].attr[0].w = prim.v[0].attr[0].w +
+								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[0].w - prim.v[0].attr[0].w) +
+								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[0].w - prim.v[0].attr[0].w);
 
 			for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
 				if (!attrEnable[attrCnt])
@@ -723,10 +722,11 @@ Rasterizer::Rasterizer()
 	depthTestEnable = false;
 	blendEnable = false;
 
-	posIndx = 0;
 	colIndx = 1;
 	texIndx = 4;
 
 	ClearTexCache();
+
+	sCore.shaderType = 1;
 }
 

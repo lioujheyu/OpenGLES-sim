@@ -7,10 +7,10 @@
 #include <algorithm>
 //#include <thread>
 
-
 #include <GLES3/gl3.h>
 #include "gpu_config.h"
 #include "gpu_type.h"
+#include "shader_core.h"
 
 const int TEX_CACHE_BLOCK_SIZE_ROOT = (int)sqrt(TEX_CACHE_BLOCK_SIZE);
 const int TEX_CACHE_BLOCK_SIZE_ROOT_LOG = (int)log2(TEX_CACHE_BLOCK_SIZE_ROOT);
@@ -40,7 +40,6 @@ public:
 	int				instCnt;
     int             pixBufferP;
     bool            attrEnable[MAX_ATTRIBUTE_NUMBER];
-    int             posIndx;
     int             colIndx;
     int             texIndx;
 
@@ -83,9 +82,7 @@ public:
 
     textureImage texImage[MAX_TEXTURE_UNIT];
 
-    //ShaderCore sCore[1];
+    ShaderCore sCore;
 };
-
-extern Rasterizer rm;
 
 #endif

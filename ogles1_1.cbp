@@ -52,6 +52,8 @@
 		<Unit filename="src/GPU/gpu_type.h" />
 		<Unit filename="src/GPU/rasterizer.cpp" />
 		<Unit filename="src/GPU/rasterizer.h" />
+		<Unit filename="src/GPU/shader_core.cpp" />
+		<Unit filename="src/GPU/shader_core.h" />
 		<Unit filename="src/context.cpp" />
 		<Unit filename="src/context.h" />
 		<Unit filename="src/context_glapi.cpp" />
@@ -83,12 +85,12 @@
 				<search_path add="src" />
 			</debugger>
 			<DoxyBlocks>
-				<comment_style block="0" line="0" />
+				<comment_style block="0" line="2" />
 				<doxyfile_project />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output />
-				<doxyfile_dot />
+				<doxyfile_dot class_diagrams="1" have_dot="1" />
 				<general />
 			</DoxyBlocks>
 		</Extensions>

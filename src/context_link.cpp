@@ -17,9 +17,9 @@ extern std::vector<instruction> instructionPool;
 
 void Context::LinkProgram(GLuint program)
 {
-	shaderObject VS, FS;
-	VS = shaderPool[programPool[program].sid4VS];
-	FS = shaderPool[programPool[program].sid4FS];
+	GLuint VS, FS;
+	VS = programPool[program].sid4VS;
+	FS = programPool[program].sid4FS;
 
 	if (programPool.find(program) == programPool.end()) {
 		RecordError(GL_INVALID_VALUE);
@@ -29,12 +29,13 @@ void Context::LinkProgram(GLuint program)
 	if (programPool[program].isLinked == GL_TRUE)
 		return;
 
-	if ((programPool[program].sid4VS == 0) || (programPool[program].sid4FS == 0)) {
+	if ((VS == 0) || (FS == 0)) {
 		programPool[program].linkInfo = "A vertex shader and a fragment shader are not both present in the program object.";
 		printf("%s\n", programPool[program].linkInfo.c_str());
 		return;
 	}
-	else if ((VS.isCompiled == GL_FALSE) || (FS.isCompiled == GL_FALSE)) {
+	else if ((shaderPool[VS].isCompiled == GL_FALSE) ||
+			 (shaderPool[FS].isCompiled == GL_FALSE)) {
 		programPool[program].linkInfo = "One or more of the attached shader objects has not been successfully compiled or loaded with a pre-compiled shader binary.";
 		printf("%s\n", programPool[program].linkInfo.c_str());
 		return;
@@ -49,13 +50,13 @@ void Context::LinkProgram(GLuint program)
  *	matched.
  */
 	nvgp4Info_lineno = 1;
-	nvgp4Info_str_in(VS.asmSrc.c_str());
+	nvgp4Info_str_in(shaderPool[VS].asmSrc.c_str());
 	nvgp4Info_parse();
 
 	printf("\n");
 
 	nvgp4Info_lineno = 1;
-	nvgp4Info_str_in(FS.asmSrc.c_str());
+	nvgp4Info_str_in(shaderPool[FS].asmSrc.c_str());
 	nvgp4Info_parse();
 
 	if (t_program.VSinCnt > MAX_ATTRIBUTE_NUMBER)
@@ -84,11 +85,11 @@ void Context::LinkProgram(GLuint program)
  	printf("\n");
 
 	nvgp4ASM_lineno = 1;
-	nvgp4ASM_str_in(VS.asmSrc.c_str());
+	nvgp4ASM_str_in(shaderPool[VS].asmSrc.c_str());
 	nvgp4ASM_parse();
 
 	nvgp4ASM_lineno = 1;
-	nvgp4ASM_str_in(FS.asmSrc.c_str());
+	nvgp4ASM_str_in(shaderPool[FS].asmSrc.c_str());
 	nvgp4ASM_parse();
 
 	programPool[program] = t_program;

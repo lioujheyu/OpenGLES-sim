@@ -1578,8 +1578,8 @@ yyreduce:
 			else
 				t_program.FSinstructionPool.push_back(t_inst);
 				
-			t_inst.init();
-			t_operand.init();
+			t_inst.Init();
+			t_operand.Init();
 			operandPool.clear();
 		;}
     break;
@@ -1598,7 +1598,7 @@ yyreduce:
     {
 		t_inst.op = (yyvsp[(1) - (5)].ival);
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
+		t_inst.src[0] = operandPool[1];
 	;}
     break;
 
@@ -1609,7 +1609,7 @@ yyreduce:
     {
 		t_inst.op = (yyvsp[(1) - (5)].ival);
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
+		t_inst.src[0] = operandPool[1];
 	;}
     break;
 
@@ -1620,8 +1620,8 @@ yyreduce:
     {
 		t_inst.op = (yyvsp[(1) - (7)].ival);
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
 	;}
     break;
 
@@ -1632,8 +1632,8 @@ yyreduce:
     {
 		t_inst.op = (yyvsp[(1) - (7)].ival);
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
 	;}
     break;
 
@@ -1644,8 +1644,8 @@ yyreduce:
     {
 		t_inst.op = (yyvsp[(1) - (7)].ival);
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
 	;}
     break;
 
@@ -1656,9 +1656,9 @@ yyreduce:
     {
 		t_inst.op = (yyvsp[(1) - (9)].ival);
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
-		t_inst.src2 = operandPool[3];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
+		t_inst.src[2] = operandPool[3];
 	;}
     break;
 
@@ -1669,7 +1669,7 @@ yyreduce:
     {
 		t_inst.op = (yyvsp[(1) - (7)].ival);
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
+		t_inst.src[0] = operandPool[1];
 	;}
     break;
 
@@ -1680,7 +1680,7 @@ yyreduce:
     {
 		t_inst.op = (yyvsp[(1) - (7)].ival);
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
+		t_inst.src[0] = operandPool[1];
 	;}
     break;
 
@@ -1691,9 +1691,9 @@ yyreduce:
     {
 		t_inst.op = (yyvsp[(1) - (11)].ival);
 		t_inst.dst = operandPool[0];
-		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
-		t_inst.src2 = operandPool[3];
+		t_inst.src[0] = operandPool[1];
+		t_inst.src[1] = operandPool[2];
+		t_inst.src[2] = operandPool[3];
 	;}
     break;
 
@@ -1867,8 +1867,8 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 292 "nvgp4ASM.y"
     {
-			t_operand.val[0] = t_operand.val[1] =
-			t_operand.val[2] = t_operand.val[3] = (yyvsp[(1) - (1)].fval);
+			t_operand.val.x = t_operand.val.y =
+			t_operand.val.z = t_operand.val.w = (yyvsp[(1) - (1)].fval);
 		;}
     break;
 
@@ -1877,8 +1877,8 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 296 "nvgp4ASM.y"
     {
-			t_operand.val[0] = (yyvsp[(1) - (3)].fval);
-			t_operand.val[1] = t_operand.val[2] = t_operand.val[3] = (yyvsp[(3) - (3)].fval);
+			t_operand.val.x = (yyvsp[(1) - (3)].fval);
+			t_operand.val.y = t_operand.val.z = t_operand.val.w = (yyvsp[(3) - (3)].fval);
 		;}
     break;
 
@@ -1887,9 +1887,9 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 300 "nvgp4ASM.y"
     {
-			t_operand.val[0] = (yyvsp[(1) - (5)].fval);
-			t_operand.val[1] = (yyvsp[(3) - (5)].fval);
-			t_operand.val[2] = t_operand.val[3] = (yyvsp[(5) - (5)].fval);
+			t_operand.val.x = (yyvsp[(1) - (5)].fval);
+			t_operand.val.y = (yyvsp[(3) - (5)].fval);
+			t_operand.val.z = t_operand.val.w = (yyvsp[(5) - (5)].fval);
 		;}
     break;
 
@@ -1898,10 +1898,10 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 305 "nvgp4ASM.y"
     {
-			t_operand.val[0] = (yyvsp[(1) - (7)].fval);
-			t_operand.val[1] = (yyvsp[(3) - (7)].fval);
-			t_operand.val[2] = (yyvsp[(5) - (7)].fval);
-			t_operand.val[3] = (yyvsp[(7) - (7)].fval);
+			t_operand.val.x = (yyvsp[(1) - (7)].fval);
+			t_operand.val.y = (yyvsp[(3) - (7)].fval);
+			t_operand.val.z = (yyvsp[(5) - (7)].fval);
+			t_operand.val.w = (yyvsp[(7) - (7)].fval);
 		;}
     break;
 

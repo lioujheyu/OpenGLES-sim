@@ -1,3 +1,8 @@
+/**
+ *	@file type.cpp
+ *  @brief Data structures and functions for common use.
+ *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
+ */
 #ifndef TYPE_H_INCLUDED
 #define TYPE_H_INCLUDED
 
@@ -5,6 +10,9 @@
 #include <vector>
 #include <cstdio>
 
+/**
+ *	@brief
+ */
 union floatVec4
 {
     struct { float x, y, z, w; };
@@ -131,46 +139,52 @@ struct textureImage
 
 struct operand
 {
-	inline operand() { init(); }
+	int id;
+	int type;
+	bool abs;
+	bool inverse;
+	char modifier[5];
+	floatVec4 val;
 
-	void init()
+	inline operand() { Init(); }
+
+	inline void Init()
 	{
 		id = 0;
 		type = 0;
 		abs = false;
 		inverse = false;
 		modifier[0] = '\0';
-		for (int i=0; i<4; i++)
-			val[i] = 0;
+		val.x = val.y = val.z = val.w = 0;
 	}
 
 	void print()
 	{
-		if (type == 0)
-			return;
-		printf(" %d[%d].%s", type, id, modifier);
+		if (type != 0)
+			printf(" %d[%d].%s", type, id, modifier);
 	}
-
-	int id;
-	int type;
-	bool abs;
-	bool inverse;
-	char modifier[5];
-	float val[4];
 };
 
 struct instruction
 {
-	inline instruction() { init(); }
+	int op;
+	std::vector<int> opModifiers;
+	operand dst;
+	operand src[3];
+	int tid, tType;
 
-	void init()
+	inline instruction() { Init(); }
+
+	inline void Init()
 	{
 		op = 0;
+		tid = -1;
+		tType = 0;
 		opModifiers.clear();
-		dst.init();
-		src0.init();
-		src1.init();
-		src2.init();
+		dst.Init();
+		src[0].Init();
+		src[1].Init();
+		src[2].Init();
 	}
 
 	void Print()
@@ -179,17 +193,13 @@ struct instruction
 		for (unsigned int i=0; i<opModifiers.size(); i++)
 			printf(".%d",opModifiers[i]);
 		dst.print();
-		src0.print();
-		src1.print();
-		src2.print();
+		src[0].print();
+		src[1].print();
+		src[2].print();
+		if (tid != -1)
+			printf(" Tex%d.%d", tid, tType);
 		printf("\n");
 	}
-
-	int op;
-	std::vector<int> opModifiers;
-
-	operand dst;
-	operand src0, src1, src2;
 };
 
 

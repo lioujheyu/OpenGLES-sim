@@ -21,11 +21,9 @@
 #define INST_NO_TYPE				0
 #define INST_ATTRIB					1
 #define INST_UNIFORM				2
-#define INST_POSITION				3
-#define INST_COLOR					4
-#define INST_TEXTURE				5
-#define INST_REG					6
-#define INST_CONSTANT				7
+#define INST_COLOR					3
+#define INST_REG					4
+#define INST_CONSTANT				5
 
 ///Instruction OP code
 #define OP_ABS		0x1
