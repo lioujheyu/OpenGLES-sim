@@ -161,7 +161,7 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 			else {
 				if (t_program.srcUniform[t_symbol.name].declareType != t_symbol.declareType) {
 					printf("%s \n",$3);
-					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+					t_program.linkInfo = "L0001: Global variables must have the same type (including the same names for structure and field names and the same size for arrays) and precision.";
 					YYABORT;
 				}
 				else

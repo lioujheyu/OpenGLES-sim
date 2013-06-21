@@ -150,10 +150,15 @@ TEXop_instruction: TEXOP opModifiers instResult ',' instOperand ',' texAccess {
 		t_inst.op = $1;
 		t_inst.dst = operandPool[0];
 		t_inst.src0 = operandPool[1];
-		t_inst.src1 = operandPool[2];
 	};
 
-TXDop_instruction: TXDOP opModifiers instResult ',' instOperand ',' instOperand ',' instOperand ',' texAccess
+TXDop_instruction: TXDOP opModifiers instResult ',' instOperand ',' instOperand ',' instOperand ',' texAccess {
+		t_inst.op = $1;
+		t_inst.dst = operandPool[0];
+		t_inst.src0 = operandPool[1];
+		t_inst.src1 = operandPool[2];
+		t_inst.src2 = operandPool[3];
+	};
 
 BRAop_instruction: BRAOP opModifiers instTarget optBranchCond
 
@@ -177,17 +182,15 @@ opModifierItem: '.' OPMODIFIER	{t_inst.opModifiers.push_back($2);}
 
 texAccess: texImageUnit ',' TEXTARGET {
 		if (shaderType == 0) { // Vertex shader {
-			int id  = $3 - t_program.asmVStexIdx[$3].idx;
-			t_operand.id = t_program.srcTexture[t_program.asmVStexIdx[$3].name].idx + id;
+			//Use idx to record the array element if target is array type.
+			int idx  = $1 - t_program.asmVStexIdx[$1].idx;
+			t_inst.tid = t_program.srcTexture[t_program.asmVStexIdx[$1].name].idx + idx;
 		}
 		else {// Fragment shader
-			int id  = $3 - t_program.asmFStexIdx[$3].idx;
-			t_operand.id = t_program.srcTexture[t_program.asmFStexIdx[$3].name].idx + id;
+			int idx  = $1 - t_program.asmFStexIdx[$1].idx;
+			t_inst.tid = t_program.srcTexture[t_program.asmFStexIdx[$1].name].idx + idx;
 		}
-		t_operand.id = $1;
-		t_operand.type = INST_TEXTURE;
-		t_operand.val[0] = $3;
-		operandPool.push_back(t_operand);
+		t_inst.tType = $3;
 	};
 
 texImageUnit: TEXTURE '[' INTEGER ']' {$$ = $3;}
@@ -217,12 +220,13 @@ instOperandBase
 		};
 	|	optSign 'c' '[' INTEGER ']' swizzleSuffix {
 			if (shaderType == 0) { // Vertex shader {
-				int id  = $4 - t_program.asmVSIdx[$4].idx;
-				t_operand.id = t_program.srcUniform[t_program.asmVSIdx[$4].name].idx + id;
+				//Use idx to record the array element if target is array type.
+				int idx  = $4 - t_program.asmVSIdx[$4].idx;
+				t_operand.id = t_program.srcUniform[t_program.asmVSIdx[$4].name].idx + idx;
 			}
 			else {// Fragment shader
-				int id  = $4 - t_program.asmFSIdx[$4].idx;
-				t_operand.id = t_program.srcUniform[t_program.asmFSIdx[$4].name].idx + id;
+				int idx  = $4 - t_program.asmFSIdx[$4].idx;
+				t_operand.id = t_program.srcUniform[t_program.asmFSIdx[$4].name].idx + idx;
 			}
 			t_operand.type = INST_UNIFORM;
 			strncpy(t_operand.modifier, $6, 5);

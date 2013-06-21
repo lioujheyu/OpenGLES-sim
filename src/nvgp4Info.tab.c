@@ -1428,7 +1428,7 @@ yyreduce:
 				if ((yyvsp[(5) - (11)].ival) == CG_IN) { //Varying
 					//Check whether VS.output and FS.input are matched.
 					if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
-						t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+						t_program.linkInfo = "L0007: Fragment shader uses an input where there is no corresponding vertex output";
 						printf("%s \n", (yyvsp[(3) - (11)].sval));
 						YYABORT;
 					}
@@ -1502,7 +1502,7 @@ yyreduce:
 			else {
 				if (t_program.srcUniform[t_symbol.name].declareType != t_symbol.declareType) {
 					printf("%s \n",(yyvsp[(3) - (11)].sval));
-					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+					t_program.linkInfo = "L0001: Global variables must have the same type (including the same names for structure and field names and the same size for arrays) and precision.";
 					YYABORT;
 				}
 				else
