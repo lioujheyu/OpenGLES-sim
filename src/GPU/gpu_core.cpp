@@ -23,7 +23,6 @@ void GPU_Core::Run()
 	rm.TEXELINFOfp = fopen(TEXEL_INFO_FILE,"w");
 #endif // TEXEL_INFO_FILE
 
-    gm.Initialize();
     rm.ClearTexCache();
 
     ///clear frame buffer if needed
@@ -33,50 +32,52 @@ void GPU_Core::Run()
 		return;
 	}
 
-	gm.sCore.instPool = VSinstPool;
-	gm.sCore.instCnt = VSinstCnt;
-	gm.sCore.uniformPool = uniformPool;
+	sCore[0].instPool = VSinstPool;
+	sCore[0].instCnt = VSinstCnt;
+	sCore[0].uniformPool = uniformPool;
+	sCore[0].shaderType= 0;
 	rm.sCore.instPool = FSinstPool;
 	rm.sCore.instCnt = FSinstCnt;
 	rm.sCore.uniformPool = uniformPool;
+
+	InitPrimitiveAssembly();
 
     ///Each vertex will be injected into Geometry's vtxInput here
     for (int vCnt=0;vCnt<vtxCount;vCnt++) {
 
         for (int attrCnt=0;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++) {
             if (attrEnable[attrCnt]) {
-                gm.attrEnable[attrCnt] = true;
                 rm.attrEnable[attrCnt] = true;
-                gm.vtxInput.attr[attrCnt].x =
+                vtxInput.attr[attrCnt].x =
                     *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt );
-                gm.vtxInput.attr[attrCnt].y =
+                vtxInput.attr[attrCnt].y =
                     *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 1 );
                 if (attrSize[attrCnt] > 2)
-                    gm.vtxInput.attr[attrCnt].z =
+                    vtxInput.attr[attrCnt].z =
                         *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 2 );
                 else
-                    gm.vtxInput.attr[attrCnt].z = 0.0;
+                    vtxInput.attr[attrCnt].z = 0.0;
 
                 if (attrSize[attrCnt] > 3)
-                    gm.vtxInput.attr[attrCnt].w =
+                    vtxInput.attr[attrCnt].w =
                         *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 3 );
                 else
-                    gm.vtxInput.attr[attrCnt].w = 1.0;
+                    vtxInput.attr[attrCnt].w = 1.0;
             }
         }
 
 		///Vertex-based operation starts here
-        gm.ShaderEXE();
-        gm.PerspectiveCorrection();
-        gm.ViewPort();
-        gm.PrimitiveAssembly();
+        VertexShaderEXE(0);
+        PerspectiveCorrection();
+        ViewPort();
+        PrimitiveAssembly();
 
         ///Primitive-based operation starts here
-        if (gm.primitiveReady)
+        if (primitiveReady)
         {
-            gm.primitiveReady = false;
+            primitiveReady = false;
 
-            rm.prim = gm.prim;
+            rm.prim = prim;
 
             rm.TriangleSetup();
 

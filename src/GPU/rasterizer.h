@@ -31,8 +31,7 @@ public:
 
     float           Edge[3][3];
     float           area2Reciprocal;
-    int             LX, RX;
-    int             LY, HY;
+    int             LX, RX, LY, HY; ///< Boundary Box
     pixel           pixBuffer[4];
     unsigned char * cBufPtr;
     float *         dBufPtr;
@@ -40,7 +39,6 @@ public:
 	int				instCnt;
     int             pixBufferP;
     bool            attrEnable[MAX_ATTRIBUTE_NUMBER];
-    int             colIndx;
     int             texIndx;
 
     int             viewPortW, viewPortH;

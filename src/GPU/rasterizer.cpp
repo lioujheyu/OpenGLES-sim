@@ -602,9 +602,9 @@ pixel Rasterizer::ShaderEXE(pixel pixInput)
 	fixColor4 texColor0 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 0);
 	fixColor4 texColor1 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 1);
 
-//	pixInput.attr[colIndx].r = texColor0.r;
-//	pixInput.attr[colIndx].g = texColor0.g;
-//	pixInput.attr[colIndx].b = texColor0.b;
+//	pixInput.attr[1].r = texColor0.r;
+//	pixInput.attr[1].g = texColor0.g;
+//	pixInput.attr[1].b = texColor0.b;
 
 	temp.r = ((float)texColor1.r / 255)*2 - 1;
 	temp.g = ((float)texColor1.g / 255)*2 - 1;
@@ -612,13 +612,13 @@ pixel Rasterizer::ShaderEXE(pixel pixInput)
 
 	dotresult = eyevector[0]*temp.r + eyevector[1]*temp.g + eyevector[2]*temp.b;
 
-	pixInput.attr[colIndx].r = texColor0.r * dotresult;
-	pixInput.attr[colIndx].g = texColor0.g * dotresult;
-	pixInput.attr[colIndx].b = texColor0.b * dotresult;
+	pixInput.attr[1].r = texColor0.r * dotresult;
+	pixInput.attr[1].g = texColor0.g * dotresult;
+	pixInput.attr[1].b = texColor0.b * dotresult;
 
-//	pixInput.attr[colIndx].r = texColor0.r + texColor1.r;
-//	pixInput.attr[colIndx].g = texColor0.g + texColor1.g;
-//	pixInput.attr[colIndx].b = texColor0.b + texColor1.b;
+//	pixInput.attr[1].r = texColor0.r + texColor1.r;
+//	pixInput.attr[1].g = texColor0.g + texColor1.g;
+//	pixInput.attr[1].b = texColor0.b + texColor1.b;
 
 	return pixInput;
 }
@@ -661,10 +661,10 @@ void Rasterizer::PerFragmentOp(pixel pixInput)
     }
 
     ///Color buffer write back
-    *(cBufPtr + bufOffset*4 + 0) = (unsigned char)pixInput.attr[colIndx].r;// R
-    *(cBufPtr + bufOffset*4 + 1) = (unsigned char)pixInput.attr[colIndx].g;// G
-    *(cBufPtr + bufOffset*4 + 2) = (unsigned char)pixInput.attr[colIndx].b;// B
-    *(cBufPtr + bufOffset*4 + 3) = (unsigned char)pixInput.attr[colIndx].a;// A
+    *(cBufPtr + bufOffset*4 + 0) = (unsigned char)pixInput.attr[1].r;// R
+    *(cBufPtr + bufOffset*4 + 1) = (unsigned char)pixInput.attr[1].g;// G
+    *(cBufPtr + bufOffset*4 + 2) = (unsigned char)pixInput.attr[1].b;// B
+    *(cBufPtr + bufOffset*4 + 3) = (unsigned char)pixInput.attr[1].a;// A
 }
 
 void Rasterizer::ClearBuffer(unsigned int mask)
@@ -722,7 +722,6 @@ Rasterizer::Rasterizer()
 	depthTestEnable = false;
 	blendEnable = false;
 
-	colIndx = 1;
 	texIndx = 4;
 
 	ClearTexCache();

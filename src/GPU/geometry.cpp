@@ -1,20 +1,12 @@
 /**
  *	@file geometry.cpp
- *  @brief The Geometry module simulator (GPU submodule)
+ *  @brief The Geometry related GPU function module simulator (GPU submodule)
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
-#include "geometry.h"
+#include "gpu_core.h"
 
-Geometry::Geometry()
-{
-    depthRangeN = 0.0;
-    depthRangeF = 1.0;
-    drawMode = GL_TRIANGLES;
-	sCore.shaderType = 0;
-}
-
-void Geometry::InitVCD()
+void GPU_Core::InitVCD()
 {
     switch (drawMode) {
     case GL_TRIANGLES:
@@ -32,7 +24,7 @@ void Geometry::InitVCD()
     }
 }
 
-void Geometry::Initialize()
+void GPU_Core::InitPrimitiveAssembly()
 {
     primitiveReady = false;
     fanCnt = false;
@@ -42,14 +34,14 @@ void Geometry::Initialize()
 
 /****** Grahphic Related Function ******/
 
-void Geometry::ShaderEXE()
+void GPU_Core::VertexShaderEXE(int sid)
 {
-	sCore.Init();
-	sCore.input = &vtxInput;
-	sCore.Exec();
+	sCore[sid].Init();
+	sCore[sid].input = &vtxInput;
+	sCore[sid].Exec();
 }
 
-void Geometry::PerspectiveCorrection()
+void GPU_Core::PerspectiveCorrection()
 {
 	float w = vtxInput.attr[0].w;
 	vtxInput.attr[0].w = (float)1/w;
@@ -65,7 +57,7 @@ void Geometry::PerspectiveCorrection()
 	}
 }
 
-void Geometry::ViewPort()
+void GPU_Core::ViewPort()
 {
     float x,y,z,w;
 
@@ -83,7 +75,7 @@ void Geometry::ViewPort()
 }
 
 /// @todo (elvis#1#): the vertex order has been compromised.
-void Geometry::PrimitiveAssembly()
+void GPU_Core::PrimitiveAssembly()
 {
     switch (drawMode) {
     case GL_TRIANGLES:

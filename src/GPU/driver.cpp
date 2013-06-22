@@ -162,20 +162,20 @@ void ActiveGPU()
 	gpu.clearStat = ctx->clearStat;
 	gpu.clearMask = ctx->clearMask;
 
-	gpu.gm.drawMode = ctx->drawCmd.mode;
-	gpu.gm.viewPortLX = ctx->vp.x;
-    gpu.gm.viewPortLY = ctx->vp.y;
-    gpu.rm.viewPortW = gpu.gm.viewPortW = ctx->vp.w;
-    gpu.rm.viewPortH = gpu.gm.viewPortH = ctx->vp.h;
-    gpu.gm.depthRangeN = ctx->vp.n;
-    gpu.gm.depthRangeF = ctx->vp.f;
+	gpu.drawMode = ctx->drawCmd.mode;
+	gpu.viewPortLX = ctx->vp.x;
+    gpu.viewPortLY = ctx->vp.y;
+    gpu.rm.viewPortW = gpu.viewPortW = ctx->vp.w;
+    gpu.rm.viewPortH = gpu.viewPortH = ctx->vp.h;
+    gpu.depthRangeN = ctx->vp.n;
+    gpu.depthRangeF = ctx->vp.f;
 
     gpu.rm.blendEnable = ctx->blendEnable;
     gpu.rm.depthTestEnable = ctx->depthTestEnable;
     gpu.rm.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
     gpu.rm.dBufPtr = (float*)ctx->drawBuffer[1];
-    gpu.rm.clearColor = ctx->clearColor;
-    gpu.rm.clearDepth = ctx->clearDepth;
+    //gpu.rm.clearColor = ctx->clearColor;
+    //gpu.rm.clearDepth = ctx->clearDepth;
 
     ///Texture Statement
     for (int i=0; i<t_program->texCnt; i++){
@@ -187,6 +187,9 @@ void ActiveGPU()
     for (int i=0; i<t_program->uniformCnt; i++)
 		gpu.uniformPool[i] = ctx->uniformPool[i];
 
+	/*	Unsure shall we copy whole instruction into gpu or just use pointer get
+	 *	instruction from outside
+	 */
 	gpu.VSinstCnt = t_program->VSinstructionPool.size();
 	gpu.VSinstPool = new instruction[gpu.VSinstCnt];
 	for (int i=0; i<gpu.VSinstCnt; i++)

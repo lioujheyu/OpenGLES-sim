@@ -137,9 +137,26 @@ void ShaderCore::Exec()
 			break;
 		case OP_X2D:
 			break;
+		//TEXop
+		case OP_TEX:
+			break;
+		case OP_TXB:
+			break;
+		case OP_TXF:
+			break;
+		case OP_TXL:
+			break;
+		case OP_TXP:
+			break;
+		case OP_TXQ:
+			break;
+		//TXDop
+		case OP_TXD:
+			break;
+
 
 		default:
-			printf("Shader: Unsurpooted OPcode: %x\n",curInst.op);
+			printf("Shader: Undefined OPcode: %x\n",curInst.op);
 			break;
 
 		}

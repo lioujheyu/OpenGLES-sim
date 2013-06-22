@@ -20,7 +20,7 @@ struct vertex {
 
 /**
  *	@brief Pixel data structure
- *	Addition to attribute value, this pixel structure also contain the x-axis
+ *	Inaddition to attribute value, this pixel structure also contain the x-axis
  *	and y-axis scale factors for each attribute. The pixel's special barycentric
  *	coordinate is also stored here.
  */
