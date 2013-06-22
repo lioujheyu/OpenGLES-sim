@@ -11,7 +11,8 @@
 #include <cstdio>
 
 /**
- *	@brief
+ *	@brief floating vector with 4 component
+ *	And its component-wised add, multiply operator overload
  */
 union floatVec4
 {

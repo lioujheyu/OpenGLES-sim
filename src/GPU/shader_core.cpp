@@ -1,5 +1,4 @@
 #include "shader_core.h"
-#include "../context_link_def.h"
 
 ShaderCore::ShaderCore()
 {
@@ -292,7 +291,7 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 		case 'a':
 			fvdst->w = val.w;
 			break;
-		default: //'\0'
+		default: // '\0'
 			goto endLabel;
 		}
 	}

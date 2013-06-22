@@ -29,6 +29,9 @@ public:
 
     primitive   	prim;
 
+	/**
+	 *	@brief Edge equation's coinfficient
+	 */
     float           Edge[3][3];
     float           area2Reciprocal;
     int             LX, RX, LY, HY; ///< Boundary Box
@@ -43,7 +46,7 @@ public:
 
     int             viewPortW, viewPortH;
     bool            blendEnable, depthTestEnable;
-    int             minFilter[MAX_TEXTURE_UNIT], magFilter[MAX_TEXTURE_UNIT];  //Texture filtering mode
+    int             minFilter[MAX_TEXTURE_UNIT], magFilter[MAX_TEXTURE_UNIT]; ///<Texture filtering mode
     int             wrapS[MAX_TEXTURE_UNIT],wrapT[MAX_TEXTURE_UNIT];
     int             AlphaTestMode,DepthTestMode;
     int             AlphaBlendingMode;

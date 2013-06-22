@@ -1,5 +1,4 @@
 #include "context.h"
-#include "context_link_def.h"
 
 /*******************************************************
 
@@ -133,7 +132,7 @@ void Context::CompileShader(GLuint shader)
 		shaderPool[shader].asmSrc = (buffer.str());
 		shaderPool[shader].isCompiled = GL_TRUE;
 	}
-	else { /// Compile error or something wrong is happened
+	else { /// Compiler error or something wrong is happened
 
 	}
 }
@@ -381,6 +380,7 @@ void Context::UseProgram(GLuint program)
 
 void Context::ValidateProgram(GLuint program)
 {
+	/// @todo ValidateProgram is unfinished
 	if (programPool.find(program) == programPool.end()) {
 		RecordError(GL_INVALID_VALUE);
 		return;

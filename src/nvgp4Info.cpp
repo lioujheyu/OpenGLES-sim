@@ -620,13 +620,14 @@ char *nvgp4Info_text;
 #line 1 "nvgp4Info.l"
 #line 10 "nvgp4Info.l"
 #include "nvgp4Info.tab.h"
-#include "context.h"
-#include "context_link_def.h"
+
+#include "GPU/instruction_def.h"
+#include "GPU/gpu_config.h"
 
 #define COL_NO nvgp4Info_col+=strlen(nvgp4Info_text)
 
 unsigned int nvgp4Info_col = 0;
-#line 630 "nvgp4Info.cpp"
+#line 631 "nvgp4Info.cpp"
 
 #define INITIAL 0
 
@@ -816,10 +817,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 19 "nvgp4Info.l"
+#line 20 "nvgp4Info.l"
 
 
-#line 823 "nvgp4Info.cpp"
+#line 824 "nvgp4Info.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -919,12 +920,12 @@ case 1:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4Info_text again */
 YY_RULE_SETUP
-#line 21 "nvgp4Info.l"
+#line 22 "nvgp4Info.l"
 /* Non-# or ! begin sentence, means real instruction */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 22 "nvgp4Info.l"
+#line 23 "nvgp4Info.l"
 /* Compiler's name */
 	YY_BREAK
 case 3:
@@ -932,7 +933,7 @@ case 3:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4Info_text again */
 YY_RULE_SETUP
-#line 23 "nvgp4Info.l"
+#line 24 "nvgp4Info.l"
 /* Comment */
 	YY_BREAK
 case 4:
@@ -940,7 +941,7 @@ case 4:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4Info_text again */
 YY_RULE_SETUP
-#line 24 "nvgp4Info.l"
+#line 25 "nvgp4Info.l"
 
 	YY_BREAK
 case 5:
@@ -948,42 +949,42 @@ case 5:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4Info_text again */
 YY_RULE_SETUP
-#line 25 "nvgp4Info.l"
+#line 26 "nvgp4Info.l"
 
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 27 "nvgp4Info.l"
+#line 28 "nvgp4Info.l"
 COL_NO; return PROF;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 28 "nvgp4Info.l"
+#line 29 "nvgp4Info.l"
 COL_NO; return PROG;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 29 "nvgp4Info.l"
+#line 30 "nvgp4Info.l"
 COL_NO; return SEMT;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 30 "nvgp4Info.l"
+#line 31 "nvgp4Info.l"
 COL_NO; return VAR;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 31 "nvgp4Info.l"
+#line 32 "nvgp4Info.l"
 COL_NO; nvgp4Info_lval.ival=0; return SHADERTYPE;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 32 "nvgp4Info.l"
+#line 33 "nvgp4Info.l"
 COL_NO; nvgp4Info_lval.ival=1; return SHADERTYPE;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 34 "nvgp4Info.l"
+#line 35 "nvgp4Info.l"
 { COL_NO;
 		strcpy(nvgp4Info_lval.sval,nvgp4Info_text);
 		return TYPE;
@@ -991,7 +992,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 38 "nvgp4Info.l"
+#line 39 "nvgp4Info.l"
 { COL_NO;
 		strcpy(nvgp4Info_lval.sval,nvgp4Info_text);
 		return TYPE;
@@ -999,7 +1000,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 42 "nvgp4Info.l"
+#line 43 "nvgp4Info.l"
 { COL_NO;
 		strcpy(nvgp4Info_lval.sval,nvgp4Info_text);
 		return TYPE;
@@ -1007,17 +1008,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 46 "nvgp4Info.l"
+#line 47 "nvgp4Info.l"
 COL_NO;	return VIN;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 47 "nvgp4Info.l"
+#line 48 "nvgp4Info.l"
 COL_NO;	return VOUT;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 50 "nvgp4Info.l"
+#line 51 "nvgp4Info.l"
 { COL_NO;
 		strcpy(nvgp4Info_lval.sval,nvgp4Info_text);
 		return IDENTIFIER;
@@ -1025,7 +1026,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 54 "nvgp4Info.l"
+#line 55 "nvgp4Info.l"
 { COL_NO;
 		nvgp4Info_lval.ival = atoi(nvgp4Info_text);
 		return INTEGER;
@@ -1033,7 +1034,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 58 "nvgp4Info.l"
+#line 59 "nvgp4Info.l"
 { COL_NO;
 		nvgp4Info_lval.ival = atof(nvgp4Info_text);
 		return FLOAT;
@@ -1041,26 +1042,26 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 62 "nvgp4Info.l"
+#line 63 "nvgp4Info.l"
 COL_NO; return *nvgp4Info_text;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 64 "nvgp4Info.l"
+#line 65 "nvgp4Info.l"
 COL_NO;		/* remove all space-related char */
 	YY_BREAK
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 65 "nvgp4Info.l"
+#line 66 "nvgp4Info.l"
 nvgp4Info_col = 0;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 66 "nvgp4Info.l"
+#line 67 "nvgp4Info.l"
 ECHO;
 	YY_BREAK
-#line 1064 "nvgp4Info.cpp"
+#line 1065 "nvgp4Info.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2068,7 +2069,7 @@ void nvgp4Info_free (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 66 "nvgp4Info.l"
+#line 67 "nvgp4Info.l"
 
 
 

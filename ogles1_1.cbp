@@ -45,11 +45,11 @@
 		<Unit filename="src/GPU/driver.cpp" />
 		<Unit filename="src/GPU/driver.h" />
 		<Unit filename="src/GPU/geometry.cpp" />
-		<Unit filename="src/GPU/geometry.h" />
 		<Unit filename="src/GPU/gpu_config.h" />
 		<Unit filename="src/GPU/gpu_core.cpp" />
 		<Unit filename="src/GPU/gpu_core.h" />
 		<Unit filename="src/GPU/gpu_type.h" />
+		<Unit filename="src/GPU/instruction_def.h" />
 		<Unit filename="src/GPU/rasterizer.cpp" />
 		<Unit filename="src/GPU/rasterizer.h" />
 		<Unit filename="src/GPU/shader_core.cpp" />
@@ -58,7 +58,6 @@
 		<Unit filename="src/context.h" />
 		<Unit filename="src/context_glapi.cpp" />
 		<Unit filename="src/context_link.cpp" />
-		<Unit filename="src/context_link_def.h" />
 		<Unit filename="src/context_shader_glapi.cpp" />
 		<Unit filename="src/gl3.cpp" />
 		<Unit filename="src/nvgp4ASM.cpp" />

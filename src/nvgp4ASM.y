@@ -1,6 +1,7 @@
 %{
-#include "context_link_def.h"
 #include "context.h"
+
+#include "GPU/instruction_def.h"
 #include "GPU/gpu_config.h"
 
 int nvgp4ASM_lex(void);

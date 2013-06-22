@@ -8,8 +8,8 @@ L	[a-zA-Z_]
 
 %{
 #include "nvgp4ASM.tab.h"
-#include "context.h"
-#include "context_link_def.h"
+#include "GPU/instruction_def.h"
+#include "GPU/gpu_config.h"
 
 #define COL_NO nvgp4ASM_col+=strlen(yytext)
 

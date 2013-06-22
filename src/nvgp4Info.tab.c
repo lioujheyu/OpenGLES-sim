@@ -77,8 +77,9 @@
 /* Line 189 of yacc.c  */
 #line 1 "nvgp4Info.y"
 
-#include "context_link_def.h"
 #include "context.h"
+
+#include "GPU/instruction_def.h"
 #include "GPU/gpu_config.h"
 
 int nvgp4Info_lex(void);
@@ -93,7 +94,7 @@ symbol t_symbol;
 
 
 /* Line 189 of yacc.c  */
-#line 97 "nvgp4Info.tab.c"
+#line 98 "nvgp4Info.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -141,7 +142,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 17 "nvgp4Info.y"
+#line 18 "nvgp4Info.y"
 
 	int		ival;
 	float	fval;
@@ -150,7 +151,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 154 "nvgp4Info.tab.c"
+#line 155 "nvgp4Info.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -162,7 +163,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 166 "nvgp4Info.tab.c"
+#line 167 "nvgp4Info.tab.c"
 
 #ifdef short
 # undef short
@@ -453,9 +454,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    36,    36,    37,    40,    41,    42,    43,    46,    48,
-      51,    52,    55,   190,   191,   200,   201,   202,   203,   204,
-     205,   209,   210,   211
+       0,    37,    37,    38,    41,    42,    43,    44,    47,    49,
+      52,    53,    56,   191,   192,   201,   202,   203,   204,   205,
+     206,   210,   211,   212
 };
 #endif
 
@@ -1385,14 +1386,14 @@ yyreduce:
         case 8:
 
 /* Line 1464 of yacc.c  */
-#line 46 "nvgp4Info.y"
+#line 47 "nvgp4Info.y"
     {shaderType = (yyvsp[(2) - (2)].ival);}
     break;
 
   case 12:
 
 /* Line 1464 of yacc.c  */
-#line 55 "nvgp4Info.y"
+#line 56 "nvgp4Info.y"
     {
 		t_symbol.name = (yyvsp[(3) - (11)].sval);
 		t_symbol.declareType = (yyvsp[(2) - (11)].sval);
@@ -1531,14 +1532,14 @@ yyreduce:
   case 13:
 
 /* Line 1464 of yacc.c  */
-#line 190 "nvgp4Info.y"
+#line 191 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval));;}
     break;
 
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 191 "nvgp4Info.y"
+#line 192 "nvgp4Info.y"
     {
 			strcpy((yyval.sval), (yyvsp[(1) - (4)].sval)); 
 			strcat((yyval.sval), "[");
@@ -1550,70 +1551,70 @@ yyreduce:
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 200 "nvgp4Info.y"
+#line 201 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 201 "nvgp4Info.y"
+#line 202 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval)); t_element = 1;;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 202 "nvgp4Info.y"
+#line 203 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval)); t_idx = (yyvsp[(3) - (4)].ival); t_element = 1;;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 203 "nvgp4Info.y"
+#line 204 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval)); t_idx = (yyvsp[(3) - (6)].ival); t_element = (yyvsp[(6) - (6)].ival);;}
     break;
 
   case 19:
 
 /* Line 1464 of yacc.c  */
-#line 204 "nvgp4Info.y"
+#line 205 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 20:
 
 /* Line 1464 of yacc.c  */
-#line 205 "nvgp4Info.y"
+#line 206 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); t_idx = (yyvsp[(2) - (2)].ival); t_element = 1;;}
     break;
 
   case 21:
 
 /* Line 1464 of yacc.c  */
-#line 209 "nvgp4Info.y"
+#line 210 "nvgp4Info.y"
     {(yyval.ival) = 0;;}
     break;
 
   case 22:
 
 /* Line 1464 of yacc.c  */
-#line 210 "nvgp4Info.y"
+#line 211 "nvgp4Info.y"
     {(yyval.ival) = CG_IN;;}
     break;
 
   case 23:
 
 /* Line 1464 of yacc.c  */
-#line 211 "nvgp4Info.y"
+#line 212 "nvgp4Info.y"
     {(yyval.ival) = CG_OUT;;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 1617 "nvgp4Info.tab.c"
+#line 1618 "nvgp4Info.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1825,7 +1826,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 214 "nvgp4Info.y"
+#line 215 "nvgp4Info.y"
 
 
 

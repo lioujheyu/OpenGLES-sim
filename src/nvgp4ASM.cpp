@@ -824,8 +824,8 @@ char *nvgp4ASM_text;
 #line 1 "nvgp4ASM.l"
 #line 10 "nvgp4ASM.l"
 #include "nvgp4ASM.tab.h"
-#include "context.h"
-#include "context_link_def.h"
+#include "GPU/instruction_def.h"
+#include "GPU/gpu_config.h"
 
 #define COL_NO nvgp4ASM_col+=strlen(nvgp4ASM_text)
 

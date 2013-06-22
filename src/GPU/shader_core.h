@@ -3,6 +3,7 @@
 
 #include "gpu_type.h"
 #include "gpu_config.h"
+#include "instruction_def.h"
 
 class ShaderCore {
 public:
@@ -12,7 +13,6 @@ public:
 	int instCnt; ///<Program Length
 	instruction const *instPool;
 	floatVec4 const *uniformPool;
-
 
 	///statitic
 
@@ -24,7 +24,7 @@ public:
 	void FetchData();
 	void WriteBack();
 	floatVec4 ReadByMask(floatVec4 in, char *mask);
-	void WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask);
+	void WriteByMask(floatVec4 val, floatVec4 *fvdst, char *mask);
 
 private:
 	int PC; ///<Program Counter

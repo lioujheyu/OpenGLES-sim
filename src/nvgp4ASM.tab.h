@@ -80,7 +80,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1685 of yacc.c  */
-#line 19 "nvgp4ASM.y"
+#line 20 "nvgp4ASM.y"
 
 	int		ival;
 	float	fval;
