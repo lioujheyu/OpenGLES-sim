@@ -1,0 +1,11 @@
+bin/
+obj/
+doxygen/
+colormap.bmp
+
+*.txt
+*.save
+*.vsasm
+*.vssrc
+*.fsasm
+*.fssrc
