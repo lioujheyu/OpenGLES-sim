@@ -35,8 +35,8 @@ public:
     int             AlphaBlendingMode;
     float           AlphaRef,DepthRef;
 
-	int 			minFilter[MAX_TEXTURE_UNIT], ///<Texture filtering mode
-					magFilter[MAX_TEXTURE_UNIT]; ///<Texture filtering mode
+	int 			minFilter[MAX_TEXTURE_UNIT], ///<Texture min filtering mode
+					magFilter[MAX_TEXTURE_UNIT]; ///<Texture mag filtering mode
     int 			wrapS[MAX_TEXTURE_UNIT],
 					wrapT[MAX_TEXTURE_UNIT];
 	textureImage 	texImage[MAX_TEXTURE_UNIT];
@@ -62,8 +62,7 @@ private:
 	vertex      	curVtx;
 	primitive   	prim;
 
-	///How many vertex are insufficient to form a primitive.
-    int         	vtxCntDwn;
+    int         	vtxCntDwn;///<How many vertex are insufficient to form a primitive.
     int         	stripCnt;
     bool        	fanCnt;
     bool        	primitiveRdy;
@@ -83,7 +82,9 @@ private:
     void        	ViewPort();
     void        	InitPrimitiveAssembly();
     void        	PrimitiveAssembly();
+	/// @todo (elvis#1#): Clipping
     void        	Clipping();
+    /// @todo (elvis#1#): Culling
     void        	Culling();
     //Rasterizer
 	void            TriangleSetup();

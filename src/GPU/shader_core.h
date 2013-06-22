@@ -1,12 +1,20 @@
+/**
+ *	@file shader_core.h
+ *  @brief Shader Core simulator
+ *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
+ */
+
 #ifndef SHADER_CORE_H_INCLUDED
 #define SHADER_CORE_H_INCLUDED
 
 #include "gpu_type.h"
 #include "gpu_config.h"
+#include "texture_unit.h"
 #include "instruction_def.h"
 
 class ShaderCore {
 public:
+	TextureUnit tUnit;
 
 	int shaderType; ///< Vertex/Fragment Shader
 	void *input;

@@ -1,3 +1,9 @@
+/**
+ *	@file texture_unit.h
+ *  @brief Texture funtion unit
+ *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
+ */
+
 #ifndef TEXTURE_UNIT_H_INCLUDED
 #define TEXTURE_UNIT_H_INCLUDED
 
@@ -19,7 +25,7 @@ public:
 	textureImage texImage[MAX_TEXTURE_UNIT];
 
 	void		ClearTexCache();
-    fixColor4	TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixelInput, unsigned char tid);
+    floatVec4	TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixelInput, unsigned char tid);
 
     ///statistic
 	int hit;
@@ -30,15 +36,15 @@ private:
 	int		CalcTexAdd( short int us, short int ub, short int uo,
 						short int vs, short int vb, short int vo,
 						int width);
-	fixColor4 GetTexColor(floatVec4 coordIn, const unsigned int level, unsigned char tid);
+	floatVec4 GetTexColor(floatVec4 coordIn, const unsigned int level, unsigned char tid);
 	floatVec4 TexCoordWrap(floatVec4 coordIn, unsigned int level, unsigned char tid);
-    fixColor4 BilinearFilter(floatVec4 coordIn, int level, unsigned char tid);
-    fixColor4 TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, unsigned char tid);
+    floatVec4 BilinearFilter(floatVec4 coordIn, int level, unsigned char tid);
+    floatVec4 TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, unsigned char tid);
 
 	struct {
         bool            valid[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         unsigned int	tag[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
-        fixColor4       color[TEX_CACHE_ENTRY_SIZE][TEX_CACHE_BLOCK_SIZE][TEX_WAY_ASSOCIATION];
+        floatVec4       color[TEX_CACHE_ENTRY_SIZE][TEX_CACHE_BLOCK_SIZE][TEX_WAY_ASSOCIATION];
 		unsigned char	LRU[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
     }TexCache;
 };

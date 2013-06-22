@@ -138,6 +138,7 @@ void ShaderCore::Exec()
 			break;
 		//TEXop
 		case OP_TEX:
+			//dst = tUnit.TextureMapping(src[1],curInst.src[1].id,*pixPtr,tid);
 			break;
 		case OP_TXB:
 			break;

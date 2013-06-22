@@ -91,8 +91,6 @@ void GPU_Core::Run()
         ///Primitive-based operation starts here
         if (primitiveRdy)
         {
-            primitiveRdy = false;
-
             TriangleSetup();
 
             ///Fragment-based operation starts here
@@ -109,6 +107,7 @@ void GPU_Core::Run()
 				}
 			}
 
+			primitiveRdy = false;
         }
     }
 

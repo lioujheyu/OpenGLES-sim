@@ -1,5 +1,5 @@
 /**
- *	@file type.cpp
+ *	@file type.h
  *  @brief Data structures and functions for common use.
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
@@ -19,6 +19,16 @@ union floatVec4
     struct { float x, y, z, w; };
     struct { float r, g, b, a; };
     struct { float s, t, p, q; };
+
+    inline floatVec4() {}
+
+    inline floatVec4(float xv, float yv, float zv, float wv)
+    {
+    	x = xv;
+    	y = yv;
+    	z = zv;
+    	w = wv;
+    }
 
     inline floatVec4& operator=(const floatVec4 &rhs)
     {
@@ -50,6 +60,16 @@ union floatVec4
         tmp.w = w * other.w;
 		return tmp;
 	}
+
+	inline const floatVec4 operator*(const GLfloat other) const
+    {
+        floatVec4 tmp;
+        tmp.r = r*other;
+        tmp.g = g*other;
+        tmp.b = b*other;
+        tmp.a = a*other;
+        return tmp;
+    }
 
 };
 

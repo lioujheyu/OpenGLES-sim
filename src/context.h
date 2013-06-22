@@ -7,9 +7,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <cmath>
 #include <algorithm>
-#include <vector>
 #include <map>
 #include <stack>
 #include <GLES3/gl3.h>

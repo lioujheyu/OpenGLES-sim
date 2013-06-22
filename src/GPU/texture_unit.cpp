@@ -41,7 +41,7 @@ int TextureUnit::CalcTexAdd(short int us,
 			+ uo;
 }
 
-fixColor4 TextureUnit::GetTexColor(floatVec4 coordIn, const unsigned int level, unsigned char tid)
+floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, const unsigned int level, unsigned char tid)
 {
 	int i,j;
 	unsigned short u, v;
@@ -55,8 +55,8 @@ fixColor4 TextureUnit::GetTexColor(floatVec4 coordIn, const unsigned int level, 
 	v = (unsigned short)coordIn.t;
 
 #ifdef SHOW_MIPMAP_LEVEL
-	fixColor4 mipmaplevel;
-	mipmaplevel = fixColor4(255-level*30, 255-level*30, 255-level*30, 255);
+	floatVec4 mipmaplevel;
+	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
 	return mipmaplevel;
 #endif //SHOW_MIPMAP_LEVEL
 
@@ -112,19 +112,19 @@ fixColor4 TextureUnit::GetTexColor(floatVec4 coordIn, const unsigned int level, 
 								   V_Super,V_Block,j,
 								   texImage[tid].widthLevel[level]) * 4;
 
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r = *texTmpPtr++;
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g = *texTmpPtr++;
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].b = *texTmpPtr++;
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].a = *texTmpPtr++;
+			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r = ((float)(*texTmpPtr++)/255);
+			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g = ((float)(*texTmpPtr++)/255);
+			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].b = ((float)(*texTmpPtr++)/255);
+			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].a = ((float)(*texTmpPtr++)/255);
 		}
 	}
 #ifdef SHOW_TEXCACHE_COLD_MISS
 	if (isColdMiss)
-		return fixColor4(255,0,0,255);
+		return floatVec4(1.0, 0.0, 0.0, 1.0);
 #endif //SHOW_TEXCACHE_COLD_MISS
 
 #ifdef SHOW_TEXCACHE_MISS
-	return fixColor4(0,255,0,255);
+	return floatVec4(0.0, 1.0, 0.0, 1.0);
 #endif //SHOW_TEXCACHE_MISS
 
 	return TexCache.color[entry][offset][tWay];
@@ -161,7 +161,7 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, unsigned int level, unsig
 	return temp;
 }
 
-fixColor4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, unsigned char tid)
+floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, unsigned char tid)
 {
 	/// coord[4]: 2 3
 	///			  0 1
@@ -169,8 +169,8 @@ fixColor4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, unsigned char
 
 	unsigned short texUC, texVC;
 	float u_ratio, v_ratio;
-	fixColor4 color;
-	fixColor4 TexColor[4];
+	floatVec4 color;
+	floatVec4 TexColor[4];
 
 	coordLOD[0].s = coordIn.s / (1<<level);
 	coordLOD[0].s = std::max(coordLOD[0].s - 0.5, 0.0);
@@ -204,9 +204,9 @@ fixColor4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, unsigned char
 	return color;
 }
 
-fixColor4 TextureUnit::TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, unsigned char tid)
+floatVec4 TextureUnit::TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, unsigned char tid)
 {
-	fixColor4 color[2];
+	floatVec4 color[2];
 	int maxLevel = texImage[tid].maxLevel;
 	color[0] = BilinearFilter(coordIn, level, tid);
 	color[1] = BilinearFilter(coordIn, std::min(level+1, maxLevel), tid);
@@ -216,13 +216,13 @@ fixColor4 TextureUnit::TrilinearFilter(floatVec4 coordIn, int level, float w_rat
 	return color[0];
 }
 
-fixColor4 TextureUnit::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixelInput, unsigned char tid)
+floatVec4 TextureUnit::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixelInput, unsigned char tid)
 {
 	floatVec4 coord;
 	float w_ratio;
 	float maxScaleFac;
-	fixColor4 TexColor[2];
-	fixColor4 color, colorNextLevel;
+	floatVec4 TexColor[2];
+	floatVec4 color, colorNextLevel;
 	int LoD, maxLevel;
 
 	//find absolutely coord in texture image

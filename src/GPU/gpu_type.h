@@ -1,5 +1,5 @@
 /**
- *	@file gpu_type.cpp
+ *	@file gpu_type.h
  *  @brief Data structure for GPU used only
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */

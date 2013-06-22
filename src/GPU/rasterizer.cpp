@@ -1,6 +1,6 @@
 /**
- *	@file raterizer.cpp
- *  @brief  The Rasterizer related GPU function module
+ *	@file rasterizer.cpp
+ *  @brief  The Rasterizer related GPU function module implmentation
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
@@ -269,19 +269,19 @@ pixel GPU_Core::ShaderEXE(pixel pixInput)
     float eyevector[] = {0.0, 0.0, 1,0};
     float dotresult;
 
-//	fixColor4 texColor0 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 0);
-//	fixColor4 texColor1 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 1);
+//	floatVec4 texColor0 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 0);
+//	floatVec4 texColor1 = TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 1);
 
-	fixColor4 texColor0 = tUnit.TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 0);
-	fixColor4 texColor1 = tUnit.TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 1);
+	floatVec4 texColor0 = tUnit.TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 0);
+	floatVec4 texColor1 = tUnit.TextureMapping(pixInput.attr[texIndx], texIndx, pixInput, 1);
 
 //	pixInput.attr[1].r = texColor0.r;
 //	pixInput.attr[1].g = texColor0.g;
 //	pixInput.attr[1].b = texColor0.b;
 
-	temp.r = ((float)texColor1.r / 255)*2 - 1;
-	temp.g = ((float)texColor1.g / 255)*2 - 1;
-	temp.b = ((float)texColor1.b / 255)*2 - 1;
+	temp.r = texColor1.r*2 - 1;
+	temp.g = texColor1.g*2 - 1;
+	temp.b = texColor1.b*2 - 1;
 
 	dotresult = eyevector[0]*temp.r + eyevector[1]*temp.g + eyevector[2]*temp.b;
 
@@ -334,10 +334,10 @@ void GPU_Core::PerFragmentOp(pixel pixInput)
     }
 
     ///Color buffer write back
-    *(cBufPtr + bufOffset*4 + 0) = (unsigned char)pixInput.attr[1].r;// R
-    *(cBufPtr + bufOffset*4 + 1) = (unsigned char)pixInput.attr[1].g;// G
-    *(cBufPtr + bufOffset*4 + 2) = (unsigned char)pixInput.attr[1].b;// B
-    *(cBufPtr + bufOffset*4 + 3) = (unsigned char)pixInput.attr[1].a;// A
+    *(cBufPtr + bufOffset*4 + 0) = pixInput.attr[1].r*255;// R
+    *(cBufPtr + bufOffset*4 + 1) = pixInput.attr[1].g*255;// G
+    *(cBufPtr + bufOffset*4 + 2) = pixInput.attr[1].b*255;// B
+    *(cBufPtr + bufOffset*4 + 3) = pixInput.attr[1].a*255;// A
 }
 
 void GPU_Core::ClearBuffer(unsigned int mask)
