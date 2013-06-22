@@ -12,7 +12,7 @@
 
 /**
  *	@brief floating vector with 4 component
- *	And its component-wised add, multiply operator overload
+ *	scalar/vector component-wised add, multiply operator
  */
 union floatVec4
 {
@@ -48,6 +48,16 @@ union floatVec4
         tmp.y = y + other.y;
         tmp.z = z + other.z;
         tmp.w = w + other.w;
+        return tmp;
+    }
+
+    inline const floatVec4 operator+(const GLfloat other) const
+    {
+        floatVec4 tmp;
+        tmp.r = r+other;
+        tmp.g = g+other;
+        tmp.b = b+other;
+        tmp.a = a+other;
         return tmp;
     }
 

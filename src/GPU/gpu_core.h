@@ -72,11 +72,10 @@ private:
     int             LX, RX, LY, HY; ///< Boundary Box
     pixel           pixBuffer[256];
     int             pixBufferP;
-    int             texIndx;
 
 
-    void 			VertexShaderEXE(int sid);
-    void 			FragmentShaderEXE(int sid);
+    void 			VertexShaderEXE(int sid, void *input);
+    void 			FragmentShaderEXE(int sid, void *input);
     //Geometry
     void        	PerspectiveCorrection();
     void        	ViewPort();
@@ -88,9 +87,7 @@ private:
     void        	Culling();
     //Rasterizer
 	void            TriangleSetup();
-    void            PixelGenerate();
     void            pixelSplit(int x, int y, int level);
-    pixel           ShaderEXE(pixel pixInput);
     void            PerFragmentOp(pixel pixInput);
 
     void 			ClearBuffer(unsigned int mask);

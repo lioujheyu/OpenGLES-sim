@@ -45,11 +45,11 @@ void GPU_Core::Run()
 	//DepthTestMode = GL_LESS;
 	//depthTestEnable = false;
 	//blendEnable = false;
-	texIndx = 4;
 
 	InitPrimitiveAssembly();
 
 	tUnit.ClearTexCache();
+	sCore[1].tUnit.ClearTexCache();
 
 	for (int i=0; i<MAX_TEXTURE_UNIT; i++) {
 		tUnit.minFilter[i] = minFilter[i];
@@ -57,6 +57,12 @@ void GPU_Core::Run()
 		tUnit.wrapS[i] = wrapS[i];
 		tUnit.wrapT[i] = wrapT[i];
 		tUnit.texImage[i] = texImage[i];
+
+		sCore[1].tUnit.minFilter[i] = minFilter[i];
+		sCore[1].tUnit.magFilter[i] = magFilter[i];
+		sCore[1].tUnit.wrapS[i] = wrapS[i];
+		sCore[1].tUnit.wrapT[i] = wrapT[i];
+		sCore[1].tUnit.texImage[i] = texImage[i];
 	}
 
     for (int vCnt=0; vCnt<vtxCount; vCnt++) {
@@ -83,7 +89,7 @@ void GPU_Core::Run()
         }
 
 		///Vertex-based operation starts here
-        VertexShaderEXE(0);
+        VertexShaderEXE(0, &curVtx);
         PerspectiveCorrection();
         ViewPort();
         PrimitiveAssembly();
@@ -101,7 +107,8 @@ void GPU_Core::Run()
 
 					pixelSplit(x,y,3);
 					for (int i=0; i<pixBufferP; i++) {
-						pixBuffer[i] = ShaderEXE(pixBuffer[i]);
+						//pixBuffer[i] = ShaderEXE(pixBuffer[i]);
+						FragmentShaderEXE(1,&pixBuffer[i]);
 						PerFragmentOp(pixBuffer[i]);
 					}
 				}

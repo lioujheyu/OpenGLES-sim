@@ -125,17 +125,18 @@ int main()
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     int v_coord_loc = glGetAttribLocation(shader.id(), "vertexPosition_modelspace");
+    int v_tex0_loc = glGetAttribLocation(shader.id(), "vertexUV");
     int c_map = glGetUniformLocation(shader.id(), "ColorMap");
     int n_map = glGetUniformLocation(shader.id(), "NormalMap");
     int mvp = glGetUniformLocation(shader.id(), "MVP");
-    printf("%d, %d, %d, %d\n", v_coord_loc, c_map, n_map, mvp);
+    printf("%d, %d, %d, %d, %d\n", v_coord_loc, v_tex0_loc, c_map, n_map, mvp);
 
     glUniform1i(c_map, texture[0]);
     glUniform1i(n_map, texture[1]);
     glUniformMatrix4fv(mvp, 1, 0, mvp4x4);
 
 
-    int v_tex0_loc = 4;
+    //int v_tex0_loc = 4;
     glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);
     glEnableVertexAttribArray(v_coord_loc);
 

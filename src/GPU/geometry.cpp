@@ -30,10 +30,10 @@ void GPU_Core::InitPrimitiveAssembly()
 
 /****** Grahphic Related Function ******/
 
-void GPU_Core::VertexShaderEXE(int sid)
+void GPU_Core::VertexShaderEXE(int sid, void *input)
 {
 	sCore[sid].Init();
-	sCore[sid].input = &curVtx;
+	sCore[sid].input = input;
 	sCore[sid].Exec();
 }
 

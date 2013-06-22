@@ -138,7 +138,7 @@ void ShaderCore::Exec()
 			break;
 		//TEXop
 		case OP_TEX:
-			//dst = tUnit.TextureMapping(src[1],curInst.src[1].id,*pixPtr,tid);
+			dst = tUnit.TextureMapping(src[0],curInst.src[0].id,*pixPtr,tid);
 			break;
 		case OP_TXB:
 			break;
@@ -171,6 +171,8 @@ void ShaderCore::FetchData()
 	curInst = instPool[PC];
 
 	//Fetch data
+	tid = curInst.tid;
+	tType = curInst.tType;
 	for (int i=0; i<3; i++) {
 		if (curInst.src[i].type != 0) {
 			switch (curInst.src[i].type) {
@@ -198,6 +200,13 @@ void ShaderCore::FetchData()
 			default:
 				printf("Shader(Exec): Encounter unknow operand type \n");
 				return;
+			}
+
+			if (curInst.src[i].inverse) {
+				src[i].x = -src[i].x;
+				src[i].y = -src[i].y;
+				src[i].z = -src[i].z;
+				src[i].w = -src[i].w;
 			}
 		}
 		else
