@@ -51,9 +51,12 @@
 		<Unit filename="src/GPU/gpu_type.h" />
 		<Unit filename="src/GPU/instruction_def.h" />
 		<Unit filename="src/GPU/rasterizer.cpp" />
-		<Unit filename="src/GPU/rasterizer.h" />
 		<Unit filename="src/GPU/shader_core.cpp" />
 		<Unit filename="src/GPU/shader_core.h" />
+		<Unit filename="src/GPU/texture_unit.cpp" />
+		<Unit filename="src/GPU/texture_unit.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="src/context.cpp" />
 		<Unit filename="src/context.h" />
 		<Unit filename="src/context_glapi.cpp" />

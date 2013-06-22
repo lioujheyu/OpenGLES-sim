@@ -3,6 +3,8 @@ obj/
 doxygen/
 colormap.bmp
 
+*.depend
+*.layout
 *.txt
 *.save
 *.vsasm

@@ -9,8 +9,13 @@ Context::Context()
     usePID = 0;
 //    textureTotalSeq = 0;
 
-    for (int i=0;i<8;i++)
+    for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++)
         vertexAttrib[i].enable = false;
+	for (int i=0; i<MAX_TEXTURE_UNIT; i++) {
+		texContext[i].wrapS = texContext[i].wrapT = GL_REPEAT;
+		texContext[i].minFilter = GL_NEAREST_MIPMAP_LINEAR;
+		texContext[i].magFilter = GL_LINEAR;
+	}
 
 	depthTestEnable = GL_FALSE;
 }

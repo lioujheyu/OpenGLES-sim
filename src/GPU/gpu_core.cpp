@@ -16,18 +16,16 @@ void GPU_Core::Run()
 #endif // GPU_INFO
 
 #ifdef PIXEL_INFO_FILE
-	rm.PIXELINFOfp = fopen(PIXEL_INFO_FILE,"w");
+	PIXELINFOfp = fopen(PIXEL_INFO_FILE,"w");
 #endif // PIXEL_INFO_FILE
 
 #ifdef TEXEL_INFO_FILE
-	rm.TEXELINFOfp = fopen(TEXEL_INFO_FILE,"w");
+	TEXELINFOfp = fopen(TEXEL_INFO_FILE,"w");
 #endif // TEXEL_INFO_FILE
-
-    rm.ClearTexCache();
 
     ///clear frame buffer if needed
     if (clearStat) {
-		rm.ClearBuffer(clearMask);
+		ClearBuffer(clearMask);
 		clearStat = false;
 		return;
 	}
@@ -36,33 +34,51 @@ void GPU_Core::Run()
 	sCore[0].instCnt = VSinstCnt;
 	sCore[0].uniformPool = uniformPool;
 	sCore[0].shaderType= 0;
-	rm.sCore.instPool = FSinstPool;
-	rm.sCore.instCnt = FSinstCnt;
-	rm.sCore.uniformPool = uniformPool;
+	sCore[1].instPool = FSinstPool;
+	sCore[1].instCnt = FSinstCnt;
+	sCore[1].uniformPool = uniformPool;
+    sCore[1].shaderType = 1;
+
+    //AlphaRef = 0;
+	//DepthRef = 255;
+	//AlphaTestMode = GL_ALWAYS;
+	//DepthTestMode = GL_LESS;
+	//depthTestEnable = false;
+	//blendEnable = false;
+	texIndx = 4;
 
 	InitPrimitiveAssembly();
 
-    ///Each vertex will be injected into Geometry's vtxInput here
-    for (int vCnt=0;vCnt<vtxCount;vCnt++) {
+	tUnit.ClearTexCache();
 
-        for (int attrCnt=0;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++) {
+	for (int i=0; i<MAX_TEXTURE_UNIT; i++) {
+		tUnit.minFilter[i] = minFilter[i];
+		tUnit.magFilter[i] = magFilter[i];
+		tUnit.wrapS[i] = wrapS[i];
+		tUnit.wrapT[i] = wrapT[i];
+		tUnit.texImage[i] = texImage[i];
+	}
+
+    for (int vCnt=0; vCnt<vtxCount; vCnt++) {
+
+		///Each vertex will be injected into Geometry's curVtx here
+        for (int attrCnt=0; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++) {
             if (attrEnable[attrCnt]) {
-                rm.attrEnable[attrCnt] = true;
-                vtxInput.attr[attrCnt].x =
+                curVtx.attr[attrCnt].x =
                     *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt );
-                vtxInput.attr[attrCnt].y =
+                curVtx.attr[attrCnt].y =
                     *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 1 );
                 if (attrSize[attrCnt] > 2)
-                    vtxInput.attr[attrCnt].z =
+                    curVtx.attr[attrCnt].z =
                         *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 2 );
                 else
-                    vtxInput.attr[attrCnt].z = 0.0;
+                    curVtx.attr[attrCnt].z = 0.0;
 
                 if (attrSize[attrCnt] > 3)
-                    vtxInput.attr[attrCnt].w =
+                    curVtx.attr[attrCnt].w =
                         *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 3 );
                 else
-                    vtxInput.attr[attrCnt].w = 1.0;
+                    curVtx.attr[attrCnt].w = 1.0;
             }
         }
 
@@ -73,33 +89,42 @@ void GPU_Core::Run()
         PrimitiveAssembly();
 
         ///Primitive-based operation starts here
-        if (primitiveReady)
+        if (primitiveRdy)
         {
-            primitiveReady = false;
+            primitiveRdy = false;
 
-            rm.prim = prim;
-
-            rm.TriangleSetup();
+            TriangleSetup();
 
             ///Fragment-based operation starts here
-            rm.PixelGenerateHiber();
+			for(int y=LY; y<HY; y+=16) {
+				for(int x=LX; x<RX; x+=16) {
+					PIXPRINTF("Recursive Entry:-------(%d,%d)-----\n",x,y);
+					pixBufferP = 0;
+
+					pixelSplit(x,y,3);
+					for (int i=0; i<pixBufferP; i++) {
+						pixBuffer[i] = ShaderEXE(pixBuffer[i]);
+						PerFragmentOp(pixBuffer[i]);
+					}
+				}
+			}
 
         }
     }
 
-    GPUPRINTF("Texture cache hit: %d\n",rm.TexCache.hit);
-    GPUPRINTF("Texture cache miss: %d\n",rm.TexCache.miss);
+    GPUPRINTF("Texture cache hit: %d\n",tUnit.hit);
+    GPUPRINTF("Texture cache miss: %d\n",tUnit.miss);
 
 #ifdef GPU_INFO_FILE
 	fclose(GPUINFOfp);
 #endif // GPU_INFO
 
 #ifdef PIXEL_INFO_FILE
-	fclose(rm.PIXELINFOfp);
+	fclose(PIXELINFOfp);
 #endif // PIXEL_INFO_FILE
 
 #ifdef TEXEL_INFO_FILE
-	fclose(rm.TEXELINFOfp);
+	fclose(TEXELINFOfp);
 #endif // TEXEL_INFO_FILE
 
 }

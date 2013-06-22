@@ -66,8 +66,6 @@ struct textureState
     GLubyte			maxLevel;
     GLuint			texBindID;
 
-    GLuint      	texArrayNum;
-
     inline textureState() {
         genMipmap = GL_FALSE;
         minFilter = GL_NEAREST_MIPMAP_LINEAR;
