@@ -60,7 +60,7 @@ void GPU_Core::PerspectiveCorrection()
 
 void GPU_Core::ViewPort()
 {
-    float x,y,z,w;
+    float x,y,z;
 
     x = curVtx.attr[0].x;
     y = curVtx.attr[0].y;
