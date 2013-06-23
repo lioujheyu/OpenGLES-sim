@@ -183,7 +183,7 @@ void Context::Enable(GLenum cap)
     case GL_RASTERIZER_DISCARD:
         break;
     default:
-        RecordError(GL_INVALID_VALUE);
+        RecordError(GL_INVALID_ENUM);
         return;
     }
 }
@@ -214,7 +214,7 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
     textureImage texObj;
 
 	int i = 0;
-	unsigned int key = 1;
+	int key = 1;
 	while(i<n) {
 		if (texImagePool.find(key) == texImagePool.end()){
 			texImagePool[key] = texObj;

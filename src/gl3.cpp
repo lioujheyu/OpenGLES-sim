@@ -595,7 +595,7 @@ GL_APICALL void GL_APIENTRY glUniform1f (GLint location, GLfloat x)
 
 GL_APICALL void GL_APIENTRY glUniform1fv (GLint location, GLsizei count, const GLfloat* v)
 {
-	CONTEXT_EXEC(Uniform2fv(location, count, v));
+	CONTEXT_EXEC(Uniform1fv(location, count, v));
 }
 
 GL_APICALL void GL_APIENTRY glUniform1i (GLint location, GLint x)

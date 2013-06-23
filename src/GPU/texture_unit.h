@@ -21,6 +21,11 @@ const int TEX_CACHE_ENTRY_SIZE_ROOT_LOG = (int)log2(TEX_CACHE_ENTRY_SIZE_ROOT);
 
 class TextureUnit {
 public:
+    TextureUnit()
+    {
+        ClearTexCache();
+    }
+
     GLenum minFilter[MAX_TEXTURE_UNIT], magFilter[MAX_TEXTURE_UNIT]; ///<Texture filtering mode
     GLenum wrapS[MAX_TEXTURE_UNIT],wrapT[MAX_TEXTURE_UNIT];
 	textureImage texImage[MAX_TEXTURE_UNIT];

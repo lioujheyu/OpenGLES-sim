@@ -1,0 +1,100 @@
+OpenGL ES 2.0 Simulator
+
+*************************
+1. Compile Requirement
+*************************
+Must Required
+  GCC 4.6.4 or above for c++11(c++0x) support
+  - There is a bug caused by Mingw-gcc 4.6.4-4.7.2 on Windows. Please see the
+    issue section for the solution by patching or updating Mingw-gcc.
+  Nvidia Cg Toolkits 
+  ( https://developer.nvidia.com/cg-toolkit-download )
+  - Current version's use cg compiler as its glsl compiler. Lack of this 
+    compiler will cause glCompilerShader malfunction, although you can use
+	glShaderBinary to avoid it.
+Recommend
+  Codeblocks 12.11 
+  ( http://www.codeblocks.org/downloads )
+  - The whole project is managed by this IDE, but you can still use custom 
+    Makefile or use cbp2make converting .cbp to Makefile
+	(You can get cbp2make here - http://sourceforge.net/projects/cbp2make/)
+Optional
+  Flex & bison 
+  - The assembly grammar is defined in .y and .l file and need Flex & bison
+    to generate C code for compiling. Although these generated C code already
+	attached within the project and you can compiled them with no problem, you 
+	still need these tool if you want to adjust the grammar.
+  
+***********************************
+2. How to get this project
+***********************************
+You can goto
+
+	http://140.116.164.239/~git/?p=ogles1_1.git;a=summary
+
+and click the "snapshot" on the master branch to download the tgz file. This
+page also allows anyone to trace the the project's current progress.
+
+Or if you have my git server's access permission, use this git command
+
+	git clone git@140.116.164.239:ogles1_1
+	
+You can use any git client to execute the above command. If on Windows, go
+checking MsysGit (http://msysgit.github.io/), TortoiseGit
+(https://code.google.com/p/tortoisegit/), or even msys/cygwin system with git
+command.
+
+***********************************
+3. How to Compile this project
+***********************************
+a. with codeblocks
+  Direcly open ogles1_1.cbp in codeblocks and push F9 (compile). If you have
+  right gcc version or pathced mingw-gcc and correct toolchain setting in 
+  codeblocks compiler setting page, there shall be no problem. 
+
+b. Makefile
+  If you prefer to use unix console, cbp2make will do you a favor but you need 
+  to compile this tool from source. Once you get cbp2make's binary, use this
+  command to generate Makefile
+  
+	cbp2make -in ogles1_1.cbp -out Makefile
+
+  You still need to check you compiler's version if you encounter any standard
+  library's problem.
+  
+Besides, there is a single, independent Makefile under 'src' directory which is
+used to generated assembler's C code from .y and .l file. You can use it after
+the .l and .y file are modified. ( However, this operation needs make tool.
+If on windows, the only way I know is to use msys/cygwin system to make this
+Makefile )
+
+
+***********************************
+3. Known Issue
+***********************************
+a. while compile the code on windows. the compile error "std::to_string is not
+   a member of std" is jumped out.
+  This is a known bug for mingw-gcc from 4.6.4 to 4.7.2. You can update your 
+  Mingw-gcc from this site. (http://sourceforge.net/projects/mingwbuilds/files/)
+  After you installed newer Mingw-gcc, make sure you have alredy change the
+  codeblocks compiler toolchain setting before compile the code.
+  
+  Their is another way to solve it by patching your Mingw-gcc from this site
+  (http://tehsausage.com/mingw-to-string). You may find your Mingw-gcc under
+  C:\Program Files (x86)\CodeBlocks\MinGW(If you use the codeblocks' bundle gcc)
+  or C:\MinGW . Follow the step on the web site with no additional work will fix
+  this problem.
+
+
+
+Cause this project is still under development, any situation is possible. 
+Please email or report to me if you find any compiler error or bug. Many thanks.
+	
+	
+Liou Jhe-Yu
+lioujheyu@gmail.com
+National Cheng-kung University, EE Department, 
+Computer and System Laboratory
+Tainan, Taiwan
+2013/6/24
+  

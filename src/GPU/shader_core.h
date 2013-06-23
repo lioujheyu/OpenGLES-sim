@@ -24,8 +24,13 @@ public:
 		src[0].x = src[0].y = src[0].z = src[0].w = 0.0;
 		src[1].x = src[1].y = src[1].z = src[1].w = 0.0;
 		src[2].x = src[2].y = src[2].z = src[2].w = 0.0;
-		tid = -1, tType = 0;
+		tid = -1; tType = 0; input = nullptr;
+		instPool = nullptr;
+		uniformPool = nullptr;
+		vtxPtr = nullptr;
+		pixPtr = nullptr;
 		curInst.Init();
+		Init();
 	}
 
 	TextureUnit texUnit;

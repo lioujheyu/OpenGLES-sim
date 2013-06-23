@@ -61,11 +61,6 @@ bool LoadRGBATexture(char *filename, unsigned int *texture)
     return true;
 }
 
-void TextureExample()
-{
-
-}
-
 int main()
 {
     //Initial a new context, need to be hidden after egl or glfw library is imported or something magic is happen.

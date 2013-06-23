@@ -6,8 +6,8 @@
 
 #include "driver.h"
 
-void ActiveGPU2GenMipMap(int tid)
-{
+//void ActiveGPU2GenMipMap(int tid)
+//{
 //	Context * ctx = Context::GetCurrentContext();
 //
 //	float quad[] = {-1.0f, -1.0f,
@@ -40,7 +40,8 @@ void ActiveGPU2GenMipMap(int tid)
 //    gpu.rm.minFilter[0] = GL_LINEAR_MIPMAP_NEAREST;
 //    gpu.rm.magFilter[0] = GL_LINEAR;
 //    gpu.rm.texImage[0] = ctx->texImagepool[ctx->texContext[tid].texBindID];
-}
+//}
+
 /** \brief Generate mip-map structure image from base level
  *
  *	\param tid Specified which texture Context's image will be used as source
