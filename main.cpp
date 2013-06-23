@@ -61,11 +61,6 @@ bool LoadRGBATexture(char *filename, unsigned int *texture)
     return true;
 }
 
-void TextureExample()
-{
-
-}
-
 int main()
 {
     //Initial a new context, need to be hidden after egl or glfw library is imported or something magic is happen.
@@ -94,8 +89,8 @@ int main()
 
     GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0,
                              1.0f, -1.0f, 0.0f, 1.0,
-                          1.0f/16,  0.0f, 1.0f,16.0,
-                         -1.0f/16,  0.0f, 1.0f,16.0
+                             1.0f,  0.0f, 1.0f,16.0,
+                            -1.0f,  0.0f, 1.0f,16.0
                           };
 
 //	GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f,
@@ -145,6 +140,4 @@ int main()
 	glDeleteTextures(2, texture);
 
     shader.unbind();
-
-    return 0;
 }

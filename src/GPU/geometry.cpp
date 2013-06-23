@@ -46,6 +46,9 @@ void GPU_Core::PerspectiveCorrection()
 {
 	float w = curVtx.attr[0].w;
 	curVtx.attr[0].w = (float)1/w;
+	curVtx.attr[0].x = curVtx.attr[0].x / w;
+	curVtx.attr[0].y = curVtx.attr[0].y / w;
+	curVtx.attr[0].z = curVtx.attr[0].z / w;
 	for (int i=1; i<MAX_ATTRIBUTE_NUMBER; i++) {
 		if (attrEnable[i] == false)
 			continue;
