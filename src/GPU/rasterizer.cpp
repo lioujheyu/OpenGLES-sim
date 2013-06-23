@@ -197,14 +197,14 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 		}
 	}
 	else {
-		/**
-		 * c - central
-		 * n - corner
-		 *                                  5 6 7
-		 * The hierachy can be presented as 3 c 4
-		 *                                  0 1 2
-		 * Zone1 = box of 012c, zone2 = 12c4, zone3 = 3c56, zone4 = c467
-		 */
+/**
+ * c - central
+ * n - corner
+ *                                  5 6 7
+ * The hierachy can be presented as 3 c 4
+ *                                  0 1 2
+ * Zone[0] = box of 012c, zone[1] = 12c4, zone[2] = 3c56, zone[3] = c467
+ */
 		for(lc=0; lc<3; lc++) {
 			cornerTest[0][lc] = centralTest[lc] + (-Edge[lc][0]+Edge[lc][1])*(1<<level);
 			cornerTest[1][lc] = centralTest[lc] + (            +Edge[lc][1])*(1<<level);
@@ -242,6 +242,11 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 
 void GPU_Core::FragmentShaderEXE(int sid, void *input)
 {
+	sCore[sid].instPool = FSinstPool;
+	sCore[sid].instCnt = FSinstCnt;
+	sCore[sid].uniformPool = uniformPool;
+    sCore[sid].shaderType = FRAGMENT_SHADER;
+
 	sCore[sid].Init();
 	sCore[sid].input = input;
 	sCore[sid].Exec();
@@ -249,38 +254,38 @@ void GPU_Core::FragmentShaderEXE(int sid, void *input)
 
 void GPU_Core::PerFragmentOp(pixel pixInput)
 {
-	bool DepthTest = true;
+	bool DepthPass = true;
 	int bufOffset;
 
 	bufOffset = (int)pixInput.attr[0].y*viewPortW + (int)pixInput.attr[0].x;
 
     ///Depth test
     if (depthTestEnable){
-        if (DepthTestMode == GL_NEVER)
-            DepthTest = false;
-        else if (DepthTestMode == GL_LESS)
-            DepthTest = pixInput.attr[0].z  < *(dBufPtr + bufOffset);
-        else if (DepthTestMode == GL_EQUAL)
-            DepthTest = pixInput.attr[0].z == *(dBufPtr + bufOffset);
-        else if (DepthTestMode == GL_LEQUAL)
-            DepthTest = pixInput.attr[0].z <= *(dBufPtr + bufOffset);
-        else if (DepthTestMode == GL_GREATER)
-            DepthTest = pixInput.attr[0].z  > *(dBufPtr + bufOffset);
-        else if (DepthTestMode == GL_NOTEQUAL)
-            DepthTest = pixInput.attr[0].z != *(dBufPtr + bufOffset);
-        else if (DepthTestMode == GL_GEQUAL)
-            DepthTest = pixInput.attr[0].z >= *(dBufPtr + bufOffset);
-        else if (DepthTestMode == GL_ALWAYS)
-            DepthTest = true;
+        if (depthTestMode == GL_NEVER)
+            DepthPass = false;
+        else if (depthTestMode == GL_LESS)
+            DepthPass = pixInput.attr[0].z  < *(dBufPtr + bufOffset);
+        else if (depthTestMode == GL_EQUAL)
+            DepthPass = pixInput.attr[0].z == *(dBufPtr + bufOffset);
+        else if (depthTestMode == GL_LEQUAL)
+            DepthPass = pixInput.attr[0].z <= *(dBufPtr + bufOffset);
+        else if (depthTestMode == GL_GREATER)
+            DepthPass = pixInput.attr[0].z  > *(dBufPtr + bufOffset);
+        else if (depthTestMode == GL_NOTEQUAL)
+            DepthPass = pixInput.attr[0].z != *(dBufPtr + bufOffset);
+        else if (depthTestMode == GL_GEQUAL)
+            DepthPass = pixInput.attr[0].z >= *(dBufPtr + bufOffset);
+        else if (depthTestMode == GL_ALWAYS)
+            DepthPass = true;
 
-        if (DepthTest == false)
+        if (DepthPass == false)
             return;
         else
             *(dBufPtr + bufOffset) = pixInput.attr[0].z;
     }
 
     ///Alpha blending
-    if (blendEnable){
+    if (blendingMode){
 
     }
 
@@ -296,7 +301,6 @@ void GPU_Core::ClearBuffer(unsigned int mask)
 	int i;
 	if (mask & GL_COLOR_BUFFER_BIT) {
 		for (i = 0; i<viewPortW*viewPortH; i++){
-
 			*(cBufPtr + i*4 + 0) = clearColor.r*255;
 			*(cBufPtr + i*4 + 1) = clearColor.g*255;
 			*(cBufPtr + i*4 + 2) = clearColor.b*255;

@@ -1,19 +1,5 @@
 #include "shader_core.h"
 
-ShaderCore::ShaderCore()
-{
-	instCnt = 0;
-	shaderType = 0;
-	for (int i=0; i<MAX_SHADER_REG_VECTOR; i++)
-		reg[i].x = reg[i].y = reg[i].z = reg[i].w = 0.0f;
-	dst.x = dst.y = dst.z = dst.w = 0.0;
-	src[0].x = src[0].y = src[0].z = src[0].w = 0.0;
-	src[1].x = src[1].y = src[1].z = src[1].w = 0.0;
-	src[2].x = src[2].y = src[2].z = src[2].w = 0.0;
-	tid = -1, tType = 0;
-	curInst.Init();
-}
-
 void ShaderCore::Init()
 {
 	PC = 0;
@@ -26,7 +12,7 @@ void ShaderCore::Exec()
 		return;
 	}
 
-	if (shaderType == 0)
+	if (shaderType == VERTEX_SHADER)
 		vtxPtr = (vertex*)input;
 	else
 		pixPtr = (pixel*)input;
@@ -37,10 +23,13 @@ void ShaderCore::Exec()
 		switch (curInst.op) {
 		//VECTORop
 		case OP_ABS:
+			dst = src[0].fvabs();
 			break;
 		case OP_CEIL:
+			dst = src[0].fvceil();
 			break;
 		case OP_FLR:
+			dst = src[0].fvfloor();
 			break;
 		case OP_FRC:
 			break;
@@ -68,7 +57,7 @@ void ShaderCore::Exec()
 		case OP_SSG:
 			break;
 		case OP_TRUNC:
-
+			break;
 		// BINop
 		case OP_ADD:
 			dst = src[0] + src[1];
@@ -138,15 +127,26 @@ void ShaderCore::Exec()
 			break;
 		//TEXop
 		case OP_TEX:
-			dst = tUnit.TextureMapping(src[0],curInst.src[0].id,*pixPtr,tid);
+			dst = texUnit.TextureSample(src[0],
+										-1,
+										pixPtr->scaleFacDX[curInst.src[0].id],
+										pixPtr->scaleFacDY[curInst.src[0].id],
+										tid );
 			break;
 		case OP_TXB:
 			break;
 		case OP_TXF:
+			dst = texUnit.GetTexColor(src[0], 0, tid);
 			break;
 		case OP_TXL:
+			dst = texUnit.TextureSample(src[0],
+										 src[0].w,
+										 floatVec4(0.0, 0.0, 0.0, 0.0),
+										 floatVec4(0.0, 0.0, 0.0, 0.0),
+										 tid );
 			break;
 		case OP_TXP:
+			dst = texUnit.TextureSample(src[0], -1, src[1], src[2], tid);
 			break;
 		case OP_TXQ:
 			break;
@@ -170,7 +170,6 @@ void ShaderCore::FetchData()
 {
 	curInst = instPool[PC];
 
-	//Fetch data
 	tid = curInst.tid;
 	tType = curInst.tType;
 	for (int i=0; i<3; i++) {
@@ -179,7 +178,7 @@ void ShaderCore::FetchData()
 			case INST_NO_TYPE:
 				goto endSrcOperand;
 			case INST_ATTRIB:
-				if (shaderType == 0)
+				if (shaderType == VERTEX_SHADER)
 					src[i] =ReadByMask(vtxPtr->attr[curInst.src[i].id], curInst.src[i].modifier);
 				else
 					src[i] =ReadByMask(pixPtr->attr[curInst.src[i].id], curInst.src[i].modifier);
@@ -220,7 +219,7 @@ void ShaderCore::WriteBack()
 {
 	switch (curInst.dst.type) {
 	case INST_ATTRIB:
-		if (shaderType == 0)
+		if (shaderType == VERTEX_SHADER)
 			WriteByMask(dst, &(vtxPtr->attr[curInst.dst.id]), curInst.dst.modifier);
 		else
 			WriteByMask(dst, &(pixPtr->attr[curInst.dst.id]), curInst.dst.modifier);
@@ -231,7 +230,7 @@ void ShaderCore::WriteBack()
 		break;
 
 	case INST_COLOR:
-		if (shaderType ==1)
+		if (shaderType == FRAGMENT_SHADER)
 			WriteByMask(dst, &(pixPtr->attr[1]), curInst.dst.modifier);
 		else
 			printf("Shader: Pix attribute color is not available in this shader");

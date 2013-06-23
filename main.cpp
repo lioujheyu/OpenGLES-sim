@@ -92,7 +92,6 @@ int main()
 		exit(1);
     }
 
-	//The projection transformation in vertex shader has not yet implementation.
     GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0,
                              1.0f, -1.0f, 0.0f, 1.0,
                           1.0f/16,  0.0f, 1.0f,16.0,
@@ -135,8 +134,6 @@ int main()
     glUniform1i(n_map, texture[1]);
     glUniformMatrix4fv(mvp, 1, 0, mvp4x4);
 
-
-    //int v_tex0_loc = 4;
     glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);
     glEnableVertexAttribArray(v_coord_loc);
 

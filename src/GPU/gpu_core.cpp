@@ -14,11 +14,9 @@ void GPU_Core::Run()
 #ifdef GPU_INFO_FILE
 	GPUINFOfp = fopen(GPU_INFO_FILE,"w");
 #endif // GPU_INFO
-
 #ifdef PIXEL_INFO_FILE
 	PIXELINFOfp = fopen(PIXEL_INFO_FILE,"w");
 #endif // PIXEL_INFO_FILE
-
 #ifdef TEXEL_INFO_FILE
 	TEXELINFOfp = fopen(TEXEL_INFO_FILE,"w");
 #endif // TEXEL_INFO_FILE
@@ -30,40 +28,11 @@ void GPU_Core::Run()
 		return;
 	}
 
-	sCore[0].instPool = VSinstPool;
-	sCore[0].instCnt = VSinstCnt;
-	sCore[0].uniformPool = uniformPool;
-	sCore[0].shaderType= 0;
-	sCore[1].instPool = FSinstPool;
-	sCore[1].instCnt = FSinstCnt;
-	sCore[1].uniformPool = uniformPool;
-    sCore[1].shaderType = 1;
-
-    //AlphaRef = 0;
-	//DepthRef = 255;
-	//AlphaTestMode = GL_ALWAYS;
-	//DepthTestMode = GL_LESS;
-	//depthTestEnable = false;
-	//blendEnable = false;
+	PassConfig2SubModule();
 
 	InitPrimitiveAssembly();
-
-	tUnit.ClearTexCache();
-	sCore[1].tUnit.ClearTexCache();
-
-	for (int i=0; i<MAX_TEXTURE_UNIT; i++) {
-		tUnit.minFilter[i] = minFilter[i];
-		tUnit.magFilter[i] = magFilter[i];
-		tUnit.wrapS[i] = wrapS[i];
-		tUnit.wrapT[i] = wrapT[i];
-		tUnit.texImage[i] = texImage[i];
-
-		sCore[1].tUnit.minFilter[i] = minFilter[i];
-		sCore[1].tUnit.magFilter[i] = magFilter[i];
-		sCore[1].tUnit.wrapS[i] = wrapS[i];
-		sCore[1].tUnit.wrapT[i] = wrapT[i];
-		sCore[1].tUnit.texImage[i] = texImage[i];
-	}
+	sCore[0].texUnit.ClearTexCache();
+	sCore[1].texUnit.ClearTexCache();
 
     for (int vCnt=0; vCnt<vtxCount; vCnt++) {
 
@@ -118,19 +87,28 @@ void GPU_Core::Run()
         }
     }
 
-    GPUPRINTF("Texture cache hit: %d\n",tUnit.hit);
-    GPUPRINTF("Texture cache miss: %d\n",tUnit.miss);
+    GPUPRINTF("Texture cache hit: %d\n",sCore[1].texUnit.hit);
+    GPUPRINTF("Texture cache miss: %d\n",sCore[1].texUnit.miss);
 
 #ifdef GPU_INFO_FILE
 	fclose(GPUINFOfp);
 #endif // GPU_INFO
-
 #ifdef PIXEL_INFO_FILE
 	fclose(PIXELINFOfp);
 #endif // PIXEL_INFO_FILE
-
 #ifdef TEXEL_INFO_FILE
 	fclose(TEXELINFOfp);
 #endif // TEXEL_INFO_FILE
 
+}
+
+void GPU_Core::PassConfig2SubModule()
+{
+	for (int i=0; i<MAX_TEXTURE_UNIT; i++) {
+		sCore[1].texUnit.minFilter[i] = minFilter[i];
+		sCore[1].texUnit.magFilter[i] = magFilter[i];
+		sCore[1].texUnit.wrapS[i] = wrapS[i];
+		sCore[1].texUnit.wrapT[i] = wrapT[i];
+		sCore[1].texUnit.texImage[i] = texImage[i];
+	}
 }

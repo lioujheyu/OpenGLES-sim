@@ -134,7 +134,7 @@ struct programObject
 	///Linker's error/warning message
 	std::string	linkInfo;
 
-/** @defgroup Naming Table
+/** @ingroup Naming Table
  *	@brief <glsl variable name, asm symbol attribute> for location retriving
  *	by user
  *	@{
@@ -152,7 +152,7 @@ struct programObject
  */
 	std::map<GLint, std::string> uniformUsage;
 
-/**	@defgroup Index Table
+/**	@ingroup Index Table
  *	@brief  <asm uniform index, asm symbol attribute> for grammar check and
  *	resource remapping.
  *	@{
@@ -161,7 +161,7 @@ struct programObject
 	std::map<GLint, symbol> asmFSIdx;
 /**	@} */
 
-/**	@defgroup Index Table
+/**	@ingroup Index Table
  *	@brief <asm texture index, asm symbol attribute> for grammar check and
  *	texture resource remapping.
  *	@{
@@ -170,7 +170,7 @@ struct programObject
 	std::map<int, symbol> asmFStexIdx;
 /**	@} */
 
-/**	@defgroup Vertex/Fragment shader instruction pool
+/**	@ingroup Instruction pool
  *	@brief Custom Format Instruction pool for hardware shader core simulator
  *	@{
  */
@@ -327,7 +327,7 @@ public:
     std::map<GLint, floatVec4> uniformPool;
 
 /**
- *	The specified texture context ID will be stored in smaplePool and use
+ *	The specified texture context ID will be stored in samplePool and use
  *	the uniform sample id as the key value.
  *	In short, <Sample ID -> texture context ID>
  *	Sample ID here can been seem as texture unit ID.

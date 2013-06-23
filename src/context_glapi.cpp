@@ -360,7 +360,6 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 		texContext[activeTexture].texBindID = 0;
     }
 
-	// @todo : image data should be copied into buffer of mipmap arrays
 	textureImage temp;
 
     temp.border = border;

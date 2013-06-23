@@ -6,14 +6,15 @@
 #ifndef TYPE_H_INCLUDED
 #define TYPE_H_INCLUDED
 
-#include <GLES3/gl3.h>
 #include <vector>
+#include <cmath>
 #include <cstdio>
 
 /**
  *	@brief floating vector with 4 component
  *	scalar/vector component-wised add, multiply operator
  */
+
 union floatVec4
 {
     struct { float x, y, z, w; };
@@ -51,17 +52,17 @@ union floatVec4
         return tmp;
     }
 
-    inline const floatVec4 operator+(const GLfloat other) const
+    inline const floatVec4 operator+(const float other) const
     {
         floatVec4 tmp;
-        tmp.r = r+other;
-        tmp.g = g+other;
-        tmp.b = b+other;
-        tmp.a = a+other;
+        tmp.x = x+other;
+        tmp.y = y+other;
+        tmp.z = z+other;
+        tmp.w = w+other;
         return tmp;
     }
 
-    inline const floatVec4 operator*(const floatVec4 &other)
+    inline const floatVec4 operator*(const floatVec4 &other) const
 	{
 		floatVec4 tmp;
 		tmp.x = x * other.x;
@@ -71,26 +72,55 @@ union floatVec4
 		return tmp;
 	}
 
-	inline const floatVec4 operator*(const GLfloat other) const
+	inline const floatVec4 operator*(const float other) const
     {
         floatVec4 tmp;
-        tmp.r = r*other;
-        tmp.g = g*other;
-        tmp.b = b*other;
-        tmp.a = a*other;
+        tmp.x = x*other;
+        tmp.y = y*other;
+        tmp.z = z*other;
+        tmp.w = w*other;
         return tmp;
     }
 
+	inline const floatVec4 fvabs()
+	{
+		floatVec4 tmp;
+		tmp.x = fabs(x);
+		tmp.y = fabs(y);
+		tmp.z = fabs(z);
+		tmp.w = fabs(w);
+		return tmp;
+	}
+
+	inline const floatVec4 fvceil()
+	{
+		floatVec4 tmp;
+		tmp.x = ceil(x);
+		tmp.y = ceil(y);
+		tmp.z = ceil(z);
+		tmp.w = ceil(w);
+		return tmp;
+	}
+
+	inline const floatVec4 fvfloor()
+	{
+		floatVec4 tmp;
+		tmp.x = floor(x);
+		tmp.y = floor(y);
+		tmp.z = floor(z);
+		tmp.w = floor(w);
+		return tmp;
+	}
 };
 
 class fixColor4
 {
 public:
-    GLubyte r,g,b,a;
+    unsigned char r,g,b,a;
 
     inline fixColor4() {}
 
-    inline fixColor4(GLubyte rv, GLubyte gv, GLubyte bv, GLubyte av)
+    inline fixColor4(unsigned char rv, unsigned char gv, unsigned char bv, unsigned char av)
     {
     	r = rv;
     	g = gv;
@@ -109,7 +139,7 @@ public:
         return *this;
     }
 
-    inline const fixColor4 operator*(const GLfloat other) const
+    inline const fixColor4 operator*(const float other) const
     {
         fixColor4 tmp;
         tmp.r = r*other;
@@ -119,7 +149,7 @@ public:
         return tmp;
     }
 
-    inline const fixColor4 operator/(const GLfloat other) const
+    inline const fixColor4 operator/(const float other) const
     {
         fixColor4 tmp;
         tmp.r = r/other;
@@ -144,12 +174,12 @@ struct textureImage
 {
 	inline textureImage():maxLevel(-1),border(0){}
 
-    GLint		maxLevel;
-    GLuint		border;
-	GLuint		widthLevel[13];
-	GLuint		heightLevel[13];
+    int				maxLevel;
+    unsigned int	border;
+	unsigned int	widthLevel[13];
+	unsigned int	heightLevel[13];
 
-    GLubyte     *data[13];
+    unsigned char	*data[13];
 
     inline textureImage& operator=(const textureImage &rhs)
     {

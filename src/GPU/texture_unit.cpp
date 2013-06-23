@@ -26,12 +26,12 @@ void TextureUnit::ClearTexCache()
  * system memory from 6D block-based texture address.
  */
 int TextureUnit::CalcTexAdd(short int us,
-                           short int ub,
-                           short int uo,
-                           short int vs,
-                           short int vb,
-                           short int vo,
-                           int width)
+                            short int ub,
+                            short int uo,
+                            short int vs,
+                            short int vb,
+                            short int vo,
+                            int width)
 {
 	return (vs*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_SIZE_ROOT
 			+ vb*TEX_CACHE_BLOCK_SIZE_ROOT
@@ -41,7 +41,7 @@ int TextureUnit::CalcTexAdd(short int us,
 			+ uo;
 }
 
-floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, const unsigned int level, unsigned char tid)
+floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 {
 	int i,j;
 	unsigned short u, v;
@@ -122,7 +122,6 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, const unsigned int level, 
 	if (isColdMiss)
 		return floatVec4(1.0, 0.0, 0.0, 1.0);
 #endif //SHOW_TEXCACHE_COLD_MISS
-
 #ifdef SHOW_TEXCACHE_MISS
 	return floatVec4(0.0, 1.0, 0.0, 1.0);
 #endif //SHOW_TEXCACHE_MISS
@@ -130,7 +129,7 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, const unsigned int level, 
 	return TexCache.color[entry][offset][tWay];
 }
 
-floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, unsigned int level, unsigned char tid)
+floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 {
 	floatVec4 temp;
 
@@ -161,7 +160,7 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, unsigned int level, unsig
 	return temp;
 }
 
-floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, unsigned char tid)
+floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
 {
 	/// coord[4]: 2 3
 	///			  0 1
@@ -204,7 +203,10 @@ floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, unsigned char
 	return color;
 }
 
-floatVec4 TextureUnit::TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, unsigned char tid)
+floatVec4 TextureUnit::TrilinearFilter(floatVec4 coordIn,
+									   int level,
+									   float w_ratio,
+									   int tid )
 {
 	floatVec4 color[2];
 	int maxLevel = texImage[tid].maxLevel;
@@ -216,7 +218,11 @@ floatVec4 TextureUnit::TrilinearFilter(floatVec4 coordIn, int level, float w_rat
 	return color[0];
 }
 
-floatVec4 TextureUnit::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pixelInput, unsigned char tid)
+floatVec4 TextureUnit::TextureSample(floatVec4 coordIn,
+									 int level,
+									 floatVec4 scaleFacDX,
+									 floatVec4 scaleFacDY,
+									 int tid )
 {
 	floatVec4 coord;
 	float w_ratio;
@@ -232,10 +238,10 @@ floatVec4 TextureUnit::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pix
 	coord.q = coordIn.q;
 
 	maxScaleFac = std::max(
-					std::max(pixelInput.scaleFacDX[attrIndx].s*texImage[tid].widthLevel[0],
-							 pixelInput.scaleFacDX[attrIndx].t*texImage[tid].heightLevel[0]),
-					std::max(pixelInput.scaleFacDY[attrIndx].s*texImage[tid].widthLevel[0],
-							 pixelInput.scaleFacDY[attrIndx].t*texImage[tid].heightLevel[0])
+					std::max(scaleFacDX.s*texImage[tid].widthLevel[0],
+							 scaleFacDX.t*texImage[tid].heightLevel[0]),
+					std::max(scaleFacDY.s*texImage[tid].widthLevel[0],
+							 scaleFacDY.t*texImage[tid].heightLevel[0])
 				);
 
 	w_ratio = frexp(maxScaleFac, &LoD);
@@ -244,8 +250,10 @@ floatVec4 TextureUnit::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pix
 
 	maxLevel = texImage[tid].maxLevel;
 
-	///Prevent LoD exceeds the maximum allowable level.
-    LoD = std::min(LoD, maxLevel);
+	if (level == -1)
+		LoD = std::min(LoD, maxLevel);
+	else
+		LoD = level;
 
 	if(maxScaleFac>1) {
 		switch (minFilter[tid]) {
@@ -332,10 +340,10 @@ floatVec4 TextureUnit::TextureMapping(floatVec4 coordIn, int attrIndx, pixel pix
 	//TEXPRINTF("  %2x %2x %2x %2x",color.r,color.g,color.b,color.a);
 	TEXPRINTF("%2d %3.2f\t\t",LoD, w_ratio);
 	TEXPRINTF("%3.2f %3.2f %3.2f %3.2f\n",
-			  pixelInput.scaleFacDX[attrIndx].s*texImage[tid].widthLevel[0],
-			  pixelInput.scaleFacDX[attrIndx].t*texImage[tid].heightLevel[0],
-			  pixelInput.scaleFacDY[attrIndx].s*texImage[tid].widthLevel[0],
-			  pixelInput.scaleFacDY[attrIndx].t*texImage[tid].heightLevel[0]);
+			  scaleFacDX.s*texImage[tid].widthLevel[0],
+			  scaleFacDX.t*texImage[tid].heightLevel[0],
+			  scaleFacDY.s*texImage[tid].widthLevel[0],
+			  scaleFacDY.t*texImage[tid].heightLevel[0]);
 
 	return color;
 }

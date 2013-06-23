@@ -14,7 +14,21 @@
 
 class ShaderCore {
 public:
-	TextureUnit tUnit;
+	ShaderCore()
+	{
+		instCnt = 0;
+		shaderType = VERTEX_SHADER;
+		for (int i=0; i<MAX_SHADER_REG_VECTOR; i++)
+			reg[i].x = reg[i].y = reg[i].z = reg[i].w = 0.0f;
+		dst.x = dst.y = dst.z = dst.w = 0.0;
+		src[0].x = src[0].y = src[0].z = src[0].w = 0.0;
+		src[1].x = src[1].y = src[1].z = src[1].w = 0.0;
+		src[2].x = src[2].y = src[2].z = src[2].w = 0.0;
+		tid = -1, tType = 0;
+		curInst.Init();
+	}
+
+	TextureUnit texUnit;
 
 	int shaderType; ///< Vertex/Fragment Shader
 	void *input;
@@ -24,9 +38,7 @@ public:
 
 	///statitic
 
-	ShaderCore();
 	void Init();
-
 	void Exec();
 	void Print();
 	void FetchData();

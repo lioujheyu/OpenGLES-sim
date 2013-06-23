@@ -32,6 +32,11 @@ void GPU_Core::InitPrimitiveAssembly()
 
 void GPU_Core::VertexShaderEXE(int sid, void *input)
 {
+	sCore[sid].instPool = VSinstPool;
+	sCore[sid].instCnt = VSinstCnt;
+	sCore[sid].uniformPool = uniformPool;
+	sCore[sid].shaderType = VERTEX_SHADER;
+
 	sCore[sid].Init();
 	sCore[sid].input = input;
 	sCore[sid].Exec();
@@ -70,7 +75,7 @@ void GPU_Core::ViewPort()
     curVtx.attr[0].z = z;
 }
 
-/// @todo (elvis#1#): the vertex order has been compromised.
+/// @bug the vertex order has been compromised.
 void GPU_Core::PrimitiveAssembly()
 {
     switch (drawMode) {
