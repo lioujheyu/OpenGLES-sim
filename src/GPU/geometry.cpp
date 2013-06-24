@@ -45,19 +45,13 @@ void GPU_Core::VertexShaderEXE(int sid, void *input)
 void GPU_Core::PerspectiveCorrection()
 {
 	float w = curVtx.attr[0].w;
-	curVtx.attr[0].w = (float)1/w;
-	curVtx.attr[0].x = curVtx.attr[0].x / w;
-	curVtx.attr[0].y = curVtx.attr[0].y / w;
-	curVtx.attr[0].z = curVtx.attr[0].z / w;
-	for (int i=1; i<MAX_ATTRIBUTE_NUMBER; i++) {
+	curVtx.attr[0].w = 1.0;
+
+	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
 		if (attrEnable[i] == false)
 			continue;
-		else{
-			curVtx.attr[i].s = curVtx.attr[i].s / w;
-			curVtx.attr[i].t = curVtx.attr[i].t / w;
-			curVtx.attr[i].p = curVtx.attr[i].p / w;
-			curVtx.attr[i].q = curVtx.attr[i].q / w;
-		}
+		else
+			curVtx.attr[i] = curVtx.attr[i] / w;
 	}
 }
 

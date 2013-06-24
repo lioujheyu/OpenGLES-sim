@@ -57,6 +57,8 @@
 		<Unit filename="src/GPU/texture_unit.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="src/common.h" />
+		<Unit filename="src/common_sse.h" />
 		<Unit filename="src/context.cpp" />
 		<Unit filename="src/context.h" />
 		<Unit filename="src/context_glapi.cpp" />
@@ -79,7 +81,6 @@
 		<Unit filename="src/nvgp4Info.y">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="src/type.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

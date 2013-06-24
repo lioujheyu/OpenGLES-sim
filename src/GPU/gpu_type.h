@@ -7,8 +7,13 @@
 #ifndef GPU_TYPE_H_INCLUDED
 #define GPU_TYPE_H_INCLUDED
 
-#include "../type.h"
 #include "gpu_config.h"
+
+#ifdef USE_SSE
+	#include "../common_sse.h"
+#else
+	#include "../common.h"
+#endif
 
 #define VERTEX_SHADER 0
 #define FRAGMENT_SHADER 1

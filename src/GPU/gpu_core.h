@@ -72,7 +72,7 @@ public:
     void 			PassConfig2SubModule();
 
 private:
-	ShaderCore		sCore[2];
+	ShaderCore		sCore[MAX_SHADER_CORE];
 
 	//Geometry
 	vertex      	curVtx;

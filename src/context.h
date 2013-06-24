@@ -12,9 +12,14 @@
 #include <stack>
 #include <GLES3/gl3.h>
 
-#include "type.h"
 #include "GPU/driver.h"
 #include "GPU/gpu_config.h"
+
+#ifdef USE_SSE
+	#include "common_sse.h"
+#else
+	#include "common.h"
+#endif
 
 struct attribute
 {

@@ -28,14 +28,7 @@ Optional
 ***********************************
 2. How to get this project
 ***********************************
-You can goto
-
-	http://140.116.164.239/~git/?p=ogles1_1.git;a=summary
-
-and click the "snapshot" on the master branch to download the tgz file. This
-page also allows anyone to trace the the project's current progress.
-
-Or if you have my git server's access permission, use this git command
+Use this git command
 
 	git clone git@140.116.164.239:ogles1_1
 	
@@ -43,6 +36,13 @@ You can use any git client to execute the above command. If on Windows, go
 checking MsysGit (http://msysgit.github.io/), TortoiseGit
 (https://code.google.com/p/tortoisegit/), or even msys/cygwin system with git
 command.
+
+You can also goto
+
+	http://140.116.164.239/~git/?p=ogles1_1.git;a=summary
+
+and click the "snapshot" on the master branch to download the tgz file. This
+page also allows anyone to trace the the project's current progress.
 
 ***********************************
 3. How to Compile this project
@@ -72,7 +72,7 @@ Makefile )
 ***********************************
 3. Known Issue
 ***********************************
-a. while compile the code on windows. the compile error "std::to_string is not
+a. while compile the code on windows, the compile error "std::to_string is not
    a member of std" is jumped out.
   This is a known bug for mingw-gcc from 4.6.4 to 4.7.2. You can update your 
   Mingw-gcc from this site. (http://sourceforge.net/projects/mingwbuilds/files/)
@@ -89,7 +89,6 @@ a. while compile the code on windows. the compile error "std::to_string is not
 
 Cause this project is still under development, any situation is possible. 
 Please email or report to me if you find any compiler error or bug. Many thanks.
-	
 	
 Liou Jhe-Yu
 lioujheyu@gmail.com

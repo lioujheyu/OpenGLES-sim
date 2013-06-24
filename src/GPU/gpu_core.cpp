@@ -6,6 +6,7 @@
 
 #include "gpu_core.h"
 #include <stdio.h>
+#include <thread>
 
 GPU_Core gpu;
 
@@ -31,8 +32,8 @@ void GPU_Core::Run()
 	PassConfig2SubModule();
 
 	InitPrimitiveAssembly();
-	sCore[0].texUnit.ClearTexCache();
-	sCore[1].texUnit.ClearTexCache();
+	for (int i=0; i<MAX_SHADER_CORE; i++)
+		sCore[i].texUnit.ClearTexCache();
 
     for (int vCnt=0; vCnt<vtxCount; vCnt++) {
 
@@ -76,9 +77,21 @@ void GPU_Core::Run()
 
 					pixelSplit(x,y,3);
 					for (int i=0; i<pixBufferP; i++) {
-						//pixBuffer[i] = ShaderEXE(pixBuffer[i]);
-						FragmentShaderEXE(1,&pixBuffer[i]);
-						PerFragmentOp(pixBuffer[i]);
+//						if ((pixBufferP-i)>1) {
+//							std::thread t1(FragmentShaderEXE, 1, std::ref(pixBuffer+i));
+//							std::thread t2(FragmentShaderEXE, 2, std::ref(pixBuffer+i+1));
+//
+//							t1.join();
+//							t2.join();
+//
+//							PerFragmentOp(pixBuffer[i]);
+//							PerFragmentOp(pixBuffer[i+1]);
+//							i++;
+//						}
+//						else {
+							FragmentShaderEXE(1,&pixBuffer[i]);
+							PerFragmentOp(pixBuffer[i]);
+//						}
 					}
 				}
 			}
@@ -104,11 +117,14 @@ void GPU_Core::Run()
 
 void GPU_Core::PassConfig2SubModule()
 {
-	for (int i=0; i<MAX_TEXTURE_UNIT; i++) {
-		sCore[1].texUnit.minFilter[i] = minFilter[i];
-		sCore[1].texUnit.magFilter[i] = magFilter[i];
-		sCore[1].texUnit.wrapS[i] = wrapS[i];
-		sCore[1].texUnit.wrapT[i] = wrapT[i];
-		sCore[1].texUnit.texImage[i] = texImage[i];
+	int i,j;
+	for (j=0; j<MAX_SHADER_CORE; j++) {
+		for (i=0; i<MAX_TEXTURE_UNIT; i++) {
+			sCore[j].texUnit.minFilter[i] = minFilter[i];
+			sCore[j].texUnit.magFilter[i] = magFilter[i];
+			sCore[j].texUnit.wrapS[i] = wrapS[i];
+			sCore[j].texUnit.wrapT[i] = wrapT[i];
+			sCore[j].texUnit.texImage[i] = texImage[i];
+		}
 	}
 }

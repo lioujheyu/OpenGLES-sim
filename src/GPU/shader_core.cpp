@@ -23,13 +23,13 @@ void ShaderCore::Exec()
 		switch (curInst.op) {
 		//VECTORop
 		case OP_ABS:
-			dst = src[0].fvabs();
+			dst = fvabs(src[0]);
 			break;
 		case OP_CEIL:
-			dst = src[0].fvceil();
+			dst = fvceil(src[0]);
 			break;
 		case OP_FLR:
-			dst = src[0].fvfloor();
+			dst = fvfloor(src[0]);
 			break;
 		case OP_FRC:
 			break;

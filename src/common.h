@@ -9,38 +9,26 @@
 #include <vector>
 #include <cmath>
 #include <cstdio>
-#include <cstdlib>
-#include <xmmintrin.h>
-
-#define _MM_ALIGN16 __attribute__ ((aligned (16)))
 
 /**
  *	@brief floating vector with 4 component
  *	scalar/vector component-wised add, multiply operator
  */
 
-
-
 union floatVec4
 {
-	__m128 sse;
-	_MM_ALIGN16 float sseResult[4];
-    _MM_ALIGN16 struct { float x, y, z, w; };
-    _MM_ALIGN16 struct { float r, g, b, a; };
-    _MM_ALIGN16 struct { float s, t, p, q; };
+    struct { float x, y, z, w; };
+    struct { float r, g, b, a; };
+    struct { float s, t, p, q; };
 
-    inline floatVec4()
-    {
-
-    }
+    inline floatVec4() {}
 
     inline floatVec4(float xv, float yv, float zv, float wv)
     {
-    	sse = _mm_setr_ps(xv, yv, zv, wv);
-//    	x = xv;
-//    	y = yv;
-//    	z = zv;
-//    	w = wv;
+    	x = xv;
+    	y = yv;
+    	z = zv;
+    	w = wv;
     }
 
     inline floatVec4& operator=(const floatVec4 &rhs)
@@ -56,74 +44,114 @@ union floatVec4
 
     inline const floatVec4 operator+(const floatVec4 &other) const
     {
-		floatVec4 tmp;
-
-    	tmp.sse = _mm_add_ps(sse, other.sse);
-
-		return tmp;
+        floatVec4 tmp;
+        tmp.x = x + other.x;
+        tmp.y = y + other.y;
+        tmp.z = z + other.z;
+        tmp.w = w + other.w;
+        return tmp;
     }
 
     inline const floatVec4 operator+(const float other) const
     {
-    	__m128 sseSrc;
-    	floatVec4 tmp;
+        floatVec4 tmp;
+        tmp.x = x+other;
+        tmp.y = y+other;
+        tmp.z = z+other;
+        tmp.w = w+other;
+        return tmp;
+    }
 
-    	sseSrc = _mm_setr_ps(other, other, other, other);
-    	tmp.sse = _mm_add_ps(sse, sseSrc);
+    inline const floatVec4 operator-(const floatVec4 &other) const
+    {
+        floatVec4 tmp;
+        tmp.x = x - other.x;
+        tmp.y = y - other.y;
+        tmp.z = z - other.z;
+        tmp.w = w - other.w;
+        return tmp;
+    }
 
+    inline const floatVec4 operator-(const float other) const
+    {
+        floatVec4 tmp;
+        tmp.x = x - other;
+        tmp.y = y - other;
+        tmp.z = z - other;
+        tmp.w = w - other;
         return tmp;
     }
 
     inline const floatVec4 operator*(const floatVec4 &other) const
 	{
 		floatVec4 tmp;
-
-		tmp.sse = _mm_mul_ps(sse, other.sse);
-
+		tmp.x = x * other.x;
+		tmp.y = y * other.y;
+		tmp.z = z * other.z;
+		tmp.w = w * other.w;
 		return tmp;
 	}
 
 	inline const floatVec4 operator*(const float other) const
     {
-    	__m128 sseSrc;
-    	floatVec4 tmp;
-
-    	sseSrc = _mm_setr_ps(other, other, other, other);
-    	tmp.sse = _mm_mul_ps(sse, sseSrc);
-
+        floatVec4 tmp;
+        tmp.x = x * other;
+        tmp.y = y * other;
+        tmp.z = z * other;
+        tmp.w = w * other;
         return tmp;
     }
 
-	inline const floatVec4 fvabs()
+    inline const floatVec4 operator/(const floatVec4 &other) const
 	{
 		floatVec4 tmp;
-		tmp.x = fabs(x);
-		tmp.y = fabs(y);
-		tmp.z = fabs(z);
-		tmp.w = fabs(w);
+		tmp.x = x / other.x;
+		tmp.y = y / other.y;
+		tmp.z = z / other.z;
+		tmp.w = w / other.w;
 		return tmp;
 	}
 
-	inline const floatVec4 fvceil()
-	{
-		floatVec4 tmp;
-		tmp.x = ceil(x);
-		tmp.y = ceil(y);
-		tmp.z = ceil(z);
-		tmp.w = ceil(w);
-		return tmp;
-	}
-
-	inline const floatVec4 fvfloor()
-	{
-		floatVec4 tmp;
-		tmp.x = floor(x);
-		tmp.y = floor(y);
-		tmp.z = floor(z);
-		tmp.w = floor(w);
-		return tmp;
-	}
+	inline const floatVec4 operator/(const float other) const
+    {
+        floatVec4 tmp;
+        tmp.x = x / other;
+        tmp.y = y / other;
+        tmp.z = z / other;
+        tmp.w = w / other;
+        return tmp;
+    }
 };
+
+inline const floatVec4 fvabs(const floatVec4 &x)
+{
+	floatVec4 tmp;
+	tmp.x = fabs(x.x);
+	tmp.y = fabs(x.y);
+	tmp.z = fabs(x.z);
+	tmp.w = fabs(x.w);
+	return tmp;
+}
+
+inline const floatVec4 fvceil(const floatVec4 &x)
+{
+	floatVec4 tmp;
+	tmp.x = ceil(x.x);
+	tmp.y = ceil(x.y);
+	tmp.z = ceil(x.z);
+	tmp.w = ceil(x.w);
+	return tmp;
+}
+
+inline const floatVec4 fvfloor(const floatVec4 &x)
+{
+	floatVec4 tmp;
+	tmp.x = floor(x.x);
+	tmp.y = floor(x.y);
+	tmp.z = floor(x.z);
+	tmp.w = floor(x.w);
+	return tmp;
+}
 
 class fixColor4
 {
@@ -181,6 +209,17 @@ public:
         return tmp;
     }
 };
+
+inline const fixColor4 fv2bv(const floatVec4 &fv)
+{
+	fixColor4 bvtmp;
+
+	bvtmp.r = floor(fv.x == 1.0 ? 255 : fv.x * 256.0);
+	bvtmp.g = floor(fv.y == 1.0 ? 255 : fv.y * 256.0);
+	bvtmp.b = floor(fv.z == 1.0 ? 255 : fv.z * 256.0);
+	bvtmp.a = floor(fv.w == 1.0 ? 255 : fv.w * 256.0);
+	return bvtmp;
+}
 
 struct textureImage
 {

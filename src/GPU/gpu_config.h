@@ -10,8 +10,15 @@
 #include <cstdio>
 
 /**
+ *	Simulation Setting
+ */
+#define USE_SSE
+
+/**
  *	GPU implementation config
  */
+#define MAX_SHADER_CORE					3
+
 #define MAX_ATTRIBUTE_NUMBER    		8
 #define MAX_VERTEX_UNIFORM_VECTORS		128
 #define MAX_FRAGMENT_UNIFORM_VECTORS	16

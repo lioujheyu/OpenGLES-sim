@@ -90,66 +90,25 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 			for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
 				if (!attrEnable[attrCnt])
 					continue;
-				pixelStamp[i].attr[attrCnt].s = prim.v[0].attr[attrCnt].s +
-												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].s - prim.v[0].attr[attrCnt].s) +
-												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].s - prim.v[0].attr[attrCnt].s);
-				pixelStamp[i].attr[attrCnt].s = pixelStamp[i].attr[attrCnt].s / pixelStamp[i].attr[0].w;
 
-				pixelStamp[i].attr[attrCnt].t = prim.v[0].attr[attrCnt].t +
-												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].t - prim.v[0].attr[attrCnt].t) +
-												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].t - prim.v[0].attr[attrCnt].t);
-				pixelStamp[i].attr[attrCnt].t = pixelStamp[i].attr[attrCnt].t / pixelStamp[i].attr[0].w;
-
-				pixelStamp[i].attr[attrCnt].p = prim.v[0].attr[attrCnt].p +
-												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].p - prim.v[0].attr[attrCnt].s) +
-												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].p - prim.v[0].attr[attrCnt].s);
-				pixelStamp[i].attr[attrCnt].p = pixelStamp[i].attr[attrCnt].p / pixelStamp[i].attr[0].w;
-
-				pixelStamp[i].attr[attrCnt].q = prim.v[0].attr[attrCnt].q +
-												pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[attrCnt].q - prim.v[0].attr[attrCnt].q) +
-												pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[attrCnt].q - prim.v[0].attr[attrCnt].q);
-				pixelStamp[i].attr[attrCnt].q = pixelStamp[i].attr[attrCnt].q / pixelStamp[i].attr[0].w;
+				pixelStamp[i].attr[attrCnt] = prim.v[0].attr[attrCnt] +
+												(prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt])*pixelStamp[i].baryCenPos3[0]  +
+												(prim.v[2].attr[attrCnt] - prim.v[0].attr[attrCnt])*pixelStamp[i].baryCenPos3[1];
+				pixelStamp[i].attr[attrCnt] = pixelStamp[i].attr[attrCnt] / pixelStamp[i].attr[0].w;
 			}
 		}
 		///each attribute needs to get its scale factor, and all 4 pixels' attribute will get theirs here.
 		for (int attrCnt=1; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++){
 			if (!attrEnable[attrCnt])
 				continue;
-			pixelStamp[0].scaleFacDX[attrCnt].s = pixelStamp[1].scaleFacDX[attrCnt].s
-												= fabs(pixelStamp[1].attr[attrCnt].s-pixelStamp[0].attr[attrCnt].s);
-			pixelStamp[0].scaleFacDX[attrCnt].t = pixelStamp[1].scaleFacDX[attrCnt].t
-												= fabs(pixelStamp[1].attr[attrCnt].t-pixelStamp[0].attr[attrCnt].t);
-			pixelStamp[0].scaleFacDX[attrCnt].p = pixelStamp[1].scaleFacDX[attrCnt].p
-												= fabs(pixelStamp[1].attr[attrCnt].p-pixelStamp[0].attr[attrCnt].p);
-			pixelStamp[0].scaleFacDX[attrCnt].q = pixelStamp[1].scaleFacDX[attrCnt].q
-												= fabs(pixelStamp[1].attr[attrCnt].q-pixelStamp[0].attr[attrCnt].q);
-
-			pixelStamp[2].scaleFacDX[attrCnt].s = pixelStamp[3].scaleFacDX[attrCnt].s
-												= fabs(pixelStamp[3].attr[attrCnt].s-pixelStamp[2].attr[attrCnt].s);
-			pixelStamp[2].scaleFacDX[attrCnt].t = pixelStamp[3].scaleFacDX[attrCnt].t
-												= fabs(pixelStamp[3].attr[attrCnt].t-pixelStamp[2].attr[attrCnt].t);
-			pixelStamp[2].scaleFacDX[attrCnt].p = pixelStamp[3].scaleFacDX[attrCnt].p
-												= fabs(pixelStamp[3].attr[attrCnt].p-pixelStamp[2].attr[attrCnt].p);
-			pixelStamp[2].scaleFacDX[attrCnt].q = pixelStamp[3].scaleFacDX[attrCnt].q
-												= fabs(pixelStamp[3].attr[attrCnt].q-pixelStamp[2].attr[attrCnt].q);
-
-			pixelStamp[0].scaleFacDY[attrCnt].s = pixelStamp[2].scaleFacDY[attrCnt].s
-												= fabs(pixelStamp[2].attr[attrCnt].s-pixelStamp[0].attr[attrCnt].s);
-			pixelStamp[0].scaleFacDY[attrCnt].t = pixelStamp[2].scaleFacDY[attrCnt].t
-												= fabs(pixelStamp[2].attr[attrCnt].t-pixelStamp[0].attr[attrCnt].t);
-			pixelStamp[0].scaleFacDY[attrCnt].p = pixelStamp[2].scaleFacDY[attrCnt].p
-												= fabs(pixelStamp[2].attr[attrCnt].p-pixelStamp[0].attr[attrCnt].p);
-			pixelStamp[0].scaleFacDY[attrCnt].q = pixelStamp[2].scaleFacDY[attrCnt].q
-												= fabs(pixelStamp[2].attr[attrCnt].q-pixelStamp[0].attr[attrCnt].q);
-
-			pixelStamp[1].scaleFacDY[attrCnt].s = pixelStamp[3].scaleFacDY[attrCnt].s
-												= fabs(pixelStamp[3].attr[attrCnt].s-pixelStamp[1].attr[attrCnt].s);
-			pixelStamp[1].scaleFacDY[attrCnt].t = pixelStamp[3].scaleFacDY[attrCnt].t
-												= fabs(pixelStamp[3].attr[attrCnt].t-pixelStamp[1].attr[attrCnt].t);
-			pixelStamp[1].scaleFacDY[attrCnt].p = pixelStamp[3].scaleFacDY[attrCnt].p
-												= fabs(pixelStamp[3].attr[attrCnt].p-pixelStamp[1].attr[attrCnt].p);
-			pixelStamp[1].scaleFacDY[attrCnt].q = pixelStamp[3].scaleFacDY[attrCnt].q
-												= fabs(pixelStamp[3].attr[attrCnt].q-pixelStamp[1].attr[attrCnt].q);
+			pixelStamp[0].scaleFacDX[attrCnt] = pixelStamp[1].scaleFacDX[attrCnt]
+												= fvabs(pixelStamp[1].attr[attrCnt]-pixelStamp[0].attr[attrCnt]);
+			pixelStamp[2].scaleFacDX[attrCnt] = pixelStamp[3].scaleFacDX[attrCnt]
+												= fvabs(pixelStamp[3].attr[attrCnt]-pixelStamp[2].attr[attrCnt]);
+			pixelStamp[0].scaleFacDY[attrCnt] = pixelStamp[2].scaleFacDY[attrCnt]
+												= fvabs(pixelStamp[2].attr[attrCnt]-pixelStamp[0].attr[attrCnt]);
+			pixelStamp[1].scaleFacDY[attrCnt] = pixelStamp[3].scaleFacDY[attrCnt]
+												= fvabs(pixelStamp[3].attr[attrCnt]-pixelStamp[1].attr[attrCnt]);
 		}
 
         ///Write valid fragment into waiting buffer if they are truly pass the edge test.
@@ -290,10 +249,12 @@ void GPU_Core::PerFragmentOp(pixel pixInput)
     }
 
     ///Color buffer write back
-    *(cBufPtr + bufOffset*4 + 0) = pixInput.attr[1].r*255;// R
-    *(cBufPtr + bufOffset*4 + 1) = pixInput.attr[1].g*255;// G
-    *(cBufPtr + bufOffset*4 + 2) = pixInput.attr[1].b*255;// B
-    *(cBufPtr + bufOffset*4 + 3) = pixInput.attr[1].a*255;// A
+    fixColor4 color;
+    color = fv2bv(pixInput.attr[1]);
+    *(cBufPtr + bufOffset*4 + 0) = color.r;// R
+    *(cBufPtr + bufOffset*4 + 1) = color.g;// G
+    *(cBufPtr + bufOffset*4 + 2) = color.b;// B
+    *(cBufPtr + bufOffset*4 + 3) = color.a;// A
 }
 
 void GPU_Core::ClearBuffer(unsigned int mask)
