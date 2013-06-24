@@ -821,7 +821,7 @@ void Context::Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
     vp.w = width;
     vp.h = height;
 
-/// @fixme (elvis#1#): dirty buffer setting before buffer management is ready
+/// @todo (elvis#1#): dirty buffer setting before buffer management is ready
     drawBuffer[0] = new unsigned char [width*height*4];
     drawBuffer[1] = new float [width*height];
 }

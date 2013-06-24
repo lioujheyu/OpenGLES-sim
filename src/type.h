@@ -9,26 +9,38 @@
 #include <vector>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
+#include <xmmintrin.h>
+
+#define _MM_ALIGN16 __attribute__ ((aligned (16)))
 
 /**
  *	@brief floating vector with 4 component
  *	scalar/vector component-wised add, multiply operator
  */
 
+
+
 union floatVec4
 {
-    struct { float x, y, z, w; };
-    struct { float r, g, b, a; };
-    struct { float s, t, p, q; };
+	__m128 sse;
+	_MM_ALIGN16 float sseResult[4];
+    _MM_ALIGN16 struct { float x, y, z, w; };
+    _MM_ALIGN16 struct { float r, g, b, a; };
+    _MM_ALIGN16 struct { float s, t, p, q; };
 
-    inline floatVec4() {}
+    inline floatVec4()
+    {
+
+    }
 
     inline floatVec4(float xv, float yv, float zv, float wv)
     {
-    	x = xv;
-    	y = yv;
-    	z = zv;
-    	w = wv;
+    	sse = _mm_setr_ps(xv, yv, zv, wv);
+//    	x = xv;
+//    	y = yv;
+//    	z = zv;
+//    	w = wv;
     }
 
     inline floatVec4& operator=(const floatVec4 &rhs)
@@ -44,41 +56,41 @@ union floatVec4
 
     inline const floatVec4 operator+(const floatVec4 &other) const
     {
-        floatVec4 tmp;
-        tmp.x = x + other.x;
-        tmp.y = y + other.y;
-        tmp.z = z + other.z;
-        tmp.w = w + other.w;
-        return tmp;
+		floatVec4 tmp;
+
+    	tmp.sse = _mm_add_ps(sse, other.sse);
+
+		return tmp;
     }
 
     inline const floatVec4 operator+(const float other) const
     {
-        floatVec4 tmp;
-        tmp.x = x+other;
-        tmp.y = y+other;
-        tmp.z = z+other;
-        tmp.w = w+other;
+    	__m128 sseSrc;
+    	floatVec4 tmp;
+
+    	sseSrc = _mm_setr_ps(other, other, other, other);
+    	tmp.sse = _mm_add_ps(sse, sseSrc);
+
         return tmp;
     }
 
     inline const floatVec4 operator*(const floatVec4 &other) const
 	{
 		floatVec4 tmp;
-		tmp.x = x * other.x;
-        tmp.y = y * other.y;
-        tmp.z = z * other.z;
-        tmp.w = w * other.w;
+
+		tmp.sse = _mm_mul_ps(sse, other.sse);
+
 		return tmp;
 	}
 
 	inline const floatVec4 operator*(const float other) const
     {
-        floatVec4 tmp;
-        tmp.x = x*other;
-        tmp.y = y*other;
-        tmp.z = z*other;
-        tmp.w = w*other;
+    	__m128 sseSrc;
+    	floatVec4 tmp;
+
+    	sseSrc = _mm_setr_ps(other, other, other, other);
+    	tmp.sse = _mm_mul_ps(sse, sseSrc);
+
         return tmp;
     }
 

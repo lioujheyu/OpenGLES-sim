@@ -31,7 +31,7 @@
 		<Compiler>
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
-			<Add option="-fexceptions" />
+			<Add option="-fexceptions -march=native" />
 			<Add directory="include" />
 		</Compiler>
 		<Unit filename="bitmap.cpp" />

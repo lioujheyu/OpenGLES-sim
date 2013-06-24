@@ -138,7 +138,9 @@ void ActiveGPU2CleanBuffer()
 
     gpu.Run();
 }
-
+/**	@todo Use link-list or command buffer to set the states only when they
+ *	@todo differ from previous context, not all of them.
+ */
 void ActiveGPU()
 {
     Context * ctx = Context::GetCurrentContext();
@@ -175,8 +177,6 @@ void ActiveGPU()
     gpu.depthTestEnable = ctx->depthTestEnable;
     gpu.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
     gpu.dBufPtr = (float*)ctx->drawBuffer[1];
-    //gpu.rm.clearColor = ctx->clearColor;
-    //gpu.rm.clearDepth = ctx->clearDepth;
 
     ///Texture Statement
     for (int i=0; i<t_program->texCnt; i++){
