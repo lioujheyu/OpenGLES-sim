@@ -1,6 +1,6 @@
 #include "context.h"
 
-
+#define U_PROG programPool[usePID] //Get Porgram in Used
 
 /*****************************************
 
@@ -120,7 +120,7 @@ void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
 		printf("Current program is invalid.\n");
 		return;
     }
-    else if (programPool[usePID].isLinked == GL_FALSE) {
+    else if (U_PROG.isLinked == GL_FALSE) {
 		printf("Current program is invalid.\n");
 		return;
     }
@@ -460,52 +460,35 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
     }
 }
 
+#define SET_UNIFORM_CHECK_PROCEDURE(type)											\
+	if (usePID == 0) {																\
+		RecordError(GL_INVALID_OPERATION);											\
+		return;																		\
+	}																				\
+	if (location >= MAX_UNIFORM_VECTORS) {											\
+		RecordError(GL_INVALID_OPERATION);											\
+		return;																		\
+	}																				\
+	else if (U_PROG.uniformUsage.find(location) ==									\
+			U_PROG.uniformUsage.end()) {											\
+		RecordError(GL_INVALID_OPERATION);											\
+		return;																		\
+	}																				\
+	else if (U_PROG.srcUniform[U_PROG.uniformUsage[location]].declareType != type) {\
+		RecordError(GL_INVALID_OPERATION);											\
+		return;																		\
+	}
+
 void Context::Uniform1f (GLint location, GLfloat x)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float");
 
 	uniformPool[location].x = x;
 }
 
 void Context::Uniform2f(GLint location, GLfloat x, GLfloat y)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float2") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float2");
 
 	uniformPool[location].x = x;
 	uniformPool[location].y = y;
@@ -513,25 +496,7 @@ void Context::Uniform2f(GLint location, GLfloat x, GLfloat y)
 
 void Context::Uniform3f(GLint location, GLfloat x, GLfloat y, GLfloat z)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float3") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float3");
 
 	uniformPool[location].x = x;
 	uniformPool[location].y = y;
@@ -540,25 +505,7 @@ void Context::Uniform3f(GLint location, GLfloat x, GLfloat y, GLfloat z)
 
 void Context::Uniform4f(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float4") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float4");
 
 	uniformPool[location].x = x;
 	uniformPool[location].y = y;
@@ -573,19 +520,17 @@ void Context::Uniform1i(GLint location, GLint x)
 		return;
 	}
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		location = location - MAX_VERTEX_UNIFORM_VECTORS - MAX_FRAGMENT_UNIFORM_VECTORS;
-		if (location >= t_program.texCnt)
+	if (location >= MAX_UNIFORM_VECTORS) {
+		location = location - MAX_UNIFORM_VECTORS;
+		if (location >= U_PROG.texCnt)
 			RecordError(GL_INVALID_OPERATION);
 		else
 			samplePool[location] = x;
 	}
 	else {
-		if (location >= t_program.uniformCnt)
+		if (location >= U_PROG.uniformCnt)
 			RecordError(GL_INVALID_OPERATION);
-		else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int")
+		else if (U_PROG.srcUniform[U_PROG.uniformUsage[location]].declareType != "int")
 			RecordError(GL_INVALID_OPERATION);
 		else
 			uniformPool[location].x = (float)x;
@@ -594,25 +539,7 @@ void Context::Uniform1i(GLint location, GLint x)
 
 void Context::Uniform2i(GLint location, GLint x, GLint y)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int2") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("int2");
 
 	uniformPool[location].x = (float)x;
 	uniformPool[location].y = (float)y;
@@ -620,25 +547,7 @@ void Context::Uniform2i(GLint location, GLint x, GLint y)
 
 void Context::Uniform3i(GLint location, GLint x, GLint y, GLint z)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int3") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("int3");
 
 	uniformPool[location].x = (float)x;
 	uniformPool[location].y = (float)y;
@@ -647,25 +556,7 @@ void Context::Uniform3i(GLint location, GLint x, GLint y, GLint z)
 
 void Context::Uniform4i(GLint location, GLint x, GLint y, GLint z, GLint w)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int4") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("int4");
 
 	uniformPool[location].x = (float)x;
 	uniformPool[location].y = (float)y;
@@ -675,26 +566,9 @@ void Context::Uniform4i(GLint location, GLint x, GLint y, GLint z, GLint w)
 
 void Context::Uniform1fv(GLint location, GLsizei count, const GLfloat * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
@@ -705,26 +579,9 @@ void Context::Uniform1fv(GLint location, GLsizei count, const GLfloat * value)
 
 void Context::Uniform2fv(GLint location, GLsizei count, const GLfloat * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float2");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float2") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
@@ -737,26 +594,9 @@ void Context::Uniform2fv(GLint location, GLsizei count, const GLfloat * value)
 
 void Context::Uniform3fv(GLint location, GLsizei count, const GLfloat * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float3");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float3") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
@@ -770,26 +610,9 @@ void Context::Uniform3fv(GLint location, GLsizei count, const GLfloat * value)
 
 void Context::Uniform4fv(GLint location, GLsizei count, const GLfloat * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float4");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float3") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
@@ -809,16 +632,14 @@ void Context::Uniform1iv(GLint location, GLsizei count, const GLint * value)
 		return;
 	}
 
-	programObject t_program = programPool[usePID];
-
-	if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
 
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		location = location - MAX_VERTEX_UNIFORM_VECTORS - MAX_FRAGMENT_UNIFORM_VECTORS;
-		if (location >= t_program.texCnt)
+	if (location >= MAX_UNIFORM_VECTORS) {
+		location = location - MAX_UNIFORM_VECTORS;
+		if (location >= U_PROG.texCnt)
 			RecordError(GL_INVALID_OPERATION);
 		else {
 			for(int i=0; i<count; i++)
@@ -826,9 +647,9 @@ void Context::Uniform1iv(GLint location, GLsizei count, const GLint * value)
 		}
 	}
 	else {
-		if (location >= t_program.uniformCnt)
+		if (location >= U_PROG.uniformCnt)
 			RecordError(GL_INVALID_OPERATION);
-		else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int")
+		else if (U_PROG.srcUniform[U_PROG.uniformUsage[location]].declareType != "int")
 			RecordError(GL_INVALID_OPERATION);
 		else {
 			for(int i=0; i<count; i++)
@@ -839,26 +660,9 @@ void Context::Uniform1iv(GLint location, GLsizei count, const GLint * value)
 
 void Context::Uniform2iv(GLint location, GLsizei count, const GLint * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("int2");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int2") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
@@ -871,26 +675,9 @@ void Context::Uniform2iv(GLint location, GLsizei count, const GLint * value)
 
 void Context::Uniform3iv(GLint location, GLsizei count, const GLint * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("int3");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int3") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
@@ -904,26 +691,9 @@ void Context::Uniform3iv(GLint location, GLsizei count, const GLint * value)
 
 void Context::Uniform4iv(GLint location, GLsizei count, const GLint * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("int4");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "int4") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
@@ -938,26 +708,9 @@ void Context::Uniform4iv(GLint location, GLsizei count, const GLint * value)
 
 void Context::UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float2x2");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float2x2") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
@@ -972,26 +725,9 @@ void Context::UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpos
 
 void Context::UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float3x3");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float3x3") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}
@@ -1011,27 +747,9 @@ void Context::UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpos
 
 void Context::UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value)
 {
-	if (usePID == 0) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
+	SET_UNIFORM_CHECK_PROCEDURE("float4x4");
 
-	programObject t_program = programPool[usePID];
-
-	if (location >= (MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS)) {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.uniformUsage.find(location) == t_program.uniformUsage.end()) {
-		printf("%d \n",t_program.uniformUsage.size());
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (t_program.srcUniform[t_program.uniformUsage[location]].declareType != "float4x4") {
-		RecordError(GL_INVALID_OPERATION);
-		return;
-	}
-	else if (count > 1 && t_program.srcUniform[t_program.uniformUsage[location]].name.find('[') == std::string::npos) {
+	if (count > 1 && U_PROG.srcUniform[U_PROG.uniformUsage[location]].name.find('[') == std::string::npos) {
 		RecordError(GL_INVALID_OPERATION);
 		return;
 	}

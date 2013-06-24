@@ -18,6 +18,9 @@
 #define MAX_TEXTURE_UNIT	    		2
 #define MAX_SHADER_REG_VECTOR			16
 
+#define MAX_UNIFORM_VECTORS  									\
+	( MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS )
+
 
 /******************** Texture debuging and setting ********************/
 /**
