@@ -18,6 +18,15 @@
 
 struct attribute
 {
+    attribute()
+    {
+        enable = normalized = GL_FALSE;
+        size = 0;
+        type = 0;
+        stride = 0;
+        ptr = nullptr;
+    }
+
     GLboolean   enable;
     GLint       size;
     GLenum      type;

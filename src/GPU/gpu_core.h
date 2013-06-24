@@ -24,6 +24,7 @@ public:
 
 		depthRangeN = 0.0;
 		depthRangeF = 1.0;
+		viewPortLX = viewPortLY = 0.0;
 
 		DepthRef = 255;
 		depthTestMode = GL_LESS;

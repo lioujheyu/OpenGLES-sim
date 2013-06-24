@@ -43,7 +43,7 @@ class pixel : unitThread {
 public:
 	pixel()
 	{
-		isKilled == false;
+		isKilled = false;
 	}
 
     //The position will always use the 1st attribute slot in whole GPU design.

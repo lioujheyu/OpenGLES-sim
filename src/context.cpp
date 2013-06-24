@@ -7,7 +7,7 @@ Context::Context()
     m_current = false;
     activeTexture = 0;
     usePID = 0;
-//    textureTotalSeq = 0;
+    drawBuffer[0] = drawBuffer[1] = nullptr;
 
     for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++)
         vertexAttrib[i].enable = false;
@@ -17,6 +17,10 @@ Context::Context()
 		texContext[i].magFilter = GL_LINEAR;
 	}
 
+	clearDepth = 1.0;
+	clearMask = 0;
+	clearStat = GL_FALSE;
+    blendEnable = GL_FALSE;
 	depthTestEnable = GL_FALSE;
 }
 

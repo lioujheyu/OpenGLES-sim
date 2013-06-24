@@ -47,9 +47,11 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	unsigned short u, v;
 	unsigned short tag, entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
 	unsigned char *texTmpPtr = NULL;
-	bool isColdMiss = false;
 	unsigned char tWay = 0;
 	unsigned char LRUbiggest = 0;
+#ifdef SHOW_TEXCACHE_COLD_MISS
+    bool isColdMiss = false;
+#endif // SHOW_TEXCACHE_COLD_MISS
 
 	u = (unsigned short)coordIn.s;
 	v = (unsigned short)coordIn.t;
@@ -85,8 +87,10 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 				return TexCache.color[entry][offset][i];
 			}
 		}
+#ifdef SHOW_TEXCACHE_COLD_MISS
 		else
 			isColdMiss = true;
+#endif// SHOW_TEXCACHE_COLD_MISS
 	}
 
 	///*********** Texture cache miss ****************
@@ -228,7 +232,8 @@ floatVec4 TextureUnit::TextureSample(floatVec4 coordIn,
 	float w_ratio;
 	float maxScaleFac;
 	floatVec4 TexColor[2];
-	floatVec4 color, colorNextLevel;
+	floatVec4 color;
+//	floatVec4 colorNextLevel;
 	int LoD, maxLevel;
 
 	//find absolutely coord in texture image
