@@ -6,7 +6,6 @@
 
 #include "gpu_core.h"
 #include <stdio.h>
-#include <thread>
 
 GPU_Core gpu;
 
@@ -77,21 +76,8 @@ void GPU_Core::Run()
 
 					pixelSplit(x,y,3);
 					for (int i=0; i<pixBufferP; i++) {
-//						if ((pixBufferP-i)>1) {
-//							std::thread t1(FragmentShaderEXE, 1, std::ref(pixBuffer+i));
-//							std::thread t2(FragmentShaderEXE, 2, std::ref(pixBuffer+i+1));
-//
-//							t1.join();
-//							t2.join();
-//
-//							PerFragmentOp(pixBuffer[i]);
-//							PerFragmentOp(pixBuffer[i+1]);
-//							i++;
-//						}
-//						else {
-							FragmentShaderEXE(1,&pixBuffer[i]);
-							PerFragmentOp(pixBuffer[i]);
-//						}
+						FragmentShaderEXE(1,&pixBuffer[i]);
+						PerFragmentOp(pixBuffer[i]);
 					}
 				}
 			}

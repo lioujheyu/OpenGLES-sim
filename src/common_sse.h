@@ -20,9 +20,9 @@
 union floatVec4
 {
 	__m128 sse;
-    alignas(alignof(sse)) struct { float x, y, z, w; };
-    alignas(alignof(sse)) struct { float r, g, b, a; };
-    alignas(alignof(sse)) struct { float s, t, p, q; };
+    struct { float x, y, z, w; };
+	struct { float r, g, b, a; };
+    struct { float s, t, p, q; };
 
     inline floatVec4() {}
 
