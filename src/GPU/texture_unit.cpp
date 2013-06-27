@@ -41,11 +41,13 @@ int TextureUnit::CalcTexAdd(short int us,
 			+ uo;
 }
 
+/// \bug It seems that Texture cache under fully association has texel error
 floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 {
 	int i,j;
 	unsigned short u, v;
-	unsigned short tag, entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
+	unsigned int tag;
+	unsigned short entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
 	unsigned char *texTmpPtr = NULL;
 	unsigned char tWay = 0;
 	unsigned char LRUbiggest = 0;
@@ -53,8 +55,20 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
     bool isColdMiss = false;
 #endif // SHOW_TEXCACHE_COLD_MISS
 
+	if (level > texImage[tid].maxLevel) {
+		printf("TexUnit: %d exceed maximum level %d\n", level, texImage[tid].maxLevel);
+		return floatVec4(0.0, 0.0, 0.0, 0.0);
+	}
+
 	u = (unsigned short)coordIn.s;
 	v = (unsigned short)coordIn.t;
+
+	if (u > texImage[tid].widthLevel[level] ||
+		v > texImage[tid].heightLevel[level]) {
+		printf("TexUnit: (%d,%d)Out of the texture image's bound(%d,%d)\n",
+				u, v, texImage[tid].widthLevel[level], texImage[tid].heightLevel[level]);
+		return floatVec4(0.0, 0.0, 0.0, 0.0);
+	}
 
 #ifdef SHOW_MIPMAP_LEVEL
 	floatVec4 mipmaplevel;
@@ -68,9 +82,9 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	V_Block = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_SIZE_ROOT - 1);
 	U_Offset = u & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	V_Offset = v & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
-	tag = (int)( (V_Super << 8) | (U_Super&0x00ff) );
+	tag = (int)( (V_Super << 12) | (U_Super&0x0fff) );
 
-	///@note (elvis#1#): Simply append level and texture_id after tag bit
+	///@note Simply append level and texture_id after tag bit
 	tag = (tag << 4) | (level&0xf);
 	tag = (tag << 1) | (tid&0x1);
 
@@ -115,6 +129,16 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 						CalcTexAdd(U_Super,U_Block,i,
 								   V_Super,V_Block,j,
 								   texImage[tid].widthLevel[level]) * 4;
+
+			if (tag == 50336)
+			{
+				t++;
+				if (t == 35)
+					printf("test %d\n",t);
+				printf ("%d\n", CalcTexAdd(U_Super,U_Block,i,
+										V_Super,V_Block,j,
+										texImage[tid].widthLevel[level]) * 4);
+			}
 
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r = ((float)(*texTmpPtr++)/255);
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g = ((float)(*texTmpPtr++)/255);

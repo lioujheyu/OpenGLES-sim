@@ -2,6 +2,8 @@
  *	@file type.h
  *  @brief Data structures and functions for common use.
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
+ *
+ *
  */
 #ifndef TYPE_H_INCLUDED
 #define TYPE_H_INCLUDED
@@ -10,126 +12,99 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
-//#include <cstdlib>
 #include <xmmintrin.h>
 
+#define _MM_ALIGN16 __attribute__((aligned (16)))
+
 /**
- *	@brief floating vector with 4 component
- *	scalar/vector component-wised add, multiply operator using SSE instruction.
+ *	@brief Vector class with 4 floating component
+ *	Vector component-wised operation using SSE instruction.
+ *
+ *	This vector class's implementation is refered to this site:
+ *	http://fastcpp.blogspot.tw/2011/12/simple-vector3-class-with-sse-support.html
+ *	It works like a charm.
  */
-union floatVec4
+_MM_ALIGN16 class floatVec4
 {
-	__m128 sse;
-    struct { float x, y, z, w; };
-	struct { float r, g, b, a; };
-    struct { float s, t, p, q; };
+public:
 
-    inline floatVec4() {}
+	inline void* operator new[](size_t x) { return _aligned_malloc(x, 16); }
+	inline void  operator delete[](void* x) { if (x) _aligned_free(x); }
 
-    inline floatVec4(float xv, float yv, float zv, float wv)
-    {
-    	sse = _mm_setr_ps(xv, yv, zv, wv);
-    }
+	union {
+		__m128 sse;
+		struct { float x, y, z, w; };
+		struct { float r, g, b, a; };
+		struct { float s, t, p, q; };
+	};
 
-	// Since the explict assignment operator is faster than mine, this
-	// assignment overload has been blocked.
-//    inline floatVec4& operator=(const floatVec4 &rhs)
-//    {
-//    	if (this == &rhs)
-//            return *this;
-//
-//		x = rhs.x;
-//		y = rhs.y;
-//		z = rhs.z;
-//		w = rhs.w;
-//
-//		// Don't know why the following two command are not work. I think this
-//		// problem is involved with incorrect memory alignment.
-//
-//		//sse = rhs.sse;
-//		//sse = _mm_setr_ps(rhs.x, rhs.y, rhs.z, rhs.w);
-//        return *this;
-//    }
+	inline floatVec4() {}
+
+	inline floatVec4(float xv, float yv, float zv, float wv) :
+		sse(_mm_setr_ps(xv, yv, zv, wv)) {}
+
+	inline floatVec4(__m128 m) : sse(m) {}
 
     inline const floatVec4 operator+(const floatVec4 &other) const
     {
-		floatVec4 tmp;
-
-    	tmp.sse = _mm_add_ps(sse, other.sse);
-
-		return tmp;
+		return _mm_add_ps(sse, other.sse);
     }
 
     inline const floatVec4 operator+(const float other) const
     {
-    	__m128 sseSrc;
-    	floatVec4 tmp;
-
-    	sseSrc = _mm_set1_ps(other);
-    	tmp.sse = _mm_add_ps(sse, sseSrc);
-
-        return tmp;
+        return _mm_add_ps(sse, _mm_set1_ps(other));
     }
 
     inline const floatVec4 operator-(const floatVec4 &other) const
     {
-		floatVec4 tmp;
-
-    	tmp.sse = _mm_sub_ps(sse, other.sse);
-
-		return tmp;
+		return _mm_sub_ps(sse, other.sse);
     }
 
     inline const floatVec4 operator-(const float other) const
     {
-    	__m128 sseSrc;
-    	floatVec4 tmp;
-
-    	sseSrc = _mm_set1_ps(other);
-    	tmp.sse = _mm_sub_ps(sse, sseSrc);
-
-        return tmp;
+    	return _mm_sub_ps(sse, _mm_set1_ps(other));
     }
 
     inline const floatVec4 operator*(const floatVec4 &other) const
 	{
-		floatVec4 tmp;
-
-		tmp.sse = _mm_mul_ps(sse, other.sse);
-
-		return tmp;
+		return _mm_mul_ps(sse, other.sse);
 	}
 
 	inline const floatVec4 operator*(const float other) const
     {
-    	__m128 sseSrc;
-    	floatVec4 tmp;
-
-    	sseSrc = _mm_set1_ps(other);
-    	tmp.sse = _mm_mul_ps(sse, sseSrc);
-
-        return tmp;
+    	return _mm_mul_ps(sse, _mm_set1_ps(other));
     }
 
     inline const floatVec4 operator/(const floatVec4 &other) const
 	{
-		floatVec4 tmp;
-
-		tmp.sse = _mm_div_ps(sse, other.sse);
-
-		return tmp;
+		return _mm_div_ps(sse, other.sse);
 	}
 
     inline const floatVec4 operator/(const float other) const
     {
-    	__m128 sseSrc;
-    	floatVec4 tmp;
-
-    	sseSrc = _mm_set1_ps(other);
-    	tmp.sse = _mm_div_ps(sse, sseSrc);
-
-        return tmp;
+    	return _mm_div_ps(sse, _mm_set1_ps(other));
     }
+
+//    // dot product with another vector
+//	inline float dot(const floatVec4& other) const
+//	{
+//		return _mm_cvtss_f32(_mm_dp_ps(sse, other.sse, 0x71));
+//	}
+//	// length of the vector
+//	inline float length() const
+//	{
+//		return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(sse, sse, 0x71)));
+//	}
+//	// 1/length() of the vector
+//	inline float rlength() const
+//	{
+//		return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_dp_ps(sse, sse, 0x71)));
+//	}
+//	// returns the vector scaled to unit length
+//	inline floatVec4 normalize() const
+//	{
+//		return _mm_mul_ps(sse, _mm_rsqrt_ps(_mm_dp_ps(sse, sse, 0x7F)));
+//	}
 };
 
 inline const floatVec4 fvabs(const floatVec4 &x)
@@ -161,9 +136,6 @@ inline const floatVec4 fvfloor(const floatVec4 &x)
 	tmp.w = floor(x.w);
 	return tmp;
 }
-
-//typedef std::aligned_storage<__m128,__m128>::type A_pod;
-
 
 class fixColor4
 {
@@ -235,7 +207,13 @@ inline const fixColor4 fv2bv(const floatVec4 &fv)
 
 struct textureImage
 {
-	inline textureImage():maxLevel(-1),border(0){}
+	inline textureImage()
+	{
+		maxLevel = -1;
+		border = 0;
+		for (int i=0;i<13;i++)
+			data[i] = nullptr;
+	}
 
     int				maxLevel;
     unsigned int	border;
