@@ -9,8 +9,7 @@
 void GPU_Core::InitPrimitiveAssembly()
 {
     primitiveRdy = false;
-    fanCnt = false;
-    stripCnt = 2;
+    stripIndicator = false;
 
     switch (drawMode) {
     case GL_TRIANGLES:
@@ -32,6 +31,8 @@ void GPU_Core::InitPrimitiveAssembly()
 
 void GPU_Core::VertexShaderEXE(int sid, void *input)
 {
+	totalVtx++;
+
 	sCore[sid].instPool = VSinstPool;
 	sCore[sid].instCnt = VSinstCnt;
 	sCore[sid].uniformPool = uniformPool;
@@ -42,16 +43,16 @@ void GPU_Core::VertexShaderEXE(int sid, void *input)
 	sCore[sid].Exec();
 }
 
-void GPU_Core::PerspectiveCorrection()
+void GPU_Core::PerspectiveDivision()
 {
-	float w = curVtx.attr[0].w;
+	float w = 1.0/curVtx.attr[0].w;
 	curVtx.attr[0].w = 1.0;
 
 	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
 		if (attrEnable[i] == false)
 			continue;
 		else
-			curVtx.attr[i] = curVtx.attr[i] / w;
+			curVtx.attr[i] = curVtx.attr[i] * w;
 	}
 }
 
@@ -72,7 +73,6 @@ void GPU_Core::ViewPort()
     curVtx.attr[0].z = z;
 }
 
-/// @bug the vertex order has been compromised.
 void GPU_Core::PrimitiveAssembly()
 {
     switch (drawMode) {
@@ -80,21 +80,54 @@ void GPU_Core::PrimitiveAssembly()
             prim.v[vtxCntDwn-1] = curVtx;
         break;
 
+	/*	Vertex order in Strip mode
+	 *	-1, 0, 1
+	 *	 0, 2, 1
+	 *	 1, 2, 3
+	 *	 2, 4, 3
+	 *	 3, 4, 5
+	 *	 4, 6, 5
+	 */
     case GL_TRIANGLE_STRIP:
-        prim.v[stripCnt] = curVtx;
-        stripCnt = (stripCnt==0)?2:stripCnt-1;
+    	if (vtxCntDwn == 1) {
+			if (stripIndicator == false) {
+				prim.v[2] = prim.v[0];
+				prim.v[0] = curVtx;
+				stripIndicator = true;
+			}
+			else {
+				prim.v[2] = prim.v[1];
+				prim.v[1] = curVtx;
+				stripIndicator = false;
+			}
+		}
+    	else if (vtxCntDwn == 3)
+			prim.v[0] = curVtx;
+		else if (vtxCntDwn == 2)
+			prim.v[1] = curVtx;
         break;
 
+	/*	Vertex order in Fan mode
+	 *	1, 0, 0
+	 *	1, 0, 2
+	 *	1, 2, 3
+	 *	1, 3, 4
+	 *	1, 4, 5
+	 *	1, 5, 6
+	 */
     case GL_TRIANGLE_FAN:
         if (vtxCntDwn == 1) {
-            prim.v[fanCnt] = curVtx;
-            fanCnt = !fanCnt;
+			prim.v[1] = prim.v[0];
+			prim.v[0] = curVtx;
         }
-        else
-            prim.v[vtxCntDwn-1] = curVtx;
+        else if (vtxCntDwn == 3)
+			prim.v[2] = curVtx;
+		else if (vtxCntDwn == 2)
+            prim.v[0] = curVtx;
         break;
-
     default:
+    	printf("GPU_Core: Unsurpport draw mode: %x\n",drawMode);
+    	exit(1);
         break;
     }
 
@@ -102,6 +135,7 @@ void GPU_Core::PrimitiveAssembly()
 
     if (vtxCntDwn == 0)
     {
+		totalPrimitive++;
         primitiveRdy = true;
 
         switch (drawMode) {
@@ -113,6 +147,8 @@ void GPU_Core::PrimitiveAssembly()
             vtxCntDwn = 1;
             break;
         default:
+        	printf("GPU_Core: Unsurpport draw mode: %x",drawMode);
+			exit(1);
             break;
         }
     }
