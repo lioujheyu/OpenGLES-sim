@@ -39,13 +39,9 @@
 //
 //    gpu.rm.minFilter[0] = GL_LINEAR_MIPMAP_NEAREST;
 //    gpu.rm.magFilter[0] = GL_LINEAR;
-//    gpu.rm.texImage[0] = ctx->texImagepool[ctx->texContext[tid].texBindID];
+//    gpu.rm.texImage[0] = ctx->texImagepool[ctx->texCtx[tid].texBindID];
 //}
 
-/**
- *	Generate mip-map structure image from base level.
- *	@param tid Specified which texture Context's image will be used as source
- */
 void GenMipMap(int tid)
 {
 	Context * ctx = Context::GetCurrentContext();
@@ -57,7 +53,7 @@ void GenMipMap(int tid)
 
 	fixColor4 texel[4], texelAvg;
 
-	textureImage *tempImg = &ctx->texImagePool[ctx->texContext[tid].texBindID];
+	textureImage *tempImg = &ctx->texImagePool[ctx->texCtx[tid].texBindID];
 	width = tempImg->widthLevel[0];
 	height = tempImg->heightLevel[0];
 
@@ -112,14 +108,14 @@ void GenMipMap(int tid)
 		height = nextHeight;
 	}
 
-	//ctx->texImagePool[ctx->texContext[tid].texBindID] = tempImg;
+	//ctx->texImagePool[ctx->texCtx[tid].texBindID] = tempImg;
 
 	printf("\nMip-map generation complete!!!\n");
 	printf("Base level width:%d, height:%d\n",tempImg->widthLevel[0], tempImg->heightLevel[0]);
 	printf("Max level:%d width:%d, height:%d\n", tempImg->maxLevel, tempImg->widthLevel[tempImg->maxLevel],
 																  tempImg->heightLevel[tempImg->maxLevel]);
 
-	ctx->texContext[tid].genMipmap = false;
+	ctx->texCtx[tid].genMipmap = false;
 }
 
 void ActiveGPU2CleanBuffer()
@@ -143,11 +139,11 @@ void ActiveGPU2CleanBuffer()
  */
 void ActiveGPU()
 {
-    Context * ctx = Context::GetCurrentContext();
+    Context *ctx = Context::GetCurrentContext();
     programObject *t_program = &ctx->programPool[ctx->usePID];
 
-    for (int i=0;i<MAX_TEXTURE_UNIT;i++){
-		if (ctx->texContext[i].genMipmap)
+    for (int i=0;i<MAX_TEXTURE_CONTEXT;i++){
+		if (ctx->texCtx[i].genMipmap)
 			GenMipMap(i);
 			//ActiveGPU2GenMipMap(i);
     }
@@ -180,11 +176,11 @@ void ActiveGPU()
 
     //Texture Statement
     for (int i=0; i<t_program->texCnt; i++){
-		gpu.minFilter[i] = ctx->texContext[ctx->samplePool[i]-1].minFilter;
-		gpu.magFilter[i] = ctx->texContext[ctx->samplePool[i]-1].magFilter;
-		gpu.wrapS[i] = ctx->texContext[ctx->samplePool[i]-1].wrapS;
-		gpu.wrapT[i] = ctx->texContext[ctx->samplePool[i]-1].wrapT;
-		gpu.texImage[i] = ctx->texImagePool[ctx->texContext[ctx->samplePool[i]-1].texBindID];
+		gpu.minFilter[i] = ctx->texCtx[ctx->samplePool[i]-1].minFilter;
+		gpu.magFilter[i] = ctx->texCtx[ctx->samplePool[i]-1].magFilter;
+		gpu.wrapS[i] = ctx->texCtx[ctx->samplePool[i]-1].wrapS;
+		gpu.wrapT[i] = ctx->texCtx[ctx->samplePool[i]-1].wrapT;
+		gpu.texImage[i] = ctx->texImagePool[ctx->texCtx[ctx->samplePool[i]-1].texBindID];
     }
 
     for (int i=0; i<t_program->uniformCnt; i++)

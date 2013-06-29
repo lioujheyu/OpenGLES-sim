@@ -24,7 +24,7 @@ Compile Requirement {#compile_required}
   + With Code::Blocks built-in mingw-gcc 4.6.4 (Windows)
   
     There is a bug caused by Mingw-gcc 4.6.4-4.7.2 on Windows. Please see the
-    [issue section](#known_Issue) for the solution by patching or updating 
+    [issue section](#known_issue) for the solution by patching or updating 
     Mingw-gcc.
 	
   + On Linux, Update to gcc 4.6.4 or above should be a piece of cake :)
@@ -33,9 +33,9 @@ Compile Requirement {#compile_required}
 - [Nvidia Cg Toolkits](https://developer.nvidia.com/cg-toolkit-download)
   (Both Windows and Linux)
   
-  Current version uses cg compiler as its glsl compiler. Lack of this 
-  compiler will cause glCompilerShader malfunction, although you can use
-  glShaderBinary to avoid it.
+  Current version uses cg compiler as its glsl compiler. Lack of this compiler
+  will cause glCompilerShader malfunction, although you can use glShaderBinary
+  to avoid it.
 	
 	
 - [Code::Blocks](http://www.codeblocks.org/downloads) (Both Windows and 
@@ -111,7 +111,8 @@ Major File Association {#basic_file_association}
 ======================
 \dot
 digraph {
-	node [ fontname=arial, fontcolor=blue, fontsize=11, shape=box ];
+	node [ fontname=arial, fontsize=11, shape=box ];
+	edge [ color=blue ];
 	"main.cpp" [URL="\ref main.cpp"]
 	"gl3.h" [URL="\ref gl3.h"]
 	"gl3.cpp" [URL="\ref gl3.cpp"]

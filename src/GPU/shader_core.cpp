@@ -1,3 +1,9 @@
+/**
+ *	@file shader_core.cpp
+ *  @brief Shader Core implementation
+ *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
+ */
+
 #include "shader_core.h"
 
 void ShaderCore::Init()
@@ -168,46 +174,40 @@ void ShaderCore::FetchData()
 	tid = curInst.tid;
 	tType = curInst.tType;
 	for (int i=0; i<3; i++) {
-		if (curInst.src[i].type != 0) {
-			switch (curInst.src[i].type) {
-			case INST_NO_TYPE:
-				goto endSrcOperand;
-			case INST_ATTRIB:
-				if (shaderType == VERTEX_SHADER)
-					src[i] =ReadByMask(vtxPtr->attr[curInst.src[i].id], curInst.src[i].modifier);
-				else
-					src[i] =ReadByMask(pixPtr->attr[curInst.src[i].id], curInst.src[i].modifier);
-				break;
-
-			case INST_UNIFORM:
-				src[i] = ReadByMask(uniformPool[curInst.src[i].id], curInst.src[i].modifier);
-				break;
-
-			case INST_REG:
-				src[i] = ReadByMask(reg[curInst.src[i].id], curInst.src[i].modifier);
-				break;
-
-			case INST_CONSTANT:
-				src[i] = ReadByMask(curInst.src[i].val, curInst.src[i].modifier);
-				break;
-
-			default:
-				printf("Shader(Exec): Unknow operand type \n");
-				return;
-			}
-
-			if (curInst.src[i].inverse) {
-				src[i].x = -src[i].x;
-				src[i].y = -src[i].y;
-				src[i].z = -src[i].z;
-				src[i].w = -src[i].w;
-			}
-		}
-		else
+		switch (curInst.src[i].type) {
+		case INST_NO_TYPE:
+			return;
+		case INST_ATTRIB:
+			if (shaderType == VERTEX_SHADER)
+				src[i] =ReadByMask(vtxPtr->attr[curInst.src[i].id], curInst.src[i].modifier);
+			else
+				src[i] =ReadByMask(pixPtr->attr[curInst.src[i].id], curInst.src[i].modifier);
 			break;
+
+		case INST_UNIFORM:
+			src[i] = ReadByMask(uniformPool[curInst.src[i].id], curInst.src[i].modifier);
+			break;
+
+		case INST_REG:
+			src[i] = ReadByMask(reg[curInst.src[i].id], curInst.src[i].modifier);
+			break;
+
+		case INST_CONSTANT:
+			src[i] = ReadByMask(curInst.src[i].val, curInst.src[i].modifier);
+			break;
+
+		default:
+			printf("Shader(Exec): Unknow operand type \n");
+			return;
+		}
+
+		if (curInst.src[i].inverse) {
+			src[i].x = -src[i].x;
+			src[i].y = -src[i].y;
+			src[i].z = -src[i].z;
+			src[i].w = -src[i].w;
+		}
 	}
-endSrcOperand:
-	return;
 }
 
 void ShaderCore::WriteBack()
@@ -232,6 +232,14 @@ void ShaderCore::WriteBack()
 	}
 }
 
+/**
+ *	Extract the source floatVec4 's component by mask
+ *
+ *	@param in 	A floatVec4 prepared for component extraction by mask.
+ *	@param mask The componemt mask
+ *
+ *	@return A floatVec4
+ */
 floatVec4 ShaderCore::ReadByMask(floatVec4 in, char *mask)
 {
 	floatVec4 temp;
@@ -272,6 +280,13 @@ floatVec4 ShaderCore::ReadByMask(floatVec4 in, char *mask)
 	return temp;
 }
 
+/**
+ *	Write the destination floatVec4 's floating component by mask
+ *
+ *	@param val		A floatVec4 value prepared for writing.
+ *	@param fvdst	The destination floatVec4 's pointer
+ *	@param mask 	The componemt mask.
+ */
 void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 {
 	for (int i=0; i<4; i++) {
@@ -296,11 +311,9 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 			fvdst->w = val.w;
 			break;
 		default: // '\0'
-			goto endLabel;
+			return;
 		}
 	}
-endLabel:
-	return;
 }
 
 void ShaderCore::Print()

@@ -29,6 +29,12 @@ void GPU_Core::InitPrimitiveAssembly()
 
 /****** Grahphic Related Function ******/
 
+/**
+ *	Invoke specified Shader Core for vertex shader processing
+ *
+ *	@param sid Which shader core id will be used.
+ *	@param input Input pointer
+ */
 void GPU_Core::VertexShaderEXE(int sid, void *input)
 {
 	totalVtx++;
@@ -152,6 +158,18 @@ void GPU_Core::PrimitiveAssembly()
             break;
         }
     }
+}
+
+/// @todo Clipping
+void GPU_Core::Clipping()
+{
+
+}
+
+/// @todo Culling
+void GPU_Core::Culling()
+{
+
 }
 
 

@@ -10,6 +10,7 @@
 
 /************************** Simulation Setting ************************/
 /**
+ *	@def USE_SSE
  *	Enable USE_SSE will use x86 SSE instruction set to accelerate vector
  *	operation by those varaible whose type is floatVec4.
  */
@@ -21,19 +22,23 @@
 #define MAX_ATTRIBUTE_NUMBER    		8
 #define MAX_VERTEX_UNIFORM_VECTORS		128
 #define MAX_FRAGMENT_UNIFORM_VECTORS	16
-#define MAX_TEXTURE_UNIT	    		2
+#define MAX_TEXTURE_CONTEXT	    		2
 #define MAX_SHADER_REG_VECTOR			16
 
 #define MAX_UNIFORM_VECTORS  									\
 	( MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS )
 
-///Whether disable texture cache or not
+/**
+ *	@def NO_TEX_CACHE
+ *	Whether disable texture cache or not
+ */
 #define NO_TEX_CACHE
 /*************************************************************************
  *	The whole texture cache size is determined be
  *	TEX_WAY_ASSOCIATION * TEX_CACHE_BLOCK_SIZE * TEX_CACHE_ENTRY_SIZE * 4B
  ************************************************************************/
 /**
+ *	@def TEX_WAY_ASSOCIATION
  *	define how many way association texture cache will use
  *	if TEX_WAY_ASSOCIATION = 1, the cache is direct mapped.
  */
@@ -47,6 +52,7 @@
 
 /******************** Texture debugging option ********************/
 /**
+ *	@def SHOW_MIPMAP_LEVEL
  *	Enable SHOW_MIPMAP_LEVEL will replace the texture color with
  *	level-represented luminance on the textured primitive nomatter
  *	which filter this primitive uses.
@@ -60,6 +66,7 @@
 //#define SHOW_MIPMAP_LEVEL
 
 /**
+ *	@def SHOW_TEXCACHE_COLD_MISS
  *	Enable SHOW_TEXCACHE_COLD_MISS will let texture cache return color red
  *	rather then the origianl texel's color when texture cache cold miss is
  *	occured. This opotion can be enable with SHOW_TEXCACHE_MISS and has no
@@ -68,6 +75,7 @@
 //#define SHOW_TEXCACHE_COLD_MISS
 
 /**
+ *	@def SHOW_TEXCACHE_MISS
  *	Enable SHOW_TEXCACHE_MISS will let texture cache return color green rather
  *	then the origianl texel's color when texture cache miss is occured. This
  *	opotion can be enable with SHOW_TEXCACHE_COLD_MISS and has no conflict.

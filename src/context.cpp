@@ -17,10 +17,10 @@ Context::Context()
 
     for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++)
         vertexAttrib[i].enable = false;
-	for (int i=0; i<MAX_TEXTURE_UNIT; i++) {
-		texContext[i].wrapS = texContext[i].wrapT = GL_REPEAT;
-		texContext[i].minFilter = GL_NEAREST_MIPMAP_LINEAR;
-		texContext[i].magFilter = GL_LINEAR;
+	for (int i=0; i<MAX_TEXTURE_CONTEXT; i++) {
+		texCtx[i].wrapS = texCtx[i].wrapT = GL_REPEAT;
+		texCtx[i].minFilter = GL_NEAREST_MIPMAP_LINEAR;
+		texCtx[i].magFilter = GL_LINEAR;
 	}
 
 	clearDepth = 1.0;

@@ -10,7 +10,8 @@
 #include "context.h"
 
 /**
- *	@brief Use current context's OpenGL api which no return value is needed
+ *	@def CONTEXT_EXEC(func)
+ *	Use current context's OpenGL api which no return value is needed.
  */
 #define CONTEXT_EXEC(func)                                  \
 	Context * context = Context::GetCurrentContext();		\
@@ -20,7 +21,8 @@
 	}
 
 /**
- *	@brief Use current context's OpenGL api which has return value
+ *	@def CONTEXT_EXEC_RETURN(func)
+ *	Use current context's OpenGL api which has return value.
  */
 #define CONTEXT_EXEC_RETURN(func)                           \
 	Context * context = Context::GetCurrentContext();		\

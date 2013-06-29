@@ -13,7 +13,6 @@
 #include "gpu_config.h"
 #include "gpu_type.h"
 #include "shader_core.h"
-#include "texture_unit.h"
 
 #ifdef GPU_INFO
 	#define GPUPRINTF(fmt, ...) \
@@ -44,6 +43,7 @@ class GPU_Core
 {
 public:
 	GPU_Core();
+	~GPU_Core();
 
     int         	vtxCount;
     int         	vtxFirst;
@@ -62,13 +62,13 @@ public:
 
 	///Texture min/mag filter for each texture unit
 	///@{
-	GLenum 			minFilter[MAX_TEXTURE_UNIT],
-					magFilter[MAX_TEXTURE_UNIT];
+	GLenum 			minFilter[MAX_TEXTURE_CONTEXT],
+					magFilter[MAX_TEXTURE_CONTEXT];
 	///@}
 
-    GLenum 			wrapS[MAX_TEXTURE_UNIT],
-					wrapT[MAX_TEXTURE_UNIT];
-	textureImage 	texImage[MAX_TEXTURE_UNIT];
+    GLenum 			wrapS[MAX_TEXTURE_CONTEXT],
+					wrapT[MAX_TEXTURE_CONTEXT];
+	textureImage 	texImage[MAX_TEXTURE_CONTEXT];
 	unsigned char	*cBufPtr;
     float			*dBufPtr;
 
@@ -102,7 +102,8 @@ private:
 
 	/// @name Primitive Assembly related member
 	///@{
-    int         	vtxCntDwn;///<How many vertex are insufficient to form a primitive.
+	///How many vertex are insufficient to form a primitive.
+    int         	vtxCntDwn;
     bool         	stripIndicator;
     bool        	primitiveRdy;
     ///@}
@@ -113,26 +114,18 @@ private:
 
     ///@name Boundary Box
     ///@{
-    int             LX, RX, LY, HY;
+    int             LX,	RX, LY,	HY;
     ///@}
 
     pixel           pixBuffer[256];
     int             pixBufferP;
 
 
-
-///@{
-/**
- *	@param sid Which shader core id will be used in processing.
- *	@param input Input pointer
- */
+	/// @name Invoke Shader Core
+	///@{
     void 			VertexShaderEXE(int sid, void *input);
-/**
- *	@param sid which shader core id will be used
- *	@param input Input pointer
- */
     void 			FragmentShaderEXE(int sid, void *input);
-///@}
+	///@}
 
     /// @name Geometry
     ///@{
@@ -140,10 +133,7 @@ private:
     void        	ViewPort();
     void        	InitPrimitiveAssembly();
     void        	PrimitiveAssembly();
-
-	/// @todo (elvis#1#): Clipping
     void        	Clipping();
-    /// @todo (elvis#1#): Culling
     void        	Culling();
     ///@}
 

@@ -73,7 +73,7 @@ struct viewPort
     }
 };
 
-struct textureState
+struct textureContext
 {
     GLboolean		genMipmap;
     GLenum      	minFilter, magFilter;
@@ -84,7 +84,7 @@ struct textureState
     ///Which Texture Image ID will binded to this texture context.
     GLuint			texBindID;
 
-    inline textureState() {
+    inline textureContext() {
         genMipmap = GL_FALSE;
         minFilter = GL_NEAREST_MIPMAP_LINEAR;
         magFilter = GL_LINEAR;
@@ -322,7 +322,6 @@ public:
 	/// @todo Correct buffer setting after buffer management is ready.
     void           *drawBuffer[2]; ///< 0 - color buffer, 1 - depth buffer
 
-	///View port related state
     viewPort        vp;
 
     /// @name clear function related variable
@@ -336,8 +335,8 @@ public:
     GLboolean       blendEnable;
     GLboolean       depthTestEnable;
 
-	///Texture Unit Statement
-	textureState	texContext[MAX_TEXTURE_UNIT];
+	///Texture Context
+	textureContext	texCtx[MAX_TEXTURE_CONTEXT];
 
     attribute       vertexAttrib[MAX_ATTRIBUTE_NUMBER];
     drawCommand     drawCmd;

@@ -199,6 +199,12 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 	}
 }
 
+/**
+ *	Invoke specified Shader Core for fragment shader processing
+ *
+ *	@param sid Which shader core id will be used.
+ *	@param input Input pointer
+ */
 void GPU_Core::FragmentShaderEXE(int sid, void *input)
 {
 	totalPix++;

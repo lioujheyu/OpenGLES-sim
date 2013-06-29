@@ -24,6 +24,12 @@ extern int nvgp4ASM_lineno;
 extern programObject t_program;
 extern unsigned int shaderType;
 
+/**
+ *	@brief Link target programObject
+ *
+ *	The link function will link the both ASM source in vertex shaderObjects
+ *	and fragment shaderObject which are attached under target programObject.
+ */
 void Context::LinkProgram(GLuint program)
 {
 	GLuint VS, FS;
@@ -53,7 +59,7 @@ void Context::LinkProgram(GLuint program)
 	t_program = programPool[program];
 	t_program.linkInfo.clear();
 
-/**
+/*
  * 	1st pass parsing for Link information retriving, including resource usage
  *	check and indexing. This stage Will also chech whether VS/FS's resource are
  *	matched.
@@ -74,7 +80,7 @@ void Context::LinkProgram(GLuint program)
 		programPool[program].linkInfo = "L0004: Too many vertex output values";
 	else if (t_program.VSuniformCnt > MAX_VERTEX_UNIFORM_VECTORS ||
 			 t_program.FSuniformCnt > MAX_FRAGMENT_UNIFORM_VECTORS ||
-			 t_program.texCnt > MAX_TEXTURE_UNIT)
+			 t_program.texCnt > MAX_TEXTURE_CONTEXT)
 		programPool[program].linkInfo = "L0005: Too many uniform values";
 
 	if (t_program.linkInfo.size() != 0) {
@@ -87,7 +93,7 @@ void Context::LinkProgram(GLuint program)
 		return;
 	}
 
-/**
+/*
  * 	2nd pass parsing for Custum instruction structure establishing from NVGP4
  *	assembly code. Resource remapping is performed in this stage.
  */

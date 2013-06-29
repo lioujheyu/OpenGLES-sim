@@ -1,6 +1,6 @@
 /**
  *	@file shader_core.h
- *  @brief Shader Core simulator
+ *  @brief Shader Core class
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
@@ -58,21 +58,7 @@ public:
 	void Print();
 	void FetchData();
 	void WriteBack();
-
-/**
- *	Extract the source floating vector's component by mask
- *	@param in A floating vector input prepared for extraction by mask
- *	@param mask The componemt mask
- *	@return A resulting floating vector
- */
 	floatVec4 ReadByMask(floatVec4 in, char *mask);
-
-/**
- *	Write the destination vector's floating component by mask
- *	@param val A floating vector value prepared for Writing by mask
- *	@param fvdst The destination floating vecto's pointer
- *	@param mask The componemt mask
- */
 	void WriteByMask(floatVec4 val, floatVec4 *fvdst, char *mask);
 
 private:

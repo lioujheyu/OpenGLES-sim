@@ -83,7 +83,8 @@ GLint Context::CreateShader(GLenum type)
 }
 
 /**
- *	@brief This function will call cg compiler to compile glsl source file.
+ *	@brief Compile source in shaderObject
+ *
  *	The procedure will write vertex shader or fragment shader source into
  *	.vssrc or .fssrc file, and then use cgc to compile them and write the
  *	assembly output in .vsasm or .fsasm file. Finally read these asm source

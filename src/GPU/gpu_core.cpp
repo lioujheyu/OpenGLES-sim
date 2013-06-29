@@ -11,7 +11,7 @@ GPU_Core gpu;
 
 void GPU_Core::Run()
 {
-    ///clear frame buffer if needed
+    //clear frame buffer if needed
     if (clearStat) {
 		ClearBuffer(clearMask);
 		clearStat = false;
@@ -26,7 +26,7 @@ void GPU_Core::Run()
 
     for (int vCnt=vtxFirst; vCnt<vtxCount; vCnt++) {
 
-		///Each vertex will be injected into Geometry's curVtx here
+		//Each vertex will be injected into Geometry's curVtx here
         for (int attrCnt=0; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++) {
             if (attrEnable[attrCnt]) {
                 curVtx.attr[attrCnt].x =
@@ -47,18 +47,18 @@ void GPU_Core::Run()
             }
         }
 
-		///Vertex-based operation starts here
+		//Vertex-based operation starts here
         VertexShaderEXE(0, &curVtx);
         PerspectiveDivision();
         ViewPort();
         PrimitiveAssembly();
 
-        ///Primitive-based operation starts here
+        //Primitive-based operation starts here
         if (primitiveRdy)
         {
             TriangleSetup();
 
-            ///Fragment-based operation starts here
+            //Fragment-based operation starts here
 			for(int y=LY; y<HY; y+=16) {
 				for(int x=LX; x<RX; x+=16) {
 					PIXPRINTF("Recursive Entry:-------(%d,%d)-----\n",x,y);
@@ -83,8 +83,6 @@ void GPU_Core::Run()
     GPUPRINTF("Texture cache hit: %d\n",sCore[1].texUnit.hit);
     GPUPRINTF("Texture cache miss: %d\n",sCore[1].texUnit.miss);
     GPUPRINTF("Texture cache miss rate: %f\n",(float)sCore[1].texUnit.miss / (sCore[1].texUnit.hit + sCore[1].texUnit.miss));
-
-
 
 }
 
@@ -132,14 +130,13 @@ void GPU_Core::PassConfig2SubModule()
 {
 	int i,j;
 	for (j=0; j<MAX_SHADER_CORE; j++) {
-		for (i=0; i<MAX_TEXTURE_UNIT; i++) {
+		for (i=0; i<MAX_TEXTURE_CONTEXT; i++) {
 			sCore[j].texUnit.minFilter[i] = minFilter[i];
 			sCore[j].texUnit.magFilter[i] = magFilter[i];
 			sCore[j].texUnit.wrapS[i] = wrapS[i];
 			sCore[j].texUnit.wrapT[i] = wrapT[i];
 			sCore[j].texUnit.texImage[i] = texImage[i];
 		}
-
 #ifdef TEXEL_INFO_FILE
 		sCore[j].texUnit.TEXELINFOfp =
 			fopen((std::string(TEXEL_INFO_FILE)+'_'+std::to_string(j)+".txt").c_str(),"w");
