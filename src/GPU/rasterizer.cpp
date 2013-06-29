@@ -29,15 +29,29 @@ void GPU_Core::TriangleSetup()
 void GPU_Core::pixelSplit(int x, int y, int level)
 {
 	int lc;
+
+/*
+ * c - central
+ * n - corner
+ *                                  5 6 7
+ * The hierachy can be presented as 3 c 4
+ *                                  0 1 2
+ * Zone[0] = box of 012c, zone[1] = 12c4, zone[2] = 3c56, zone[3] = c467
+ */
 	float centralTest[3];
 	float cornerTest[8][3];
 	bool Zone[4][3];
 
+/*
+ * pixel stamp: 2 3
+ *              0 1
+ * We need to calculating 4 pixels in quad concurrently nomatter if
+ * they are both falling into a triangle or not for scale factor calculation
+ */
 	pixel pixelStamp[4];
 
 
 	PIXPRINTF("-------(%d,%d),Level:%d-----\n",x,y,level);
-	TEXPRINTF("XXXX-YYYY-UUUU.UU-VVVV.VV----------------\n");
 
 	centralTest[0] = (x+(1<<level)-prim.v[1].attr[0].x)*Edge[0][0]-
 					 (y+(1<<level)-prim.v[1].attr[0].y)*Edge[0][1];
@@ -47,12 +61,6 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 					 (y+(1<<level)-prim.v[0].attr[0].y)*Edge[2][1];
 
 	if (level == 0) {
-		/**
-		 * pixel stamp: 2 3
-		 *              0 1
-		 * We need to calculating 4 pixels in quad concurrently nomatter if
-		 * they are both falling into a triangle or not for scale factor calculation
-		 */
 
 		for(lc=0; lc<3; lc++) {
 			cornerTest[0][lc] = centralTest[lc] + (-Edge[lc][0]+Edge[lc][1])*0.5;
@@ -78,7 +86,7 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 		pixelStamp[3].baryCenPos3[0] = cornerTest[7][2]*area2Reciprocal;
 		pixelStamp[3].baryCenPos3[1] = cornerTest[7][0]*area2Reciprocal;
 
-		///Interpolate the all 4 pixel's attributes, then perform perspective correction
+		//Interpolate the all 4 pixel's attributes, then perform perspective correction
 		for (int i=0;i<4;i++){
 			pixelStamp[i].attr[0].z = prim.v[0].attr[0].z +
 								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[0].z - prim.v[0].attr[0].z) +
@@ -97,7 +105,7 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 				pixelStamp[i].attr[attrCnt] = pixelStamp[i].attr[attrCnt] / pixelStamp[i].attr[0].w;
 			}
 		}
-		///each attribute needs to get its scale factor, and all 4 pixels' attribute will get theirs here.
+		//each attribute needs to get its scale factor, and all 4 pixels' attribute will get theirs here.
 		for (int attrCnt=1; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++){
 			if (!attrEnable[attrCnt])
 				continue;
@@ -111,7 +119,7 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 												= fvabs(pixelStamp[3].attr[attrCnt]-pixelStamp[1].attr[attrCnt]);
 		}
 
-        ///Write valid fragment into waiting buffer if they are truly pass the edge test.
+        //Write valid fragment into waiting buffer if they are truly pass the edge test.
 		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)|
             (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
 			pixBuffer[pixBufferP] = pixelStamp[0];
@@ -156,14 +164,6 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 		}
 	}
 	else {
-/**
- * c - central
- * n - corner
- *                                  5 6 7
- * The hierachy can be presented as 3 c 4
- *                                  0 1 2
- * Zone[0] = box of 012c, zone[1] = 12c4, zone[2] = 3c56, zone[3] = c467
- */
 		for(lc=0; lc<3; lc++) {
 			cornerTest[0][lc] = centralTest[lc] + (-Edge[lc][0]+Edge[lc][1])*(1<<level);
 			cornerTest[1][lc] = centralTest[lc] + (            +Edge[lc][1])*(1<<level);
@@ -201,6 +201,8 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 
 void GPU_Core::FragmentShaderEXE(int sid, void *input)
 {
+	totalPix++;
+
 	sCore[sid].instPool = FSinstPool;
 	sCore[sid].instCnt = FSinstCnt;
 	sCore[sid].uniformPool = uniformPool;
@@ -218,7 +220,7 @@ void GPU_Core::PerFragmentOp(pixel pixInput)
 
 	bufOffset = (int)pixInput.attr[0].y*viewPortW + (int)pixInput.attr[0].x;
 
-    ///Depth test
+    //Depth test
     if (depthTestEnable){
         if (depthTestMode == GL_NEVER)
             DepthPass = false;
@@ -243,12 +245,12 @@ void GPU_Core::PerFragmentOp(pixel pixInput)
             *(dBufPtr + bufOffset) = pixInput.attr[0].z;
     }
 
-    ///Alpha blending
+    //Alpha blending
     if (blendingMode){
 
     }
 
-    ///Color buffer write back
+    //Color buffer write back
     fixColor4 color;
     color = fv2bv(pixInput.attr[1]);
     *(cBufPtr + bufOffset*4 + 0) = color.r;// R

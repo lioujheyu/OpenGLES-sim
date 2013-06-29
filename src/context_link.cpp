@@ -1,18 +1,28 @@
+/**
+ *	@file context_link.cpp
+ *  @brief Link vertex shader and fragment shader under specfied program object
+ *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
+ */
+
 #include "context.h"
 
 #include "nvgp4Info.tab.h"
 #include "nvgp4ASM.tab.h"
 
+///Parse assembly source's header info into symbol table.
 extern int nvgp4Info_parse();
+///Setting which string will be the info-parsing input.
 extern void nvgp4Info_str_in(const char *s);
 extern int nvgp4Info_lineno;
+
+///Parse assembly instruction into custom instruction format.
 extern int nvgp4ASM_parse();
+///Setting which string will be the instruction-parsing input.
 extern void nvgp4ASM_str_in(const char *s);
 extern int nvgp4ASM_lineno;
 
 extern programObject t_program;
 extern unsigned int shaderType;
-extern std::vector<instruction> instructionPool;
 
 void Context::LinkProgram(GLuint program)
 {
@@ -45,7 +55,7 @@ void Context::LinkProgram(GLuint program)
 
 /**
  * 	1st pass parsing for Link information retriving, including resource usage
- *	check and indexing. This stage Will also chech whether VS/FS's resource is
+ *	check and indexing. This stage Will also chech whether VS/FS's resource are
  *	matched.
  */
 	nvgp4Info_lineno = 1;

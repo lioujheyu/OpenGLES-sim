@@ -1,10 +1,10 @@
+/**
+ *	@file context_shader_glapi.cpp
+ *  @brief OpenGL ES 2.0 Shader-Related API Layer Implemention
+ *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
+ */
+
 #include "context.h"
-
-/*******************************************************
-
-    OpenGL ES 2.0 Shader-Related API Layer Implemention
-
-********************************************************/
 
 void Context::AttachShader(GLuint program, GLuint shader)
 {
@@ -82,6 +82,13 @@ GLint Context::CreateShader(GLenum type)
 	}
 }
 
+/**
+ *	@brief This function will call cg compiler to compile glsl source file.
+ *	The procedure will write vertex shader or fragment shader source into
+ *	.vssrc or .fssrc file, and then use cgc to compile them and write the
+ *	assembly output in .vsasm or .fsasm file. Finally read these asm source
+ *	from file as string input back into shader object.
+ */
 void Context::CompileShader(GLuint shader)
 {
 	if (shaderPool.find(shader) == shaderPool.end()) {
@@ -97,24 +104,22 @@ void Context::CompileShader(GLuint shader)
 	std::string fileName, cFileName;
 	std::string compileCmd, fileIdx;
 
-	fileIdx.append("shader_src/");
 	fileIdx.append(std::to_string((int)shader));
 
-	fileName = cFileName = fileIdx;
 	if (shaderPool[shader].type == GL_VERTEX_SHADER) {
-		fileName.append(".vssrc");
-		cFileName.append(".vsasm");
+		fileName = fileIdx + ".vssrc";
+		cFileName = fileIdx + ".vsasm";
 	}
 	else {
-		fileName.append(".fssrc");
-		cFileName.append(".fsasm");
+		fileName = fileIdx + ".fssrc";
+		cFileName = fileIdx + ".fsasm";
 	}
 
 	shaderFile = fopen(fileName.c_str(),"w");
 	fprintf(shaderFile,shaderPool[shader].src.c_str());
 	fclose(shaderFile);
 
-	compileCmd.append("cgc -q -oglsl -o ");
+	compileCmd = "cgc -q -oglsl -o ";
 	compileCmd+=cFileName;
 	if (shaderPool[shader].type == GL_VERTEX_SHADER)
 		compileCmd.append(" -profile gp4vp ");
@@ -123,7 +128,7 @@ void Context::CompileShader(GLuint shader)
 	compileCmd+=fileName;
 	system(compileCmd.c_str());
 
-	///Get Assembly code
+	//Get Assembly code
 	std::ifstream ift;
 	ift.open(cFileName, std::ifstream::in);
 	if (ift.is_open()) {
@@ -132,7 +137,7 @@ void Context::CompileShader(GLuint shader)
 		shaderPool[shader].asmSrc = (buffer.str());
 		shaderPool[shader].isCompiled = GL_TRUE;
 	}
-	else { /// Compiler error or something wrong is happened
+	else { // Compiler error or something wrong is happened
 
 	}
 }

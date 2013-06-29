@@ -4,22 +4,18 @@
 #define CG_IN	1
 #define CG_OUT	2
 
-/** @defgroup
- *	@brief Instruction operand/result type
- *	@{
- */
+/// @name Instruction operand/result type
+///@{
 #define INST_NO_TYPE				0
 #define INST_ATTRIB					1
 #define INST_UNIFORM				2
 #define INST_COLOR					3
 #define INST_REG					4
 #define INST_CONSTANT				5
-/**	@} */
+///@}
 
-/** @defgroup
- *	@brief Instruction OP code
- *	@{
- */
+/// @name Instruction OP code
+///@{
 #define OP_ABS		0x1
 #define OP_CEIL		0x2
 #define OP_FLR		0x3
@@ -99,12 +95,10 @@
 #define OP_ENDREP	0x4d
 #define OP_POW		0x4e
 #define OP_SWZ		0x4f
-/**	@} */
+///@}
 
-/** @defgroup
- *	@brief Instruction OPCODE Modifier
- *	@{
- */
+/// @name Instruction OPCODE Modifier
+///@{
 #define OPM_F		0x1
 #define OPM_U		0x2
 #define OPM_S		0x3
@@ -117,12 +111,10 @@
 #define OPM_S24		0xa
 #define OPM_U24		0xb
 #define OPM_HI		0xc
-/**	@} */
+///@}
 
-/** @defgroup
- *	@brief Instruction Texture Target
- *	@{
- */
+/// @name Instruction Texture Target
+///@{
 #define TT_1D				0x1
 #define TT_2D				0x2
 #define TT_3D				0x3
@@ -136,12 +128,10 @@
 #define TT_SHADOWCUBE		0xb
 #define TT_SHADOWARRAY1D	0xc
 #define TT_SHADOWARRAY2D	0xd
-/**	@} */
+///@}
 
-/** @defgroup
- *	@brief Instruction CC Mask
- *	@{
- */
+/// @name Instruction CC Mask
+///@{
 #define CC_EQ		0x1
 #define CC_GE		0x2
 #define CC_GT		0x3
@@ -196,6 +186,6 @@
 #define CC_NSF		0x34
 #define CC_NSF0		0x35
 #define CC_NSF1		0x36
-/**	@} */
+///@}
 
 #endif // CONTEXT_LINK_GLAPI_H_INCLUDED

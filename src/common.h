@@ -1,5 +1,5 @@
 /**
- *	@file type.h
+ *	@file common.h
  *  @brief Data structures and functions for common use.
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */

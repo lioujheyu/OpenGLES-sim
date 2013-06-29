@@ -1,3 +1,9 @@
+/**
+ *	@file context.cpp
+ *  @brief Context management function implemention
+ *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
+ */
+
 #include "context.h"
 
 static Context *currentContext = NULL;

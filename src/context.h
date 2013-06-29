@@ -1,3 +1,9 @@
+/**
+ *	@file Context.h
+ *  @brief Record all gl state from gl function
+ *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
+ */
+
 #ifndef CONTEXT_H_INCLUDED
 #define CONTEXT_H_INCLUDED
 
@@ -70,12 +76,12 @@ struct viewPort
 struct textureState
 {
     GLboolean		genMipmap;
-    GLenum      	minFilter;
-    GLenum      	magFilter;
-    GLenum      	wrapS;
-    GLenum      	wrapT;
+    GLenum      	minFilter, magFilter;
+    GLenum      	wrapS, wrapT;
     GLubyte			baseLevel;
     GLubyte			maxLevel;
+
+    ///Which Texture Image ID will binded to this texture context.
     GLuint			texBindID;
 
     inline textureState() {
@@ -141,56 +147,59 @@ struct programObject
 	GLboolean isLinked;
 	GLboolean delFlag;
 
-	///Resource Statistic
+	///@name Resource Statistic
+	///@{
 	int VSinCnt, VSoutCnt, VSuniformCnt, FSinCnt, FSoutCnt, FSuniformCnt,
 		uniformCnt, texCnt;
+	///@}
 
 	///Linker's error/warning message
 	std::string	linkInfo;
 
-/** @ingroup Naming Table
- *	@brief <glsl variable name, asm symbol attribute> for location retriving
- *	by user
- *	@{
+/** @name Naming Table
+ *	GLSL variable name <-> ASM symbol attribute.
+ *	For location retriving by user.
  */
+///@{
 	std::map<std::string, symbol> srcVSin;
 	std::map<std::string, symbol> srcVSout;
 	std::map<std::string, symbol> srcFSin;
 	std::map<std::string, symbol> srcFSout;
 	std::map<std::string, symbol> srcUniform;
 	std::map<std::string, symbol> srcTexture;
-/**	@} */
+///@}
 
-/**	@brief Index Table <true uniform index, glsl variable name> for unifrom
- *	function
+/**	@name Index Table
+ *	True uniform index -> glsl variable name.
+ *	For unifrom value setting function
  */
 	std::map<GLint, std::string> uniformUsage;
 
-/**	@ingroup Index Table
- *	@brief  <asm uniform index, asm symbol attribute> for grammar check and
- *	resource remapping.
- *	@{
+/**	@name Index Table
+ *	asm uniform index -> asm symbol attribute.
+ *	For grammar check and resource remapping.
  */
+///@{
 	std::map<GLint, symbol> asmVSIdx;
 	std::map<GLint, symbol> asmFSIdx;
-/**	@} */
+///@}
 
-/**	@ingroup Index Table
- *	@brief <asm texture index, asm symbol attribute> for grammar check and
- *	texture resource remapping.
- *	@{
+/**	@name Index Table
+ *	asm texture index -> asm symbol attribute.
+ *	For grammar check and texture resource remapping.
  */
+///@{
 	std::map<int, symbol> asmVStexIdx;
 	std::map<int, symbol> asmFStexIdx;
-/**	@} */
+///@}
 
-/**	@ingroup Instruction pool
- *	@brief Custom Format Instruction pool for hardware shader core simulator
- *	@{
+/**	@name Instruction pool
+ *	Custom Format Instruction pool for hardware shader core simulator
  */
+///@{
 	std::vector<instruction> VSinstructionPool;
 	std::vector<instruction> FSinstructionPool;
-/**	@} */
+///@}
 
 	inline programObject()
 	{
@@ -208,7 +217,7 @@ struct programObject
 		texCnt = 0;
 	}
 
-	/** @brief Initialize the elements which is related for program linkage */
+	/// Initialize the members which is related for program linkage
 	void LinkInit()
 	{
 		isLinked = GL_FALSE;
@@ -242,13 +251,17 @@ public:
     Context();
     ~Context();
 
+    /// @name Context management function
+	///@{
     void                SetCurrent(bool current);
     static void         SetCurrentContext(Context * context);
     static Context *    GetCurrentContext();
     void                RecordError(GLenum error);
     void                DumpImage();
+    ///@}
 
-//OpenGL ES 2.0 API
+	/// @name OpenGL ES 2.0 API
+	///@{
 	void 		AttachShader(GLuint program, GLuint shader);
 	void 		ActiveTexture(GLenum texture);
 	void 		BindTexture (GLenum target, GLuint texture);
@@ -304,34 +317,52 @@ public:
     void 		ValidateProgram (GLuint program);
     void 		VertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* ptr);
     void 		Viewport (GLint x, GLint y, GLsizei width, GLsizei height);
+	///@}
 
+	/// @todo Correct buffer setting after buffer management is ready.
+    void           *drawBuffer[2]; ///< 0 - color buffer, 1 - depth buffer
 
-/// \todo (elvis#1#): dirty buffer setting before buffer management is ready
-    void           *drawBuffer[2]; //0 - color buffer, 1 - depth buffer
-
+	///View port related state
     viewPort        vp;
+
+    /// @name clear function related variable
+    ///@{
     floatVec4		clearColor;
     GLfloat			clearDepth;
     GLboolean		clearStat;
     GLuint		 	clearMask;
+    ///@}
 
     GLboolean       blendEnable;
     GLboolean       depthTestEnable;
 
+	///Texture Unit Statement
 	textureState	texContext[MAX_TEXTURE_UNIT];
+
     attribute       vertexAttrib[MAX_ATTRIBUTE_NUMBER];
     drawCommand     drawCmd;
 
 	///the Program ID called in UseProgram()
     GLuint			usePID;
 
+///@name Object Pool
+///@{
 /**
- *	All created program/shader/texImage objects will push into
- *	programPool/shaderPool/texImagePool respectly. And their ID genreated
- *	from their created function will also be used as std::map key value.
+ *	All created texture objects will push into texImagePool, and their ID from
+ *	their created function will also be used as std::map key value.
  */
     std::map<GLuint, textureImage> texImagePool;
+
+/**
+ *	All created program objects will push into programPool, and their ID from
+ *	their created function will also be used as std::map key value.
+ */
 	std::map<GLuint, programObject> programPool;
+
+/**
+ *	All created shader objects will push into shaderPool, and their ID from
+ *	their created function will also be used as std::map key value.
+ */
     std::map<GLuint, shaderObject> shaderPool;
 
 /**
@@ -343,10 +374,11 @@ public:
 /**
  *	The specified texture context ID will be stored in samplePool and use
  *	the uniform sample id as the key value.
- *	In short, <Sample ID -> texture context ID>
+ *	In short, Sample ID -> texture context ID
  *	Sample ID here can been seem as texture unit ID.
  */
     std::map<GLint, GLint> samplePool;
+///@}
 
 private:
 	bool            m_current;

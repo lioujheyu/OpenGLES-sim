@@ -7,11 +7,6 @@ void ShaderCore::Init()
 
 void ShaderCore::Exec()
 {
-	if (instCnt == 0) {
-		printf("Shader: Program Length = 0.\n");
-		return;
-	}
-
 	if (shaderType == VERTEX_SHADER)
 		vtxPtr = (vertex*)input;
 	else
@@ -65,12 +60,12 @@ void ShaderCore::Exec()
 		case OP_AND:
 			break;
 		case OP_DP3:
-			dst.x = dst.y = dst.z = dst.w =
-				src[0].x*src[1].x + src[0].y*src[1].y + src[0].z*src[1].z;
+			dst = src[0] * src[1];
+			dst.x = dst.y = dst.z = dst.w = (dst.x + dst.y + dst.z);
 			break;
 		case OP_DP4:
-			dst.x = dst.y = dst.z = dst.w =
-				src[0].x*src[1].x + src[0].y*src[1].y + src[0].z*src[1].z + src[0].w*src[1].w;
+			dst = src[0] * src[1];
+			dst.x = dst.y = dst.z = dst.w = (dst.x + dst.y + dst.z + dst.w);
 			break;
 		case OP_DPH:
 			break;
@@ -140,10 +135,10 @@ void ShaderCore::Exec()
 			break;
 		case OP_TXL:
 			dst = texUnit.TextureSample(src[0],
-										 src[0].w,
-										 floatVec4(0.0, 0.0, 0.0, 0.0),
-										 floatVec4(0.0, 0.0, 0.0, 0.0),
-										 tid );
+										src[0].w,
+										floatVec4(0.0, 0.0, 0.0, 0.0),
+										floatVec4(0.0, 0.0, 0.0, 0.0),
+										tid );
 			break;
 		case OP_TXP:
 			dst = texUnit.TextureSample(src[0], -1, src[1], src[2], tid);
@@ -197,7 +192,7 @@ void ShaderCore::FetchData()
 				break;
 
 			default:
-				printf("Shader(Exec): Encounter unknow operand type \n");
+				printf("Shader(Exec): Unknow operand type \n");
 				return;
 			}
 

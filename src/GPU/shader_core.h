@@ -12,6 +12,18 @@
 #include "texture_unit.h"
 #include "instruction_def.h"
 
+#ifdef SHADER_INFO
+	#define SHADERPRINTF(fmt, ...) \
+		do { if (DBG_ON) fprintf(SHADER_INFO_PTR, fmt, ##__VA_ARGS__); } while (0)
+#else
+	#define SHADERPRINTF(fmt, ...)
+#endif //SHADER_INFO
+#ifdef SHADER_INFO_FILE
+	#define SHADER_INFO_PTR SHADERINFOfp
+#else
+	#define SHADER_INFO_PTR stderr
+#endif
+
 class ShaderCore {
 public:
 	ShaderCore()
@@ -20,10 +32,7 @@ public:
 		shaderType = VERTEX_SHADER;
 		for (int i=0; i<MAX_SHADER_REG_VECTOR; i++)
 			reg[i].x = reg[i].y = reg[i].z = reg[i].w = 0.0f;
-		dst.x = dst.y = dst.z = dst.w = 0.0;
-		src[0].x = src[0].y = src[0].z = src[0].w = 0.0;
-		src[1].x = src[1].y = src[1].z = src[1].w = 0.0;
-		src[2].x = src[2].y = src[2].z = src[2].w = 0.0;
+
 		tid = -1; tType = 0; input = nullptr;
 		instPool = nullptr;
 		uniformPool = nullptr;
@@ -36,24 +45,39 @@ public:
 	TextureUnit texUnit;
 
 	int shaderType; ///< Vertex/Fragment Shader
-	void *input;
-	int instCnt; ///<Program Length
-	instruction const *instPool;
-	floatVec4 const *uniformPool;
+	void *input; ///< Input pointer, can be further convert into vertex or pixel
+	int instCnt; ///< Program Length
+	instruction const *instPool; ///< Instruction Pool pointer
+	floatVec4 const *uniformPool; ///< Uniform Pool pointer
 
 	///statitic
+	FILE *SHADERINFOfp;
 
 	void Init();
 	void Exec();
 	void Print();
 	void FetchData();
 	void WriteBack();
+
+/**
+ *	Extract the source floating vector's component by mask
+ *	@param in A floating vector input prepared for extraction by mask
+ *	@param mask The componemt mask
+ *	@return A resulting floating vector
+ */
 	floatVec4 ReadByMask(floatVec4 in, char *mask);
+
+/**
+ *	Write the destination vector's floating component by mask
+ *	@param val A floating vector value prepared for Writing by mask
+ *	@param fvdst The destination floating vecto's pointer
+ *	@param mask The componemt mask
+ */
 	void WriteByMask(floatVec4 val, floatVec4 *fvdst, char *mask);
 
 private:
 	int PC; ///<Program Counter
-	instruction	curInst;
+	instruction	curInst; ///< Current Instruction
 	vertex *vtxPtr;
 	pixel *pixPtr;
 

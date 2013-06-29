@@ -17,14 +17,6 @@ void TextureUnit::ClearTexCache()
 	coldMiss = 0;
 }
 
-/**
- * u,v - Texture coodinate in 2 dimension directions.
- * s,b,o - 3 block-based hirachy level, Super block, Block, Offset, in textrue
- * coordinate.
- *
- * The following two function are to calculate 1D address and fetch data in
- * system memory from 6D block-based texture address.
- */
 int TextureUnit::CalcTexAdd(short int us,
                             short int ub,
                             short int uo,
@@ -41,7 +33,32 @@ int TextureUnit::CalcTexAdd(short int us,
 			+ uo;
 }
 
-/// \bug It seems that Texture cache under fully association has texel error
+#ifdef NO_TEX_CACHE
+floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
+{
+	unsigned char *texTmpPtr = NULL;
+	unsigned short u,v;
+	floatVec4 color;
+#ifdef SHOW_MIPMAP_LEVEL
+	floatVec4 mipmaplevel;
+	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
+	return mipmaplevel;
+#endif //SHOW_MIPMAP_LEVEL
+
+	u = (unsigned short)coordIn.s;
+	v = (unsigned short)coordIn.t;
+
+	texTmpPtr = texImage[tid].data[level] +
+				(v*texImage[tid].widthLevel[level] + u)*4;
+
+	color.r = ((float)(*texTmpPtr++)/255);
+	color.g = ((float)(*texTmpPtr++)/255);
+	color.b = ((float)(*texTmpPtr++)/255);
+	color.a = ((float)(*texTmpPtr++)/255);
+
+	return color;
+}
+#else
 floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 {
 	int i,j;
@@ -51,9 +68,7 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	unsigned char *texTmpPtr = NULL;
 	unsigned char tWay = 0;
 	unsigned char LRUbiggest = 0;
-#ifdef SHOW_TEXCACHE_COLD_MISS
     bool isColdMiss = false;
-#endif // SHOW_TEXCACHE_COLD_MISS
 
 	if (level > texImage[tid].maxLevel) {
 		printf("TexUnit: %d exceed maximum level %d\n", level, texImage[tid].maxLevel);
@@ -69,12 +84,6 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 				u, v, texImage[tid].widthLevel[level], texImage[tid].heightLevel[level]);
 		return floatVec4(0.0, 0.0, 0.0, 0.0);
 	}
-
-#ifdef SHOW_MIPMAP_LEVEL
-	floatVec4 mipmaplevel;
-	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
-	return mipmaplevel;
-#endif //SHOW_MIPMAP_LEVEL
 
 	U_Super = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_SIZE_ROOT_LOG);
 	V_Super = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_SIZE_ROOT_LOG);
@@ -98,13 +107,17 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 				hit++;
 				TexCache.LRU[entry][i] = 0;
 
+#ifdef SHOW_MIPMAP_LEVEL
+	floatVec4 mipmaplevel;
+	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
+	return mipmaplevel;
+#endif //SHOW_MIPMAP_LEVEL
+
 				return TexCache.color[entry][offset][i];
 			}
 		}
-#ifdef SHOW_TEXCACHE_COLD_MISS
 		else
 			isColdMiss = true;
-#endif// SHOW_TEXCACHE_COLD_MISS
 	}
 
 	///*********** Texture cache miss ****************
@@ -130,16 +143,6 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 								   V_Super,V_Block,j,
 								   texImage[tid].widthLevel[level]) * 4;
 
-			if (tag == 50336)
-			{
-				t++;
-				if (t == 35)
-					printf("test %d\n",t);
-				printf ("%d\n", CalcTexAdd(U_Super,U_Block,i,
-										V_Super,V_Block,j,
-										texImage[tid].widthLevel[level]) * 4);
-			}
-
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r = ((float)(*texTmpPtr++)/255);
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g = ((float)(*texTmpPtr++)/255);
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].b = ((float)(*texTmpPtr++)/255);
@@ -153,9 +156,15 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 #ifdef SHOW_TEXCACHE_MISS
 	return floatVec4(0.0, 1.0, 0.0, 1.0);
 #endif //SHOW_TEXCACHE_MISS
+#ifdef SHOW_MIPMAP_LEVEL
+	floatVec4 mipmaplevel;
+	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
+	return mipmaplevel;
+#endif //SHOW_MIPMAP_LEVEL
 
 	return TexCache.color[entry][offset][tWay];
 }
+#endif // NO_TEX_CACHE
 
 floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 {
@@ -280,7 +289,7 @@ floatVec4 TextureUnit::TextureSample(floatVec4 coordIn,
 	maxLevel = texImage[tid].maxLevel;
 
 	if (level == -1)
-		LoD = std::min(LoD, maxLevel);
+		LoD = CLAMP(LoD, 0, maxLevel);
 	else
 		LoD = level;
 
@@ -361,18 +370,14 @@ floatVec4 TextureUnit::TextureSample(floatVec4 coordIn,
 		}
 	}
 
-	TEXPRINTF("%4d %4d %7.2f %7.2f\t",
-			  (int)pixelInput.attr[0].x,
-			  (int)pixelInput.attr[0].y,
-			  coord.s,
-			  coord.t);
+	TEXPRINTF("%7.2f %7.2f\t", coord.s,  coord.t);
 	//TEXPRINTF("  %2x %2x %2x %2x",color.r,color.g,color.b,color.a);
 	TEXPRINTF("%2d %3.2f\t\t",LoD, w_ratio);
 	TEXPRINTF("%3.2f %3.2f %3.2f %3.2f\n",
-			  scaleFacDX.s*texImage[tid].widthLevel[0],
-			  scaleFacDX.t*texImage[tid].heightLevel[0],
-			  scaleFacDY.s*texImage[tid].widthLevel[0],
-			  scaleFacDY.t*texImage[tid].heightLevel[0]);
+			  scaleFacDX.s*texImage[tid].widthLevel[LoD],
+			  scaleFacDX.t*texImage[tid].heightLevel[LoD],
+			  scaleFacDY.s*texImage[tid].widthLevel[LoD],
+			  scaleFacDY.t*texImage[tid].heightLevel[LoD]);
 
 	return color;
 }

@@ -1,12 +1,13 @@
+/**
+ *	@file context_glapi.cpp
+ *  @brief OpenGL ES 2.0 API Layer Implemention (no shader related API)
+ *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
+ */
+
 #include "context.h"
 
-#define U_PROG programPool[usePID] //Get Porgram in Used
-
-/*****************************************
-
-    OpenGL ES 2.0 API Layer Implemention
-
-*****************************************/
+///Define U_PROG is the porgram which is in current used
+#define U_PROG programPool[usePID]
 
 void Context::ActiveTexture(GLenum texture)
 {
@@ -103,7 +104,7 @@ void Context::Disable(GLenum cap)
         break;
     case GL_STENCIL_TEST:
         break;
-        ///OpenGL ES 3.0
+        //OpenGL ES 3.0
     case GL_PRIMITIVE_RESTART_FIXED_INDEX:
         break;
     case GL_RASTERIZER_DISCARD:
@@ -114,6 +115,8 @@ void Context::Disable(GLenum cap)
     }
 }
 
+
+///DrawArrays will also call driver to active GPU for drawing.
 void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
 {
     if (usePID == 0) {
@@ -203,7 +206,7 @@ void Context::GenerateMipmap(GLenum target)
 	texContext[activeTexture].genMipmap = GL_TRUE;
 }
 
-/// @note (elvis#1#): Searching the free texture id under std::map is not efficient.
+/// @note Searching the free texture id under std::map is not efficient.
 void Context::GenTextures(GLsizei n, GLuint* textures)
 {
 	if (n < 0) {
@@ -266,7 +269,7 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 
     GLint externalFormat = (GLint)format;
 
-    /// @todo : check type between internalformat and externalformat
+    /// @todo check type between internalformat and externalformat
     if (internalformat != externalFormat) {
         RecordError(GL_INVALID_OPERATION);
         return;
@@ -275,7 +278,7 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
     int biSizeImage = width*height;
     unsigned char * image = new unsigned char[biSizeImage*4];
 
-	/// @note (elvis#1#): Unsure format conversion is performed in API implementation or in Hardware
+	/// @note Unsure format conversion is performed in API implementation or in Hardware
 	for (int i=0; i<biSizeImage;i++){
 		switch (format) {
 		case GL_ALPHA:
@@ -403,7 +406,6 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
 			RecordError(GL_INVALID_OPERATION);
 			return;
         }
-
         break;
 
     case GL_TEXTURE_MAG_FILTER:
@@ -419,7 +421,6 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
 			RecordError(GL_INVALID_OPERATION);
 			return;
         }
-
         break;
 
     case GL_TEXTURE_WRAP_S:
@@ -466,6 +467,10 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
 		return;																		\
 	}																				\
 	if (location >= MAX_UNIFORM_VECTORS) {											\
+		RecordError(GL_INVALID_OPERATION);											\
+		return;																		\
+	}																				\
+	else if (location < 0) {														\
 		RecordError(GL_INVALID_OPERATION);											\
 		return;																		\
 	}																				\
@@ -527,6 +532,8 @@ void Context::Uniform1i(GLint location, GLint x)
 		else
 			samplePool[location] = x;
 	}
+	else if (location < 0)
+		RecordError(GL_INVALID_OPERATION);
 	else {
 		if (location >= U_PROG.uniformCnt)
 			RecordError(GL_INVALID_OPERATION);
@@ -637,7 +644,7 @@ void Context::Uniform1iv(GLint location, GLsizei count, const GLint * value)
 		return;
 	}
 
-	if (location >= MAX_UNIFORM_VECTORS) {
+	if (location >= MAX_UNIFORM_VECTORS ) {
 		location = location - MAX_UNIFORM_VECTORS;
 		if (location >= U_PROG.texCnt)
 			RecordError(GL_INVALID_OPERATION);
@@ -646,6 +653,8 @@ void Context::Uniform1iv(GLint location, GLsizei count, const GLint * value)
 				samplePool[location+i] = *(value + i);
 		}
 	}
+	else if (location < 0)
+		RecordError(GL_INVALID_OPERATION);
 	else {
 		if (location >= U_PROG.uniformCnt)
 			RecordError(GL_INVALID_OPERATION);
@@ -821,7 +830,7 @@ void Context::Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
     vp.w = width;
     vp.h = height;
 
-/// @todo (elvis#1#): dirty buffer setting before buffer management is ready
+/// @todo Correct buffer setting after buffer management is ready.
     drawBuffer[0] = new unsigned char [width*height*4];
     drawBuffer[1] = new float [width*height];
 }

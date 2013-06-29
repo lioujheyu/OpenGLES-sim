@@ -1,6 +1,6 @@
 /**
  *	@file driver.cpp
- *  @brief
+ *  @brief Write all statements from current context into GPU_Core
  *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
  */
 
@@ -42,10 +42,9 @@
 //    gpu.rm.texImage[0] = ctx->texImagepool[ctx->texContext[tid].texBindID];
 //}
 
-/** \brief Generate mip-map structure image from base level
- *
- *	\param tid Specified which texture Context's image will be used as source
- *	\return void
+/**
+ *	Generate mip-map structure image from base level.
+ *	@param tid Specified which texture Context's image will be used as source
  */
 void GenMipMap(int tid)
 {
@@ -138,8 +137,9 @@ void ActiveGPU2CleanBuffer()
 
     gpu.Run();
 }
+
 /**	@todo Use link-list or command buffer to set the states only when they
- *	@todo differ from previous context, not all of them.
+ *	differ from previous context, not all of them.
  */
 void ActiveGPU()
 {
@@ -178,7 +178,7 @@ void ActiveGPU()
     gpu.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
     gpu.dBufPtr = (float*)ctx->drawBuffer[1];
 
-    ///Texture Statement
+    //Texture Statement
     for (int i=0; i<t_program->texCnt; i++){
 		gpu.minFilter[i] = ctx->texContext[ctx->samplePool[i]-1].minFilter;
 		gpu.magFilter[i] = ctx->texContext[ctx->samplePool[i]-1].magFilter;

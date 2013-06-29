@@ -11,16 +11,6 @@ GPU_Core gpu;
 
 void GPU_Core::Run()
 {
-#ifdef GPU_INFO_FILE
-	GPUINFOfp = fopen(GPU_INFO_FILE,"w");
-#endif // GPU_INFO
-#ifdef PIXEL_INFO_FILE
-	PIXELINFOfp = fopen(PIXEL_INFO_FILE,"w");
-#endif // PIXEL_INFO_FILE
-#ifdef TEXEL_INFO_FILE
-	TEXELINFOfp = fopen(TEXEL_INFO_FILE,"w");
-#endif // TEXEL_INFO_FILE
-
     ///clear frame buffer if needed
     if (clearStat) {
 		ClearBuffer(clearMask);
@@ -34,7 +24,7 @@ void GPU_Core::Run()
 	for (int i=0; i<MAX_SHADER_CORE; i++)
 		sCore[i].texUnit.ClearTexCache();
 
-    for (int vCnt=0; vCnt<vtxCount; vCnt++) {
+    for (int vCnt=vtxFirst; vCnt<vtxCount; vCnt++) {
 
 		///Each vertex will be injected into Geometry's curVtx here
         for (int attrCnt=0; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++) {
@@ -59,7 +49,7 @@ void GPU_Core::Run()
 
 		///Vertex-based operation starts here
         VertexShaderEXE(0, &curVtx);
-        PerspectiveCorrection();
+        PerspectiveDivision();
         ViewPort();
         PrimitiveAssembly();
 
@@ -86,19 +76,56 @@ void GPU_Core::Run()
         }
     }
 
+    GPUPRINTF("Vertex number: %d\n",totalVtx);
+    GPUPRINTF("Primitive number: %d\n",totalPrimitive);
+    GPUPRINTF("Pixel number: %d\n\n",totalPix);
+
     GPUPRINTF("Texture cache hit: %d\n",sCore[1].texUnit.hit);
     GPUPRINTF("Texture cache miss: %d\n",sCore[1].texUnit.miss);
+    GPUPRINTF("Texture cache miss rate: %f\n",(float)sCore[1].texUnit.miss / (sCore[1].texUnit.hit + sCore[1].texUnit.miss));
 
+
+
+}
+
+GPU_Core::GPU_Core()
+{
+	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++)
+		attrEnable[i] = false;
+
+	depthRangeN = 0.0;
+	depthRangeF = 1.0;
+	viewPortLX = viewPortLY = 0.0;
+
+	DepthRef = 255;
+	depthTestMode = GL_LESS;
+	depthTestEnable = false;
+	blendEnable = false;
+
+	totalPrimitive = totalPix = totalVtx = 0;
+
+#ifdef GPU_INFO_FILE
+	GPUINFOfp = fopen((std::string(GPU_INFO_FILE)+".txt").c_str(),"w");
+#endif // GPU_INFO
+#ifdef PIXEL_INFO_FILE
+	PIXELINFOfp = fopen((std::string(PIXEL_INFO_FILE)+".txt").c_str(),"w");
+#endif // PIXEL_INFO_FILE
+}
+
+GPU_Core::~GPU_Core()
+{
 #ifdef GPU_INFO_FILE
 	fclose(GPUINFOfp);
 #endif // GPU_INFO
 #ifdef PIXEL_INFO_FILE
 	fclose(PIXELINFOfp);
 #endif // PIXEL_INFO_FILE
-#ifdef TEXEL_INFO_FILE
-	fclose(TEXELINFOfp);
-#endif // TEXEL_INFO_FILE
 
+#ifdef TEXEL_INFO_FILE
+	for (int i=0; i<MAX_SHADER_CORE; i++) {
+		fclose(sCore[i].texUnit.TEXELINFOfp);
+	}
+#endif // TEXEL_INFO_FILE
 }
 
 void GPU_Core::PassConfig2SubModule()
@@ -112,5 +139,10 @@ void GPU_Core::PassConfig2SubModule()
 			sCore[j].texUnit.wrapT[i] = wrapT[i];
 			sCore[j].texUnit.texImage[i] = texImage[i];
 		}
+
+#ifdef TEXEL_INFO_FILE
+		sCore[j].texUnit.TEXELINFOfp =
+			fopen((std::string(TEXEL_INFO_FILE)+'_'+std::to_string(j)+".txt").c_str(),"w");
+#endif // TEXEL_INFO_FILE
 	}
 }

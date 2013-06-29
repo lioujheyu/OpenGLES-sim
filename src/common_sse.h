@@ -1,9 +1,7 @@
 /**
- *	@file type.h
+ *	@file common_sse.h
  *  @brief Data structures and functions for common use.
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
- *
- *
  */
 #ifndef TYPE_H_INCLUDED
 #define TYPE_H_INCLUDED
@@ -24,7 +22,7 @@
  *	http://fastcpp.blogspot.tw/2011/12/simple-vector3-class-with-sse-support.html
  *	It works like a charm.
  */
-_MM_ALIGN16 class floatVec4
+class _MM_ALIGN16 floatVec4
 {
 public:
 

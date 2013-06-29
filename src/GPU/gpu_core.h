@@ -8,33 +8,42 @@
 #define GPU_CORE_H_INCLUDED
 
 #include <GLES3/gl3.h>
+#include <string>
 
 #include "gpu_config.h"
 #include "gpu_type.h"
 #include "shader_core.h"
 #include "texture_unit.h"
 
+#ifdef GPU_INFO
+	#define GPUPRINTF(fmt, ...) \
+		do { if (DBG_ON) fprintf(GPU_INFO_PTR, fmt, ##__VA_ARGS__); } while (0)
+#else
+	#define GPUPRINTF(fmt, ...)
+#endif //GPU_INFO
+#ifdef GPU_INFO_FILE
+	#define GPU_INFO_PTR GPUINFOfp
+#else
+	#define GPU_INFO_PTR stderr
+#endif
+
+#ifdef PIXEL_INFO
+	#define PIXPRINTF(fmt, ...) \
+		do { if (DBG_ON) fprintf(PIXEL_INFO_PTR, fmt, ##__VA_ARGS__); } while (0)
+#else
+	#define PIXPRINTF(fmt, ...)
+#endif //PIXEL_INFO
+#ifdef PIXEL_INFO_FILE
+	#define PIXEL_INFO_PTR PIXELINFOfp
+#else
+	#define PIXEL_INFO_PTR stderr
+#endif
+
+
 class GPU_Core
 {
 public:
-	GPU_Core()
-	{
-		for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++)
-			attrEnable[i] = false;
-
-		depthRangeN = 0.0;
-		depthRangeF = 1.0;
-		viewPortLX = viewPortLY = 0.0;
-
-		DepthRef = 255;
-		depthTestMode = GL_LESS;
-		depthTestEnable = false;
-		blendEnable = false;
-	}
-
-	FILE *GPUINFOfp;
-	FILE *PIXELINFOfp;
-	FILE *TEXELINFOfp;
+	GPU_Core();
 
     int         	vtxCount;
     int         	vtxFirst;
@@ -51,8 +60,12 @@ public:
     GLenum			blendingMode;
     float           DepthRef;
 
-	GLenum 			minFilter[MAX_TEXTURE_UNIT], ///<Texture min filtering mode
-					magFilter[MAX_TEXTURE_UNIT]; ///<Texture mag filtering mode
+	///Texture min/mag filter for each texture unit
+	///@{
+	GLenum 			minFilter[MAX_TEXTURE_UNIT],
+					magFilter[MAX_TEXTURE_UNIT];
+	///@}
+
     GLenum 			wrapS[MAX_TEXTURE_UNIT],
 					wrapT[MAX_TEXTURE_UNIT];
 	textureImage 	texImage[MAX_TEXTURE_UNIT];
@@ -68,6 +81,15 @@ public:
 	floatVec4		clearColor;
     float			clearDepth;
 
+    /// @name Statistic
+    ///@{
+    FILE 			*GPUINFOfp;
+	FILE 			*PIXELINFOfp;
+    int				totalPrimitive,
+					totalVtx,
+					totalPix;
+    ///@}
+
     void        	Run();
     void 			PassConfig2SubModule();
 
@@ -78,35 +100,60 @@ private:
 	vertex      	curVtx;
 	primitive   	prim;
 
+	/// @name Primitive Assembly related member
+	///@{
     int         	vtxCntDwn;///<How many vertex are insufficient to form a primitive.
-    int         	stripCnt;
-    bool        	fanCnt;
+    bool         	stripIndicator;
     bool        	primitiveRdy;
+    ///@}
+
 	//Rasterizer
 	float           Edge[3][3]; ///< Edge equation's coinfficient
     float           area2Reciprocal;
-    int             LX, RX, LY, HY; ///< Boundary Box
+
+    ///@name Boundary Box
+    ///@{
+    int             LX, RX, LY, HY;
+    ///@}
+
     pixel           pixBuffer[256];
     int             pixBufferP;
 
 
+
+///@{
+/**
+ *	@param sid Which shader core id will be used in processing.
+ *	@param input Input pointer
+ */
     void 			VertexShaderEXE(int sid, void *input);
+/**
+ *	@param sid which shader core id will be used
+ *	@param input Input pointer
+ */
     void 			FragmentShaderEXE(int sid, void *input);
-    //Geometry
-    void        	PerspectiveCorrection();
+///@}
+
+    /// @name Geometry
+    ///@{
+    void        	PerspectiveDivision();
     void        	ViewPort();
     void        	InitPrimitiveAssembly();
     void        	PrimitiveAssembly();
+
 	/// @todo (elvis#1#): Clipping
     void        	Clipping();
     /// @todo (elvis#1#): Culling
     void        	Culling();
-    //Rasterizer
+    ///@}
+
+    /// @name Rasterizer
+    ///@{
 	void            TriangleSetup();
     void            pixelSplit(int x, int y, int level);
     void            PerFragmentOp(pixel pixInput);
-
     void 			ClearBuffer(unsigned int mask);
+    ///@}
 
 };
 
