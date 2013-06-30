@@ -111,34 +111,42 @@ Major File Association {#basic_file_association}
 ======================
 \dot
 digraph {
-	node [ fontname=arial, fontsize=11, shape=box ];
+	node [ fontname=arial, fontsize=11, shape=record ];
 	edge [ color=blue ];
-	"main.cpp" [URL="\ref main.cpp"]
-	"gl3.h" [URL="\ref gl3.h"]
+	"main.cpp" [URL="\ref main.cpp"];
+	"gl3.h" [URL="\ref gl3.h", 
+			 shape=ellipse];
 	"gl3.cpp" [URL="\ref gl3.cpp"]
-	"context.h" [URL="\ref context.h"]
+	"context.h" [URL="\ref context.h",
+				 shape=ellipse];
 	"context.cpp" [URL="\ref context.cpp"]
-	"context_glapi.cpp" [URL="\ref context_glapi.cpp"]
+	context_glapi [label="{context_glapi.cpp|{DrawArray()}}", 
+				   URL="\ref Context::DrawArrays()"];
 	"context_shader_glapi.cpp" [URL="\ref context_shader_glapi.cpp"]
 	"context_link.cpp" [URL="\ref context_link.cpp"]
-	"driver.cpp" [URL="\ref driver.cpp"]
-	"driver.h" [URL="\ref driver.h"]
-	"gpu_core.h" [URL="\ref gpu_core.h"]
+	driver [label="{driver.cpp|{ActiveGPU()}}", 
+			URL="\ref ActiveGPU()"]
+	"driver.h" [URL="\ref driver.h",
+				shape=ellipse];
+	"gpu_core.h" [URL="\ref gpu_core.h",
+				  shape=ellipse];
 	"gpu_core.cpp" [URL="\ref gpu_core.cpp"]
-	"shader_core.h" [URL="\ref shader_core.h"]
+	"shader_core.h" [URL="\ref shader_core.h",
+					 shape=ellipse];
 	"shader_core.cpp" [URL="\ref shader_core.cpp"]
 	"geometry.cpp" [URL="\ref geometry.cpp"]
 	"rasterizer.cpp" [URL="\ref rasterizer.cpp"]
-	"texture_unit.h" [URL="\ref texture_unit.h"]
+	"texture_unit.h" [URL="\ref texture_unit.h",
+					  shape=ellipse];
 	"texture_unit.cpp" [URL="\ref texture_unit.cpp"]
 	
-	"main.cpp" -> {"gl3.h" "gl3.cpp"} [shape=box];
-	"gl3.cpp" -> {"context.h" "context.cpp" "context_glapi.cpp"
+	"main.cpp" -> {"gl3.h" "gl3.cpp"};
+	"gl3.cpp" -> {"context.h" "context.cpp" context_glapi
 				 "context_shader_glapi.cpp" "context_link.cpp"};
 	"context_link.cpp" -> {"nvgp4info.l" "nvgp4info.y" 
 						   "nvgp4ASM.l" "nvgp4ASM.y"};
-	"context_glapi.cpp" -> {"driver.cpp" "driver.h"};
-	"driver.cpp" -> {"gpu_core.h" "gpu_core.cpp"};
+	context_glapi -> {driver "driver.h"};
+	driver -> {"gpu_core.h" "gpu_core.cpp"};
 	"gpu_core.cpp" -> {"shader_core.h" "shader_core.cpp" 
 					   "geometry.cpp" "rasterizer.cpp"}
 	"shader_core.cpp" -> {"texture_unit.h" "texture_unit.cpp"}
@@ -151,8 +159,8 @@ digraph {
 Known Issue {#known_issue}
 ===========
 
-- While compile the code on windows, the compile error "std::to_string is not
-  a member of std" is jumped out.
+- While compile the code on windows, the compile error **std::to_string is not
+  a member of std** is jumped out.
 	
   This is a known bug for mingw-gcc from 4.6.4 to 4.7.2. You can update your 
   Mingw-gcc by [MinGW-builds](http://sourceforge.net/projects/mingwbuilds/files/).
@@ -161,19 +169,20 @@ Known Issue {#known_issue}
   
   Their is another way to solve it by patching your Mingw-gcc from this [site]
   (http://tehsausage.com/mingw-to-string). You may find your Mingw-gcc under
-  `C:\Program Files (x86)\CodeBlocks\MinGW`(If you use the codeblocks' bundled 
+  `C:\Program Files (x86)\CodeBlocks\MinGW` (If you use the codeblocks' bundled 
   gcc) or `C:\MinGW` . Follow the step on the web site with no additional work 
   should fix this problem.
 
 * * *
 
-Cause this project is still under development, any situation is possible. 
-Please email or report to me if you find any compiler error or bug. Many thanks.
+Cause this project is still under development, any unexpected situation is 
+possible. Please email or report to me if you find any compiler error or bug.
 
 	
 Liou Jhe-Yu <br>
 lioujheyu@gmail.com <br>
 National Cheng-kung University, EE Department, <br>
-[Computer and System Laboratory](http://caslab.ee.ncku.edu.tw/index.html) <br>
+[Computer Architecture and System Laboratory]
+(http://caslab.ee.ncku.edu.tw/index.html) <br>
 Tainan, Taiwan <br>
-2013/6/24
+2013/6/30
