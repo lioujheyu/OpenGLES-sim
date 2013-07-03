@@ -6,6 +6,7 @@
 #ifndef TYPE_H_INCLUDED
 #define TYPE_H_INCLUDED
 
+#include <cstdlib>
 #include <vector>
 #include <cmath>
 #include <cstdio>
@@ -16,6 +17,7 @@
 
 /**
  *	@brief Vector class with 4 floating component
+ *
  *	Vector component-wised operation using SSE instruction.
  *
  *	This vector class's implementation is refered to this site:
@@ -26,8 +28,12 @@ class _MM_ALIGN16 floatVec4
 {
 public:
 
+#ifdef WIN32
 	inline void* operator new[](size_t x) { return _aligned_malloc(x, 16); }
 	inline void  operator delete[](void* x) { if (x) _aligned_free(x); }
+#else
+	inline void* operator new[](size_t x) { return aligned_alloc(x, 16); }
+#endif
 
 	union {
 		__m128 sse;
