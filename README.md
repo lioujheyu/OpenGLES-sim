@@ -60,11 +60,15 @@ Compile Requirement {#compile_required}
 How to get this project {#how_to_get_this_project}
 =======================
 
-Use this git command
+Use this git command if you dont have an account on my git server.
 
+	git clone git://140.116.164.239/ogles1_1.git
+	
+Or this if you do have one
+	
 	git clone git@140.116.164.239:ogles1_1
 	
-You can use any git client to execute the above command. If on Windows, go
+You can use any git client to execute the above commands. If on Windows, go
 checking [MsysGit](http://msysgit.github.io/), [TortoiseGit]
 (https://code.google.com/p/tortoisegit/), or even Msys/Cygwin system with git
 command.
@@ -123,22 +127,22 @@ digraph {
 	context_glapi [label="{context_glapi.cpp|{DrawArray()}}", 
 				   URL="\ref Context::DrawArrays()"];
 	"context_shader_glapi.cpp" [URL="\ref context_shader_glapi.cpp"]
-	"context_link.cpp" [URL="\ref context_link.cpp"]
+	"context_link.cpp" [URL="\ref context_link.cpp"];
 	driver [label="{driver.cpp|{ActiveGPU()}}", 
-			URL="\ref ActiveGPU()"]
+			URL="\ref ActiveGPU()"];
 	"driver.h" [URL="\ref driver.h",
 				shape=ellipse];
 	"gpu_core.h" [URL="\ref gpu_core.h",
 				  shape=ellipse];
-	"gpu_core.cpp" [URL="\ref gpu_core.cpp"]
+	"gpu_core.cpp" [URL="\ref gpu_core.cpp"];
 	"shader_core.h" [URL="\ref shader_core.h",
 					 shape=ellipse];
-	"shader_core.cpp" [URL="\ref shader_core.cpp"]
-	"geometry.cpp" [URL="\ref geometry.cpp"]
-	"rasterizer.cpp" [URL="\ref rasterizer.cpp"]
+	"shader_core.cpp" [URL="\ref shader_core.cpp"];
+	"geometry.cpp" [URL="\ref geometry.cpp"];
+	"rasterizer.cpp" [URL="\ref rasterizer.cpp"];
 	"texture_unit.h" [URL="\ref texture_unit.h",
 					  shape=ellipse];
-	"texture_unit.cpp" [URL="\ref texture_unit.cpp"]
+	"texture_unit.cpp" [URL="\ref texture_unit.cpp"];
 	
 	"main.cpp" -> {"gl3.h" "gl3.cpp"};
 	"gl3.cpp" -> {"context.h" "context.cpp" context_glapi
@@ -148,8 +152,8 @@ digraph {
 	context_glapi -> {driver "driver.h"};
 	driver -> {"gpu_core.h" "gpu_core.cpp"};
 	"gpu_core.cpp" -> {"shader_core.h" "shader_core.cpp" 
-					   "geometry.cpp" "rasterizer.cpp"}
-	"shader_core.cpp" -> {"texture_unit.h" "texture_unit.cpp"}
+					   "geometry.cpp" "rasterizer.cpp"};
+	"shader_core.cpp" -> {"texture_unit.h" "texture_unit.cpp"};
 					
 }
 \enddot
