@@ -51,7 +51,8 @@ int TextureUnit::CalcTexAdd(short int us,
 
 /**
  *	Get the texel's color in the specified texture cooridnate. You can toggle
- *	NO_TEX_CACHE to determine whether this function use texture cache or not.
+ *	\ref NO_TEX_CACHE to determine whether this function use texture cache or
+ *	not.
  *
  *	@param coordIn 	The target texture coordinate.
  *	@param level 	This target coordinate is belongs to which level.
@@ -97,7 +98,10 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
     bool isColdMiss = false;
 
 	if (level > texImage[tid].maxLevel) {
-		printf("TexUnit: %d exceed maximum level %d\n", level, texImage[tid].maxLevel);
+		fprintf(stderr,
+				"TexUnit: %d exceed maximum level %d\n",
+				level,
+				texImage[tid].maxLevel );
 		return floatVec4(0.0, 0.0, 0.0, 0.0);
 	}
 
@@ -106,8 +110,11 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 
 	if (u > texImage[tid].widthLevel[level] ||
 		v > texImage[tid].heightLevel[level]) {
-		printf("TexUnit: (%d,%d)Out of the texture image's bound(%d,%d)\n",
-				u, v, texImage[tid].widthLevel[level], texImage[tid].heightLevel[level]);
+		fprintf(stderr,
+				"TexUnit: (%d,%d)Out of the texture image's bound(%d,%d)\n",
+				u, v,
+				texImage[tid].widthLevel[level],
+				texImage[tid].heightLevel[level] );
 		return floatVec4(0.0, 0.0, 0.0, 0.0);
 	}
 
@@ -213,7 +220,7 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 		temp.s = std::min(coordIn.s, (float)texImage[tid].widthLevel[level]-1);
 		break;
 	default:
-		//DPRINTF(stderr,"Wrong Texture Wrap mode in x-axis!!\n");
+		fprintf(stderr, "TexUnit: Unknown Texture Wrap mode in x-axis!!\n");
 		break;
 	}
 
@@ -225,7 +232,7 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 		temp.t = std::min(coordIn.t, (float)texImage[tid].heightLevel[level]-1);
 		break;
 	default:
-		//DPRINTF(stderr,"Wrong Texture Wrap mode in y-axis!!\n");
+		fprintf(stderr, "TexUnit: Unknown Texture Wrap mode in y-axis!!\n");
 		break;
 	}
 

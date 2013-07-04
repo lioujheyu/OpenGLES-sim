@@ -46,13 +46,13 @@ void Context::LinkProgram(GLuint program)
 
 	if ((VS == 0) || (FS == 0)) {
 		programPool[program].linkInfo = "A vertex shader and a fragment shader are not both present in the program object.";
-		printf("%s\n", programPool[program].linkInfo.c_str());
+		fprintf(stderr, "%s\n", programPool[program].linkInfo.c_str());
 		return;
 	}
 	else if ((shaderPool[VS].isCompiled == GL_FALSE) ||
 			 (shaderPool[FS].isCompiled == GL_FALSE)) {
 		programPool[program].linkInfo = "One or more of the attached shader objects has not been successfully compiled or loaded with a pre-compiled shader binary.";
-		printf("%s\n", programPool[program].linkInfo.c_str());
+		fprintf(stderr, "%s\n", programPool[program].linkInfo.c_str());
 		return;
 	}
 
@@ -85,11 +85,11 @@ void Context::LinkProgram(GLuint program)
 
 	if (t_program.linkInfo.size() != 0) {
 		programPool[program].linkInfo = t_program.linkInfo;
-		printf("%s\n", programPool[program].linkInfo.c_str());
+		fprintf(stderr, "%s\n", programPool[program].linkInfo.c_str());
 		return;
 	}
 	else if (programPool[program].linkInfo.size() != 0){
-		printf("%s\n", programPool[program].linkInfo.c_str());
+		fprintf(stderr, "%s\n", programPool[program].linkInfo.c_str());
 		return;
 	}
 

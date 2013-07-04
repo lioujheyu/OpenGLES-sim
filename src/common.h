@@ -10,8 +10,12 @@
 #include <cmath>
 #include <cstdio>
 
+#define VERTEX_SHADER 0
+#define FRAGMENT_SHADER 1
+
 /**
  *	@brief floating vector with 4 component
+ *
  *	scalar/vector component-wised add, multiply operator
  */
 

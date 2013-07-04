@@ -176,7 +176,7 @@ struct programObject
 	std::map<GLint, std::string> uniformUsage;
 
 /**	@name Index Table
- *	asm uniform index -> asm symbol attribute.
+ *	asm uniform index -> ASM symbol attribute.
  *	For grammar check and resource remapping.
  */
 ///@{
@@ -341,7 +341,7 @@ public:
     attribute       vertexAttrib[MAX_ATTRIBUTE_NUMBER];
     drawCommand     drawCmd;
 
-	///the Program ID called in UseProgram()
+	///The Program ID prepared for using.
     GLuint			usePID;
 
 ///@name Object Pool
@@ -374,7 +374,6 @@ public:
  *	The specified texture context ID will be stored in samplePool and use
  *	the uniform sample id as the key value.
  *	In short, Sample ID -> texture context ID
- *	Sample ID here can been seem as texture unit ID.
  */
     std::map<GLint, GLint> samplePool;
 ///@}

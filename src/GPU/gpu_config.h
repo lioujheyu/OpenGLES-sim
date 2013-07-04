@@ -17,7 +17,7 @@
 #define USE_SSE
 
 /******************** GPU implementation config************************/
-#define MAX_SHADER_CORE					3  //No effect now for temporaily.
+#define MAX_SHADER_CORE					3  //No effect now for temporary.
 
 #define MAX_ATTRIBUTE_NUMBER    		8
 #define MAX_VERTEX_UNIFORM_VECTORS		128
@@ -39,8 +39,8 @@
  ************************************************************************/
 /**
  *	@def TEX_WAY_ASSOCIATION
- *	define how many way association texture cache will use
- *	if TEX_WAY_ASSOCIATION = 1, the cache is direct mapped.
+ *	Define how many way association texture cache will use. If
+ *	\ref TEX_WAY_ASSOCIATION = 1, the cache is direct mapped.
  */
 #define TEX_WAY_ASSOCIATION 4
 
@@ -85,7 +85,7 @@
 /**
  *	Debug information
  */
-#define DEBUG 1
+#define DEBUG
 
 #define GPU_INFO
 #define SHADER_INFO

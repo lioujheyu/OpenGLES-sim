@@ -455,8 +455,8 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    37,    37,    38,    41,    42,    43,    44,    47,    49,
-      52,    53,    56,   191,   192,   201,   202,   203,   204,   205,
-     206,   210,   211,   212
+      52,    53,    56,   186,   187,   196,   197,   198,   199,   200,
+     201,   205,   206,   207
 };
 #endif
 
@@ -1404,17 +1404,15 @@ yyreduce:
 			t_symbol.element = t_element;
 			t_program.VSoutCnt+= t_element;
 			t_program.srcVSout[t_symbol.name] = t_symbol;
-			t_symbol.Print();
 		}
 		else if (strncmp((yyvsp[(7) - (11)].sval),"ATTR",4) == 0) {
 			t_idx = (unsigned int)(yyvsp[(7) - (11)].sval)[4] - 48;
 			t_symbol.element = t_element;
-			if (shaderType == 0) { //Vertex Shader
+			if (shaderType == VERTEX_SHADER) {
 				if ((yyvsp[(5) - (11)].ival) == CG_IN) {
 					t_symbol.idx = t_idx;
 					t_program.VSinCnt += t_element;
 					t_program.srcVSin[(yyvsp[(3) - (11)].sval)]=t_symbol;
-					t_symbol.Print();
 				}
 				else { //Varying
 					//Cause position has already occupy the attribute slot 0
@@ -1422,7 +1420,6 @@ yyreduce:
 					t_symbol.element = t_element;
 					t_program.VSoutCnt+= t_element;
 					t_program.srcVSout[t_symbol.name]=t_symbol;
-					t_symbol.Print();
 				}
 			}
 			else { //Fragment Shader
@@ -1430,13 +1427,13 @@ yyreduce:
 					//Check whether VS.output and FS.input are matched.
 					if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
 						t_program.linkInfo = "L0007: Fragment shader uses an input where there is no corresponding vertex output";
-						printf("%s \n", (yyvsp[(3) - (11)].sval));
+						fprintf(stderr, "Linker: %s \n", (yyvsp[(3) - (11)].sval));
 						YYABORT;
 					}
 					else {
 						if (t_program.srcVSout[t_symbol.name].declareType != (yyvsp[(2) - (11)].sval)) {
 							t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
-							printf("%s \n", (yyvsp[(3) - (11)].sval));
+							fprintf(stderr, "Linker: Type mismatch %s \n", (yyvsp[(3) - (11)].sval));
 							YYABORT;
 						}
 						else {
@@ -1445,11 +1442,11 @@ yyreduce:
 							t_symbol.element = t_element;
 							t_program.FSinCnt+= t_element;
 							t_program.srcFSin[t_symbol.name]=t_symbol;
-							t_symbol.Print();
 						}
 					}
 				}
-				//else: There is no any FS.output belonging to ATTR type
+				else
+					fprintf(stderr, "Linker: ATTR can NOT be used under Fragment shader.\n");
 			}
 		}
 		else if (strncmp((yyvsp[(7) - (11)].sval),"texunit",7) == 0) {
@@ -1458,29 +1455,26 @@ yyreduce:
 				t_symbol.element = t_element;
 				t_program.texCnt+= t_element;
 				t_program.srcTexture[t_symbol.name] = t_symbol;
-				t_symbol.Print();
 			}
 			else { // VS has already declared this texture
 				if (t_program.srcTexture[t_symbol.name].declareType != (yyvsp[(2) - (11)].sval)) {
 					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
-					printf("%s \n", (yyvsp[(3) - (11)].sval));
+					fprintf(stderr, "Linker: Type mismatch %s \n", (yyvsp[(3) - (11)].sval));
 					YYABORT;
 				}
 			}
 			
-			if (shaderType == 0) {
+			if (shaderType == VERTEX_SHADER) {
 				for (int i=0;i<t_element; i++) {
 					t_program.asmVStexIdx[i + t_idx].name = t_symbol.name;
 					t_program.asmVStexIdx[i + t_idx].idx = t_idx;
 				}
-				//t_program.VSuniformCnt+= t_element;
 			}
-			else {
+			else { //Fragment Shader
 				for (int i=0;i<t_element; i++) {
 					t_program.asmFStexIdx[i + t_idx].name = t_symbol.name;
 					t_program.asmFStexIdx[i + t_idx].idx = t_idx;
 				}
-				//t_program.FSuniformCnt+= t_element;
 			}
 		}
 		//@todo: Need to handle the multi output situation
@@ -1489,7 +1483,6 @@ yyreduce:
 			t_symbol.element = t_element;
 			t_program.FSoutCnt+= t_element;
 			t_program.srcFSout[t_symbol.name] = t_symbol;
-			t_symbol.Print();
 		}
 		else if ((yyvsp[(7) - (11)].sval)[0] == 'c') {
 			t_symbol.element = t_element;
@@ -1498,16 +1491,15 @@ yyreduce:
 				t_program.uniformCnt+= t_element;
 				t_program.uniformUsage[t_symbol.idx] = t_symbol.name;
 				t_program.srcUniform[t_symbol.name] = t_symbol;
-				t_symbol.Print();
 			}
 			else {
 				if (t_program.srcUniform[t_symbol.name].declareType != t_symbol.declareType) {
-					printf("%s \n",(yyvsp[(3) - (11)].sval));
 					t_program.linkInfo = "L0001: Global variables must have the same type (including the same names for structure and field names and the same size for arrays) and precision.";
+					fprintf(stderr, "Linker: %s \n",(yyvsp[(3) - (11)].sval));
 					YYABORT;
 				}
 				else
-					t_program.srcUniform[t_symbol.name].Print();
+					t_symbol = t_program.srcUniform[t_symbol.name];
 			}
 
 			if (shaderType == 0) {
@@ -1525,21 +1517,24 @@ yyreduce:
 				t_program.FSuniformCnt+= t_element;
 			}
 		}
-		//else:The variable is useless in current program (maybe)
+		else //The variable is useless in current program (maybe)
+			return 0;
+		
+		t_symbol.Print();
 	;}
     break;
 
   case 13:
 
 /* Line 1464 of yacc.c  */
-#line 191 "nvgp4Info.y"
+#line 186 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval));;}
     break;
 
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 192 "nvgp4Info.y"
+#line 187 "nvgp4Info.y"
     {
 			strcpy((yyval.sval), (yyvsp[(1) - (4)].sval)); 
 			strcat((yyval.sval), "[");
@@ -1551,70 +1546,70 @@ yyreduce:
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 201 "nvgp4Info.y"
+#line 196 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 202 "nvgp4Info.y"
+#line 197 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval)); t_element = 1;;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 203 "nvgp4Info.y"
+#line 198 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval)); t_idx = (yyvsp[(3) - (4)].ival); t_element = 1;;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 204 "nvgp4Info.y"
+#line 199 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval)); t_idx = (yyvsp[(3) - (6)].ival); t_element = (yyvsp[(6) - (6)].ival);;}
     break;
 
   case 19:
 
 /* Line 1464 of yacc.c  */
-#line 205 "nvgp4Info.y"
+#line 200 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 20:
 
 /* Line 1464 of yacc.c  */
-#line 206 "nvgp4Info.y"
+#line 201 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); t_idx = (yyvsp[(2) - (2)].ival); t_element = 1;;}
     break;
 
   case 21:
 
 /* Line 1464 of yacc.c  */
-#line 210 "nvgp4Info.y"
+#line 205 "nvgp4Info.y"
     {(yyval.ival) = 0;;}
     break;
 
   case 22:
 
 /* Line 1464 of yacc.c  */
-#line 211 "nvgp4Info.y"
+#line 206 "nvgp4Info.y"
     {(yyval.ival) = CG_IN;;}
     break;
 
   case 23:
 
 /* Line 1464 of yacc.c  */
-#line 212 "nvgp4Info.y"
+#line 207 "nvgp4Info.y"
     {(yyval.ival) = CG_OUT;;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 1618 "nvgp4Info.tab.c"
+#line 1613 "nvgp4Info.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1826,7 +1821,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 215 "nvgp4Info.y"
+#line 210 "nvgp4Info.y"
 
 
 

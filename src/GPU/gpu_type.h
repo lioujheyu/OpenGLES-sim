@@ -15,9 +15,6 @@
 	#include "../common.h"
 #endif
 
-#define VERTEX_SHADER 0
-#define FRAGMENT_SHADER 1
-
 /**
  *	@brief Unit thread class
  *

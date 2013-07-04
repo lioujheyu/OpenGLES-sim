@@ -15,6 +15,9 @@
 
 #define _MM_ALIGN16 __attribute__((aligned (16)))
 
+#define VERTEX_SHADER 0
+#define FRAGMENT_SHADER 1
+
 /**
  *	@brief Vector class with 4 floating component
  *

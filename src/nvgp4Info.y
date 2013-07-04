@@ -63,17 +63,15 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 			t_symbol.element = t_element;
 			t_program.VSoutCnt+= t_element;
 			t_program.srcVSout[t_symbol.name] = t_symbol;
-			t_symbol.Print();
 		}
 		else if (strncmp($7,"ATTR",4) == 0) {
 			t_idx = (unsigned int)$7[4] - 48;
 			t_symbol.element = t_element;
-			if (shaderType == 0) { //Vertex Shader
+			if (shaderType == VERTEX_SHADER) {
 				if ($5 == CG_IN) {
 					t_symbol.idx = t_idx;
 					t_program.VSinCnt += t_element;
 					t_program.srcVSin[$3]=t_symbol;
-					t_symbol.Print();
 				}
 				else { //Varying
 					//Cause position has already occupy the attribute slot 0
@@ -81,7 +79,6 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 					t_symbol.element = t_element;
 					t_program.VSoutCnt+= t_element;
 					t_program.srcVSout[t_symbol.name]=t_symbol;
-					t_symbol.Print();
 				}
 			}
 			else { //Fragment Shader
@@ -89,13 +86,13 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 					//Check whether VS.output and FS.input are matched.
 					if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
 						t_program.linkInfo = "L0007: Fragment shader uses an input where there is no corresponding vertex output";
-						printf("%s \n", $3);
+						fprintf(stderr, "Linker: %s \n", $3);
 						YYABORT;
 					}
 					else {
 						if (t_program.srcVSout[t_symbol.name].declareType != $2) {
 							t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
-							printf("%s \n", $3);
+							fprintf(stderr, "Linker: Type mismatch %s \n", $3);
 							YYABORT;
 						}
 						else {
@@ -104,11 +101,11 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 							t_symbol.element = t_element;
 							t_program.FSinCnt+= t_element;
 							t_program.srcFSin[t_symbol.name]=t_symbol;
-							t_symbol.Print();
 						}
 					}
 				}
-				//else: There is no any FS.output belonging to ATTR type
+				else
+					fprintf(stderr, "Linker: ATTR can NOT be used under Fragment shader.\n");
 			}
 		}
 		else if (strncmp($7,"texunit",7) == 0) {
@@ -117,29 +114,26 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 				t_symbol.element = t_element;
 				t_program.texCnt+= t_element;
 				t_program.srcTexture[t_symbol.name] = t_symbol;
-				t_symbol.Print();
 			}
 			else { // VS has already declared this texture
 				if (t_program.srcTexture[t_symbol.name].declareType != $2) {
 					t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
-					printf("%s \n", $3);
+					fprintf(stderr, "Linker: Type mismatch %s \n", $3);
 					YYABORT;
 				}
 			}
 			
-			if (shaderType == 0) {
+			if (shaderType == VERTEX_SHADER) {
 				for (int i=0;i<t_element; i++) {
 					t_program.asmVStexIdx[i + t_idx].name = t_symbol.name;
 					t_program.asmVStexIdx[i + t_idx].idx = t_idx;
 				}
-				//t_program.VSuniformCnt+= t_element;
 			}
-			else {
+			else { //Fragment Shader
 				for (int i=0;i<t_element; i++) {
 					t_program.asmFStexIdx[i + t_idx].name = t_symbol.name;
 					t_program.asmFStexIdx[i + t_idx].idx = t_idx;
 				}
-				//t_program.FSuniformCnt+= t_element;
 			}
 		}
 		//@todo: Need to handle the multi output situation
@@ -148,7 +142,6 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 			t_symbol.element = t_element;
 			t_program.FSoutCnt+= t_element;
 			t_program.srcFSout[t_symbol.name] = t_symbol;
-			t_symbol.Print();
 		}
 		else if ($7[0] == 'c') {
 			t_symbol.element = t_element;
@@ -157,16 +150,15 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 				t_program.uniformCnt+= t_element;
 				t_program.uniformUsage[t_symbol.idx] = t_symbol.name;
 				t_program.srcUniform[t_symbol.name] = t_symbol;
-				t_symbol.Print();
 			}
 			else {
 				if (t_program.srcUniform[t_symbol.name].declareType != t_symbol.declareType) {
-					printf("%s \n",$3);
 					t_program.linkInfo = "L0001: Global variables must have the same type (including the same names for structure and field names and the same size for arrays) and precision.";
+					fprintf(stderr, "Linker: %s \n",$3);
 					YYABORT;
 				}
 				else
-					t_program.srcUniform[t_symbol.name].Print();
+					t_symbol = t_program.srcUniform[t_symbol.name];
 			}
 
 			if (shaderType == 0) {
@@ -184,7 +176,10 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 				t_program.FSuniformCnt+= t_element;
 			}
 		}
-		//else:The variable is useless in current program (maybe)
+		else //The variable is useless in current program (maybe)
+			return 0;
+		
+		t_symbol.Print();
 	};
 
 complex_id

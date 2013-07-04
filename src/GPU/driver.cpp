@@ -108,12 +108,16 @@ void GenMipMap(int tid)
 		height = nextHeight;
 	}
 
-	//ctx->texImagePool[ctx->texCtx[tid].texBindID] = tempImg;
-
+#ifdef DEBUG
 	printf("\nMip-map generation complete!!!\n");
-	printf("Base level width:%d, height:%d\n",tempImg->widthLevel[0], tempImg->heightLevel[0]);
-	printf("Max level:%d width:%d, height:%d\n", tempImg->maxLevel, tempImg->widthLevel[tempImg->maxLevel],
-																  tempImg->heightLevel[tempImg->maxLevel]);
+	printf("Base level width:%d, height:%d\n",
+			tempImg->widthLevel[0],
+			tempImg->heightLevel[0] );
+	printf("Max level:%d width:%d, height:%d\n",
+			tempImg->maxLevel,
+			tempImg->widthLevel[tempImg->maxLevel],
+			tempImg->heightLevel[tempImg->maxLevel] );
+#endif
 
 	ctx->texCtx[tid].genMipmap = false;
 }

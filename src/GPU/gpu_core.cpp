@@ -82,7 +82,9 @@ void GPU_Core::Run()
 
     GPUPRINTF("Texture cache hit: %d\n",sCore[1].texUnit.hit);
     GPUPRINTF("Texture cache miss: %d\n",sCore[1].texUnit.miss);
-    GPUPRINTF("Texture cache miss rate: %f\n",(float)sCore[1].texUnit.miss / (sCore[1].texUnit.hit + sCore[1].texUnit.miss));
+    GPUPRINTF("Texture cache miss rate: %f\n",
+			   (float)sCore[1].texUnit.miss /
+			   (sCore[1].texUnit.hit + sCore[1].texUnit.miss) );
 
 }
 
