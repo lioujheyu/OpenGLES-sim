@@ -480,15 +480,17 @@ struct operand
 
 	void print()
 	{
+		if (inverse)
+			printf(" -");
 		if (type != 0)
-			printf(" %d[%d].%s", type, id, modifier);
+			printf("%d[%d].%s", type, id, modifier);
 	}
 };
 
 struct instruction
 {
 	int op;
-	std::vector<int> opModifiers;
+	bool opModifiers[12];
 	operand dst;
 	operand src[3];
 	int tid, tType;
@@ -498,9 +500,10 @@ struct instruction
 	inline void Init()
 	{
 		op = 0;
+		for (unsigned int i=0; i<12; i++)
+			opModifiers[i] = false;
 		tid = -1;
 		tType = 0;
-		opModifiers.clear();
 		dst.Init();
 		src[0].Init();
 		src[1].Init();
@@ -509,9 +512,9 @@ struct instruction
 
 	void Print()
 	{
-		printf("%d",op);
-		for (unsigned int i=0; i<opModifiers.size(); i++)
-			printf(".%d",opModifiers[i]);
+		printf("%d.",op);
+		for (unsigned int i=0; i<12; i++)
+			printf("%d",(opModifiers[i])?1:0);
 		dst.print();
 		src[0].print();
 		src[1].print();

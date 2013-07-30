@@ -36,7 +36,7 @@ void GPU_Core::pixelSplit(int x, int y, int level)
  *                                  5 6 7
  * The hierachy can be presented as 3 c 4
  *                                  0 1 2
- * Zone[0] = box of 012c, zone[1] = 12c4, zone[2] = 3c56, zone[3] = c467
+ * Zone[0] = box of 013c, zone[1] = 12c4, zone[2] = 3c56, zone[3] = c467
  */
 	float centralTest[3];
 	float cornerTest[8][3];
@@ -100,7 +100,7 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 					continue;
 
 				pixelStamp[i].attr[attrCnt] = prim.v[0].attr[attrCnt] +
-												(prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt])*pixelStamp[i].baryCenPos3[0]  +
+												(prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt])*pixelStamp[i].baryCenPos3[0] +
 												(prim.v[2].attr[attrCnt] - prim.v[0].attr[attrCnt])*pixelStamp[i].baryCenPos3[1];
 				pixelStamp[i].attr[attrCnt] = pixelStamp[i].attr[attrCnt] / pixelStamp[i].attr[0].w;
 			}
@@ -252,7 +252,7 @@ void GPU_Core::PerFragmentOp(pixel pixInput)
     }
 
     //Alpha blending
-    if (blendingMode){
+    if (blendEnable){
 
     }
 

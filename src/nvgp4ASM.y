@@ -23,7 +23,7 @@ extern unsigned int shaderType;
 	char	sval[30];
 }
 
-%token TEXTURE VERTEX FRAGMENT RESULT PROF
+%token TEXTURE VERTEX FRAGMENT RESULT PROF END
 %token ATTRIB POSITION RESULT_COLOR0
 %token <ival> SHADERTYPE
 %token <sval> IDENTIFIER
@@ -66,6 +66,7 @@ line:	profile
 			operandPool.clear();
 		};
 	|	instLabel ':'
+	|	END
 /*	|	namingStatement ';'*/
 	;
 	
@@ -165,21 +166,88 @@ BRAop_instruction: BRAOP opModifiers instTarget optBranchCond
 
 FLOWCCop_instruction: FLOWCCOP opModifiers optBranchCond
 
-IFop_instruction: IFOP opModifiers ccTest
+IFop_instruction: IFOP opModifiers ccTest {
+		t_inst.op = $1;
+		t_inst.src[0] = t_operand;
+		t_inst.src[0].type = INST_CCREG;
+		switch (t_operand.ccMask) {
+		case CC_EQ:
+		case CC_EQ0:
+		case CC_GE:
+		case CC_GE0:
+		case CC_GT:
+		case CC_GT0:
+		case CC_LE:
+		case CC_LE0:
+		case CC_LT:
+		case CC_LT0:
+		case CC_NE:
+		case CC_NE0:
+		case CC_TR:
+		case CC_TR0:
+		case CC_FL:
+		case CC_FL0:
+		case CC_NAN:
+		case CC_NAN0:
+		case CC_LEG:
+		case CC_LEG0:
+		case CC_CF:
+		case CC_CF0:
+		case CC_NCF:
+		case CC_NCF0:
+		case CC_OF:
+		case CC_OF0:
+		case CC_NOF:
+		case CC_NOF0:
+		case CC_AB:
+		case CC_AB0:
+		case CC_BLE:
+		case CC_BLE0:
+		case CC_SF:
+		case CC_SF0:
+		case CC_NSF:
+		case CC_NSF0:
+			t_inst.src[0].id = 0;
+			break;
+				
+		case CC_EQ1:
+		case CC_GE1:
+		case CC_GT1:
+		case CC_LE1:
+		case CC_LT1:
+		case CC_NE1:
+		case CC_TR1:
+		case CC_FL1:
+		case CC_NAN1:
+		case CC_LEG1:
+		case CC_CF1:
+		case CC_NCF1:
+		case CC_OF1:
+		case CC_NOF1:
+		case CC_AB1:
+		case CC_BLE1:
+		case CC_SF1:
+		case CC_NSF1:
+			t_inst.src[0].id = 1;
+			break;
+		}
+	}
 
 REPop_instruction
 	:	REPOP opModifiers instOperand
 	|	REPOP opModifiers
 	;
 
-ENDFLOWop_instruction: ENDFLOWOP opModifiers
+ENDFLOWop_instruction: ENDFLOWOP opModifiers {
+		t_inst.op = $1;
+	}
 
 opModifiers
 	: 	/* empty */
 	|	opModifierItem opModifiers
 	;
 
-opModifierItem: '.' OPMODIFIER	{t_inst.opModifiers.push_back($2);}
+opModifierItem: '.' OPMODIFIER	{t_inst.opModifiers[$2] = true;}
 
 texAccess: texImageUnit ',' TEXTARGET {
 		if (shaderType == 0) { // Vertex shader {
@@ -202,8 +270,8 @@ optBranchCond
 	;
 
 instOperand
-	:	instOperandAbs	{operandPool.push_back(t_operand);}
-	|	instOperandBase	{operandPool.push_back(t_operand);}
+	:	instOperandAbs	{operandPool.push_back(t_operand); t_operand.Init();}
+	|	instOperandBase	{operandPool.push_back(t_operand); t_operand.Init();}
 	;
 
 instOperandAbs: optSign '|' instOperandBase '|' {t_operand.abs = true;}
@@ -285,7 +353,10 @@ instResultBase
 
 ccMask: '(' ccTest ')'
 
-ccTest: CCMASKRULE swizzleSuffix
+ccTest: CCMASKRULE swizzleSuffix {
+		t_operand.ccMask = $1;
+		strncpy(t_operand.ccModifier, $2, 5);
+	}
 
 constantVector: '{' constantVectorList '}'
 

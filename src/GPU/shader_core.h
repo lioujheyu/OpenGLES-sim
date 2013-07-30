@@ -7,6 +7,8 @@
 #ifndef SHADER_CORE_H_INCLUDED
 #define SHADER_CORE_H_INCLUDED
 
+#include <stack>
+
 #include "gpu_type.h"
 #include "gpu_config.h"
 #include "texture_unit.h"
@@ -66,8 +68,11 @@ private:
 	instruction	curInst; ///< Current Instruction
 	vertex *vtxPtr;
 	pixel *pixPtr;
+	bool curCCState;
+	std::stack<bool> ccStack;
 
 	floatVec4 reg[MAX_SHADER_REG_VECTOR];
+	floatVec4 CCisSigned[2], CCisZero[2];
 	floatVec4 dst, src[3];
 	int tid, tType;
 };

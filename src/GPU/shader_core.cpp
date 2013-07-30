@@ -9,6 +9,7 @@
 void ShaderCore::Init()
 {
 	PC = 0;
+	curCCState = true;
 }
 
 void ShaderCore::Exec()
@@ -54,10 +55,12 @@ void ShaderCore::Exec()
 		case OP_PK4UB:
 			break;
 		case OP_ROUND:
+			dst = fvround(src[0]);
 			break;
 		case OP_SSG:
 			break;
 		case OP_TRUNC:
+			dst = fvtrunc(src[0]);
 			break;
 		// BINop
 		case OP_ADD:
@@ -89,22 +92,29 @@ void ShaderCore::Exec()
 		case OP_RFL:
 			break;
 		case OP_SEQ:
+			dst = src[0] == src[1];
 			break;
 		case OP_SFL:
 			break;
 		case OP_SGE:
+			dst = src[0] >= src[1];
 			break;
 		case OP_SGT:
+			dst = src[0] > src[1];
 			break;
 		case OP_SLE:
+			dst = src[0] <= src[1];
 			break;
 		case OP_SLT:
+			dst = src[0] < src[1];
 			break;
 		case OP_SNE:
+			dst = src[0] != src[1];
 			break;
 		case OP_STR:
 			break;
 		case OP_SUB:
+			dst = src[0] - src[1];
 			break;
 		case OP_XPD:
 			break;
@@ -154,12 +164,45 @@ void ShaderCore::Exec()
 		//TXDop
 		case OP_TXD:
 			break;
+		//BRAop
+		//FLOWCCop
+		//IFop
+		case OP_IF:
+			switch (curInst.src[0].ccMask) {
+			case CC_NE: case CC_NE0: case CC_NE1:
+				curCCState = ((src[0].x == 1.0) || !(src[1].x == 1.0)) ||
+							 ((src[0].y == 1.0) || !(src[1].y == 1.0)) ||
+							 ((src[0].z == 1.0) || !(src[1].z == 1.0)) ||
+							 ((src[0].w == 1.0) || !(src[1].w == 1.0));
+				break;
+			}
+
+			ccStack.push(curCCState);
+			break;
+		//REPop
+		//ENDFLOWop
+		case OP_ELSE:
+			curCCState = !ccStack.top();
+			break;
+		case OP_ENDIF:
+			ccStack.pop();
+
+			if (ccStack.empty())
+				curCCState = true;
+			else
+				curCCState = ccStack.top();
+			break;
 
 
 		default:
 			printf("Shader: Undefined OPcode: %x\n",curInst.op);
 			break;
 
+		}
+
+		if (curCCState == false) {
+			PC++;
+			continue;
 		}
 
 		WriteBack();
@@ -192,6 +235,11 @@ void ShaderCore::FetchData()
 			src[i] = ReadByMask(reg[curInst.src[i].id], curInst.src[i].modifier);
 			break;
 
+		case INST_CCREG:
+			src[i] = ReadByMask(CCisSigned[curInst.src[i].id], curInst.src[i].ccModifier);
+			src[i+1] = ReadByMask(CCisZero[curInst.src[i].id], curInst.src[i].ccModifier);
+			break;
+
 		case INST_CONSTANT:
 			src[i] = ReadByMask(curInst.src[i].val, curInst.src[i].modifier);
 			break;
@@ -221,7 +269,10 @@ void ShaderCore::WriteBack()
 		break;
 
 	case INST_REG:
-		WriteByMask(dst, &(reg[curInst.dst.id]), curInst.dst.modifier);
+		if (curInst.dst.id < 0)
+			WriteByMask(dst, nullptr, curInst.dst.modifier);
+		else
+			WriteByMask(dst, &(reg[curInst.dst.id]), curInst.dst.modifier);
 		break;
 
 	case INST_COLOR:
@@ -281,7 +332,8 @@ floatVec4 ShaderCore::ReadByMask(floatVec4 in, char *mask)
 }
 
 /**
- *	Write the destination floatVec4 's floating component by mask
+ *	Write the destination floatVec4 's floating component by mask including CC
+ *	register's update if necessray.
  *
  *	@param val		A floatVec4 value prepared for writing.
  *	@param fvdst	The destination floatVec4 's pointer
@@ -293,22 +345,62 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 		switch (mask[i]) {
 		case 'x':
 		case 'r':
-			fvdst->x = val.x;
+			if (fvdst != nullptr)
+				fvdst->x = val.x;
+
+			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
+				CCisSigned[0].x = (val.x < 0)?1.0:0.0;
+				CCisZero[0].x = (val.x == 0)?1.0:0.0;
+			}
+			else if (curInst.opModifiers[OPM_CC1]) {
+				CCisSigned[1].x = (val.x < 0)?1.0:0.0;
+				CCisZero[1].x = (val.x == 0)?1.0:0.0;
+			}
 			break;
 
 		case 'y':
 		case 'g':
-			fvdst->y = val.y;
+			if (fvdst != nullptr)
+				fvdst->y = val.y;
+
+			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
+				CCisSigned[0].y = (val.y < 0)?1.0:0.0;
+				CCisZero[0].y = (val.y == 0)?1.0:0.0;
+			}
+			else if (curInst.opModifiers[OPM_CC1]) {
+				CCisSigned[1].y = (val.y < 0)?1.0:0.0;
+				CCisZero[1].y = (val.y == 0)?1.0:0.0;
+			}
 			break;
 
 		case 'z':
 		case 'b':
-			fvdst->z = val.z;
+			if (fvdst != nullptr)
+				fvdst->z = val.z;
+
+			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
+				CCisSigned[0].z = (val.z < 0)?1.0:0.0;
+				CCisZero[0].z = (val.z == 0)?1.0:0.0;
+			}
+			else if (curInst.opModifiers[OPM_CC1]) {
+				CCisSigned[1].z = (val.z < 0)?1.0:0.0;
+				CCisZero[1].z = (val.z == 0)?1.0:0.0;
+			}
 			break;
 
 		case 'w':
 		case 'a':
-			fvdst->w = val.w;
+			if (fvdst != nullptr)
+				fvdst->w = val.w;
+
+			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
+				CCisSigned[0].w = (val.w < 0)?1.0:0.0;
+				CCisZero[0].w = (val.w == 0)?1.0:0.0;
+			}
+			else if (curInst.opModifiers[OPM_CC1]) {
+				CCisSigned[1].w = (val.w < 0)?1.0:0.0;
+				CCisZero[1].w = (val.w == 0)?1.0:0.0;
+			}
 			break;
 		default: // '\0'
 			return;

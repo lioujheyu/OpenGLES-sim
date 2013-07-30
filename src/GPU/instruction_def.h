@@ -11,7 +11,8 @@
 #define INST_UNIFORM				2
 #define INST_COLOR					3
 #define INST_REG					4
-#define INST_CONSTANT				5
+#define INST_CCREG					5
+#define INST_CONSTANT				6
 ///@}
 
 /// @name Instruction OP code
@@ -99,18 +100,18 @@
 
 /// @name Instruction OPCODE Modifier
 ///@{
-#define OPM_F		0x1
-#define OPM_U		0x2
-#define OPM_S		0x3
-#define OPM_CC		0x4
-#define OPM_CC0		0x5
-#define OPM_CC1		0x6
-#define OPM_SAT		0x7
-#define OPM_SSAT	0x8
-#define OPM_NTC		0x9
-#define OPM_S24		0xa
-#define OPM_U24		0xb
-#define OPM_HI		0xc
+#define OPM_F		0x0
+#define OPM_U		0x1
+#define OPM_S		0x2
+#define OPM_CC		0x3
+#define OPM_CC0		0x4
+#define OPM_CC1		0x5
+#define OPM_SAT		0x6
+#define OPM_SSAT	0x7
+#define OPM_NTC		0x8
+#define OPM_S24		0x9
+#define OPM_U24		0xa
+#define OPM_HI		0xb
 ///@}
 
 /// @name Instruction Texture Target

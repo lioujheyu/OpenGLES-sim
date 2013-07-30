@@ -51,8 +51,8 @@ int TextureUnit::CalcTexAdd(short int us,
 
 /**
  *	Get the texel's color in the specified texture cooridnate. You can toggle
- *	\ref NO_TEX_CACHE to determine whether this function use texture cache or
- *	not.
+ *	\ref NO_TEX_CACHE in \ref gpu_config.h to determine whether this function
+ *	use texture cache or not.
  *
  *	@param coordIn 	The target texture coordinate.
  *	@param level 	This target coordinate is belongs to which level.
@@ -245,6 +245,7 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
  *	@param coordIn The target texture coordinate.
  *	@param level This target coordinate is belongs to which level.
  *	@param tid This target coordinate is belongs to which texture unit.
+ *
  *	@return The fianl color.
  */
 floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
@@ -253,7 +254,6 @@ floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
 	//			 0 1
 	floatVec4 coordLOD[4];
 
-	unsigned short texUC, texVC;
 	float u_ratio, v_ratio;
 	floatVec4 color;
 	floatVec4 TexColor[4];
@@ -279,10 +279,8 @@ floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
 	TexColor[2] = GetTexColor(coordLOD[2], level, tid);
 	TexColor[3] = GetTexColor(coordLOD[3], level, tid);
 
-	texUC = (unsigned short)floor(coordLOD[0].s);
-	texVC = (unsigned short)floor(coordLOD[0].t);
-	u_ratio = coordLOD[0].s - texUC;
-	v_ratio = coordLOD[0].t - texVC;
+	u_ratio = modf(coordLOD[0].s, nullptr);
+	v_ratio = modf(coordLOD[0].t, nullptr);
 
 	color = (TexColor[0]*(1-u_ratio) + TexColor[1]*u_ratio)*(1-v_ratio) +
 			(TexColor[2]*(1-u_ratio) + TexColor[3]*u_ratio)*v_ratio;

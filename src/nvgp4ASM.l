@@ -28,11 +28,11 @@ ATTRIB.*$
 TEMP.*$
 PARAM.*$
 OUTPUT.*$
-END.*$
 
 "#profile"	COL_NO; return PROF;
 "gp4vp"		COL_NO; nvgp4ASM_lval.ival=0; return SHADERTYPE;
 "gp4fp"		COL_NO; nvgp4ASM_lval.ival=1; return SHADERTYPE;
+"END"		COL_NO; return END;
 
 "texture"	COL_NO;	return TEXTURE;
 
@@ -201,6 +201,8 @@ END.*$
 "position"          COL_NO; return POSITION;
 "result_color0"     COL_NO; return RESULT_COLOR0;
 [xyzwrgbac]         COL_NO;	return *nvgp4ASM_text;
+"HC"				COL_NO; nvgp4ASM_lval.ival=-1; return REG;
+
 R{D}+ { COL_NO;
 		char *temp = nvgp4ASM_text+1;
 		nvgp4ASM_lval.ival=atoi(temp);
@@ -223,7 +225,7 @@ R{D}+ { COL_NO;
 		return INTEGER;
 	}
 [-+]?{D}+\.{D}+ { COL_NO;
-		nvgp4ASM_lval.ival = atof(nvgp4ASM_text);
+		nvgp4ASM_lval.fval = atof(nvgp4ASM_text);
 		return FLOAT;
 	}
 [:\[\].$,;\-\+{}|()]  COL_NO; return *nvgp4ASM_text;

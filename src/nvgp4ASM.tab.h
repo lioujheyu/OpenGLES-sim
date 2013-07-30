@@ -43,33 +43,34 @@
      FRAGMENT = 260,
      RESULT = 261,
      PROF = 262,
-     ATTRIB = 263,
-     POSITION = 264,
-     RESULT_COLOR0 = 265,
-     SHADERTYPE = 266,
-     IDENTIFIER = 267,
-     INTEGER = 268,
-     FLOAT = 269,
-     VECTOROP = 270,
-     SCALAROP = 271,
-     BINSCOP = 272,
-     VECSCAOP = 273,
-     BINOP = 274,
-     TRIOP = 275,
-     SWZOP = 276,
-     TEXOP = 277,
-     TXDOP = 278,
-     BRAOP = 279,
-     FLOWCCOP = 280,
-     IFOP = 281,
-     REPOP = 282,
-     ENDFLOWOP = 283,
-     OPMODIFIER = 284,
-     TEXTARGET = 285,
-     CCMASKRULE = 286,
-     XYZW_SWIZZLE = 287,
-     RGBA_SWIZZLE = 288,
-     REG = 289
+     END = 263,
+     ATTRIB = 264,
+     POSITION = 265,
+     RESULT_COLOR0 = 266,
+     SHADERTYPE = 267,
+     IDENTIFIER = 268,
+     INTEGER = 269,
+     FLOAT = 270,
+     VECTOROP = 271,
+     SCALAROP = 272,
+     BINSCOP = 273,
+     VECSCAOP = 274,
+     BINOP = 275,
+     TRIOP = 276,
+     SWZOP = 277,
+     TEXOP = 278,
+     TXDOP = 279,
+     BRAOP = 280,
+     FLOWCCOP = 281,
+     IFOP = 282,
+     REPOP = 283,
+     ENDFLOWOP = 284,
+     OPMODIFIER = 285,
+     TEXTARGET = 286,
+     CCMASKRULE = 287,
+     XYZW_SWIZZLE = 288,
+     RGBA_SWIZZLE = 289,
+     REG = 290
    };
 #endif
 
@@ -89,7 +90,7 @@ typedef union YYSTYPE
 
 
 /* Line 1685 of yacc.c  */
-#line 93 "nvgp4ASM.tab.h"
+#line 94 "nvgp4ASM.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
