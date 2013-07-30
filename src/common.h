@@ -9,84 +9,204 @@
 #include <vector>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
+
+#include "GPU/gpu_config.h"
+#ifdef USE_SSE
+#include <xmmintrin.h>
+
+#define _MM_ALIGN16 __attribute__((aligned (16)))
+#endif
 
 #define VERTEX_SHADER 0
 #define FRAGMENT_SHADER 1
 
+
 /**
- *	@brief floating vector with 4 component
+ *	@brief Vector class with 4 floating component
  *
- *	scalar/vector component-wised add, multiply operator
+ *	Vector component-wised operation instruction(using SSE).
+ *
+ *	This SSE vector class's implementation is refered to this site:
+ *	http://fastcpp.blogspot.tw/2011/12/simple-vector3-class-with-sse-support.html
+ *	It works like a charm.
  */
-
-union floatVec4
+#ifdef USE_SSE
+struct _MM_ALIGN16 floatVec4
 {
-    struct { float x, y, z, w; };
-    struct { float r, g, b, a; };
-    struct { float s, t, p, q; };
+#ifdef WIN32
+	inline void* operator new[](size_t x) { return _aligned_malloc(x, 16); }
+	inline void  operator delete[](void* x) { if (x) _aligned_free(x); }
+#else
+	inline void* operator new[](size_t x) { return aligned_alloc(x, 16); }
+#endif
 
-    inline floatVec4() {}
+	union {
+		__m128 sse;
+		struct { float x, y, z, w; };
+		struct { float r, g, b, a; };
+		struct { float s, t, p, q; };
+	};
 
-    inline floatVec4(float xv, float yv, float zv, float wv)
-    {
-    	x = xv;
-    	y = yv;
-    	z = zv;
-    	w = wv;
-    }
+	inline floatVec4() {}
 
-    inline floatVec4& operator=(const floatVec4 &rhs)
-    {
-    	if (this == &rhs)
-            return *this;
-        x = rhs.x;
-        y = rhs.y;
-        z = rhs.z;
-        w = rhs.w;
-        return *this;
-    }
+	inline floatVec4(float xv, float yv, float zv, float wv) :
+		sse(_mm_setr_ps(xv, yv, zv, wv)) {}
+
+	inline floatVec4(__m128 m) : sse(m) {}
 
     inline const floatVec4 operator+(const floatVec4 &other) const
     {
-        floatVec4 tmp;
-        tmp.x = x + other.x;
-        tmp.y = y + other.y;
-        tmp.z = z + other.z;
-        tmp.w = w + other.w;
-        return tmp;
+		return _mm_add_ps(sse, other.sse);
     }
 
     inline const floatVec4 operator+(const float other) const
     {
-        floatVec4 tmp;
-        tmp.x = x+other;
-        tmp.y = y+other;
-        tmp.z = z+other;
-        tmp.w = w+other;
-        return tmp;
+        return _mm_add_ps(sse, _mm_set1_ps(other));
     }
 
     inline const floatVec4 operator-(const floatVec4 &other) const
     {
-        floatVec4 tmp;
-        tmp.x = x - other.x;
-        tmp.y = y - other.y;
-        tmp.z = z - other.z;
-        tmp.w = w - other.w;
-        return tmp;
+		return _mm_sub_ps(sse, other.sse);
     }
 
     inline const floatVec4 operator-(const float other) const
     {
-        floatVec4 tmp;
-        tmp.x = x - other;
-        tmp.y = y - other;
-        tmp.z = z - other;
-        tmp.w = w - other;
-        return tmp;
+    	return _mm_sub_ps(sse, _mm_set1_ps(other));
     }
 
     inline const floatVec4 operator*(const floatVec4 &other) const
+	{
+		return _mm_mul_ps(sse, other.sse);
+	}
+
+	inline const floatVec4 operator*(const float other) const
+    {
+    	return _mm_mul_ps(sse, _mm_set1_ps(other));
+    }
+
+    inline const floatVec4 operator/(const floatVec4 &other) const
+	{
+		return _mm_div_ps(sse, other.sse);
+	}
+
+    inline const floatVec4 operator/(const float other) const
+    {
+    	return _mm_div_ps(sse, _mm_set1_ps(other));
+    }
+
+    inline const floatVec4 operator>(const floatVec4 &other) const
+	{
+		return _mm_cmpgt_ps(sse, other.sse);
+	}
+
+	inline const floatVec4 operator>=(const floatVec4 &other) const
+	{
+		return _mm_cmpge_ps(sse, other.sse);
+	}
+
+	inline const floatVec4 operator<(const floatVec4 &other) const
+	{
+		return _mm_cmplt_ps(sse, other.sse);
+	}
+
+	inline const floatVec4 operator<=(const floatVec4 &other) const
+	{
+		return _mm_cmple_ps(sse, other.sse);
+	}
+
+	inline const floatVec4 operator==(const floatVec4 &other) const
+	{
+		return _mm_cmpeq_ps(sse, other.sse);
+	}
+
+	inline const floatVec4 operator!=(const floatVec4 &other) const
+	{
+		return _mm_cmpneq_ps(sse, other.sse);
+	}
+
+//    // dot product with another vector
+//	inline float dot(const floatVec4& other) const
+//	{
+//		return _mm_cvtss_f32(_mm_dp_ps(sse, other.sse, 0x71));
+//	}
+//	// length of the vector
+//	inline float length() const
+//	{
+//		return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(sse, sse, 0x71)));
+//	}
+//	// 1/length() of the vector
+//	inline float rlength() const
+//	{
+//		return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_dp_ps(sse, sse, 0x71)));
+//	}
+//	// returns the vector scaled to unit length
+//	inline floatVec4 normalize() const
+//	{
+//		return _mm_mul_ps(sse, _mm_rsqrt_ps(_mm_dp_ps(sse, sse, 0x7F)));
+//	}
+};
+#else
+struct floatVec4
+{
+	union
+	{
+		struct { float x, y, z, w; };
+		struct { float r, g, b, a; };
+		struct { float s, t, p, q; };
+	};
+
+	inline floatVec4() {}
+
+	inline floatVec4(float xv, float yv, float zv, float wv)
+	{
+		x = xv;
+		y = yv;
+		z = zv;
+		w = wv;
+	}
+
+	inline const floatVec4 operator+(const floatVec4 &other) const
+	{
+		floatVec4 tmp;
+		tmp.x = x + other.x;
+		tmp.y = y + other.y;
+		tmp.z = z + other.z;
+		tmp.w = w + other.w;
+		return tmp;
+	}
+
+	inline const floatVec4 operator+(const float other) const
+	{
+		floatVec4 tmp;
+		tmp.x = x+other;
+		tmp.y = y+other;
+		tmp.z = z+other;
+		tmp.w = w+other;
+		return tmp;
+	}
+
+	inline const floatVec4 operator-(const floatVec4 &other) const
+	{
+		floatVec4 tmp;
+		tmp.x = x - other.x;
+		tmp.y = y - other.y;
+		tmp.z = z - other.z;
+		tmp.w = w - other.w;
+		return tmp;
+	}
+
+	inline const floatVec4 operator-(const float other) const
+	{
+		floatVec4 tmp;
+		tmp.x = x - other;
+		tmp.y = y - other;
+		tmp.z = z - other;
+		tmp.w = w - other;
+		return tmp;
+	}
+
+	inline const floatVec4 operator*(const floatVec4 &other) const
 	{
 		floatVec4 tmp;
 		tmp.x = x * other.x;
@@ -97,16 +217,16 @@ union floatVec4
 	}
 
 	inline const floatVec4 operator*(const float other) const
-    {
-        floatVec4 tmp;
-        tmp.x = x * other;
-        tmp.y = y * other;
-        tmp.z = z * other;
-        tmp.w = w * other;
-        return tmp;
-    }
+	{
+		floatVec4 tmp;
+		tmp.x = x * other;
+		tmp.y = y * other;
+		tmp.z = z * other;
+		tmp.w = w * other;
+		return tmp;
+	}
 
-    inline const floatVec4 operator/(const floatVec4 &other) const
+	inline const floatVec4 operator/(const floatVec4 &other) const
 	{
 		floatVec4 tmp;
 		tmp.x = x / other.x;
@@ -117,15 +237,76 @@ union floatVec4
 	}
 
 	inline const floatVec4 operator/(const float other) const
+	{
+		floatVec4 tmp;
+		tmp.x = x / other;
+		tmp.y = y / other;
+		tmp.z = z / other;
+		tmp.w = w / other;
+		return tmp;
+	}
+
+	inline const floatVec4 operator>(const floatVec4 &other) const
     {
         floatVec4 tmp;
-        tmp.x = x / other;
-        tmp.y = y / other;
-        tmp.z = z / other;
-        tmp.w = w / other;
+        tmp.x = (x > other.x)?0xffffffff:0x0;
+        tmp.y = (y > other.y)?0xffffffff:0x0;
+        tmp.z = (z > other.z)?0xffffffff:0x0;
+        tmp.w = (w > other.w)?0xffffffff:0x0;
+        return tmp;
+    }
+
+    inline const floatVec4 operator>=(const floatVec4 &other) const
+    {
+        floatVec4 tmp;
+        tmp.x = (x >= other.x)?0xffffffff:0x0;
+        tmp.y = (y >= other.y)?0xffffffff:0x0;
+        tmp.z = (z >= other.z)?0xffffffff:0x0;
+        tmp.w = (w >= other.w)?0xffffffff:0x0;
+        return tmp;
+    }
+
+    inline const floatVec4 operator<(const floatVec4 &other) const
+    {
+        floatVec4 tmp;
+        tmp.x = (x < other.x)?0xffffffff:0x0;
+        tmp.y = (y < other.y)?0xffffffff:0x0;
+        tmp.z = (z < other.z)?0xffffffff:0x0;
+        tmp.w = (w < other.w)?0xffffffff:0x0;
+        return tmp;
+    }
+
+    inline const floatVec4 operator<=(const floatVec4 &other) const
+    {
+        floatVec4 tmp;
+        tmp.x = (x <= other.x)?0xffffffff:0x0;
+        tmp.y = (y <= other.y)?0xffffffff:0x0;
+        tmp.z = (z <= other.z)?0xffffffff:0x0;
+        tmp.w = (w <= other.w)?0xffffffff:0x0;
+        return tmp;
+    }
+
+    inline const floatVec4 operator==(const floatVec4 &other) const
+    {
+        floatVec4 tmp;
+        tmp.x = (x == other.x)?0xffffffff:0x0;
+        tmp.y = (y == other.y)?0xffffffff:0x0;
+        tmp.z = (z == other.z)?0xffffffff:0x0;
+        tmp.w = (w == other.w)?0xffffffff:0x0;
+        return tmp;
+    }
+
+	inline const floatVec4 operator!=(const floatVec4 &other) const
+    {
+        floatVec4 tmp;
+        tmp.x = (x != other.x)?0xffffffff:0x0;
+        tmp.y = (y != other.y)?0xffffffff:0x0;
+        tmp.z = (z != other.z)?0xffffffff:0x0;
+        tmp.w = (w != other.w)?0xffffffff:0x0;
         return tmp;
     }
 };
+#endif
 
 inline const floatVec4 fvabs(const floatVec4 &x)
 {
@@ -157,9 +338,28 @@ inline const floatVec4 fvfloor(const floatVec4 &x)
 	return tmp;
 }
 
-class fixColor4
+inline const floatVec4 fvround(const floatVec4 &x)
 {
-public:
+	floatVec4 tmp;
+	tmp.x = round(x.x);
+	tmp.y = round(x.y);
+	tmp.z = round(x.z);
+	tmp.w = round(x.w);
+	return tmp;
+}
+
+inline const floatVec4 fvtrunc(const floatVec4 &x)
+{
+	floatVec4 tmp;
+	tmp.x = trunc(x.x);
+	tmp.y = trunc(x.y);
+	tmp.z = trunc(x.z);
+	tmp.w = trunc(x.w);
+	return tmp;
+}
+
+struct fixColor4
+{
     unsigned char r,g,b,a;
 
     inline fixColor4() {}
@@ -257,6 +457,8 @@ struct operand
 {
 	int id;
 	int type;
+	int ccMask;
+	char ccModifier[5];
 	bool abs;
 	bool inverse;
 	char modifier[5];
@@ -268,6 +470,8 @@ struct operand
 	{
 		id = 0;
 		type = 0;
+		ccMask = 0;
+		ccModifier[0] = '\0';
 		abs = false;
 		inverse = false;
 		modifier[0] = '\0';

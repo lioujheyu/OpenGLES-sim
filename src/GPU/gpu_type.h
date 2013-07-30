@@ -8,12 +8,7 @@
 #define GPU_TYPE_H_INCLUDED
 
 #include "gpu_config.h"
-
-#ifdef USE_SSE
-	#include "../common_sse.h"
-#else
-	#include "../common.h"
-#endif
+#include "../common.h"
 
 /**
  *	@brief Unit thread class

@@ -85,7 +85,7 @@
 /**
  *	Debug information
  */
-#define DEBUG
+//#define DEBUG
 
 #define GPU_INFO
 #define SHADER_INFO

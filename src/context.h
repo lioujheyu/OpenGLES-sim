@@ -20,12 +20,7 @@
 
 #include "GPU/driver.h"
 #include "GPU/gpu_config.h"
-
-#ifdef USE_SSE
-	#include "common_sse.h"
-#else
-	#include "common.h"
-#endif
+#include "common.h"
 
 struct attribute
 {
@@ -81,7 +76,7 @@ struct textureContext
     GLubyte			baseLevel;
     GLubyte			maxLevel;
 
-    ///Which Texture Image ID will binded to this texture context.
+    ///Which Texture Image ID will be binded to this texture context.
     GLuint			texBindID;
 
     inline textureContext() {
@@ -262,8 +257,8 @@ public:
 
 	/// @name OpenGL ES 2.0 API
 	///@{
-	void 		AttachShader(GLuint program, GLuint shader);
 	void 		ActiveTexture(GLenum texture);
+	void 		AttachShader(GLuint program, GLuint shader);
 	void 		BindTexture (GLenum target, GLuint texture);
     void 		Clear (GLbitfield mask);
     void 		ClearColor (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
