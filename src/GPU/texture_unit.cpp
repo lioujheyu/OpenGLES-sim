@@ -258,6 +258,8 @@ floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
 	floatVec4 color;
 	floatVec4 TexColor[4];
 
+	double intPart; //No use
+
 	coordLOD[0].s = coordIn.s / (1<<level);
 	coordLOD[0].s = std::max(coordLOD[0].s - 0.5, 0.0);
 	coordLOD[0].t = coordIn.t / (1<<level);
@@ -279,8 +281,8 @@ floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
 	TexColor[2] = GetTexColor(coordLOD[2], level, tid);
 	TexColor[3] = GetTexColor(coordLOD[3], level, tid);
 
-	u_ratio = modf(coordLOD[0].s, nullptr);
-	v_ratio = modf(coordLOD[0].t, nullptr);
+	u_ratio = modf(coordLOD[0].s, &intPart);
+	v_ratio = modf(coordLOD[0].t, &intPart);
 
 	color = (TexColor[0]*(1-u_ratio) + TexColor[1]*u_ratio)*(1-v_ratio) +
 			(TexColor[2]*(1-u_ratio) + TexColor[3]*u_ratio)*v_ratio;

@@ -10,17 +10,21 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#ifdef USE_SSE
+    #include <xmmintrin.h>
+
+    #ifndef WIN32
+        #include <malloc.h>
+    #endif // WIN32
+#endif // USE_SSE
 
 #include "GPU/gpu_config.h"
+
 #ifdef USE_SSE
-#include <xmmintrin.h>
-
-#define _MM_ALIGN16 __attribute__((aligned (16)))
-#endif
-
+    #define _MM_ALIGN16 __attribute__((aligned (16)))
+#endif // USE_SSE
 #define VERTEX_SHADER 0
 #define FRAGMENT_SHADER 1
-
 
 /**
  *	@brief Vector class with 4 floating component
@@ -38,7 +42,7 @@ struct _MM_ALIGN16 floatVec4
 	inline void* operator new[](size_t x) { return _aligned_malloc(x, 16); }
 	inline void  operator delete[](void* x) { if (x) _aligned_free(x); }
 #else
-	inline void* operator new[](size_t x) { return aligned_alloc(x, 16); }
+	inline void* operator new[](size_t x) { return memalign(16, x); }
 #endif
 
 	union {
