@@ -169,11 +169,22 @@ void ShaderCore::Exec()
 		//IFop
 		case OP_IF:
 			switch (curInst.src[0].ccMask) {
+			case CC_EQ: case CC_EQ0: case CC_EQ1:
+				curCCState = (!(src[0].x == 1.0) && (src[1].x == 1.0)) ||
+							 (!(src[0].y == 1.0) && (src[1].y == 1.0)) ||
+							 (!(src[0].z == 1.0) && (src[1].z == 1.0)) ||
+							 (!(src[0].w == 1.0) && (src[1].w == 1.0));
+				break;
+
 			case CC_NE: case CC_NE0: case CC_NE1:
 				curCCState = ((src[0].x == 1.0) || !(src[1].x == 1.0)) ||
 							 ((src[0].y == 1.0) || !(src[1].y == 1.0)) ||
 							 ((src[0].z == 1.0) || !(src[1].z == 1.0)) ||
 							 ((src[0].w == 1.0) || !(src[1].w == 1.0));
+				break;
+
+			default:
+				printf("Shader: undefined or unimplemented ccMask:%d\n", curInst.src[0].ccMask);
 				break;
 			}
 
@@ -184,6 +195,7 @@ void ShaderCore::Exec()
 		case OP_ELSE:
 			curCCState = !ccStack.top();
 			break;
+
 		case OP_ENDIF:
 			ccStack.pop();
 
@@ -193,19 +205,14 @@ void ShaderCore::Exec()
 				curCCState = ccStack.top();
 			break;
 
-
 		default:
 			printf("Shader: Undefined OPcode: %x\n",curInst.op);
 			break;
-
 		}
 
-		if (curCCState == false) {
-			PC++;
-			continue;
-		}
+		if (curCCState == true)
+			WriteBack();
 
-		WriteBack();
 		PC++;
 	}
 }
