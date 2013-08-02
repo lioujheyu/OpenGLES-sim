@@ -10,17 +10,21 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#ifdef USE_SSE
+    #include <xmmintrin.h>
+
+    #ifndef WIN32
+        #include <malloc.h>
+    #endif // WIN32
+#endif // USE_SSE
 
 #include "GPU/gpu_config.h"
+
 #ifdef USE_SSE
-#include <xmmintrin.h>
-
-#define _MM_ALIGN16 __attribute__((aligned (16)))
-#endif
-
+    #define _MM_ALIGN16 __attribute__((aligned (16)))
+#endif // USE_SSE
 #define VERTEX_SHADER 0
 #define FRAGMENT_SHADER 1
-
 
 /**
  *	@brief Vector class with 4 floating component
@@ -38,7 +42,8 @@ struct _MM_ALIGN16 floatVec4
 	inline void* operator new[](size_t x) { return _aligned_malloc(x, 16); }
 	inline void  operator delete[](void* x) { if (x) _aligned_free(x); }
 #else
-	inline void* operator new[](size_t x) { return aligned_alloc(x, 16); }
+	inline void* operator new[](size_t x) { return memalign(16, x); }
+	inline void operator delete[](void* x) { if(x) free(x); }
 #endif
 
 	union {
@@ -146,6 +151,31 @@ struct _MM_ALIGN16 floatVec4
 //		return _mm_mul_ps(sse, _mm_rsqrt_ps(_mm_dp_ps(sse, sse, 0x7F)));
 //	}
 };
+
+//component-wise maximums
+inline const floatVec4 fvmax(const floatVec4& x, const floatVec4& y)
+{
+	floatVec4 tmp;
+	tmp.sse = _mm_max_ps(x.sse, y.sse);
+	return tmp;
+}
+
+//component-wise minimums
+inline const floatVec4 fvmin(const floatVec4& x, const floatVec4& y)
+{
+	floatVec4 tmp;
+	tmp.sse = _mm_min_ps(x.sse, y.sse);
+	return tmp;
+}
+
+//Calculate reciprocal square root of input (for HW: approximate)
+inline const floatVec4 fvrsqrt(const floatVec4 &x)
+{
+	floatVec4 tmp;
+	tmp.sse = _mm_rsqrt_ss(x.sse);
+	return tmp;
+}
+
 #else
 struct floatVec4
 {
@@ -306,6 +336,40 @@ struct floatVec4
         return tmp;
     }
 };
+
+//component-wise maximums
+inline const floatVec4 fvmax(const floatVec4& x, const floatVec4& y)
+{
+	floatVec4 tmp;
+	tmp.x = std::max(x.x, y.x);
+	tmp.y = std::max(x.y, y.y);
+	tmp.z = std::max(x.z, y.z);
+	tmp.w = std::max(x.w, y.w);
+	return tmp;
+}
+
+//component-wise minimums
+inline const floatVec4 fvmin(const floatVec4& x, const floatVec4& y)
+{
+	floatVec4 tmp;
+	tmp.x = std::min(x.x, y.x);
+	tmp.y = std::min(x.y, y.y);
+	tmp.z = std::min(x.z, y.z);
+	tmp.w = std::min(x.w, y.w);
+	return tmp;
+}
+
+//Calculate reciprocal square root of input (for HW: approximate)
+inline const floatVec4 fvrsqrt(const floatVec4 &x)
+{
+	floatVec4 tmp;
+	tmp.x = 1.0/sqrt(x.x);
+	tmp.y = x.y;
+	tmp.z = x.z;
+	tmp.w = x.w;
+	return tmp;
+}
+
 #endif
 
 inline const floatVec4 fvabs(const floatVec4 &x)
@@ -355,6 +419,17 @@ inline const floatVec4 fvtrunc(const floatVec4 &x)
 	tmp.y = trunc(x.y);
 	tmp.z = trunc(x.z);
 	tmp.w = trunc(x.w);
+	return tmp;
+}
+
+//Returns the fractional portion of each input component
+inline const floatVec4 fvfrc(const floatVec4 &x)
+{
+	floatVec4 tmp;
+	tmp.x = x.x - floor(x.x);
+	tmp.y = x.y - floor(x.y);
+	tmp.z = x.z - floor(x.z);
+	tmp.w = x.w - floor(x.w);
 	return tmp;
 }
 

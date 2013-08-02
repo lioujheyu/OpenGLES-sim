@@ -34,6 +34,7 @@ void ShaderCore::Exec()
 			dst = fvfloor(src[0]);
 			break;
 		case OP_FRC:
+			dst = fvfrc(src[0]);
 			break;
 		case OP_I2F:
 			break;
@@ -68,6 +69,13 @@ void ShaderCore::Exec()
 			break;
 		case OP_AND:
 			break;
+		case OP_DIV:
+			dst = src[0] / src[1];
+			break;
+		case OP_DP2:
+			dst = src[0] * src[1];
+			dst.x = dst.y = dst.z = dst.w = (dst.x + dst.y);
+			break;
 		case OP_DP3:
 			dst = src[0] * src[1];
 			dst.x = dst.y = dst.z = dst.w = (dst.x + dst.y + dst.z);
@@ -78,11 +86,17 @@ void ShaderCore::Exec()
 			break;
 		case OP_DPH:
 			break;
-		case OP_DST:
+		case OP_DST:	//Distance vector
+			dst.x = 1.0;
+			dst.y = src[0].y * src[1].y;
+			dst.z = src[0].z;
+			dst.w = src[1].w;
 			break;
 		case OP_MAX:
+			dst = fvmax(src[0], src[1]);
 			break;
 		case OP_MIN:
+			dst = fvmin(src[0], src[1]);
 			break;
 		case OP_MUL:
 			dst = src[0] * src[1];
@@ -90,6 +104,9 @@ void ShaderCore::Exec()
 		case OP_OR:
 			break;
 		case OP_RFL:
+			break;
+		case OP_RSQ:	//Reciprocal square root
+			dst = fvrsqrt(src[0]);
 			break;
 		case OP_SEQ:
 			dst = src[0] == src[1];
@@ -118,14 +135,18 @@ void ShaderCore::Exec()
 			break;
 		case OP_XPD:
 			break;
-		case OP_DP2:
-			break;
 		case OP_XOR:
 			break;
 		//TRIop
 		case OP_CMP:
 			break;
 		case OP_DP2A:
+			{
+				float dot;
+				dot = (src[0].x * src[1].x) + (src[0].y * src[1].y) + src[2].x;
+				dst.x = dst.y = dst.z = dst.w  = dot;
+				break;
+			}
 			break;
 		case OP_LRP:
 			break;
@@ -261,6 +282,10 @@ void ShaderCore::FetchData()
 			src[i].y = -src[i].y;
 			src[i].z = -src[i].z;
 			src[i].w = -src[i].w;
+		}
+
+		if (curInst.src[i].abs) {
+			src[i] = fvabs(src[i]);
 		}
 	}
 }
