@@ -37,6 +37,7 @@ void ShaderCore::Exec()
 			dst = fvfrc(src[0]);
 			break;
 		case OP_I2F:
+			dst = fvInt2Float(src[0]);
 			break;
 		case OP_LIT:
 			break;
@@ -81,8 +82,7 @@ void ShaderCore::Exec()
 			dst.x = dst.y = dst.z = dst.w = (dst.x + dst.y + dst.z);
 			break;
 		case OP_DP4:
-			dst = src[0] * src[1];
-			dst.x = dst.y = dst.z = dst.w = (dst.x + dst.y + dst.z + dst.w);
+			dst.x = dst.y = dst.z = dst.w = dot(src[0], src[1]);
 			break;
 		case OP_DPH:
 			break;
@@ -370,8 +370,16 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 		switch (mask[i]) {
 		case 'x':
 		case 'r':
-			if (fvdst != nullptr)
+			if (fvdst != nullptr)	{
+				if(curInst.opModifiers[OPM_SAT]){
+					val.x = CLAMP(val.x, 0.0f, 1.0f);
+				}
+				else if(curInst.opModifiers[OPM_SSAT]){
+					val.x = CLAMP(val.x, -1.0f, 1.0f);
+				}
+
 				fvdst->x = val.x;
+			}
 
 			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
 				CCisSigned[0].x = (val.x < 0)?1.0:0.0;
@@ -385,8 +393,16 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 
 		case 'y':
 		case 'g':
-			if (fvdst != nullptr)
+			if (fvdst != nullptr)	{
+				if(curInst.opModifiers[OPM_SAT]){
+					val.y = CLAMP(val.y, 0.0f, 1.0f);
+				}
+				else if(curInst.opModifiers[OPM_SSAT]){
+					val.y = CLAMP(val.y, -1.0f, 1.0f);
+				}
+
 				fvdst->y = val.y;
+			}
 
 			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
 				CCisSigned[0].y = (val.y < 0)?1.0:0.0;
@@ -400,8 +416,16 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 
 		case 'z':
 		case 'b':
-			if (fvdst != nullptr)
+			if (fvdst != nullptr)	{
+				if(curInst.opModifiers[OPM_SAT]){
+					val.z = CLAMP(val.z, 0.0f, 1.0f);
+				}
+				else if(curInst.opModifiers[OPM_SSAT]){
+					val.z = CLAMP(val.z, -1.0f, 1.0f);
+				}
+
 				fvdst->z = val.z;
+			}
 
 			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
 				CCisSigned[0].z = (val.z < 0)?1.0:0.0;
@@ -415,8 +439,16 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 
 		case 'w':
 		case 'a':
-			if (fvdst != nullptr)
+			if (fvdst != nullptr)	{
+				if(curInst.opModifiers[OPM_SAT]){
+					val.w = CLAMP(val.w, 0.0f, 1.0f);
+				}
+				else if(curInst.opModifiers[OPM_SSAT]){
+					val.w = CLAMP(val.w, -1.0f, 1.0f);
+				}
+
 				fvdst->w = val.w;
+			}
 
 			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
 				CCisSigned[0].w = (val.w < 0)?1.0:0.0;
