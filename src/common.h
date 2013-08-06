@@ -19,11 +19,11 @@
 	#ifdef __SSE2__
 	#include <emmintrin.h>
 	#endif
-	
+
 	#ifdef __SSSE3__
 	#include <tmmintrin.h>
 	#endif
-	
+
 	#ifdef __SSE4_1__
 	#include <smmintrin.h>
 	#endif
@@ -48,25 +48,6 @@
  *	It works like a charm.
  */
 #ifdef USE_SSE
-inline const __m128 sse_dot4_ps(__m128 a, __m128 b)
-{
-#ifdef __SSE4_1__   //not yet verified
-		return _mm_dp_ps(a, b, 0xff);
-#elif defined(__SSSE3__)
-		__m128 t1 = _mm_mul_ps(a, b);
-		__m128 t2 = _mm_hadd_ps(t1, t1);
-		__m128 dp = _mm_hadd_ps(t2, t2);
-		return dp;
-#else   //SSE2
-		__m128 t1 = _mm_mul_ps(a, b);
-		__m128 t2 = _mm_shuffle_ps(t1, t1, 0x93);
-		__m128 t3 = _mm_add_ps(t1, t2);
-		__m128 t4 = _mm_shuffle_ps(t3, t3, 0x4e);
-		__m128 dp = _mm_add_ps(t3, t4);
-		return dp;
-#endif
-}
-
 struct _MM_ALIGN16 floatVec4
 {
 #ifdef WIN32
@@ -74,7 +55,7 @@ struct _MM_ALIGN16 floatVec4
 	inline void  operator delete[](void* x) { if (x) _aligned_free(x); }
 #else
 	inline void* operator new[](size_t x) { return memalign(16, x); }
-	inline void operator delete[](void* x) { if(x) free(x); }
+	inline void  operator delete[](void* x) { if(x) free(x); }
 #endif
 
 	union {
@@ -130,119 +111,6 @@ struct _MM_ALIGN16 floatVec4
     {
     	return _mm_div_ps(sse, _mm_set1_ps(other));
     }
-
-    inline const floatVec4 operator>(const floatVec4 &other) const
-	{
-	    floatVec4 tmp;
-		tmp.x = (x > other.x)? 1.0 : 0.0;
-		tmp.y = (y > other.y)? 1.0 : 0.0;
-		tmp.z = (z > other.z)? 1.0 : 0.0;
-		tmp.w = (w > other.w)? 1.0 : 0.0;
-		return tmp;
-	}
-
-	inline const floatVec4 operator>=(const floatVec4 &other) const
-	{
-	    floatVec4 tmp;
-		tmp.x = (x >= other.x)? 1.0 : 0.0;
-		tmp.y = (y >= other.y)? 1.0 : 0.0;
-		tmp.z = (z >= other.z)? 1.0 : 0.0;
-		tmp.w = (w >= other.w)? 1.0 : 0.0;
-		return tmp;
-	}
-
-	inline const floatVec4 operator<(const floatVec4 &other) const
-	{
-	    floatVec4 tmp;
-		tmp.x = (x < other.x)? 1.0 : 0.0;
-		tmp.y = (y < other.y)? 1.0 : 0.0;
-		tmp.z = (z < other.z)? 1.0 : 0.0;
-		tmp.w = (w < other.w)? 1.0 : 0.0;
-		return tmp;
-	}
-
-	inline const floatVec4 operator<=(const floatVec4 &other) const
-	{
-	    floatVec4 tmp;
-		tmp.x = (x <= other.x)? 1.0 : 0.0;
-		tmp.y = (y <= other.y)? 1.0 : 0.0;
-		tmp.z = (z <= other.z)? 1.0 : 0.0;
-		tmp.w = (w <= other.w)? 1.0 : 0.0;
-		return tmp;
-	}
-
-	inline const floatVec4 operator==(const floatVec4 &other) const
-	{
-		floatVec4 tmp;
-		tmp.x = (x == other.x)? 1.0 : 0.0;
-		tmp.y = (y == other.y)? 1.0 : 0.0;
-		tmp.z = (z == other.z)? 1.0 : 0.0;
-		tmp.w = (w == other.w)? 1.0 : 0.0;
-		return tmp;
-	}
-
-	inline const floatVec4 operator!=(const floatVec4 &other) const
-	{
-		floatVec4 tmp;
-		tmp.x = (x != other.x)? 1.0 : 0.0;
-		tmp.y = (y != other.y)? 1.0 : 0.0;
-		tmp.z = (z != other.z)? 1.0 : 0.0;
-		tmp.w = (w != other.w)? 1.0 : 0.0;
-		return tmp;
-	}
-
-//    // dot product with another vector
-//	inline float dot(const floatVec4& other) const
-//	{
-//		return _mm_cvtss_f32(_mm_dp_ps(sse, other.sse, 0x71));
-//	}
-//	// length of the vector
-//	inline float length() const
-//	{
-//		return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(sse, sse, 0x71)));
-//	}
-//	// 1/length() of the vector
-//	inline float rlength() const
-//	{
-//		return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_dp_ps(sse, sse, 0x71)));
-//	}
-//	// returns the vector scaled to unit length
-//	inline floatVec4 normalize() const
-//	{
-//		return _mm_mul_ps(sse, _mm_rsqrt_ps(_mm_dp_ps(sse, sse, 0x7F)));
-//	}
-};
-
-//component-wise maximums
-inline const floatVec4 fvmax(const floatVec4& x, const floatVec4& y)
-{
-	floatVec4 tmp;
-	tmp.sse = _mm_max_ps(x.sse, y.sse);
-	return tmp;
-}
-
-//component-wise minimums
-inline const floatVec4 fvmin(const floatVec4& x, const floatVec4& y)
-{
-	floatVec4 tmp;
-	tmp.sse = _mm_min_ps(x.sse, y.sse);
-	return tmp;
-}
-
-//Calculate reciprocal square root of input (for HW: approximate)
-inline const floatVec4 fvrsqrt(const floatVec4 &x)
-{
-	floatVec4 tmp;
-	tmp.sse = _mm_rsqrt_ss(x.sse);
-	return tmp;
-}
-
-// dot product with another vector
-inline float dot(const floatVec4 &x, const floatVec4& other)
-{
-	return _mm_cvtss_f32(sse_dot4_ps(x.sse, other.sse));
-}
-
 #else
 struct floatVec4
 {
@@ -342,6 +210,7 @@ struct floatVec4
 		tmp.w = w / other;
 		return tmp;
 	}
+#endif
 
 	inline const floatVec4 operator>(const floatVec4 &other) const
     {
@@ -408,10 +277,14 @@ struct floatVec4
 inline const floatVec4 fvmax(const floatVec4& x, const floatVec4& y)
 {
 	floatVec4 tmp;
+#ifdef USE_SSE
+	tmp.sse = _mm_max_ps(x.sse, y.sse);
+#else
 	tmp.x = std::max(x.x, y.x);
 	tmp.y = std::max(x.y, y.y);
 	tmp.z = std::max(x.z, y.z);
 	tmp.w = std::max(x.w, y.w);
+#endif
 	return tmp;
 }
 
@@ -419,10 +292,14 @@ inline const floatVec4 fvmax(const floatVec4& x, const floatVec4& y)
 inline const floatVec4 fvmin(const floatVec4& x, const floatVec4& y)
 {
 	floatVec4 tmp;
+#ifdef USE_SSE
+	tmp.sse = _mm_min_ps(x.sse, y.sse);
+#else
 	tmp.x = std::min(x.x, y.x);
 	tmp.y = std::min(x.y, y.y);
 	tmp.z = std::min(x.z, y.z);
 	tmp.w = std::min(x.w, y.w);
+#endif
 	return tmp;
 }
 
@@ -430,22 +307,49 @@ inline const floatVec4 fvmin(const floatVec4& x, const floatVec4& y)
 inline const floatVec4 fvrsqrt(const floatVec4 &x)
 {
 	floatVec4 tmp;
+#ifdef USE_SSE
+	tmp.sse = _mm_rsqrt_ss(x.sse);
+#else
 	tmp.x = 1.0/sqrt(x.x);
 	tmp.y = x.y;
 	tmp.z = x.z;
 	tmp.w = x.w;
+#endif
 	return tmp;
 }
+
+#ifdef USE_SSE
+inline const __m128 sse_dot4_ps(__m128 a, __m128 b)
+{
+	#ifdef __SSE4_1__   //not yet verified
+		return _mm_dp_ps(a, b, 0xff);
+	#elif defined(__SSSE3__)
+		__m128 t1 = _mm_mul_ps(a, b);
+		__m128 t2 = _mm_hadd_ps(t1, t1);
+		__m128 dp = _mm_hadd_ps(t2, t2);
+		return dp;
+	#else   //SSE2
+		__m128 t1 = _mm_mul_ps(a, b);
+		__m128 t2 = _mm_shuffle_ps(t1, t1, 0x93);
+		__m128 t3 = _mm_add_ps(t1, t2);
+		__m128 t4 = _mm_shuffle_ps(t3, t3, 0x4e);
+		__m128 dp = _mm_add_ps(t3, t4);
+		return dp;
+	#endif
+}
+#endif
 
 // dot product with another vector
 inline float dot(const floatVec4 &x, const floatVec4& other)
 {
+#ifdef USE_SSE
+	return _mm_cvtss_f32(sse_dot4_ps(x.sse, other.sse));
+#else
 	floatVec4 tmp;
 	tmp = x * other;
 	return (tmp.x + tmp.y + tmp.z + tmp.w);
-}
-
 #endif
+}
 
 inline const floatVec4 fvabs(const floatVec4 &x)
 {

@@ -378,14 +378,12 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 		case 'x':
 		case 'r':
 			if (fvdst != nullptr)	{
-				if(curInst.opModifiers[OPM_SAT]){
-					val.x = CLAMP(val.x, 0.0f, 1.0f);
-				}
-				else if(curInst.opModifiers[OPM_SSAT]){
-					val.x = CLAMP(val.x, -1.0f, 1.0f);
-				}
-
-				fvdst->x = val.x;
+				if(curInst.opModifiers[OPM_SAT])
+					fvdst->x = CLAMP(val.x, 0.0f, 1.0f);
+				else if(curInst.opModifiers[OPM_SSAT])
+					fvdst->x = CLAMP(val.x, -1.0f, 1.0f);
+				else
+					fvdst->x = val.x;
 			}
 
 			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
@@ -401,14 +399,12 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 		case 'y':
 		case 'g':
 			if (fvdst != nullptr)	{
-				if(curInst.opModifiers[OPM_SAT]){
-					val.y = CLAMP(val.y, 0.0f, 1.0f);
-				}
-				else if(curInst.opModifiers[OPM_SSAT]){
-					val.y = CLAMP(val.y, -1.0f, 1.0f);
-				}
-
-				fvdst->y = val.y;
+				if(curInst.opModifiers[OPM_SAT])
+					fvdst->y = CLAMP(val.y, 0.0f, 1.0f);
+				else if(curInst.opModifiers[OPM_SSAT])
+					fvdst->y = CLAMP(val.y, -1.0f, 1.0f);
+				else
+					fvdst->y = val.y;
 			}
 
 			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
@@ -424,14 +420,12 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 		case 'z':
 		case 'b':
 			if (fvdst != nullptr)	{
-				if(curInst.opModifiers[OPM_SAT]){
-					val.z = CLAMP(val.z, 0.0f, 1.0f);
-				}
-				else if(curInst.opModifiers[OPM_SSAT]){
-					val.z = CLAMP(val.z, -1.0f, 1.0f);
-				}
-
-				fvdst->z = val.z;
+				if(curInst.opModifiers[OPM_SAT])
+					fvdst->z = CLAMP(val.z, 0.0f, 1.0f);
+				else if(curInst.opModifiers[OPM_SSAT])
+					fvdst->z = CLAMP(val.z, -1.0f, 1.0f);
+				else
+					fvdst->z = val.z;
 			}
 
 			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
@@ -447,14 +441,12 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 		case 'w':
 		case 'a':
 			if (fvdst != nullptr)	{
-				if(curInst.opModifiers[OPM_SAT]){
-					val.w = CLAMP(val.w, 0.0f, 1.0f);
-				}
-				else if(curInst.opModifiers[OPM_SSAT]){
-					val.w = CLAMP(val.w, -1.0f, 1.0f);
-				}
-
-				fvdst->w = val.w;
+				if(curInst.opModifiers[OPM_SAT])
+					fvdst->w = CLAMP(val.w, 0.0f, 1.0f);
+				else if(curInst.opModifiers[OPM_SSAT])
+					fvdst->w = CLAMP(val.w, -1.0f, 1.0f);
+				else
+					fvdst->w = val.w;
 			}
 
 			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {

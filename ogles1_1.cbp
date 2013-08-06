@@ -13,7 +13,6 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add option="-DWIN32" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -33,6 +32,7 @@
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions -march=native" />
+			<Add option="-DWIN32" />
 			<Add directory="include" />
 		</Compiler>
 		<Unit filename="bitmap.cpp" />
@@ -59,7 +59,6 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="src/common.h" />
-		<Unit filename="src/common_sse.h" />
 		<Unit filename="src/context.cpp" />
 		<Unit filename="src/context.h" />
 		<Unit filename="src/context_glapi.cpp" />
