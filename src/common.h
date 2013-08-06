@@ -3,8 +3,8 @@
  *  @brief Data structures and functions for common use.
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
-#ifndef TYPE_H_INCLUDED
-#define TYPE_H_INCLUDED
+#ifndef COMMON_H_INCLUDED
+#define COMMON_H_INCLUDED
 
 #include <vector>
 #include <cmath>
@@ -210,7 +210,7 @@ struct floatVec4
 		tmp.w = w / other;
 		return tmp;
 	}
-#endif
+#endif //USE_SSE
 
 	inline const floatVec4 operator>(const floatVec4 &other) const
     {
@@ -284,7 +284,7 @@ inline const floatVec4 fvmax(const floatVec4& x, const floatVec4& y)
 	tmp.y = std::max(x.y, y.y);
 	tmp.z = std::max(x.z, y.z);
 	tmp.w = std::max(x.w, y.w);
-#endif
+#endif //USE_SSE
 	return tmp;
 }
 
@@ -299,7 +299,7 @@ inline const floatVec4 fvmin(const floatVec4& x, const floatVec4& y)
 	tmp.y = std::min(x.y, y.y);
 	tmp.z = std::min(x.z, y.z);
 	tmp.w = std::min(x.w, y.w);
-#endif
+#endif //USE_SSE
 	return tmp;
 }
 
@@ -314,7 +314,7 @@ inline const floatVec4 fvrsqrt(const floatVec4 &x)
 	tmp.y = x.y;
 	tmp.z = x.z;
 	tmp.w = x.w;
-#endif
+#endif //USE_SSE
 	return tmp;
 }
 
@@ -337,7 +337,7 @@ inline const __m128 sse_dot4_ps(__m128 a, __m128 b)
 		return dp;
 	#endif
 }
-#endif
+#endif //USE_SSE
 
 // dot product with another vector
 inline float dot(const floatVec4 &x, const floatVec4& other)
@@ -348,7 +348,7 @@ inline float dot(const floatVec4 &x, const floatVec4& other)
 	floatVec4 tmp;
 	tmp = x * other;
 	return (tmp.x + tmp.y + tmp.z + tmp.w);
-#endif
+#endif //USE_SSE
 }
 
 inline const floatVec4 fvabs(const floatVec4 &x)
@@ -606,4 +606,4 @@ template <typename T> T CLAMP(const T& V, const T& L, const T& H)
 {
   return V < L ? L : (V > H ? H : V);
 }
-#endif // TYPE_H_INCLUDED
+#endif // COMMON_H_INCLUDED
