@@ -18,12 +18,22 @@ void GPU_Core::TriangleSetup()
 	Edge[2][1] = prim.v[2].attr[0].x - prim.v[0].attr[0].x;
 
 	constantC = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
+	printf("Area: %f\n", constantC);
+	if (fabs(constantC) > 1000000)
+	{
+		printf("fuck!!\n");
+	}
+
 	area2Reciprocal = 1/constantC;
 
 	LY = MIN3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
+	LY = CLAMP(LY, viewPortLY, viewPortLY+viewPortH);
 	LX = MIN3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
+	LX = CLAMP(LX, viewPortLX, viewPortLX+viewPortW);
 	HY = MAX3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
+	HY = CLAMP(HY, viewPortLY, viewPortLY+viewPortH);
 	RX = MAX3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
+	RX = CLAMP(RX, viewPortLX, viewPortLX+viewPortW);
 }
 
 void GPU_Core::pixelSplit(int x, int y, int level)
@@ -120,7 +130,7 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 		}
 
         //Write valid fragment into waiting buffer if they are truly pass the edge test.
-		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)|
+		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)||
             (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
 			pixBuffer[pixBufferP] = pixelStamp[0];
 
@@ -133,34 +143,42 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 
 		if ((cornerTest[2][0]>=0 && cornerTest[2][1]>=0 && cornerTest[2][2]>=0)|
             (cornerTest[2][0]<=0 && cornerTest[2][1]<=0 && cornerTest[2][2]<=0)) {
-			pixBuffer[pixBufferP] = pixelStamp[1];
+			if ( pixelStamp[1].attr[0].x < RX ) {
+				pixBuffer[pixBufferP] = pixelStamp[1];
 
-			PIXPRINTF("P:(%3d,%3d)\t \n",
-					   (int)pixBuffer[pixBufferP].attr[0].x,
-					   (int)pixBuffer[pixBufferP].attr[0].y);
+				PIXPRINTF("P:(%3d,%3d)\t \n",
+						(int)pixBuffer[pixBufferP].attr[0].x,
+						(int)pixBuffer[pixBufferP].attr[0].y);
 
-			pixBufferP++;
+				pixBufferP++;
+			}
 		}
 
 		if ((cornerTest[5][0]>=0 && cornerTest[5][1]>=0 && cornerTest[5][2]>=0)|
             (cornerTest[5][0]<=0 && cornerTest[5][1]<=0 && cornerTest[5][2]<=0)) {
-			pixBuffer[pixBufferP] = pixelStamp[2];
+			if ( pixelStamp[2].attr[0].y < HY ) {
+				pixBuffer[pixBufferP] = pixelStamp[2];
 
-			PIXPRINTF("P:(%3d,%3d)\t \n",
-					   (int)pixBuffer[pixBufferP].attr[0].x,
-					   (int)pixBuffer[pixBufferP].attr[0].y);
+				PIXPRINTF("P:(%3d,%3d)\t \n",
+						(int)pixBuffer[pixBufferP].attr[0].x,
+						(int)pixBuffer[pixBufferP].attr[0].y);
 
-			pixBufferP++;
+				pixBufferP++;
+			}
 		}
 
 		if ((cornerTest[7][0]>=0 && cornerTest[7][1]>=0 && cornerTest[7][2]>=0)|
             (cornerTest[7][0]<=0 && cornerTest[7][1]<=0 && cornerTest[7][2]<=0)) {
-			pixBuffer[pixBufferP] = pixelStamp[3];
+			if ( ( pixelStamp[1].attr[0].x < RX ) &&
+				 ( pixelStamp[2].attr[0].y < HY ) ){
+				pixBuffer[pixBufferP] = pixelStamp[3];
 
-			PIXPRINTF("P:(%3d,%3d)\t \n",
-					   (int)pixBuffer[pixBufferP].attr[0].x,
-					   (int)pixBuffer[pixBufferP].attr[0].y);
-			pixBufferP++;
+				PIXPRINTF("P:(%3d,%3d)\t \n",
+						(int)pixBuffer[pixBufferP].attr[0].x,
+						(int)pixBuffer[pixBufferP].attr[0].y);
+
+				pixBufferP++;
+            }
 		}
 	}
 	else {
@@ -192,10 +210,17 @@ void GPU_Core::pixelSplit(int x, int y, int level)
             }
         }
 
-		if (Zone[0][0] == true && Zone[0][1] == true && Zone[0][2] == true )    pixelSplit(x           ,y           ,level-1);
-		if (Zone[1][0] == true && Zone[1][1] == true && Zone[1][2] == true )    pixelSplit(x+(1<<level),y           ,level-1);
-		if (Zone[2][0] == true && Zone[2][1] == true && Zone[2][2] == true )    pixelSplit(x           ,y+(1<<level),level-1);
-		if (Zone[3][0] == true && Zone[3][1] == true && Zone[3][2] == true )    pixelSplit(x+(1<<level),y+(1<<level),level-1);
+		if (Zone[0][0] == true && Zone[0][1] == true && Zone[0][2] == true )
+			pixelSplit(x, y, level-1);
+		if (Zone[1][0] == true && Zone[1][1] == true && Zone[1][2] == true )
+			if ( (x + (1<<level)) < RX )
+				pixelSplit(x+(1<<level), y, level-1);
+		if (Zone[2][0] == true && Zone[2][1] == true && Zone[2][2] == true )
+			if ( (y + (1<<level)) < HY )
+				pixelSplit(x, y+(1<<level), level-1);
+		if (Zone[3][0] == true && Zone[3][1] == true && Zone[3][2] == true )
+			if ( ((x + (1<<level)) < RX) && ((y + (1<<level)) < HY) )
+				pixelSplit(x+(1<<level),y+(1<<level),level-1);
 	}
 }
 

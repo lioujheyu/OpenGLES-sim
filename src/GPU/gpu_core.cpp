@@ -54,8 +54,7 @@ void GPU_Core::Run()
         PrimitiveAssembly();
 
         //Primitive-based operation starts here
-        if (primitiveRdy)
-        {
+        if (primitiveRdy) {
             TriangleSetup();
 
             //Fragment-based operation starts here
