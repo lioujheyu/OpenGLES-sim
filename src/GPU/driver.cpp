@@ -180,11 +180,11 @@ void ActiveGPU()
 
     //Texture Statement
     for (int i=0; i<t_program->texCnt; i++){
-		gpu.minFilter[i] = ctx->texCtx[ctx->samplePool[i]-1].minFilter;
-		gpu.magFilter[i] = ctx->texCtx[ctx->samplePool[i]-1].magFilter;
-		gpu.wrapS[i] = ctx->texCtx[ctx->samplePool[i]-1].wrapS;
-		gpu.wrapT[i] = ctx->texCtx[ctx->samplePool[i]-1].wrapT;
-		gpu.texImage[i] = ctx->texImagePool[ctx->texCtx[ctx->samplePool[i]-1].texBindID];
+		gpu.minFilter[i] = ctx->texCtx[ctx->samplePool[i]].minFilter;
+		gpu.magFilter[i] = ctx->texCtx[ctx->samplePool[i]].magFilter;
+		gpu.wrapS[i] = ctx->texCtx[ctx->samplePool[i]].wrapS;
+		gpu.wrapT[i] = ctx->texCtx[ctx->samplePool[i]].wrapT;
+		gpu.texImage[i] = ctx->texImagePool[ctx->texCtx[ctx->samplePool[i]].texBindID];
     }
 
     for (int i=0; i<t_program->uniformCnt; i++)
