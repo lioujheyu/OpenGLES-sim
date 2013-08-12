@@ -15,15 +15,16 @@
 #include "instruction_def.h"
 
 #ifdef SHADER_INFO
-	#define SHADERPRINTF(fmt, ...) \
+#	define SHADERPRINTF(fmt, ...) \
 		do { if (DBG_ON) fprintf(SHADER_INFO_PTR, fmt, ##__VA_ARGS__); } while (0)
 #else
-	#define SHADERPRINTF(fmt, ...)
+#	define SHADERPRINTF(fmt, ...)
 #endif //SHADER_INFO
+
 #ifdef SHADER_INFO_FILE
-	#define SHADER_INFO_PTR SHADERINFOfp
+#	define SHADER_INFO_PTR SHADERINFOfp
 #else
-	#define SHADER_INFO_PTR stderr
+#	define SHADER_INFO_PTR stderr
 #endif
 
 class ShaderCore {

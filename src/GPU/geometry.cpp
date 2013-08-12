@@ -142,6 +142,7 @@ void GPU_Core::PrimitiveAssembly()
     if (vtxCntDwn == 0)
     {
 		totalPrimitive++;
+		printf("Primitive %d drawing. ", totalPrimitive);
         primitiveRdy = true;
 
         switch (drawMode) {

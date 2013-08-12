@@ -14,15 +14,16 @@
 #include "gpu_config.h"
 
 #ifdef TEXEL_INFO
-	#define TEXPRINTF(fmt, ...) \
+#	define TEXPRINTF(fmt, ...) \
 		do { if (DBG_ON) fprintf(TEXEL_INFO_PTR, fmt, ##__VA_ARGS__); } while (0)
 #else
-	#define TEXPRINTF(fmt, ...)
+#	define TEXPRINTF(fmt, ...)
 #endif //TEXEL_INFO
+
 #ifdef TEXEL_INFO_FILE
-	#define TEXEL_INFO_PTR TEXELINFOfp
+#	define TEXEL_INFO_PTR TEXELINFOfp
 #else
-	#define TEXEL_INFO_PTR stderr
+#	define TEXEL_INFO_PTR stderr
 #endif
 
 const int TEX_CACHE_BLOCK_SIZE_ROOT = (int)sqrt(TEX_CACHE_BLOCK_SIZE);

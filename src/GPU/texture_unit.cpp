@@ -60,17 +60,19 @@ int TextureUnit::CalcTexAdd(short int us,
  *
  *	@return the target texel's color
  */
-#ifdef NO_TEX_CACHE
+
 floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 {
 	unsigned char *texTmpPtr = NULL;
 	unsigned short u,v;
+#ifdef NO_TEX_CACHE
 	floatVec4 color;
-#ifdef SHOW_MIPMAP_LEVEL
+
+#	ifdef SHOW_MIPMAP_LEVEL
 	floatVec4 mipmaplevel;
 	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
 	return mipmaplevel;
-#endif //SHOW_MIPMAP_LEVEL
+#	else
 
 	u = (unsigned short)coordIn.s;
 	v = (unsigned short)coordIn.t;
@@ -84,15 +86,11 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	color.a = ((float)(*texTmpPtr++)/255);
 
 	return color;
-}
+#	endif //SHOW_MIPMAP_LEVEL
 #else
-floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
-{
-	int i,j;
-	unsigned short u, v;
+	int i,j; //loop counter
 	unsigned int tag;
 	unsigned short entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
-	unsigned char *texTmpPtr = NULL;
 	unsigned char tWay = 0;
 	unsigned char LRUbiggest = 0;
     bool isColdMiss = false;
@@ -140,13 +138,13 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 				hit++;
 				TexCache.LRU[entry][i] = 0;
 
-#ifdef SHOW_MIPMAP_LEVEL
-	floatVec4 mipmaplevel;
-	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
-	return mipmaplevel;
-#endif //SHOW_MIPMAP_LEVEL
-
+#	ifdef SHOW_MIPMAP_LEVEL
+				floatVec4 mipmaplevel;
+				mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
+				return mipmaplevel;
+#	else
 				return TexCache.color[entry][offset][i];
+#	endif //SHOW_MIPMAP_LEVEL
 			}
 		}
 		else
@@ -182,22 +180,23 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].a = ((float)(*texTmpPtr++)/255);
 		}
 	}
-#ifdef SHOW_TEXCACHE_COLD_MISS
+#	ifdef SHOW_TEXCACHE_COLD_MISS
 	if (isColdMiss)
 		return floatVec4(1.0, 0.0, 0.0, 1.0);
-#endif //SHOW_TEXCACHE_COLD_MISS
-#ifdef SHOW_TEXCACHE_MISS
+#	endif //SHOW_TEXCACHE_COLD_MISS
+
+#	if defined(SHOW_TEXCACHE_MISS)
 	return floatVec4(0.0, 1.0, 0.0, 1.0);
-#endif //SHOW_TEXCACHE_MISS
-#ifdef SHOW_MIPMAP_LEVEL
+#	elif defined(SHOW_MIPMAP_LEVEL)
 	floatVec4 mipmaplevel;
 	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
 	return mipmaplevel;
-#endif //SHOW_MIPMAP_LEVEL
-
+#	else
 	return TexCache.color[entry][offset][tWay];
-}
+#	endif
+
 #endif // NO_TEX_CACHE
+}
 
 /**
  *	Perform textrue wrap operation on texture coordinate.

@@ -14,25 +14,9 @@
 #include "GPU/gpu_config.h"
 
 #ifdef USE_SSE
-    #include <xmmintrin.h>
-
-	#ifdef __SSE2__
-	#include <emmintrin.h>
-	#endif
-
-	#ifdef __SSSE3__
-	#include <tmmintrin.h>
-	#endif
-
-	#ifdef __SSE4_1__
-	#include <smmintrin.h>
-	#endif
-
-    #ifndef WIN32
-        #include <malloc.h>
-    #endif // WIN32
-
-    #define _MM_ALIGN16 __attribute__((aligned (16)))
+#	include <intrin.h>
+#	include <malloc.h>
+#	define _MM_ALIGN16 __attribute__((aligned (16)))
 #endif // USE_SSE
 
 #define VERTEX_SHADER 0
@@ -321,21 +305,21 @@ inline const floatVec4 fvrsqrt(const floatVec4 &x)
 #ifdef USE_SSE
 inline const __m128 sse_dot4_ps(__m128 a, __m128 b)
 {
-	#ifdef __SSE4_1__   //not yet verified
+#	if defined(__SSE4_1__)//not yet verified
 		return _mm_dp_ps(a, b, 0xff);
-	#elif defined(__SSSE3__)
+#	elif defined(__SSSE3__)
 		__m128 t1 = _mm_mul_ps(a, b);
 		__m128 t2 = _mm_hadd_ps(t1, t1);
 		__m128 dp = _mm_hadd_ps(t2, t2);
 		return dp;
-	#else   //SSE2
+#	else   //SSE2
 		__m128 t1 = _mm_mul_ps(a, b);
 		__m128 t2 = _mm_shuffle_ps(t1, t1, 0x93);
 		__m128 t3 = _mm_add_ps(t1, t2);
 		__m128 t4 = _mm_shuffle_ps(t3, t3, 0x4e);
 		__m128 dp = _mm_add_ps(t3, t4);
 		return dp;
-	#endif
+#	endif
 }
 #endif //USE_SSE
 

@@ -15,27 +15,27 @@
 #include "shader_core.h"
 
 #ifdef GPU_INFO
-	#define GPUPRINTF(fmt, ...) \
+#	define GPUPRINTF(fmt, ...) \
 		do { if (DBG_ON) fprintf(GPU_INFO_PTR, fmt, ##__VA_ARGS__); } while (0)
 #else
-	#define GPUPRINTF(fmt, ...)
+#	define GPUPRINTF(fmt, ...)
 #endif //GPU_INFO
 #ifdef GPU_INFO_FILE
-	#define GPU_INFO_PTR GPUINFOfp
+#	define GPU_INFO_PTR GPUINFOfp
 #else
-	#define GPU_INFO_PTR stderr
+#	define GPU_INFO_PTR stderr
 #endif
 
 #ifdef PIXEL_INFO
-	#define PIXPRINTF(fmt, ...) \
+#	define PIXPRINTF(fmt, ...) \
 		do { if (DBG_ON) fprintf(PIXEL_INFO_PTR, fmt, ##__VA_ARGS__); } while (0)
 #else
-	#define PIXPRINTF(fmt, ...)
+#	define PIXPRINTF(fmt, ...)
 #endif //PIXEL_INFO
 #ifdef PIXEL_INFO_FILE
-	#define PIXEL_INFO_PTR PIXELINFOfp
+#	define PIXEL_INFO_PTR PIXELINFOfp
 #else
-	#define PIXEL_INFO_PTR stderr
+#	define PIXEL_INFO_PTR stderr
 #endif
 
 
