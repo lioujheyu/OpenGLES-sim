@@ -176,8 +176,8 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 				t_program.FSuniformCnt+= t_element;
 			}
 		}
-		else //The variable is useless in current program (maybe)
-			return 0;
+//		else //The variable is useless in current program (maybe)
+//			return 0;
 		
 		t_symbol.Print();
 	};

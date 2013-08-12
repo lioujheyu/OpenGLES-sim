@@ -1517,8 +1517,8 @@ yyreduce:
 				t_program.FSuniformCnt+= t_element;
 			}
 		}
-		else //The variable is useless in current program (maybe)
-			return 0;
+//		else //The variable is useless in current program (maybe)
+//			return 0;
 		
 		t_symbol.Print();
 	;}
