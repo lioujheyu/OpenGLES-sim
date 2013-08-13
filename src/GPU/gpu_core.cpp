@@ -58,8 +58,8 @@ void GPU_Core::Run()
             TriangleSetup();
 
             //Fragment-based operation starts here
-			for(int y=LY; y<HY; y+=16) {
-				for(int x=LX; x<RX; x+=16) {
+			for(int y=LY; y<=HY; y+=16) {
+				for(int x=LX; x<=RX; x+=16) {
 					PIXPRINTF("Recursive Entry:-------(%d,%d)-----\n",x,y);
 					pixBufferP = 0;
 
