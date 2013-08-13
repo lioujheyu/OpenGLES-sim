@@ -14,10 +14,14 @@ void ShaderCore::Init()
 
 void ShaderCore::Exec()
 {
-	if (shaderType == VERTEX_SHADER)
+	if (shaderType == VERTEX_SHADER) {
 		vtxPtr = (vertex*)input;
-	else
+		vtxTemp = *vtxPtr;
+	}
+	else {
 		pixPtr = (pixel*)input;
+		pixTemp = *pixPtr;
+	}
 
 	while(PC < instCnt) {
 		FetchData();
@@ -244,15 +248,16 @@ void ShaderCore::FetchData()
 
 	tid = curInst.tid;
 	tType = curInst.tType;
+
 	for (int i=0; i<3; i++) {
 		switch (curInst.src[i].type) {
 		case INST_NO_TYPE:
 			return;
 		case INST_ATTRIB:
 			if (shaderType == VERTEX_SHADER)
-				src[i] =ReadByMask(vtxPtr->attr[curInst.src[i].id], curInst.src[i].modifier);
+				src[i] =ReadByMask(vtxTemp.attr[curInst.src[i].id], curInst.src[i].modifier);
 			else
-				src[i] =ReadByMask(pixPtr->attr[curInst.src[i].id], curInst.src[i].modifier);
+				src[i] =ReadByMask(pixTemp.attr[curInst.src[i].id], curInst.src[i].modifier);
 			break;
 
 		case INST_UNIFORM:

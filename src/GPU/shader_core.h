@@ -67,8 +67,8 @@ public:
 private:
 	int PC; ///<Program Counter
 	instruction	curInst; ///< Current Instruction
-	vertex *vtxPtr;
-	pixel *pixPtr;
+	vertex *vtxPtr;	vertex vtxTemp;
+	pixel *pixPtr;	pixel pixTemp;
 	bool curCCState;
 	std::stack<bool> ccStack;
 
