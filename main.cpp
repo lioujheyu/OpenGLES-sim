@@ -151,12 +151,6 @@ void draw_road()
 
 void draw_banana()
 {
-	GLfloat mvp4x4[] = {1.0f, 0.0f, 0.0f, 0.0f,
-	                    0.0f, 1.0f, 0.0f, 0.0f,
-	                    0.0f, 0.0f, 1.0f, 0.0f,
-	                    0.0f, 0.0f, 0.0f, 1.0f
-	                   };
-
 	Shader shader;
 	shader.init("shader_src/drawObj.vert", "shader_src/drawObj.frag");
 	shader.bind();
@@ -176,9 +170,10 @@ void draw_banana()
     }
 
     glm::vec3 eye_pos = glm::vec3(2.0f, 1.0f, 1.0f);
+	glm::vec3 light_pos = glm::vec3(1.0f, 3.0f, 1.0f);
     glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
     glm::mat4 View = glm::lookAt(
-						eye_pos, // Camera is at (4,3,3), in World Space
+						eye_pos, // Camera is at (2,1,1), in World Space
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
@@ -191,13 +186,13 @@ void draw_banana()
     int c_map = glGetUniformLocation(shader.id(), "ColorMap");
     int vp = glGetUniformLocation(shader.id(), "VP");
     int model_mat = glGetUniformLocation(shader.id(), "model_mat");
-    int eye = glGetUniformLocation(shader.id(), "eye_pos");
-    printf("%d, %d, %d, %d, %d, %d, %d\n", v_coord_loc, v_normal, v_tex0_loc, c_map, vp, model_mat, eye);
+    int light = glGetUniformLocation(shader.id(), "light_pos");
+    printf("%d, %d, %d, %d, %d, %d, %d\n", v_coord_loc, v_normal, v_tex0_loc, c_map, vp, model_mat, light);
 
 	glUniform1i(c_map, 0);
     glUniformMatrix4fv(vp, 1, 0, &VP[0][0]);
 	glUniformMatrix4fv(model_mat, 1, 0, &Model[0][0]);
-    glUniform3fv(eye, 1, &eye_pos[0]);
+    glUniform3fv(light, 1, &light_pos[0]);
 
     glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, bananaVerts);
     glEnableVertexAttribArray(v_coord_loc);
