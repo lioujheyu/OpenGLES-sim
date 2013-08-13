@@ -110,7 +110,8 @@ void ShaderCore::Exec()
 		case OP_RFL:
 			break;
 		case OP_RSQ:	//Reciprocal square root
-			dst = fvrsqrt(src[0]);
+			//dst = fvrsqrt(src[0]);
+			dst.x = dst.y = dst.z = dst.w = Q_rsqrt(src[0].x);
 			break;
 		case OP_SEQ:
 			dst = src[0] == src[1];

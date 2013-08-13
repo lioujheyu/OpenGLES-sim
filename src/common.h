@@ -14,7 +14,7 @@
 #include "GPU/gpu_config.h"
 
 #ifdef USE_SSE
-#	include <intrin.h>
+#	include <x86intrin.h>
 #	include <malloc.h>
 #	define _MM_ALIGN16 __attribute__((aligned (16)))
 #endif // USE_SSE
@@ -407,6 +407,27 @@ inline const floatVec4 fvInt2Float(const floatVec4 &x)
 	return tmp;
 }
 
+/**
+ *	Fast inverse square root
+ *	Reference: http://en.wikipedia.org/wiki/Fast_inverse_square_root
+ */
+inline const float Q_rsqrt(float number)
+{
+	long i;
+	float x2, y;
+	const float threehalfs = 1.5F;
+
+	x2 = number * 0.5F;
+	y  = number;
+	i  = * ( long * ) &y;                       // evil floating point bit level hacking
+	i  = 0x5f3759df - ( i >> 1 );               // what the fuck?
+	y  = * ( float * ) &i;
+	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+
+	return y;
+}
+
 struct fixColor4
 {
     unsigned char r,g,b,a;
@@ -529,10 +550,12 @@ struct operand
 
 	void print()
 	{
-		if (inverse)
-			printf(" -");
-		if (type != 0)
-			printf("%d[%d].%s", type, id, modifier);
+		if (type != 0) {
+			if (inverse)
+				printf(" -%d[%d].%s", type, id, modifier);
+			else
+				printf(" %d[%d].%s", type, id, modifier);
+		}
 	}
 };
 
