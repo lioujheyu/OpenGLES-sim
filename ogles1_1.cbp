@@ -34,6 +34,7 @@
 			<Add option="-fexceptions -march=native" />
 			<Add option="-DWIN32" />
 			<Add directory="include" />
+			<Add directory="external" />
 		</Compiler>
 		<Unit filename="bitmap.cpp" />
 		<Unit filename="bitmap.h" />

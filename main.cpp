@@ -1,8 +1,20 @@
 #include <stdio.h>
 #include <GLES3/gl3.h>
+
 #include "src/context.h"
+
+// glm::vec3, glm::vec4, glm::ivec4, glm::mat4
+#include <glm/glm.hpp>
+// glm::perspective
+#include <glm/gtc/matrix_transform.hpp>
+// glm::value_ptr
+#include <glm/gtc/type_ptr.hpp>
+
 #include "bitmap.h"
 #include "shader.h"
+
+#include "data/banana.h"
+
 bool LoadTexture(char *filename, unsigned int *texture)
 {
 	unsigned char *bitmap;
@@ -61,16 +73,11 @@ bool LoadRGBATexture(char *filename, unsigned int *texture)
     return true;
 }
 
-int main()
+void draw_road()
 {
-    //Initial a new context, need to be hidden after egl or glfw library is imported.
-    Context::SetCurrentContext(new Context());
-
 	Shader shader;
-
 	shader.init("shader_src/TransformVertexShader.vertexshader",
 			"shader_src/TextureFragmentShader.fragmentshader");
-
 	shader.bind();
 
     unsigned int texture[2];
@@ -125,8 +132,8 @@ int main()
     int mvp = glGetUniformLocation(shader.id(), "MVP");
     printf("%d, %d, %d, %d, %d\n", v_coord_loc, v_tex0_loc, c_map, n_map, mvp);
 
-    glUniform1i(c_map, texture[0]);
-    glUniform1i(n_map, texture[1]);
+    glUniform1i(c_map, 0);
+    glUniform1i(n_map, 1);
     glUniformMatrix4fv(mvp, 1, 0, mvp4x4);
 
     glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);
@@ -137,7 +144,82 @@ int main()
 
     glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
-	glDeleteTextures(2, texture);
+    glDeleteTextures(2, texture);
 
     shader.unbind();
+}
+
+void draw_banana()
+{
+	GLfloat mvp4x4[] = {1.0f, 0.0f, 0.0f, 0.0f,
+	                    0.0f, 1.0f, 0.0f, 0.0f,
+	                    0.0f, 0.0f, 1.0f, 0.0f,
+	                    0.0f, 0.0f, 0.0f, 1.0f
+	                   };
+
+	Shader shader;
+	shader.init("shader_src/drawObj.vert", "shader_src/drawObj.frag");
+	shader.bind();
+
+	glEnable(GL_DEPTH_TEST);
+
+    glViewport(0,0,1024,768);
+	glClearColor(0.0,0.0,0.0,1.0);
+	glClearDepthf(1.0);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	unsigned int texture[2];
+	glActiveTexture(GL_TEXTURE0);
+    if (LoadTexture("data/banana.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+    }
+
+    glm::vec3 eye_pos = glm::vec3(2.0f, 1.0f, 1.0f);
+    glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
+    glm::mat4 View = glm::lookAt(
+						eye_pos, // Camera is at (4,3,3), in World Space
+						glm::vec3(0,0,0), // and looks at the origin
+						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+					);
+	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
+	glm::mat4 VP = Projection * View;
+
+	int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
+	int v_normal = glGetAttribLocation(shader.id(), "obj_normal");
+    int v_tex0_loc = glGetAttribLocation(shader.id(), "obj_texcoord");
+    int c_map = glGetUniformLocation(shader.id(), "ColorMap");
+    int vp = glGetUniformLocation(shader.id(), "VP");
+    int model_mat = glGetUniformLocation(shader.id(), "model_mat");
+    int eye = glGetUniformLocation(shader.id(), "eye_pos");
+    printf("%d, %d, %d, %d, %d, %d, %d\n", v_coord_loc, v_normal, v_tex0_loc, c_map, vp, model_mat, eye);
+
+	glUniform1i(c_map, 0);
+    glUniformMatrix4fv(vp, 1, 0, &VP[0][0]);
+	glUniformMatrix4fv(model_mat, 1, 0, &Model[0][0]);
+    glUniform3fv(eye, 1, &eye_pos[0]);
+
+    glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, bananaVerts);
+    glEnableVertexAttribArray(v_coord_loc);
+
+    glVertexAttribPointer(v_normal, 3, GL_FLOAT, GL_FALSE, 0, bananaNormals);
+    glEnableVertexAttribArray(v_normal);
+
+    glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, bananaTexCoords);
+    glEnableVertexAttribArray(v_tex0_loc);
+
+	glDrawArrays(GL_TRIANGLES, 0, bananaNumVerts);
+
+	glDeleteTextures(1, texture);
+
+	shader.unbind();
+}
+
+int main()
+{
+    //Initial a new context, need to be hidden after egl or glfw library is imported.
+    Context::SetCurrentContext(new Context());
+
+	//draw_road();
+	draw_banana();
 }
