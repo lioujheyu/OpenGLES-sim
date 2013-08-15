@@ -32,7 +32,7 @@
  *	@def NO_TEX_CACHE
  *	Whether disable texture cache or not
  */
-#define NO_TEX_CACHE
+//#define NO_TEX_CACHE
 /*************************************************************************
  *	The whole texture cache size is determined be
  *	TEX_WAY_ASSOCIATION * TEX_CACHE_BLOCK_SIZE * TEX_CACHE_ENTRY_SIZE * 4B
@@ -85,12 +85,12 @@
 /**
  *	Debug information
  */
-//#define DEBUG
+#define DEBUG
 
 #define GPU_INFO
-#define SHADER_INFO
-#define PIXEL_INFO
-#define TEXEL_INFO
+//#define SHADER_INFO
+//#define PIXEL_INFO
+//#define TEXEL_INFO
 
 #define GPU_INFO_FILE "gpu_info"
 #define SHADER_INFO_FILE "shader_info"
@@ -99,9 +99,9 @@
 
 /***************Debugging marco for simulator use*****************/
 #ifdef DEBUG
-	#define DBG_ON 1
+#	define DBG_ON 1
 #else
-	#define DBG_ON 0
+#	define DBG_ON 0
 #endif
 
 #endif // GPU_CONFIG_H_INCLUDED

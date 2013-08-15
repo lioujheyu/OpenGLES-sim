@@ -55,7 +55,7 @@ void GPU_Core::PerspectiveDivision()
 	curVtx.attr[0].w = 1.0;
 
 	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
-		if (attrEnable[i] == false)
+		if (varyEnable[i] == false)
 			continue;
 		else
 			curVtx.attr[i] = curVtx.attr[i] * w;
@@ -142,7 +142,6 @@ void GPU_Core::PrimitiveAssembly()
     if (vtxCntDwn == 0)
     {
 		totalPrimitive++;
-		printf("Primitive %d drawing. ", totalPrimitive);
         primitiveRdy = true;
 
         switch (drawMode) {

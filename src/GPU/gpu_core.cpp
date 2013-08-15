@@ -57,6 +57,9 @@ void GPU_Core::Run()
         if (primitiveRdy) {
             TriangleSetup();
 
+            //printf("Primitive %d drawing. ", totalPrimitive);
+            //printf("Area: %f\n", fabs(constantC/2));
+
             //Fragment-based operation starts here
 			for(int y=LY; y<=HY; y+=16) {
 				for(int x=LX; x<=RX; x+=16) {
@@ -89,8 +92,10 @@ void GPU_Core::Run()
 
 GPU_Core::GPU_Core()
 {
-	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++)
+	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
 		attrEnable[i] = false;
+		varyEnable[i] = false;
+	}
 
 	depthRangeN = 0.0;
 	depthRangeF = 1.0;

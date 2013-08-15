@@ -231,6 +231,10 @@ void ShaderCore::Exec()
 				curCCState = ccStack.top();
 			break;
 
+		case OP_POW:
+			dst.x = dst.y = dst.z = dst.w = pow(src[0].x, src[1].x);
+			break;
+
 		default:
 			printf("Shader: Undefined OPcode: %x\n",curInst.op);
 			break;

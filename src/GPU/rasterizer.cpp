@@ -18,7 +18,6 @@ void GPU_Core::TriangleSetup()
 	Edge[2][1] = prim.v[2].attr[0].x - prim.v[0].attr[0].x;
 
 	constantC = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
-	//printf("Area: %f\n", fabs(constantC/2));
 	if (fabs(constantC) > 1000000)
 	{
 		printf("fuck!!\n");
@@ -106,7 +105,7 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[0].w - prim.v[0].attr[0].w);
 
 			for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
-				if (!attrEnable[attrCnt])
+				if (!varyEnable[attrCnt])
 					continue;
 
 				pixelStamp[i].attr[attrCnt] = prim.v[0].attr[attrCnt] +
@@ -117,7 +116,7 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 		}
 		//each attribute needs to get its scale factor, and all 4 pixels' attribute will get theirs here.
 		for (int attrCnt=1; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++){
-			if (!attrEnable[attrCnt])
+			if (!varyEnable[attrCnt])
 				continue;
 			pixelStamp[0].scaleFacDX[attrCnt] = pixelStamp[1].scaleFacDX[attrCnt]
 												= fvabs(pixelStamp[1].attr[attrCnt]-pixelStamp[0].attr[attrCnt]);
@@ -132,18 +131,22 @@ void GPU_Core::pixelSplit(int x, int y, int level)
         //Write valid fragment into waiting buffer if they are truly pass the edge test.
 		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)||
             (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
-			pixBuffer[pixBufferP] = pixelStamp[0];
+			if ( ( pixelStamp[0].attr[0].x < viewPortW ) &&
+				 ( pixelStamp[0].attr[0].y < viewPortH ) ){
+				pixBuffer[pixBufferP] = pixelStamp[0];
 
-			PIXPRINTF("P:(%3d,%3d)\t \n",
-					   (int)pixBuffer[pixBufferP].attr[0].x,
-					   (int)pixBuffer[pixBufferP].attr[0].y);
+				PIXPRINTF("P:(%3d,%3d)\t \n",
+						(int)pixBuffer[pixBufferP].attr[0].x,
+						(int)pixBuffer[pixBufferP].attr[0].y);
 
-			pixBufferP++;
+				pixBufferP++;
+			}
 		}
 
 		if ((cornerTest[2][0]>=0 && cornerTest[2][1]>=0 && cornerTest[2][2]>=0)|
             (cornerTest[2][0]<=0 && cornerTest[2][1]<=0 && cornerTest[2][2]<=0)) {
-			if ( pixelStamp[1].attr[0].x <= RX ) {
+			if ( ( pixelStamp[1].attr[0].x < viewPortW ) &&
+				 ( pixelStamp[1].attr[0].y < viewPortH ) ){
 				pixBuffer[pixBufferP] = pixelStamp[1];
 
 				PIXPRINTF("P:(%3d,%3d)\t \n",
@@ -156,7 +159,8 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 
 		if ((cornerTest[5][0]>=0 && cornerTest[5][1]>=0 && cornerTest[5][2]>=0)|
             (cornerTest[5][0]<=0 && cornerTest[5][1]<=0 && cornerTest[5][2]<=0)) {
-			if ( pixelStamp[2].attr[0].y <= HY ) {
+			if ( ( pixelStamp[2].attr[0].x < viewPortW ) &&
+				 ( pixelStamp[2].attr[0].y < viewPortH ) ){
 				pixBuffer[pixBufferP] = pixelStamp[2];
 
 				PIXPRINTF("P:(%3d,%3d)\t \n",
@@ -169,8 +173,8 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 
 		if ((cornerTest[7][0]>=0 && cornerTest[7][1]>=0 && cornerTest[7][2]>=0)|
             (cornerTest[7][0]<=0 && cornerTest[7][1]<=0 && cornerTest[7][2]<=0)) {
-			if ( ( pixelStamp[1].attr[0].x <= RX ) &&
-				 ( pixelStamp[2].attr[0].y <= HY ) ){
+			if ( ( pixelStamp[3].attr[0].x < viewPortW ) &&
+				 ( pixelStamp[3].attr[0].y < viewPortH ) ){
 				pixBuffer[pixBufferP] = pixelStamp[3];
 
 				PIXPRINTF("P:(%3d,%3d)\t \n",

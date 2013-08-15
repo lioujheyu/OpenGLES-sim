@@ -158,6 +158,7 @@ void ActiveGPU()
             gpu.vtxPointer[i] = ctx->vertexAttrib[i].ptr;
             gpu.attrSize[i] = ctx->vertexAttrib[i].size;
         }
+        gpu.varyEnable[i] = t_program->varyEnable[i];
     }
 
     gpu.vtxCount = ctx->drawCmd.count;

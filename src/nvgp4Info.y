@@ -63,6 +63,7 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 			t_symbol.element = t_element;
 			t_program.VSoutCnt+= t_element;
 			t_program.srcVSout[t_symbol.name] = t_symbol;
+			t_program.varyEnable[0] = true;
 		}
 		else if (strncmp($7,"ATTR",4) == 0) {
 			t_idx = (unsigned int)$7[4] - 48;
@@ -79,6 +80,7 @@ link_info: VAR TYPE complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
 					t_symbol.element = t_element;
 					t_program.VSoutCnt+= t_element;
 					t_program.srcVSout[t_symbol.name]=t_symbol;
+					t_program.varyEnable[t_symbol.idx] = true;
 				}
 			}
 			else { //Fragment Shader

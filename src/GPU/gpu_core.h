@@ -50,6 +50,7 @@ public:
     const void  	*vtxPointer[MAX_ATTRIBUTE_NUMBER];
     int         	attrSize[MAX_ATTRIBUTE_NUMBER];
     bool        	attrEnable[MAX_ATTRIBUTE_NUMBER];
+    bool        	varyEnable[MAX_ATTRIBUTE_NUMBER];
 	GLenum			drawMode;
     float       	depthRangeN, depthRangeF;
     int         	viewPortLX, viewPortLY,

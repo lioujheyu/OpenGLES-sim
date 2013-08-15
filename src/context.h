@@ -141,6 +141,7 @@ struct programObject
 	GLuint sid4FS;	///Shader ID for Fragment Shader
 	GLboolean isLinked;
 	GLboolean delFlag;
+	GLboolean varyEnable[MAX_ATTRIBUTE_NUMBER];
 
 	///@name Resource Statistic
 	///@{
@@ -153,7 +154,7 @@ struct programObject
 
 /** @name Naming Table
  *	GLSL variable name <-> ASM symbol attribute.
- *	For location retriving by user.
+ *	For location retrieving by user.
  */
 ///@{
 	std::map<std::string, symbol> srcVSin;
@@ -166,7 +167,7 @@ struct programObject
 
 /**	@name Index Table
  *	True uniform index -> glsl variable name.
- *	For unifrom value setting function
+ *	For uniform value setting function
  */
 	std::map<GLint, std::string> uniformUsage;
 
@@ -202,6 +203,8 @@ struct programObject
 		sid4FS = 0;
 		isLinked = GL_FALSE;
 		delFlag = GL_FALSE;
+		for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++)
+			varyEnable[i] = GL_FALSE;
 		VSinCnt = 0;
 		VSoutCnt = 0;
 		VSuniformCnt = 0;
@@ -216,6 +219,8 @@ struct programObject
 	void LinkInit()
 	{
 		isLinked = GL_FALSE;
+		for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++)
+			varyEnable[i] = GL_FALSE;
 		VSinCnt = 0;
 		VSoutCnt = 0;
 		VSuniformCnt = 0;
@@ -361,7 +366,7 @@ public:
 
 /**
  *	All specified uniform value will be stored in uniformPool and it's ID
- *	queried from getLocation funtion will be used as its std::map key value.
+ *	queried from getLocation function will be used as its std::map key value.
  */
     std::map<GLint, floatVec4> uniformPool;
 
