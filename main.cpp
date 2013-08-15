@@ -181,24 +181,26 @@ void draw_banana()
 	glm::mat4 VP = Projection * View;
 
 	int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
-	int v_normal = glGetAttribLocation(shader.id(), "obj_normal");
+	int v_normal_loc = glGetAttribLocation(shader.id(), "obj_normal");
     int v_tex0_loc = glGetAttribLocation(shader.id(), "obj_texcoord");
-    int c_map = glGetUniformLocation(shader.id(), "ColorMap");
-    int vp = glGetUniformLocation(shader.id(), "VP");
-    int model_mat = glGetUniformLocation(shader.id(), "model_mat");
-    int light = glGetUniformLocation(shader.id(), "light_pos");
-    printf("%d, %d, %d, %d, %d, %d, %d\n", v_coord_loc, v_normal, v_tex0_loc, c_map, vp, model_mat, light);
+    int c_map_loc = glGetUniformLocation(shader.id(), "ColorMap");
+    int vp_loc = glGetUniformLocation(shader.id(), "VP");
+    int model_loc = glGetUniformLocation(shader.id(), "model_mat");
+    int light_loc = glGetUniformLocation(shader.id(), "light_pos");
+    int eye_loc = glGetUniformLocation(shader.id(), "eye_pos");
+    printf("%d, %d, %d, %d, %d, %d, %d\n", v_coord_loc, v_normal_loc, v_tex0_loc, c_map_loc, vp_loc, model_loc, light_loc);
 
-	glUniform1i(c_map, 0);
-    glUniformMatrix4fv(vp, 1, 0, &VP[0][0]);
-	glUniformMatrix4fv(model_mat, 1, 0, &Model[0][0]);
-    glUniform3fv(light, 1, &light_pos[0]);
+	glUniform1i(c_map_loc, 0);
+    glUniformMatrix4fv(vp_loc, 1, 0, &VP[0][0]);
+	glUniformMatrix4fv(model_loc, 1, 0, &Model[0][0]);
+    glUniform3fv(light_loc, 1, &light_pos[0]);
+    glUniform3fv(eye_loc, 1, &eye_pos[0]);
 
     glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, bananaVerts);
     glEnableVertexAttribArray(v_coord_loc);
 
-    glVertexAttribPointer(v_normal, 3, GL_FLOAT, GL_FALSE, 0, bananaNormals);
-    glEnableVertexAttribArray(v_normal);
+    glVertexAttribPointer(v_normal_loc, 3, GL_FLOAT, GL_FALSE, 0, bananaNormals);
+    glEnableVertexAttribArray(v_normal_loc);
 
     glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, bananaTexCoords);
     glEnableVertexAttribArray(v_tex0_loc);
