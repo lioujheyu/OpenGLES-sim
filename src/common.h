@@ -288,21 +288,6 @@ inline const floatVec4 fvmin(const floatVec4& x, const floatVec4& y)
 	return tmp;
 }
 
-//Calculate reciprocal square root of input (for HW: approximate)
-inline const floatVec4 fvrsqrt(const floatVec4 &x)
-{
-	floatVec4 tmp;
-#ifdef USE_SSE
-	tmp.sse = _mm_rsqrt_ss(x.sse);
-#else
-	tmp.x = 1.0/sqrt(x.x);
-	tmp.y = x.y;
-	tmp.z = x.z;
-	tmp.w = x.w;
-#endif //USE_SSE
-	return tmp;
-}
-
 #ifdef USE_SSE
 inline const __m128 sse_dot4_ps(__m128 a, __m128 b)
 {
@@ -427,7 +412,7 @@ inline const float Q_rsqrt(float number)
 	i  = 0x5f3759df - ( i >> 1 );               // what the fuck?
 	y  = * ( float * ) &i;
 	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
-	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+	//y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
 
 	return y;
 }
