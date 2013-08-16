@@ -224,7 +224,7 @@ R{D}+ { COL_NO;
 		nvgp4ASM_lval.ival = atoi(nvgp4ASM_text);
 		return INTEGER;
 	}
-[-+]?{D}+\.{D}+ { COL_NO;
+[-+]?{D}+\.{D}+([eE][-+]?{D}+)? { COL_NO;
 		nvgp4ASM_lval.fval = atof(nvgp4ASM_text);
 		return FLOAT;
 	}
