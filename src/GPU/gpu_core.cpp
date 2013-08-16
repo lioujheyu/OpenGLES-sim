@@ -84,9 +84,23 @@ void GPU_Core::Run()
 
     GPUPRINTF("Texture cache hit: %d\n",sCore[1].texUnit.hit);
     GPUPRINTF("Texture cache miss: %d\n",sCore[1].texUnit.miss);
-    GPUPRINTF("Texture cache miss rate: %f\n",
+    GPUPRINTF("Texture cache miss rate: %f\n\n",
 			   (float)sCore[1].texUnit.miss /
 			   (sCore[1].texUnit.hit + sCore[1].texUnit.miss) );
+
+	GPUPRINTF("VShader total executed instruction: %d\n",
+			   sCore[0].totalInstructionCnt);
+	GPUPRINTF("VShader total executed scale operation: %d\n",
+			   sCore[0].totalScaleOperation);
+	GPUPRINTF("Vertex Shader Usage: %f\n\n",
+			   (float)(sCore[0].totalScaleOperation)/(sCore[0].totalInstructionCnt*4));
+
+	GPUPRINTF("FShader total executed instruction: %d\n",
+			   sCore[1].totalInstructionCnt);
+	GPUPRINTF("FShader total executed scale operation: %d\n",
+			   sCore[1].totalScaleOperation);
+	GPUPRINTF("Fragment Shader Usage: %f\n\n",
+			   (float)(sCore[1].totalScaleOperation)/(sCore[1].totalInstructionCnt*4));
 
 }
 

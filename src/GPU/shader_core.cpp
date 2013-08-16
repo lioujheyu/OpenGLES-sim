@@ -43,50 +43,77 @@ void ShaderCore::Exec()
 		case OP_I2F:
 			dst = fvInt2Float(src[0]);
 			break;
-		case OP_LIT:
-			break;
+//		case OP_LIT:
+//			break;
 		case OP_MOV:
 			dst = src[0];
 			break;
-		case OP_NOT:
-			break;
-		case OP_NRM:
-			break;
-		case OP_PK2H:
-			break;
-		case OP_PK2US:
-			break;
-		case OP_PK4B:
-			break;
-		case OP_PK4UB:
-			break;
+//		case OP_NOT:
+//			break;
+//		case OP_NRM:
+//			break;
+//		case OP_PK2H:
+//			break;
+//		case OP_PK2US:
+//			break;
+//		case OP_PK4B:
+//			break;
+//		case OP_PK4UB:
+//			break;
 		case OP_ROUND:
 			dst = fvround(src[0]);
 			break;
-		case OP_SSG:
-			break;
+//		case OP_SSG:
+//			break;
 		case OP_TRUNC:
 			dst = fvtrunc(src[0]);
 			break;
+		// SCALARop
+//		case OP_COS:
+//			break;
+//		case OP_EX2:
+//			break;
+//		case OP_LG2;
+//			break;
+//		case OP_RCC:
+//			break;
+		case OP_RCP:
+			dst.x = dst.y = dst.z = dst.w = (1/src[0].x);
+			break;
+//		case OP_SCS:
+//			break;
+//		case OP_SIN:
+//			break;
+//		case OP_UP2H:
+//			break;
+//		case OP_UP2US:
+//			break;
+//		case OP_UP4B:
+//			break;
+//		case OP_UP4UB:
+//			break;
 		// BINop
 		case OP_ADD:
 			dst = src[0] + src[1];
 			break;
-		case OP_AND:
-			break;
+//		case OP_AND:
+//			break;
 		case OP_DIV:
 			dst = src[0] / src[1];
 			break;
 		case OP_DP2:
 			dst = src[0] * src[1];
 			dst.x = dst.y = dst.z = dst.w = (dst.x + dst.y);
+			totalScaleOperation+=1;
 			break;
 		case OP_DP3:
 			dst = src[0] * src[1];
 			dst.x = dst.y = dst.z = dst.w = (dst.x + dst.y + dst.z);
+			totalScaleOperation+=2;
 			break;
 		case OP_DP4:
 			dst.x = dst.y = dst.z = dst.w = dot(src[0], src[1]);
+			totalScaleOperation+=3;
 			break;
 		case OP_DPH:
 			break;
@@ -105,19 +132,19 @@ void ShaderCore::Exec()
 		case OP_MUL:
 			dst = src[0] * src[1];
 			break;
-		case OP_OR:
-			break;
-		case OP_RFL:
-			break;
+//		case OP_OR:
+//			break;
+//		case OP_RFL:
+//			break;
 		case OP_RSQ:	//Reciprocal square root
-			//dst = fvrsqrt(src[0]);
+			//dst.x = dst.y = dst.z = dst.w = 1/sqrt(src[0].x);
 			dst.x = dst.y = dst.z = dst.w = Q_rsqrt(src[0].x);
 			break;
 		case OP_SEQ:
 			dst = src[0] == src[1];
 			break;
-		case OP_SFL:
-			break;
+//		case OP_SFL:
+//			break;
 		case OP_SGE:
 			dst = src[0] >= src[1];
 			break;
@@ -133,15 +160,15 @@ void ShaderCore::Exec()
 		case OP_SNE:
 			dst = src[0] != src[1];
 			break;
-		case OP_STR:
-			break;
+//		case OP_STR:
+//			break;
 		case OP_SUB:
 			dst = src[0] - src[1];
 			break;
-		case OP_XPD:
-			break;
-		case OP_XOR:
-			break;
+//		case OP_XPD:
+//			break;
+//		case OP_XOR:
+//			break;
 		//TRIop
 		case OP_CMP:
 			break;
@@ -153,15 +180,15 @@ void ShaderCore::Exec()
 				break;
 			}
 			break;
-		case OP_LRP:
-			break;
+//		case OP_LRP:
+//			break;
 		case OP_MAD:
 			dst = src[0] * src[1] + src[2];
 			break;
-		case OP_SAD:
-			break;
-		case OP_X2D:
-			break;
+//		case OP_SAD:
+//			break;
+//		case OP_X2D:
+//			break;
 		//TEXop
 		case OP_TEX:
 			dst = texUnit.TextureSample(src[0],
@@ -185,11 +212,11 @@ void ShaderCore::Exec()
 		case OP_TXP:
 			dst = texUnit.TextureSample(src[0], -1, src[1], src[2], tid);
 			break;
-		case OP_TXQ:
-			break;
+//		case OP_TXQ:
+//			break;
 		//TXDop
-		case OP_TXD:
-			break;
+//		case OP_TXD:
+//			break;
 		//BRAop
 		//FLOWCCop
 		//IFop
@@ -230,7 +257,7 @@ void ShaderCore::Exec()
 			else
 				curCCState = ccStack.top();
 			break;
-
+		//BINSCop
 		case OP_POW:
 			dst.x = dst.y = dst.z = dst.w = pow(src[0].x, src[1].x);
 			break;
@@ -240,8 +267,10 @@ void ShaderCore::Exec()
 			break;
 		}
 
-		if (curCCState == true)
+		if (curCCState == true){
+			totalInstructionCnt+=1;
 			WriteBack();
+		}
 
 		PC++;
 	}
@@ -404,6 +433,7 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 				CCisSigned[1].x = (val.x < 0)?1.0:0.0;
 				CCisZero[1].x = (val.x == 0)?1.0:0.0;
 			}
+			totalScaleOperation+=1;
 			break;
 
 		case 'y':
@@ -425,6 +455,7 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 				CCisSigned[1].y = (val.y < 0)?1.0:0.0;
 				CCisZero[1].y = (val.y == 0)?1.0:0.0;
 			}
+			totalScaleOperation+=1;
 			break;
 
 		case 'z':
@@ -446,6 +477,7 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 				CCisSigned[1].z = (val.z < 0)?1.0:0.0;
 				CCisZero[1].z = (val.z == 0)?1.0:0.0;
 			}
+			totalScaleOperation+=1;
 			break;
 
 		case 'w':
@@ -467,7 +499,9 @@ void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 				CCisSigned[1].w = (val.w < 0)?1.0:0.0;
 				CCisZero[1].w = (val.w == 0)?1.0:0.0;
 			}
+			totalScaleOperation+=1;
 			break;
+
 		default: // '\0'
 			return;
 		}

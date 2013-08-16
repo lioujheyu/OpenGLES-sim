@@ -32,6 +32,8 @@ public:
 	ShaderCore()
 	{
 		instCnt = 0;
+		totalInstructionCnt = 0;
+		totalScaleOperation = 0;
 		shaderType = VERTEX_SHADER;
 		for (int i=0; i<MAX_SHADER_REG_VECTOR; i++)
 			reg[i].x = reg[i].y = reg[i].z = reg[i].w = 0.0f;
@@ -55,6 +57,8 @@ public:
 
 	///statitic
 	FILE *SHADERINFOfp;
+	int totalInstructionCnt;
+	int totalScaleOperation;
 
 	void Init();
 	void Exec();
