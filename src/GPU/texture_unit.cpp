@@ -213,7 +213,14 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 
 	switch (wrapS[tid]){
 	case GL_REPEAT:
-		temp.s = fmod(coordIn.s,texImage[tid].widthLevel[level]);
+		/*	I found the function's behavior of "fmod" in C++ is not matched
+		 *	with OpenGL.
+		 *	fmod(x,y) in C++: x - y * trunc(x/y);
+		 *	fmod(x,y) in OpenGL: x - y * floor(x/y);
+		 */
+//		temp.s = fmod(coordIn.s,texImage[tid].widthLevel[level]);
+		temp.s = coordIn.s - texImage[tid].widthLevel[level] *
+				 floor(coordIn.s/texImage[tid].widthLevel[level]);
 		break;
 	case GL_CLAMP_TO_EDGE:
 		temp.s = std::min(coordIn.s, (float)texImage[tid].widthLevel[level]-1);
@@ -225,7 +232,9 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 
 	switch (wrapT[tid]){
 	case GL_REPEAT:
-		temp.t = fmod(coordIn.t,texImage[tid].heightLevel[level]);
+//		temp.t = fmod(coordIn.t,texImage[tid].heightLevel[level]);
+		temp.t = coordIn.t - texImage[tid].heightLevel[level] *
+				 floor(coordIn.t/texImage[tid].heightLevel[level]);
 		break;
 	case GL_CLAMP_TO_EDGE:
 		temp.t = std::min(coordIn.t, (float)texImage[tid].heightLevel[level]-1);
@@ -421,6 +430,7 @@ floatVec4 TextureUnit::TextureSample(floatVec4 coordIn,
 	} else {
 		switch (magFilter[tid]) {
 		case GL_NEAREST:    //u,v nearest filter
+			coord = TexCoordWrap(coord, 0, tid);
 			color = GetTexColor(coord ,0, tid);
 			break;
 
