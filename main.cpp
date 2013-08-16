@@ -33,10 +33,12 @@ bool LoadTexture(char *filename, unsigned int *texture)
                  info->bmiHeader.biHeight, 0, GL_RGB, GL_UNSIGNED_BYTE,
                  bitmap);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glGenerateMipmap(GL_TEXTURE_2D);
+    //glGenerateMipmap(GL_TEXTURE_2D);
 
     free(bitmap);
     free(info);
@@ -106,8 +108,8 @@ void draw_road()
 //                            -1.0f,  1.0f, 0.0f, 1.0f
 //                          };
 
-    GLfloat texCoord[] = { 0.0f, 0.0f,
-                           1.0f, 0.0f,
+    GLfloat texCoord[] = { 0.0f, -1.0f,
+                           1.0f, -1.0f,
                            1.0f, 1.0f,
                            0.0f, 1.0f,
                          };
@@ -169,8 +171,8 @@ void draw_banana()
 		exit(1);
     }
 
-    glm::vec3 eye_pos = glm::vec3(2.0f, 1.0f, 1.0f);
-	glm::vec3 light_pos = glm::vec3(1.0f, 3.0f, 1.0f);
+	glm::vec3 eye_pos = glm::vec3(2.0f, 1.0f, 1.0f);
+	glm::vec3 light_pos = glm::vec3(1.0f, 1.5f, -2.0f);
     glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
     glm::mat4 View = glm::lookAt(
 						eye_pos, // Camera is at (2,1,1), in World Space
@@ -217,6 +219,6 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-	//draw_road();
-	draw_banana();
+	draw_road();
+	//draw_banana();
 }

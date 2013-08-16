@@ -2,7 +2,7 @@
 
 in vec2 UV;
 in float lightIntensity;
-in float specular_factor;
+in vec3 specular_color;
 
 out vec3 color;
 
@@ -10,11 +10,8 @@ uniform sampler2D ColorMap;
 
 void main()
 {
-
-	vec3 c1;
 	color = texture2D( ColorMap, UV ).rgb;
 	color = color * lightIntensity;
-	color = color + vec3(specular_factor);
+	color = color + specular_color;
 	color = clamp(color, 0.0, 1.0);
-	
 }

@@ -20,10 +20,10 @@ void main(){
 	
 	cfactor = dot(c2, eyeVector);
 	
-	if (cfactor > 0.7)
-		cfactor = 1.0;
-	else
-		cfactor = 0.0;
+//	if (cfactor > 0.7)
+//		cfactor = 1.0;
+//	else
+//		cfactor = 0.0;
 	
 	color = c1 * cfactor;
 }
