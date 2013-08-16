@@ -18,7 +18,7 @@
 class unitThread
 {
 public:
-	int pc; ///< Program conunter
+	int pc; ///< Program counter
 	int threadId; ///< Thread ID
 };
 

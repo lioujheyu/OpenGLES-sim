@@ -113,7 +113,7 @@ private:
     ///@}
 
 	//Rasterizer
-	float           Edge[3][3]; ///< Edge equation's coinfficient
+	float           Edge[3][3]; ///< Edge equation's coefficient
     float           area2Reciprocal;
 
     ///@name Boundary Box

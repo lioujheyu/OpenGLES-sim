@@ -28,7 +28,7 @@
  *
  *	Vector component-wised operation instruction(using SSE).
  *
- *	This SSE vector class's implementation is refered to this site:
+ *	This SSE vector class's implementation is referred to this site:
  *	http://fastcpp.blogspot.tw/2011/12/simple-vector3-class-with-sse-support.html
  *	It works like a charm.
  */

@@ -191,7 +191,7 @@ void ActiveGPU()
     for (int i=0; i<t_program->uniformCnt; i++)
 		gpu.uniformPool[i] = ctx->uniformPool[i];
 
-/*	Unsure shall we copy whole instruction into gpu or just use pointer to
+/*	Unsure shall we copy whole instruction into GPU or just use pointer to
  *	get instruction from outside
  */
 	gpu.VSinstCnt = t_program->VSinstructionPool.size();

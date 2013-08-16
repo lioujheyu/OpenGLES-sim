@@ -1,6 +1,6 @@
 /**
  *	@file context_shader_glapi.cpp
- *  @brief OpenGL ES 2.0 Shader-Related API Layer Implemention
+ *  @brief OpenGL ES 2.0 Shader-Related API Layer Implementation
  *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
  */
 

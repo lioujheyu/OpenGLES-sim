@@ -1,6 +1,6 @@
 /**
  *	@file context_link.cpp
- *  @brief Link vertex shader and fragment shader under specfied program object
+ *  @brief Link vertex shader and fragment shader under specified program object
  *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
  */
 
@@ -94,7 +94,7 @@ void Context::LinkProgram(GLuint program)
 	}
 
 /*
- * 	2nd pass parsing for Custum instruction structure establishing from NVGP4
+ * 	2nd pass parsing for custom instruction structure establishing from NVGP4
  *	assembly code. Resource remapping is performed in this stage.
  */
  	printf("\n");

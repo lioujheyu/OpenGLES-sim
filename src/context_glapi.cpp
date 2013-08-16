@@ -1,12 +1,12 @@
 /**
  *	@file context_glapi.cpp
- *  @brief OpenGL ES 2.0 API Layer Implemention (no shader related API)
+ *  @brief OpenGL ES 2.0 API Layer Implementation (no shader related API)
  *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
  */
 
 #include "context.h"
 
-///Define U_PROG is the porgram which is in current used
+///Define U_PROG is the program which is in current used
 #define U_PROG programPool[usePID]
 
 void Context::ActiveTexture(GLenum texture)

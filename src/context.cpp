@@ -1,6 +1,6 @@
 /**
  *	@file context.cpp
- *  @brief Context management function implemention
+ *  @brief Context management function implementation
  *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
  */
 

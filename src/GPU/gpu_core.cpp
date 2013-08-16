@@ -124,28 +124,28 @@ GPU_Core::GPU_Core()
 
 	totalPrimitive = totalPix = totalVtx = 0;
 
-#ifdef GPU_INFO_FILE
+#if defined(DEBUG) && defined(GPU_INFO) && defined(GPU_INFO_FILE)
 	GPUINFOfp = fopen((std::string(GPU_INFO_FILE)+".txt").c_str(),"w");
-#endif // GPU_INFO
-#ifdef PIXEL_INFO_FILE
+#endif // GPU_INFO && GPU_INFO_FILE
+#if defined(DEBUG) && defined(PIXEL_INFO) && defined(PIXEL_INFO_FILE)
 	PIXELINFOfp = fopen((std::string(PIXEL_INFO_FILE)+".txt").c_str(),"w");
-#endif // PIXEL_INFO_FILE
+#endif // PIXEL_INFO && PIXEL_INFO_FILE
 }
 
 GPU_Core::~GPU_Core()
 {
-#ifdef GPU_INFO_FILE
+#if defined(DEBUG) && defined(GPU_INFO) && defined(GPU_INFO_FILE)
 	fclose(GPUINFOfp);
-#endif // GPU_INFO
-#ifdef PIXEL_INFO_FILE
+#endif // GPU_INFO && GPU_INFO_FILE
+#if defined(DEBUG) && defined(PIXEL_INFO) && defined(PIXEL_INFO_FILE)
 	fclose(PIXELINFOfp);
-#endif // PIXEL_INFO_FILE
+#endif //PIXEL_INFO && PIXEL_INFO_FILE
 
-#ifdef TEXEL_INFO_FILE
+#if defined(DEBUG) && defined(TEXEL_INFO) && defined(TEXEL_INFO_FILE)
 	for (int i=0; i<MAX_SHADER_CORE; i++) {
 		fclose(sCore[i].texUnit.TEXELINFOfp);
 	}
-#endif // TEXEL_INFO_FILE
+#endif //TEXEL_INFO && TEXEL_INFO_FILE
 }
 
 void GPU_Core::PassConfig2SubModule()
@@ -159,9 +159,9 @@ void GPU_Core::PassConfig2SubModule()
 			sCore[j].texUnit.wrapT[i] = wrapT[i];
 			sCore[j].texUnit.texImage[i] = texImage[i];
 		}
-#ifdef TEXEL_INFO_FILE
+#if defined(DEBUG) && defined(TEXEL_INFO) && defined(TEXEL_INFO_FILE)
 		sCore[j].texUnit.TEXELINFOfp =
 			fopen((std::string(TEXEL_INFO_FILE)+'_'+std::to_string(j)+".txt").c_str(),"w");
-#endif // TEXEL_INFO_FILE
+#endif //TEXEL_INFO && TEXEL_INFO_FILE
 	}
 }

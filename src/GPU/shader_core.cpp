@@ -303,8 +303,8 @@ void ShaderCore::FetchData()
 			break;
 
 		case INST_CCREG:
-			src[i] = ReadByMask(CCisSigned[curInst.src[i].id], curInst.src[i].ccModifier);
-			src[i+1] = ReadByMask(CCisZero[curInst.src[i].id], curInst.src[i].ccModifier);
+			src[0] = ReadByMask(CCisSigned[curInst.src[i].id], curInst.src[i].ccModifier);
+			src[1] = ReadByMask(CCisZero[curInst.src[i].id], curInst.src[i].ccModifier);
 			break;
 
 		case INST_CONSTANT:
@@ -312,7 +312,7 @@ void ShaderCore::FetchData()
 			break;
 
 		default:
-			printf("Shader(Exec): Unknow operand type \n");
+			printf("Shader(Exec): Unknown operand type \n");
 			return;
 		}
 
@@ -358,7 +358,7 @@ void ShaderCore::WriteBack()
  *	Extract the source floatVec4 's component by mask
  *
  *	@param in 	A floatVec4 prepared for component extraction by mask.
- *	@param mask The componemt mask
+ *	@param mask The component mask
  *
  *	@return A floatVec4
  */
@@ -404,11 +404,11 @@ floatVec4 ShaderCore::ReadByMask(floatVec4 in, char *mask)
 
 /**
  *	Write the destination floatVec4 's floating component by mask including CC
- *	register's update if necessray.
+ *	register's update if necessary.
  *
  *	@param val		A floatVec4 value prepared for writing.
  *	@param fvdst	The destination floatVec4 's pointer
- *	@param mask 	The componemt mask.
+ *	@param mask 	The component mask.
  */
 void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask)
 {
