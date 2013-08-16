@@ -394,11 +394,11 @@ inline const floatVec4 fvInt2Float(const floatVec4 &x)
 }
 
 /**
- *	Fast inverse square root
+ *	@brief Fast inverse square root
  *	Reference: http://en.wikipedia.org/wiki/Fast_inverse_square_root
- *  Attention!! the variable "i" needs to be declared as integer. Some
- *  compiler has different definition in long type and make the result
- *  compromised.
+ *  Attention!! the variable "i" needs to be declared as integer which is
+ *	defined as long integer originally. Some compiler has different definition
+ *	in long integer type and make the result compromised.
  */
 inline const float Q_rsqrt(float number)
 {

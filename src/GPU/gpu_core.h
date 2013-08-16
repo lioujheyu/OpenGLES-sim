@@ -39,6 +39,9 @@
 #endif
 
 
+/**
+ *	@brief The major class for whole GPU hardware design
+ */
 class GPU_Core
 {
 public:

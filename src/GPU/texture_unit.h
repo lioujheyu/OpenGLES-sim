@@ -80,6 +80,12 @@ private:
     floatVec4 BilinearFilter(floatVec4 coordIn, int level, int tid);
     floatVec4 TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, int tid);
 
+	/**
+	*	@brief Texture cache structure
+	*
+	*	The whole texture cache size is determined as
+	*	TEX_WAY_ASSOCIATION * TEX_CACHE_BLOCK_SIZE * TEX_CACHE_ENTRY_SIZE * 4B
+	*/
 	struct {
         bool            valid[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         unsigned int	tag[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];

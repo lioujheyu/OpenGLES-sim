@@ -48,6 +48,7 @@ void GPU_Core::Run()
         }
 
 		//Vertex-based operation starts here
+		///@todo Task scheduler for auto job dispatch
         VertexShaderEXE(0, &curVtx);
         PerspectiveDivision();
         ViewPort();
@@ -68,6 +69,7 @@ void GPU_Core::Run()
 
 					pixelSplit(x,y,3);
 					for (int i=0; i<pixBufferP; i++) {
+						///@todo Task scheduler for auto job dispatch
 						FragmentShaderEXE(1,&pixBuffer[i]);
 						PerFragmentOp(pixBuffer[i]);
 					}

@@ -35,7 +35,7 @@ public:
 /**
  *	@brief Pixel thread class (child class to unit thread)
  *
- *	Inaddition to attribute value, this pixel class also contain the x-axis and
+ *	In addition to attribute value, this pixel class also contain the x-axis and
  *	y-axis scale factors for each attribute. The pixel's special barycentric
  *	coordinate is also stored here.
  */

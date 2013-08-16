@@ -27,7 +27,12 @@ Compile Requirement {#compile_required}
     [issue section](#known_issue) for the solution by patching or updating 
     Mingw-gcc.
 	
-  + On Linux, Update to gcc 4.6.4 or above should be a piece of cake :)
+  + On most Linux distribution, Update to gcc 4.6.4 or above should be a piece 
+    of cake :)
+
+	If you are using RedHat or CentOS, please do what this [page]
+	(http://people.centos.org/tru/devtools-1.1/readme) say to add the updated
+	gcc into the independent environment.
   
   
 - [Nvidia Cg Toolkits](https://developer.nvidia.com/cg-toolkit-download)
@@ -86,9 +91,10 @@ How to Compile this project {#how_to_compile_this_project}
 
 - Use Code::Blocks
   
-  Direcly open ogles1_1.cbp in codeblocks and push F9 (compile). If you have
-  right gcc version or pathced mingw-gcc and correct toolchain setting in 
-  codeblocks compiler setting page, there shall be no problem. 
+  Direcly open ogles1_1.cbp(for Winddows) or ogles1_1_linux.cbp(for Linux) in 
+  codeblocks and push F9 (compile). If you have right gcc version or pathced 
+  mingw-gcc and correct toolchain setting in codeblocks compiler setting page,
+  there shall be no problem.
 
 - Makefile
 
@@ -96,23 +102,34 @@ How to Compile this project {#how_to_compile_this_project}
   need to compile this tool from source. You can get its source from [here]
   (http://sourceforge.net/projects/cbp2make/)
 	
-  Once you get cbp2make's binary, use this command to generate Makefile
+  Once you get cbp2make's binary, use this command to generate Makefile if you 
+  are under Windows.
   
 		cbp2make -in ogles1_1.cbp -out Makefile
+
+  or this command if you are using linux.
+
+		cbp2make -in ogles1_1_linux.cbp -out Makefile
 
   You still need to check you compiler's version if you encounter any standard
   library's problem.
 
 Besides, there is a single, independent Makefile under 'src' directory which is
 used to generated assembler's C code from .y and .l file. You can use it after
-the .l and .y file are modified. ( However, this operation needs make tool.
-If on windows, the only way I know is to use msys/cygwin system to make this
-Makefile )
+the .l and .y file are modified. ( However, this operation needs make tool and
+flex/bison. If on windows, the most convenient way I know is to use msys/cygwin
+system to make this Makefile )
 
 * * *
 
 Major File Association {#basic_file_association}
 ======================
+The main.cpp and other file in the same level with main.cpp plus the file
+in /external are used for OpenGL Application only, not the part of my 
+simulation. If there are any licence issue in it, it shouldn't have business
+with me. If I have time in the future, this project should be compiled into
+library and has no relationship with these files.
+
 \dot
 digraph {
 	node [ fontname=arial, fontsize=11, shape=record ];
@@ -189,4 +206,5 @@ National Cheng-kung University, EE Department, <br>
 [Computer Architecture and System Laboratory]
 (http://caslab.ee.ncku.edu.tw/index.html) <br>
 Tainan, Taiwan <br>
-2013/6/30
+2013/6/30 <br>
+2013/8/16 1st update

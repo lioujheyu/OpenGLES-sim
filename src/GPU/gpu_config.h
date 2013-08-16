@@ -7,16 +7,20 @@
 #ifndef GPU_CONFIG_H_INCLUDED
 #define GPU_CONFIG_H_INCLUDED
 
-
-/************************** Simulation Setting ************************/
 /**
  *	@def USE_SSE
  *	Enable USE_SSE will use x86 SSE instruction set to accelerate vector
- *	operation by those variable whose type is floatVec4.
+ *	operation involved with the variable whose data type is floatVec4.
  */
 #define USE_SSE
 
-/******************** GPU implementation config************************/
+/// @name GPU internal resource configuration.
+///@{
+/** @def MAX_SHADER_CORE
+ *	This option cannot be define less than 2 because 1 shader core for vertex
+ *	shader and another one for fragment shader. Currently it has no effect if
+ *	it is larger than 2 until the task scheduler is finished.
+ */
 #define MAX_SHADER_CORE					3  //No effect now for temporary.
 
 #define MAX_ATTRIBUTE_NUMBER    		8
@@ -27,16 +31,14 @@
 
 #define MAX_UNIFORM_VECTORS  									\
 	( MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS )
+///@}
 
 /**
  *	@def NO_TEX_CACHE
- *	Whether disable texture cache or not
+ *	Disable texture cache if this option is defined.
  */
 //#define NO_TEX_CACHE
-/*************************************************************************
- *	The whole texture cache size is determined be
- *	TEX_WAY_ASSOCIATION * TEX_CACHE_BLOCK_SIZE * TEX_CACHE_ENTRY_SIZE * 4B
- ************************************************************************/
+
 /**
  *	@def TEX_WAY_ASSOCIATION
  *	Define how many way association texture cache will use. If
@@ -56,12 +58,13 @@
  *	Enable SHOW_MIPMAP_LEVEL will replace the texture color with
  *	level-represented luminance on the textured primitive no matter
  *	which filter this primitive uses.
- *	level 0 - 1.0	maximum white
- *		  1 - 0.9
- *		  2 - 0.8
- *		  3 - 0.7
- *		  4 - .
- *		      .
+ *
+ *	level 0 - 1.0	maximum white										<br>
+ *	level 1 - 0.9														<br>
+ *	level 2 - 0.8														<br>
+ *	level 3 - 0.7														<br>
+ *	level 4 - .															<br>
+ *		      .															<br>
  */
 //#define SHOW_MIPMAP_LEVEL
 
@@ -83,21 +86,29 @@
 //#define SHOW_TEXCACHE_MISS
 
 /**
- *	Debug information
+ *	@def DEBUG
+ *	Enable Debug mode. The other debug marco define are directly dependent on
+ *	this define.
  */
 #define DEBUG
 
+/// @name Flags for debug information's destination. (screen or files)
+///@{
 #define GPU_INFO
-//#define SHADER_INFO
+#define SHADER_INFO
 //#define PIXEL_INFO
 //#define TEXEL_INFO
+///@}
 
+///@name Specify the file name for information dump.
+///@{
 #define GPU_INFO_FILE "gpu_info"
 #define SHADER_INFO_FILE "shader_info"
 #define PIXEL_INFO_FILE "pixel_info"
 #define TEXEL_INFO_FILE "texel_info"
+///@}
 
-/***************Debugging marco for simulator use*****************/
+/*************** !!! DO NOT TOUCH STUFF BELOW !!! *****************/
 #ifdef DEBUG
 #	define DBG_ON 1
 #else

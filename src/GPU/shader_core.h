@@ -27,6 +27,12 @@
 #	define SHADER_INFO_PTR stderr
 #endif
 
+/**
+ *	@brief Unified shader core class
+ *
+ *	Responsible for executing NVGP4 assembly code. It also contain texture_unit
+ *	for tex instruction execution.
+ */
 class ShaderCore {
 public:
 	ShaderCore()
