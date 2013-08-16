@@ -1,6 +1,6 @@
 /**
  *	@file gpu_config.h
- *  @brief GPU simulator related config and debug setting
+ *  @brief GPU simulator related configuration and debug setting
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
@@ -12,7 +12,7 @@
 /**
  *	@def USE_SSE
  *	Enable USE_SSE will use x86 SSE instruction set to accelerate vector
- *	operation by those varaible whose type is floatVec4.
+ *	operation by those variable whose type is floatVec4.
  */
 #define USE_SSE
 
@@ -54,7 +54,7 @@
 /**
  *	@def SHOW_MIPMAP_LEVEL
  *	Enable SHOW_MIPMAP_LEVEL will replace the texture color with
- *	level-represented luminance on the textured primitive nomatter
+ *	level-represented luminance on the textured primitive no matter
  *	which filter this primitive uses.
  *	level 0 - 1.0	maximum white
  *		  1 - 0.9
@@ -68,8 +68,8 @@
 /**
  *	@def SHOW_TEXCACHE_COLD_MISS
  *	Enable SHOW_TEXCACHE_COLD_MISS will let texture cache return color red
- *	rather then the origianl texel's color when texture cache cold miss is
- *	occured. This opotion can be enable with SHOW_TEXCACHE_MISS and has no
+ *	rather then the original texel's color when texture cache cold miss is
+ *	occurred. This option can be enable with SHOW_TEXCACHE_MISS and has no
  *	conflict.
  */
 //#define SHOW_TEXCACHE_COLD_MISS
@@ -77,8 +77,8 @@
 /**
  *	@def SHOW_TEXCACHE_MISS
  *	Enable SHOW_TEXCACHE_MISS will let texture cache return color green rather
- *	then the origianl texel's color when texture cache miss is occured. This
- *	opotion can be enable with SHOW_TEXCACHE_COLD_MISS and has no conflict.
+ *	then the original texel's color when texture cache miss is occurred. This
+ *	option can be enable with SHOW_TEXCACHE_COLD_MISS and has no conflict.
  */
 //#define SHOW_TEXCACHE_MISS
 

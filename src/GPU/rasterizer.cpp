@@ -20,7 +20,7 @@ void GPU_Core::TriangleSetup()
 	constantC = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
 	if (fabs(constantC) > 1000000)
 	{
-		printf("fuck!!\n");
+		printf("What the fuck!!\n");
 	}
 
 	area2Reciprocal = 1/constantC;

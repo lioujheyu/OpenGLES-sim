@@ -60,8 +60,8 @@ void Context::LinkProgram(GLuint program)
 	t_program.linkInfo.clear();
 
 /*
- * 	1st pass parsing for Link information retriving, including resource usage
- *	check and indexing. This stage Will also chech whether VS/FS's resource are
+ * 	1st pass parsing for Link information retrieving, including resource usage
+ *	check and indexing. This stage Will also check whether VS/FS's resource are
  *	matched.
  */
 	nvgp4Info_lineno = 1;
