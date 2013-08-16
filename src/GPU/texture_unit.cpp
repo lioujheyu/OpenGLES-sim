@@ -213,7 +213,7 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 
 	switch (wrapS[tid]){
 	case GL_REPEAT:
-		/*	I found the function's behavior of "fmod" in C++ is not matched
+		/*	The function's behavior of "fmod" in C++ is not matched
 		 *	with OpenGL.
 		 *	fmod(x,y) in C++: x - y * trunc(x/y);
 		 *	fmod(x,y) in OpenGL: x - y * floor(x/y);

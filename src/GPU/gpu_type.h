@@ -13,7 +13,7 @@
 /**
  *	@brief Unit thread class
  *
- *	Contain the thread's program counter and it id generated from thread pool.
+ *	Contain the thread's program counter and its id generated from thread pool.
  */
 class unitThread
 {
@@ -48,8 +48,8 @@ public:
 
     //The position will always use the 1st attribute slot in whole GPU design.
     floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
-    floatVec4   scaleFacDX[MAX_ATTRIBUTE_NUMBER];//scalefactor[0] is unused.
-    floatVec4   scaleFacDY[MAX_ATTRIBUTE_NUMBER];//scalefactor[0] is unused.
+    floatVec4   scaleFacDX[MAX_ATTRIBUTE_NUMBER];//scaleFactor[0] is unused.
+    floatVec4   scaleFacDY[MAX_ATTRIBUTE_NUMBER];//scaleFactor[0] is unused.
 
     ///Barycentric Coordinate
     float       baryCenPos3[3];

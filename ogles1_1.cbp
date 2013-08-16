@@ -67,21 +67,11 @@
 		<Unit filename="src/context_shader_glapi.cpp" />
 		<Unit filename="src/gl3.cpp" />
 		<Unit filename="src/nvgp4ASM.cpp" />
-		<Unit filename="src/nvgp4ASM.l" />
-		<Unit filename="src/nvgp4ASM.tab.c">
-			<Option compilerVar="CPP" />
-		</Unit>
+		<Unit filename="src/nvgp4ASM.tab.cpp" />
 		<Unit filename="src/nvgp4ASM.tab.h" />
-		<Unit filename="src/nvgp4ASM.y" />
 		<Unit filename="src/nvgp4Info.cpp" />
-		<Unit filename="src/nvgp4Info.l" />
-		<Unit filename="src/nvgp4Info.tab.c">
-			<Option compilerVar="CPP" />
-		</Unit>
+		<Unit filename="src/nvgp4Info.tab.cpp" />
 		<Unit filename="src/nvgp4Info.tab.h" />
-		<Unit filename="src/nvgp4Info.y">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />

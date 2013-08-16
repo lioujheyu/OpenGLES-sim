@@ -55,10 +55,12 @@ public:
 	instruction const *instPool; ///< Instruction Pool pointer
 	floatVec4 const *uniformPool; ///< Uniform Pool pointer
 
-	///statitic
+	///Statistic
+	///@{
 	FILE *SHADERINFOfp;
 	int totalInstructionCnt;
 	int totalScaleOperation;
+	///@}
 
 	void Init();
 	void Exec();

@@ -263,7 +263,7 @@ void ShaderCore::Exec()
 			break;
 
 		default:
-			printf("Shader: Undefined OPcode: %x\n",curInst.op);
+			printf("Shader: Undefined or unimplemented OPcode: %x\n",curInst.op);
 			break;
 		}
 
