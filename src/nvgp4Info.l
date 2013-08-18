@@ -40,7 +40,7 @@ unsigned int nvgp4Info_col = 0;
 		strcpy(nvgp4Info_lval.sval,nvgp4Info_text);
 		return TYPE;
 	}
-"sampler2D"	{ COL_NO;
+(sampler2D)|(samplerCUBE)	{ COL_NO;
 		strcpy(nvgp4Info_lval.sval,nvgp4Info_text);
 		return TYPE;
 	}
