@@ -35,7 +35,7 @@ void GPU_Core::TriangleSetup()
 	RX = CLAMP(RX, viewPortLX, viewPortLX+viewPortW-1);
 }
 
-void GPU_Core::pixelSplit(int x, int y, int level)
+void GPU_Core::tileSplit(int x, int y, int level)
 {
 	int lc;
 
@@ -114,67 +114,42 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 				pixelStamp[i].attr[attrCnt] = pixelStamp[i].attr[attrCnt] / pixelStamp[i].attr[0].w;
 			}
 		}
-		//each attribute needs to get its scale factor, and all 4 pixels' attribute will get theirs here.
-		for (int attrCnt=1; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++){
-			if (!varyEnable[attrCnt])
-				continue;
-			pixelStamp[0].scaleFacDX[attrCnt] = pixelStamp[1].scaleFacDX[attrCnt]
-												= fvabs(pixelStamp[1].attr[attrCnt]-pixelStamp[0].attr[attrCnt]);
-			pixelStamp[2].scaleFacDX[attrCnt] = pixelStamp[3].scaleFacDX[attrCnt]
-												= fvabs(pixelStamp[3].attr[attrCnt]-pixelStamp[2].attr[attrCnt]);
-			pixelStamp[0].scaleFacDY[attrCnt] = pixelStamp[2].scaleFacDY[attrCnt]
-												= fvabs(pixelStamp[2].attr[attrCnt]-pixelStamp[0].attr[attrCnt]);
-			pixelStamp[1].scaleFacDY[attrCnt] = pixelStamp[3].scaleFacDY[attrCnt]
-												= fvabs(pixelStamp[3].attr[attrCnt]-pixelStamp[1].attr[attrCnt]);
-		}
 
-        //Write valid fragment into waiting buffer if they are truly pass the edge test.
+        /* Drop their ghost flag if they are pass the edge test. But they are
+         * still pushed into shader core.
+		 */
 		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)||
             (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
-
-            pixBuffer[pixBufferP] = pixelStamp[0];
-
-            PIXPRINTF("P:(%3d,%3d)\t \n",
-                    (int)pixBuffer[pixBufferP].attr[0].x,
-                    (int)pixBuffer[pixBufferP].attr[0].y);
-
-            pixBufferP++;
+            pixelStamp[0].isGhost = false;
 		}
 
 		if ((cornerTest[2][0]>=0 && cornerTest[2][1]>=0 && cornerTest[2][2]>=0)|
             (cornerTest[2][0]<=0 && cornerTest[2][1]<=0 && cornerTest[2][2]<=0)) {
-
-            pixBuffer[pixBufferP] = pixelStamp[1];
-
-            PIXPRINTF("P:(%3d,%3d)\t \n",
-                    (int)pixBuffer[pixBufferP].attr[0].x,
-                    (int)pixBuffer[pixBufferP].attr[0].y);
-
-            pixBufferP++;
+            pixelStamp[1].isGhost = false;
 		}
 
 		if ((cornerTest[5][0]>=0 && cornerTest[5][1]>=0 && cornerTest[5][2]>=0)|
             (cornerTest[5][0]<=0 && cornerTest[5][1]<=0 && cornerTest[5][2]<=0)) {
-
-            pixBuffer[pixBufferP] = pixelStamp[2];
-
-            PIXPRINTF("P:(%3d,%3d)\t \n",
-                    (int)pixBuffer[pixBufferP].attr[0].x,
-                    (int)pixBuffer[pixBufferP].attr[0].y);
-
-            pixBufferP++;
+            pixelStamp[2].isGhost = false;
 		}
 
 		if ((cornerTest[7][0]>=0 && cornerTest[7][1]>=0 && cornerTest[7][2]>=0)|
             (cornerTest[7][0]<=0 && cornerTest[7][1]<=0 && cornerTest[7][2]<=0)) {
+            pixelStamp[3].isGhost = false;
+		}
 
-            pixBuffer[pixBufferP] = pixelStamp[3];
-
-            PIXPRINTF("P:(%3d,%3d)\t \n",
-                    (int)pixBuffer[pixBufferP].attr[0].x,
-                    (int)pixBuffer[pixBufferP].attr[0].y);
-
-            pixBufferP++;
+		if (pixelStamp[0].isGhost && pixelStamp[1].isGhost &&
+			pixelStamp[2].isGhost && pixelStamp[3].isGhost ) {
+			return;
+		}
+		else {
+			pixBuffer[pixBufferP] = pixelStamp[0];
+			pixBuffer[pixBufferP+1] = pixelStamp[1];
+			pixBuffer[pixBufferP+2] = pixelStamp[2];
+			pixBuffer[pixBufferP+3] = pixelStamp[3];
+			pixBufferP += 4;
+//			PIXPRINTF("P:(%3d,%3d)\t \n", (int)pixBuffer[pixBufferP].attr[0].x,
+//										  (int)pixBuffer[pixBufferP].attr[0].y);
 		}
 	}
 	else {
@@ -207,16 +182,16 @@ void GPU_Core::pixelSplit(int x, int y, int level)
         }
 
 		if (Zone[0][0] == true && Zone[0][1] == true && Zone[0][2] == true )
-			pixelSplit(x, y, level-1);
+			tileSplit(x, y, level-1);
 		if (Zone[1][0] == true && Zone[1][1] == true && Zone[1][2] == true )
 			if ( (x + (1<<level)) <= RX )
-				pixelSplit(x+(1<<level), y, level-1);
+				tileSplit(x+(1<<level), y, level-1);
 		if (Zone[2][0] == true && Zone[2][1] == true && Zone[2][2] == true )
 			if ( (y + (1<<level)) <= HY )
-				pixelSplit(x, y+(1<<level), level-1);
+				tileSplit(x, y+(1<<level), level-1);
 		if (Zone[3][0] == true && Zone[3][1] == true && Zone[3][2] == true )
 			if ( ((x + (1<<level)) <= RX) && ((y + (1<<level)) <= HY) )
-				pixelSplit(x+(1<<level), y+(1<<level), level-1);
+				tileSplit(x+(1<<level), y+(1<<level), level-1);
 	}
 }
 
@@ -226,9 +201,13 @@ void GPU_Core::pixelSplit(int x, int y, int level)
  *	@param sid Which shader core id will be used.
  *	@param input Input pointer
  */
-void GPU_Core::FragmentShaderEXE(int sid, void *input)
+void GPU_Core::FragmentShaderEXE(int sid,
+								 void *input0,
+								 void *input1,
+								 void *input2,
+								 void *input3 )
 {
-	totalPix++;
+	totalPix+=4;
 
 	sCore[sid].instPool = FSinstPool;
 	sCore[sid].instCnt = FSinstCnt;
@@ -236,14 +215,22 @@ void GPU_Core::FragmentShaderEXE(int sid, void *input)
     sCore[sid].shaderType = FRAGMENT_SHADER;
 
 	sCore[sid].Init();
-	sCore[sid].input = input;
-	sCore[sid].Exec();
+	sCore[sid].enableFlag[0] = sCore[sid].enableFlag[1] =
+		sCore[sid].enableFlag[2] = sCore[sid].enableFlag[3] = true;
+	sCore[sid].input[0] = input0;
+	sCore[sid].input[1] = input1;
+	sCore[sid].input[2] = input2;
+	sCore[sid].input[3] = input3;
+	sCore[sid].Run();
 }
 
 void GPU_Core::PerFragmentOp(pixel pixInput)
 {
 	bool DepthPass = true;
 	int bufOffset;
+
+	if (pixInput.isGhost)
+		return;
 
 	bufOffset = (int)pixInput.attr[0].y*viewPortW + (int)pixInput.attr[0].x;
 

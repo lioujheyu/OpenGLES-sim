@@ -60,6 +60,7 @@ public:
 							  int level,
 							  floatVec4 scaleFacDX,
 							  floatVec4 scaleFacDY,
+							  int targetType,
 							  int tid );
 
     ///statistic
