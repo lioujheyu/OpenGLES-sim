@@ -53,7 +53,7 @@ void GenMipMap(int tid)
 
 	fixColor4 texel[4], texelAvg;
 
-	textureImage *tempImg = &ctx->texImagePool[ctx->texCtx[tid].texBindID];
+	textureImage *tempImg = &ctx->texImagePool[ctx->texCtx[tid].tex2DBindID];
 	width = tempImg->widthLevel[0];
 	height = tempImg->heightLevel[0];
 
@@ -185,7 +185,7 @@ void ActiveGPU()
 		gpu.magFilter[i] = ctx->texCtx[ctx->samplePool[i]].magFilter;
 		gpu.wrapS[i] = ctx->texCtx[ctx->samplePool[i]].wrapS;
 		gpu.wrapT[i] = ctx->texCtx[ctx->samplePool[i]].wrapT;
-		gpu.texImage[i] = ctx->texImagePool[ctx->texCtx[ctx->samplePool[i]].texBindID];
+		gpu.texImage[i] = ctx->texImagePool[ctx->texCtx[ctx->samplePool[i]].tex2DBindID];
     }
 
     for (int i=0; i<t_program->uniformCnt; i++)

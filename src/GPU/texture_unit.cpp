@@ -328,6 +328,7 @@ floatVec4 TextureUnit::TextureSample(floatVec4 coordIn,
 									 int level,
 									 floatVec4 scaleFacDX,
 									 floatVec4 scaleFacDY,
+									 int targetType,
 									 int tid )
 {
 	floatVec4 coord;
