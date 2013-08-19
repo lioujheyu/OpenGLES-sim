@@ -35,6 +35,7 @@ void GPU_Core::InitPrimitiveAssembly()
  *	@param sid Which shader core id will be used.
  *	@param input Input pointer
  */
+///@todo Raise the usage of four exec units.
 void GPU_Core::VertexShaderEXE(int sid, void *input)
 {
 	totalVtx++;
@@ -45,8 +46,9 @@ void GPU_Core::VertexShaderEXE(int sid, void *input)
 	sCore[sid].shaderType = VERTEX_SHADER;
 
 	sCore[sid].Init();
-	sCore[sid].input = input;
-	sCore[sid].Exec();
+	sCore[sid].enableFlag[0] = true;
+	sCore[sid].input[0] = input;
+	sCore[sid].Run();
 }
 
 void GPU_Core::PerspectiveDivision()

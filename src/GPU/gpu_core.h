@@ -128,7 +128,11 @@ private:
 	/// @name Invoke Shader Core
 	///@{
     void 			VertexShaderEXE(int sid, void *input);
-    void 			FragmentShaderEXE(int sid, void *input);
+    void 			FragmentShaderEXE(int sid,
+									  void *input0,
+									  void *input1,
+									  void *input2,
+									  void *input3);
 	///@}
 
     /// @name Geometry
@@ -144,7 +148,7 @@ private:
     /// @name Rasterizer
     ///@{
 	void            TriangleSetup();
-    void            pixelSplit(int x, int y, int level);
+    void            tileSplit(int x, int y, int level);
     void            PerFragmentOp(pixel pixInput);
     void 			ClearBuffer(unsigned int mask);
     ///@}

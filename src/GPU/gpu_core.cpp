@@ -67,11 +67,18 @@ void GPU_Core::Run()
 					PIXPRINTF("Recursive Entry:-------(%d,%d)-----\n",x,y);
 					pixBufferP = 0;
 
-					pixelSplit(x,y,3);
-					for (int i=0; i<pixBufferP; i++) {
+					tileSplit(x,y,3);
+					for (int i=0; i<pixBufferP/4; i++) {
 						///@todo Task scheduler for auto job dispatch
-						FragmentShaderEXE(1,&pixBuffer[i]);
-						PerFragmentOp(pixBuffer[i]);
+						FragmentShaderEXE(1,
+										  &pixBuffer[i*4  ],
+										  &pixBuffer[i*4+1],
+										  &pixBuffer[i*4+2],
+										  &pixBuffer[i*4+3]);
+						PerFragmentOp(pixBuffer[i*4  ]);
+						PerFragmentOp(pixBuffer[i*4+1]);
+						PerFragmentOp(pixBuffer[i*4+2]);
+						PerFragmentOp(pixBuffer[i*4+3]);
 					}
 				}
 			}
