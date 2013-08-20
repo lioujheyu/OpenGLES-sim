@@ -38,7 +38,7 @@ bool LoadTexture(char *filename, unsigned int *texture)
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    //glGenerateMipmap(GL_TEXTURE_2D);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     free(bitmap);
     free(info);
@@ -219,6 +219,6 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-	//draw_road();
-	draw_banana();
+	draw_road();
+	//draw_banana();
 }

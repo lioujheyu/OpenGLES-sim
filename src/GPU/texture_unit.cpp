@@ -268,10 +268,8 @@ floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
 
 	double intPart; //No use
 
-	coordLOD[0].s = coordIn.s / (1<<level);
-	coordLOD[0].s = std::max(coordLOD[0].s - 0.5, 0.0);
-	coordLOD[0].t = coordIn.t / (1<<level);
-	coordLOD[0].t = std::max(coordLOD[0].t - 0.5, 0.0);
+	coordLOD[0].s = coordIn.s / (1<<level) - 0.5;
+	coordLOD[0].t = coordIn.t / (1<<level) - 0.5;
 
 	coordLOD[1] =  coordLOD[2] = coordLOD[3] = coordLOD[0];
 	coordLOD[1].s = coordLOD[1].s + 1;
