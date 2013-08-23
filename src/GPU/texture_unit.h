@@ -60,6 +60,7 @@ public:
 							  int level,
 							  floatVec4 scaleFacDX,
 							  floatVec4 scaleFacDY,
+							  int targetType,
 							  int tid );
 
     ///statistic
@@ -90,7 +91,7 @@ private:
         bool            valid[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         unsigned int	tag[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         floatVec4       color[TEX_CACHE_ENTRY_SIZE][TEX_CACHE_BLOCK_SIZE][TEX_WAY_ASSOCIATION];
-		unsigned char	LRU[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
+		unsigned char	RRFlag[TEX_CACHE_ENTRY_SIZE];
     }TexCache;
 };
 

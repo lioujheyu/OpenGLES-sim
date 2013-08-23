@@ -13,10 +13,7 @@ void TextureUnit::ClearTexCache()
 		TexCache.valid[i][1] =
 		TexCache.valid[i][2] =
 		TexCache.valid[i][3] = false;
-		TexCache.LRU[i][0] =
-		TexCache.LRU[i][1] =
-		TexCache.LRU[i][2] =
-		TexCache.LRU[i][3] = 0;
+		TexCache.RRFlag[i] = 0;
 	}
 	hit = 0;
 	miss = 0;
@@ -27,9 +24,9 @@ void TextureUnit::ClearTexCache()
  *	This function is to convert 6D block-based texture address and return 1D
  *	address and fetch data in system memory.
  *
- *	@param u,v 		Texture coodinate in 2 dimension directions.
- *	@param s,b,o 	3 block-based hirachy level, Super block, Block, Offset, in
- *	textrue coordinate.
+ *	@param u,v 		Texture coordinate in 2 dimension directions.
+ *	@param s,b,o 	3 block-based hierarchy level, Super block, Block, Offset,
+ *	in texture coordinate.
  *
  *	@return 1D address
  */
@@ -50,7 +47,7 @@ int TextureUnit::CalcTexAdd(short int us,
 }
 
 /**
- *	Get the texel's color in the specified texture cooridnate. You can toggle
+ *	Get the texel's color in the specified texture coordinate. You can toggle
  *	\ref NO_TEX_CACHE in \ref gpu_config.h to determine whether this function
  *	use texture cache or not.
  *
@@ -68,12 +65,6 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 #ifdef NO_TEX_CACHE
 	floatVec4 color;
 
-#	ifdef SHOW_MIPMAP_LEVEL
-	floatVec4 mipmaplevel;
-	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
-	return mipmaplevel;
-#	else
-
 	u = (unsigned short)coordIn.s;
 	v = (unsigned short)coordIn.t;
 
@@ -86,7 +77,6 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	color.a = ((float)(*texTmpPtr++)/255);
 
 	return color;
-#	endif //SHOW_MIPMAP_LEVEL
 #else
 	int i,j; //loop counter
 	unsigned int tag;
@@ -136,15 +126,7 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 			if (TexCache.tag[entry][i] == tag) {
 			//*************** Texture cache hit *************
 				hit++;
-				TexCache.LRU[entry][i] = 0;
-
-#	ifdef SHOW_MIPMAP_LEVEL
-				floatVec4 mipmaplevel;
-				mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
-				return mipmaplevel;
-#	else
 				return TexCache.color[entry][offset][i];
-#	endif //SHOW_MIPMAP_LEVEL
 			}
 		}
 		else
@@ -154,18 +136,12 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	//*********** Texture cache miss ****************
 	miss++;
 
-	for (i=0; i<TEX_WAY_ASSOCIATION; i++) {
-		if (LRUbiggest < TexCache.LRU[entry][i]) {
-			LRUbiggest = TexCache.LRU[entry][i];
-			tWay = i;
-		}
-		TexCache.LRU[entry][i]++;
-	}
+	tWay = TexCache.RRFlag[entry] % TEX_WAY_ASSOCIATION;
+	TexCache.RRFlag[entry]++;
+	TexCache.tag[entry][tWay] = tag;
 
 	if (TexCache.valid[entry][tWay] == false)
 		TexCache.valid[entry][tWay] = true;
-	TexCache.LRU[entry][tWay] = 0;
-	TexCache.tag[entry][tWay] = tag;
 
 	for (j=0; j<TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
 		for (i=0; i<TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
@@ -187,10 +163,6 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 
 #	if defined(SHOW_TEXCACHE_MISS)
 	return floatVec4(0.0, 1.0, 0.0, 1.0);
-#	elif defined(SHOW_MIPMAP_LEVEL)
-	floatVec4 mipmaplevel;
-	mipmaplevel = floatVec4(1.0-level*0.1, 1.0-level*0.1, 1.0-level*0.1, 1.0);
-	return mipmaplevel;
 #	else
 	return TexCache.color[entry][offset][tWay];
 #	endif
@@ -199,13 +171,13 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 }
 
 /**
- *	Perform textrue wrap operation on texture coordinate.
+ *	Perform texture wrap operation on texture coordinate.
  *
  *	@param coordIn 	The target texture coordinate.
  *	@param level 	This target coordinate is belongs to which level.
  *	@param tid 		This target coordinate is belongs to which texContext.
  *
- *	@return "Wraped" texture coordinate.
+ *	@return "Wrapped" texture coordinate.
  */
 floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 {
@@ -248,13 +220,13 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 }
 
 /**
- *	Perform Bi-linear filter on specifed texture cooridnate.
+ *	Perform Bi-linear filter on specified texture coordinate.
  *
  *	@param coordIn The target texture coordinate.
  *	@param level This target coordinate is belongs to which level.
  *	@param tid This target coordinate is belongs to which texture unit.
  *
- *	@return The fianl color.
+ *	@return The final color.
  */
 floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
 {
@@ -297,7 +269,7 @@ floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
 }
 
 /**
- *	Perform Tri-linear filter on specifed texture cooridnate, this operation is
+ *	Perform Tri-linear filter on specified texture coordinate, this operation is
  *	actually invokes TextureUnit::BilinearFilter() twice.
  *
  *	@param coordIn 	The target texture coordinate.
@@ -305,7 +277,7 @@ floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
  *	@param w_ratio 	The target coordinate's w-axis ratio for color interpolation.
  *	@param tid 		This target coordinate is belongs to which texContext.
  *
- *	@return The fianl color.
+ *	@return The final color.
  */
 floatVec4 TextureUnit::TrilinearFilter(floatVec4 coordIn,
 									   int level,
@@ -326,6 +298,7 @@ floatVec4 TextureUnit::TextureSample(floatVec4 coordIn,
 									 int level,
 									 floatVec4 scaleFacDX,
 									 floatVec4 scaleFacDY,
+									 int targetType,
 									 int tid )
 {
 	floatVec4 coord;
