@@ -69,7 +69,7 @@
  *	then the original texel's color when texture cache miss is occurred. This
  *	option can be enable with SHOW_TEXCACHE_COLD_MISS and has no conflict.
  */
-#define SHOW_TEXCACHE_MISS
+//#define SHOW_TEXCACHE_MISS
 ///@}
 
 /**

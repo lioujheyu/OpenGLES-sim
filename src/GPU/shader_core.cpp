@@ -195,6 +195,7 @@ void ShaderCore::Exec()
 										-1,
 										pixPtr->scaleFacDX[curInst.src[0].id],
 										pixPtr->scaleFacDY[curInst.src[0].id],
+										curInst.tType,
 										tid );
 			break;
 		case OP_TXB:
@@ -207,10 +208,11 @@ void ShaderCore::Exec()
 										src[0].w,
 										floatVec4(0.0, 0.0, 0.0, 0.0),
 										floatVec4(0.0, 0.0, 0.0, 0.0),
+										curInst.tType,
 										tid );
 			break;
 		case OP_TXP:
-			dst = texUnit.TextureSample(src[0], -1, src[1], src[2], tid);
+			dst = texUnit.TextureSample(src[0], -1, src[1], src[2], curInst.tType, tid);
 			break;
 //		case OP_TXQ:
 //			break;
