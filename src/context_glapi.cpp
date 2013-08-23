@@ -20,32 +20,13 @@ void Context::ActiveTexture(GLenum texture)
 
 void Context::BindTexture(GLenum target, GLuint texture)
 {
-	switch(target){
-	case GL_TEXTURE_2D:
-		texCtx[activeTexture].tex2DBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-		texCtx[activeTexture].texCubeNXBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-		texCtx[activeTexture].texCubeNYBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-		texCtx[activeTexture].texCubeNZBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-		texCtx[activeTexture].texCubePXBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-		texCtx[activeTexture].texCubePYBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-		texCtx[activeTexture].texCubePZBindID = texture;
-		break;
-	default:
-		RecordError(GL_INVALID_ENUM);
+	if (target != GL_TEXTURE_2D)
+    {
+        RecordError(GL_INVALID_ENUM);
         return;
-	}
+    }
+
+	texCtx[activeTexture].texBindID = texture;
 }
 
 void Context::Clear(GLbitfield mask)
@@ -271,26 +252,10 @@ GLboolean Context::IsTexture(GLuint texture)
 
 void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels)
 {
-	int texImageID;
-
-	switch(target){
-	case GL_TEXTURE_2D:
-		break;
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-		if (width != height){
-			RecordError(GL_INVALID_VALUE);
-			return;
-		}
-		break;
-	default:
-		RecordError(GL_INVALID_ENUM);
+	if (target != GL_TEXTURE_2D) {
+        RecordError(GL_INVALID_ENUM);
         return;
-	}
+    }
 
     if (level < 0 || (float)level > log2f((float)std::max(width,height))) {
         RecordError(GL_INVALID_ENUM);
@@ -395,37 +360,7 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
     {
         textureImage texObj;
         texImagePool[0] = texObj;
-        texImageID = 0;
-        if (target = GL_TEXTURE_2D)
-			texCtx[activeTexture].tex2DBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_X)
-			texCtx[activeTexture].texCubeNXBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_Y)
-			texCtx[activeTexture].texCubeNYBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_Z)
-			texCtx[activeTexture].texCubeNZBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_X)
-			texCtx[activeTexture].texCubePXBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_Y)
-			texCtx[activeTexture].texCubePYBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_Z)
-			texCtx[activeTexture].texCubePZBindID = 0;
-    }
-    else {
-    	if (target == GL_TEXTURE_2D)
-			texImageID = texCtx[activeTexture].tex2DBindID;
-		else if (target = GL_TEXTURE_CUBE_MAP_NEGATIVE_X)
-			texImageID = texCtx[activeTexture].texCubeNXBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_Y)
-			texImageID = texCtx[activeTexture].texCubeNYBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_Z)
-			texImageID = texCtx[activeTexture].texCubeNZBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_X)
-			texImageID = texCtx[activeTexture].texCubePXBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_Y)
-			texImageID = texCtx[activeTexture].texCubePYBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_Z)
-			texImageID = texCtx[activeTexture].texCubePZBindID = 0;
+		texCtx[activeTexture].texBindID = 0;
     }
 
 	textureImage temp;
@@ -437,7 +372,7 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 
     temp.data[level] = image;
 
-	texImagePool[texImageID] = temp;
+	texImagePool[texCtx[activeTexture].texBindID] =temp;
 }
 
 void Context::TexParameteri(GLenum target, GLenum pname, GLint param)

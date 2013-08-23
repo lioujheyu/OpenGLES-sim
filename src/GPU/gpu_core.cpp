@@ -48,6 +48,7 @@ void GPU_Core::Run()
         }
 
 		//Vertex-based operation starts here
+		totalProcessingVtx++;
 		///@todo Task scheduler for auto job dispatch
         VertexShaderEXE(0, &curVtx);
         PerspectiveDivision();
@@ -69,6 +70,8 @@ void GPU_Core::Run()
 
 					tileSplit(x,y,3);
 					for (int i=0; i<pixBufferP/4; i++) {
+						totalProcessingPix += 4;
+
 						///@todo Task scheduler for auto job dispatch
 						FragmentShaderEXE(1,
 										  &pixBuffer[i*4  ],
@@ -87,9 +90,13 @@ void GPU_Core::Run()
         }
     }
 
-    GPUPRINTF("Vertex number: %d\n",totalVtx);
-    GPUPRINTF("Primitive number: %d\n",totalPrimitive);
-    GPUPRINTF("Pixel number: %d\n\n",totalPix);
+    GPUPRINTF("Total processed vertex: %d\n",totalProcessingVtx);
+    GPUPRINTF("Total processed Primitive: %d\n",totalProcessingPrimitive);
+    GPUPRINTF("Total processed pixel: %d\n",totalProcessingPix);
+	GPUPRINTF("Ghost pixel: %d\n",totalGhostPix);
+	GPUPRINTF("Normal/All processed pixel ratio: %f\n",
+			  (float)(totalProcessingPix - totalGhostPix)/totalProcessingPix);
+	GPUPRINTF("Final living pixel: %d\n\n",totalLivePix);
 
     GPUPRINTF("Texture cache hit: %d\n",sCore[1].texUnit.hit);
     GPUPRINTF("Texture cache miss: %d\n",sCore[1].texUnit.miss);
@@ -129,7 +136,8 @@ GPU_Core::GPU_Core()
 	depthTestEnable = false;
 	blendEnable = false;
 
-	totalPrimitive = totalPix = totalVtx = 0;
+	totalProcessingPrimitive = totalProcessingPix = totalProcessingVtx =
+		totalGhostPix = totalLivePix = 0;
 
 #if defined(DEBUG) && defined(GPU_INFO) && defined(GPU_INFO_FILE)
 	GPUINFOfp = fopen((std::string(GPU_INFO_FILE)+".txt").c_str(),"w");

@@ -77,10 +77,7 @@ struct textureContext
     GLubyte			maxLevel;
 
     ///Which Texture Image ID will be binded to this texture context.
-    GLuint			tex2DBindID;
-    GLuint			texCubeNXBindID, texCubePXBindID;
-    GLuint			texCubeNYBindID, texCubePYBindID;
-    GLuint			texCubeNZBindID, texCubePZBindID;
+    GLuint			texBindID;
 
     inline textureContext() {
         genMipmap = GL_FALSE;

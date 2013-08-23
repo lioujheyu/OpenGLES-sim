@@ -37,7 +37,7 @@ void GPU_Core::TriangleSetup()
 
 void GPU_Core::tileSplit(int x, int y, int level)
 {
-	int lc;
+	int lc; //loop counter
 
 /*
  * c - central
@@ -54,8 +54,8 @@ void GPU_Core::tileSplit(int x, int y, int level)
 /*
  * pixel stamp: 2 3
  *              0 1
- * We need to calculating 4 pixels in quad concurrently nomatter if
- * they are both falling into a triangle or not for scale factor calculation
+ * We need to calculate 4 pixels in quad concurrently for the DDX/Y instruction
+ * and texture scale factor calculation later time in shader core.
  */
 	pixel pixelStamp[4];
 
@@ -71,6 +71,13 @@ void GPU_Core::tileSplit(int x, int y, int level)
 
 	if (level == 0) {
 
+/*
+ * When split level is 0, the cornerTests are now for each pixel's center test,
+ * and not for corner test anymore.
+ *
+ * cornerTest: 5 7 for pixel stamp: 2 3
+ *             0 2                  0 1
+ */
 		for(lc=0; lc<3; lc++) {
 			cornerTest[0][lc] = centralTest[lc] + (-Edge[lc][0]+Edge[lc][1])*0.5;
 			cornerTest[2][lc] = centralTest[lc] + ( Edge[lc][0]+Edge[lc][1])*0.5;
@@ -97,26 +104,30 @@ void GPU_Core::tileSplit(int x, int y, int level)
 
 		//Interpolate the all 4 pixel's attributes, then perform perspective correction
 		for (int i=0;i<4;i++){
-			pixelStamp[i].attr[0].z = prim.v[0].attr[0].z +
-								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[0].z - prim.v[0].attr[0].z) +
-								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[0].z - prim.v[0].attr[0].z);
-			pixelStamp[i].attr[0].w = prim.v[0].attr[0].w +
-								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[0].w - prim.v[0].attr[0].w) +
-								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[0].w - prim.v[0].attr[0].w);
+			pixelStamp[i].attr[0].z =
+				prim.v[0].attr[0].z +
+				pixelStamp[i].baryCenPos3[0]*( prim.v[1].attr[0].z - prim.v[0].attr[0].z ) +
+				pixelStamp[i].baryCenPos3[1]*( prim.v[2].attr[0].z - prim.v[0].attr[0].z );
+			pixelStamp[i].attr[0].w =
+				prim.v[0].attr[0].w +
+				pixelStamp[i].baryCenPos3[0]*( prim.v[1].attr[0].w - prim.v[0].attr[0].w ) +
+				pixelStamp[i].baryCenPos3[1]*( prim.v[2].attr[0].w - prim.v[0].attr[0].w );
 
 			for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
 				if (!varyEnable[attrCnt])
 					continue;
 
-				pixelStamp[i].attr[attrCnt] = prim.v[0].attr[attrCnt] +
-												(prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt])*pixelStamp[i].baryCenPos3[0] +
-												(prim.v[2].attr[attrCnt] - prim.v[0].attr[attrCnt])*pixelStamp[i].baryCenPos3[1];
-				pixelStamp[i].attr[attrCnt] = pixelStamp[i].attr[attrCnt] / pixelStamp[i].attr[0].w;
+				pixelStamp[i].attr[attrCnt] =
+					prim.v[0].attr[attrCnt] +
+					( prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[0] +
+					( prim.v[2].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[1];
+				pixelStamp[i].attr[attrCnt] =
+					pixelStamp[i].attr[attrCnt] / pixelStamp[i].attr[0].w;
 			}
 		}
 
-        /* Drop their ghost flag if they are pass the edge test. But they are
-         * still pushed into shader core.
+        /* Drop their ghost flag if they are pass the edge test. But those ghost
+         * pixels will be still pushed into shader core.
 		 */
 		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)||
             (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
@@ -207,8 +218,6 @@ void GPU_Core::FragmentShaderEXE(int sid,
 								 void *input2,
 								 void *input3 )
 {
-	totalPix+=4;
-
 	sCore[sid].instPool = FSinstPool;
 	sCore[sid].instCnt = FSinstCnt;
 	sCore[sid].uniformPool = uniformPool;
@@ -229,8 +238,10 @@ void GPU_Core::PerFragmentOp(pixel pixInput)
 	bool DepthPass = true;
 	int bufOffset;
 
-	if (pixInput.isGhost)
+	if (pixInput.isGhost) {
+		totalGhostPix++;
 		return;
+	}
 
 	bufOffset = (int)pixInput.attr[0].y*viewPortW + (int)pixInput.attr[0].x;
 
@@ -271,6 +282,8 @@ void GPU_Core::PerFragmentOp(pixel pixInput)
     *(cBufPtr + bufOffset*4 + 1) = color.g;// G
     *(cBufPtr + bufOffset*4 + 2) = color.b;// B
     *(cBufPtr + bufOffset*4 + 3) = color.a;// A
+
+    totalLivePix++;
 }
 
 void GPU_Core::ClearBuffer(unsigned int mask)
