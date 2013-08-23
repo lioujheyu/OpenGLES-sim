@@ -33,7 +33,7 @@ void ShaderCore::Run()
 			vtxTemp[3] = *vtxPtr[3];
 		}
 	}
-	else {
+	else {	//FRAGMENT_SHADER
 		if (enableFlag[0]) {
 			pixPtr[0]  = (pixel*)input[0];
 			pixTemp[0] = *pixPtr[0];
@@ -58,8 +58,21 @@ void ShaderCore::Run()
 		tid = curInst.tid;
 		tType = curInst.tType;
 
-		if (enableFlag[0]){
+/* Each pipeline needs to fetch data before other pipeline write result
+ * back when they are in the same instruction. It avoids the barrier-
+ * like instruction(DDX, DDY, TEX with auto scale factor computation)'s
+ * result is corrupted.
+ */
+		if (enableFlag[0])
 			FetchData(0);
+		if (enableFlag[1])
+			FetchData(1);
+		if (enableFlag[2])
+			FetchData(2);
+		if (enableFlag[3])
+			FetchData(3);
+
+		if (enableFlag[0]){
 			Exec(0);
 			if (curCCState[0] == true) {
 				totalInstructionCnt+=1;
@@ -68,7 +81,6 @@ void ShaderCore::Run()
 		}
 
 		if (enableFlag[1]){
-			FetchData(1);
 			Exec(1);
 			if (curCCState[1] == true) {
 				totalInstructionCnt+=1;
@@ -77,7 +89,6 @@ void ShaderCore::Run()
 		}
 
 		if (enableFlag[2]){
-			FetchData(2);
 			Exec(2);
 			if (curCCState[2] == true) {
 				totalInstructionCnt+=1;
@@ -86,7 +97,6 @@ void ShaderCore::Run()
 		}
 
 		if (enableFlag[3]){
-			FetchData(3);
 			Exec(3);
 			if (curCCState[3] == true) {
 				totalInstructionCnt+=1;
@@ -270,17 +280,22 @@ void ShaderCore::Exec(int idx)
 //		break;
 	//TEXop
 	case OP_TEX:
+	/* The scale factor in this instruction comes from directly subtracting
+	 * neighbor thread's requested texture coordinate. Therefore, it has a
+	 * big advantage that we don't need to know which attribute is used to
+	 * locate the texel position and even can accept non-attribute variable
+	 * as texture coordinate without additional DDX or DDY instruction involved
+	 * (Cause it performs DDX/DDY-like operation in default). The further
+	 * discussion of the position of finding the gradient of texture coordinate
+	 * (In shader core like right now or in texture unit) is needed.
+	 */
 		if (idx == 0 || idx == 1) {
-			scaleFacDX = pixPtr[1]->attr[curInst.src[0].id] -
-						 pixPtr[0]->attr[curInst.src[0].id];
-			scaleFacDY = pixPtr[idx+2]->attr[curInst.src[0].id] -
-						 pixPtr[idx]->attr[curInst.src[0].id];
+			scaleFacDX = src[1][0] - src[0][0];
+			scaleFacDY = src[idx+2][0] - src[idx][0];
 		}
 		else {
-			scaleFacDX = pixPtr[3]->attr[curInst.src[0].id] -
-						 pixPtr[2]->attr[curInst.src[0].id];
-			scaleFacDY = pixPtr[idx]->attr[curInst.src[0].id] -
-						 pixPtr[idx-2]->attr[curInst.src[0].id];
+			scaleFacDX = src[3][0] - src[2][0];
+			scaleFacDY = src[idx][0] - src[idx-2][0];
 		}
 		dst[idx] = texUnit.TextureSample(src[idx][0],
 										 -1,
@@ -386,20 +401,25 @@ void ShaderCore::FetchData(int idx)
 			break;
 
 		case INST_UNIFORM:
-			src[idx][i] = ReadByMask(uniformPool[curInst.src[i].id], curInst.src[i].modifier);
+			src[idx][i] = ReadByMask(uniformPool[curInst.src[i].id],
+									 curInst.src[i].modifier );
 			break;
 
 		case INST_REG:
-			src[idx][i] = ReadByMask(reg[curInst.src[i].id*4 + idx], curInst.src[i].modifier);
+			src[idx][i] = ReadByMask(reg[curInst.src[i].id*4 + idx],
+									 curInst.src[i].modifier );
 			break;
 
 		case INST_CCREG:
-			src[idx][0] = ReadByMask(CCisSigned[idx][curInst.src[i].id], curInst.src[i].ccModifier);
-			src[idx][1] = ReadByMask(CCisZero[idx][curInst.src[i].id], curInst.src[i].ccModifier);
+			src[idx][0] = ReadByMask(CCisSigned[idx][curInst.src[i].id],
+									 curInst.src[i].ccModifier );
+			src[idx][1] = ReadByMask(CCisZero[idx][curInst.src[i].id],
+									 curInst.src[i].ccModifier);
 			break;
 
 		case INST_CONSTANT:
-			src[idx][i] = ReadByMask(curInst.src[i].val, curInst.src[i].modifier);
+			src[idx][i] = ReadByMask(curInst.src[i].val,
+									 curInst.src[i].modifier);
 			break;
 
 		default:
@@ -494,7 +514,7 @@ floatVec4 ShaderCore::ReadByMask(floatVec4 in, char *mask)
 }
 
 /**
- *	Write the destination floatVec4 's floating component by mask including CC
+ *	Write the destination floatVec4's floating component by mask including CC
  *	register's update if necessary.
  *
  *	@param val		A floatVec4 value prepared for writing.

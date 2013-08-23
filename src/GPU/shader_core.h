@@ -31,7 +31,12 @@
  *	@brief Unified shader core class
  *
  *	Responsible for executing NVGP4 assembly code. It also contain texture_unit
- *	for tex instruction execution.
+ *	for TEX instruction execution. Currently, there are four fetch, execution,
+ *	and write-back units in one shader core. Such architecture is served for one
+ *	purpose - Find partial differential value from adjacent thread. It also has
+ *	the ability to get texture scale factor without fixing hardware pipeline's
+ *	help. But have a defect that it wastes resource on the ghost pixels which
+ *	is already known as fail on edge test.
  */
 class ShaderCore {
 public:
@@ -58,7 +63,7 @@ public:
 
 	int shaderType; ///< Vertex/Fragment Shader
 	bool enableFlag[4];
-	void *input[4]; ///< Input pointer, can be further convert into vertex or pixel
+	void *input[4]; ///< Input pointer, can be further converted into vertex or pixel
 	int instCnt; ///< Program Length
 	instruction const *instPool; ///< Instruction Pool pointer
 	floatVec4 const *uniformPool; ///< Uniform Pool pointer

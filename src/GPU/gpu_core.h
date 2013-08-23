@@ -89,9 +89,11 @@ public:
     ///@{
     FILE 			*GPUINFOfp;
 	FILE 			*PIXELINFOfp;
-    int				totalPrimitive,
-					totalVtx,
-					totalPix;
+    int				totalProcessingPrimitive,
+					totalProcessingVtx,
+					totalProcessingPix,
+					totalGhostPix,
+					totalLivePix;
     ///@}
 
     void        	Run();

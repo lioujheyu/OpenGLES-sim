@@ -35,11 +35,10 @@ void GPU_Core::InitPrimitiveAssembly()
  *	@param sid Which shader core id will be used.
  *	@param input Input pointer
  */
-///@todo Raise the usage of four exec units.
+
+///@todo Raise the usage of 4 exec units.
 void GPU_Core::VertexShaderEXE(int sid, void *input)
 {
-	totalVtx++;
-
 	sCore[sid].instPool = VSinstPool;
 	sCore[sid].instCnt = VSinstCnt;
 	sCore[sid].uniformPool = uniformPool;
@@ -134,7 +133,7 @@ void GPU_Core::PrimitiveAssembly()
             prim.v[0] = curVtx;
         break;
     default:
-    	printf("GPU_Core: Unsurpport draw mode: %x\n",drawMode);
+    	printf("GPU_Core: Nonsupport draw mode: %x\n",drawMode);
     	exit(1);
         break;
     }
@@ -143,7 +142,7 @@ void GPU_Core::PrimitiveAssembly()
 
     if (vtxCntDwn == 0)
     {
-		totalPrimitive++;
+		totalProcessingPrimitive++;
         primitiveRdy = true;
 
         switch (drawMode) {
@@ -155,7 +154,7 @@ void GPU_Core::PrimitiveAssembly()
             vtxCntDwn = 1;
             break;
         default:
-        	printf("GPU_Core: Unsurpport draw mode: %x",drawMode);
+        	printf("GPU_Core: Nonsupport draw mode: %x",drawMode);
 			exit(1);
             break;
         }
