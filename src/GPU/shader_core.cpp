@@ -290,12 +290,12 @@ void ShaderCore::Exec(int idx)
 	 * (In shader core like right now or in texture unit) is needed.
 	 */
 		if (idx == 0 || idx == 1) {
-			scaleFacDX = src[1][0] - src[0][0];
-			scaleFacDY = src[idx+2][0] - src[idx][0];
+			scaleFacDX = fvabs(src[1][0] - src[0][0]);
+			scaleFacDY = fvabs(src[idx+2][0] - src[idx][0]);
 		}
 		else {
-			scaleFacDX = src[3][0] - src[2][0];
-			scaleFacDY = src[idx][0] - src[idx-2][0];
+			scaleFacDX = fvabs(src[3][0] - src[2][0]);
+			scaleFacDY = fvabs(src[idx][0] - src[idx-2][0]);
 		}
 		dst[idx] = texUnit.TextureSample(src[idx][0],
 										 -1,
