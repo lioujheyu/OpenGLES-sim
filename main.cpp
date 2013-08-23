@@ -33,12 +33,12 @@ bool LoadTexture(char *filename, unsigned int *texture)
                  info->bmiHeader.biHeight, 0, GL_RGB, GL_UNSIGNED_BYTE,
                  bitmap);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -66,8 +66,12 @@ bool LoadRGBATexture(char *filename, unsigned int *texture)
                  info->bmiHeader.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                  bitmap);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -80,8 +84,8 @@ bool LoadRGBATexture(char *filename, unsigned int *texture)
 void draw_road()
 {
 	Shader shader;
-	shader.init("shader_src/TransformVertexShader.vertexshader",
-			"shader_src/TextureFragmentShader.fragmentshader");
+	shader.init("shader_src/NormalMapping.vert",
+				"shader_src/NormalMapping.frag");
 	shader.bind();
 
     unsigned int texture[2];
@@ -98,29 +102,22 @@ void draw_road()
 		exit(1);
     }
 
-    GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0,
-                             1.0f, -1.0f, 0.0f, 1.0,
-                             1.0f,  0.0f, 1.0f,16.0,
-                            -1.0f,  0.0f, 1.0f,16.0
+	GLfloat vertexPos[] = { -1.0f, -0.7f, 0.0f, 1.0f,
+                             1.0f, -0.7f, 0.0f, 1.0f,
+                             1.0f, -0.7f, 4.0f, 1.0f,
+                            -1.0f, -0.7f, 4.0f, 1.0f
                           };
 
-//	GLfloat vertexPos[] = { -1.0f, -1.0f, 0.0f, 1.0f,
-//                             1.0f, -1.0f, 0.0f, 1.0f,
-//                             1.0f,  1.0f, 0.0f, 1.0f,
-//                            -1.0f,  1.0f, 0.0f, 1.0f
-//                          };
+	GLfloat vertexNormal[] = { 0.0f, 1.0f, 0.0f,
+							   0.0f, 1.0f, 0.0f,
+							   0.0f, 1.0f, 0.0f
+							 };
 
-    GLfloat texCoord[] = { 0.0f, -1.0f,
-                           1.0f, -1.0f,
+    GLfloat texCoord[] = { 0.0f, 1.0f,
                            1.0f, 1.0f,
-                           0.0f, 1.0f,
+                           1.0f, -1.0f,
+                           0.0f, -1.0f,
                          };
-
-	GLfloat mvp4x4[] = {1.0f, 0.0f, 0.0f, 0.0f,
-	                    0.0f, 1.0f, 0.0f, 0.0f,
-	                    0.0f, 0.0f, 1.0f, 0.0f,
-	                    0.0f, 0.0f, 0.0f, 1.0f
-	                   };
 
     glEnable(GL_DEPTH_TEST);
 
@@ -129,19 +126,34 @@ void draw_road()
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    int v_coord_loc = glGetAttribLocation(shader.id(), "vertexPosition_modelspace");
-    int v_tex0_loc = glGetAttribLocation(shader.id(), "vertexUV");
+	glm::vec3 eye_pos = glm::vec3(0.0f, 0.2f, -0.5f);
+	glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
+    glm::mat4 View = glm::lookAt(
+						eye_pos,          // Camera position in World space
+						glm::vec3(0,0,0), // and looks at the origin
+						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+					);
+	//glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
+	glm::mat4 MVP = Projection * View;
+
+    int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
+    int v_tex0_loc = glGetAttribLocation(shader.id(), "obj_texCoord");
+    int v_normal_loc = glGetAttribLocation(shader.id(), "obj_texCoord");
     int c_map = glGetUniformLocation(shader.id(), "ColorMap");
     int n_map = glGetUniformLocation(shader.id(), "NormalMap");
     int mvp = glGetUniformLocation(shader.id(), "MVP");
-    printf("%d, %d, %d, %d, %d\n", v_coord_loc, v_tex0_loc, c_map, n_map, mvp);
+    int eye_loc = glGetUniformLocation(shader.id(), "eye_pos");
 
     glUniform1i(c_map, 0);
     glUniform1i(n_map, 1);
-    glUniformMatrix4fv(mvp, 1, 0, mvp4x4);
+    glUniform3fv(eye_loc, 1, &eye_pos[0]);
+    glUniformMatrix4fv(mvp, 1, 0, &MVP[0][0]);
 
     glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);
     glEnableVertexAttribArray(v_coord_loc);
+
+    glVertexAttribPointer(v_normal_loc, 3, GL_FLOAT, GL_FALSE, 0, vertexNormal);
+    glEnableVertexAttribArray(v_normal_loc);
 
     glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, texCoord);
     glEnableVertexAttribArray(v_tex0_loc);
@@ -221,6 +233,6 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-	//draw_road();
-	draw_banana();
+	draw_road();
+	//draw_banana();
 }
