@@ -21,7 +21,7 @@
  *	shader and another one for fragment shader. Currently it has no effect if
  *	it is larger than 2 until the task scheduler is finished.
  */
-#define MAX_SHADER_CORE					3  //No effect now for temporary.
+#define MAX_SHADER_CORE					3
 
 #define MAX_ATTRIBUTE_NUMBER    		8
 #define MAX_VERTEX_UNIFORM_VECTORS		128
@@ -52,22 +52,8 @@
 #define TEX_CACHE_ENTRY_SIZE 16
 ///@}
 
-/******************** Texture debugging option ********************/
-/**
- *	@def SHOW_MIPMAP_LEVEL
- *	Enable SHOW_MIPMAP_LEVEL will replace the texture color with
- *	level-represented luminance on the textured primitive no matter
- *	which filter this primitive uses.
- *
- *	level 0 - 1.0	maximum white										<br>
- *	level 1 - 0.9														<br>
- *	level 2 - 0.8														<br>
- *	level 3 - 0.7														<br>
- *	level 4 - .															<br>
- *		      .															<br>
- */
-//#define SHOW_MIPMAP_LEVEL
-
+///	@name Texture debugging option
+///@{
 /**
  *	@def SHOW_TEXCACHE_COLD_MISS
  *	Enable SHOW_TEXCACHE_COLD_MISS will let texture cache return color red
@@ -83,7 +69,8 @@
  *	then the original texel's color when texture cache miss is occurred. This
  *	option can be enable with SHOW_TEXCACHE_COLD_MISS and has no conflict.
  */
-//#define SHOW_TEXCACHE_MISS
+#define SHOW_TEXCACHE_MISS
+///@}
 
 /**
  *	@def DEBUG
@@ -92,7 +79,7 @@
  */
 #define DEBUG
 
-/// @name Flags for debug information's destination. (screen or files)
+/// @name Definition for whether print the defined target's information.
 ///@{
 #define GPU_INFO
 #define SHADER_INFO
@@ -100,7 +87,11 @@
 //#define TEXEL_INFO
 ///@}
 
-///@name Specify the file name for information dump.
+/**
+ *	@name Specify the file name for information dump.
+ *	If file name is empty, the target's information will be printed directly
+ *	on screen.
+ */
 ///@{
 #define GPU_INFO_FILE "gpu_info"
 #define SHADER_INFO_FILE "shader_info"
@@ -113,6 +104,8 @@
 #	define DBG_ON 1
 #else
 #	define DBG_ON 0
+#	undef SHOW_TEXCACHE_COLD_MISS
+#	undef SHOW_TEXCACHE_MISS
 #endif
 
 #endif // GPU_CONFIG_H_INCLUDED

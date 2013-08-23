@@ -56,9 +56,7 @@
 		<Unit filename="src/GPU/shader_core.cpp" />
 		<Unit filename="src/GPU/shader_core.h" />
 		<Unit filename="src/GPU/texture_unit.cpp" />
-		<Unit filename="src/GPU/texture_unit.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
+		<Unit filename="src/GPU/texture_unit.h" />
 		<Unit filename="src/common.h" />
 		<Unit filename="src/context.cpp" />
 		<Unit filename="src/context.h" />
