@@ -174,6 +174,18 @@ void ActiveGPU()
     gpu.depthRangeN = ctx->vp.n;
     gpu.depthRangeF = ctx->vp.f;
 
+    gpu.cullingEnable = ctx->cullingEn;
+    if (ctx->frontFace == GL_CCW)
+		gpu.cullFaceMode = ctx->cullFaceMode;
+	else if (ctx->frontFace == GL_CW) {
+		if (ctx->cullFaceMode == GL_FRONT)
+			gpu.cullFaceMode = GL_BACK;
+		else if (ctx->cullFaceMode == GL_BACK)
+			gpu.cullFaceMode = GL_FRONT;
+		else
+			gpu.cullFaceMode = ctx->cullFaceMode;
+	}
+
     gpu.blendEnable = ctx->blendEnable;
     gpu.depthTestEnable = ctx->depthTestEnable;
     gpu.cBufPtr = (unsigned char*)ctx->drawBuffer[0];

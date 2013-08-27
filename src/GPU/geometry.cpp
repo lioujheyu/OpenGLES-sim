@@ -167,10 +167,72 @@ void GPU_Core::Clipping()
 
 }
 
-/// @todo Culling
-void GPU_Core::Culling()
+void GPU_Core::TriangleSetup()
 {
+	float doubleArea;
 
+	Edge[0][0] = prim.v[0].attr[0].y - prim.v[1].attr[0].y;
+	Edge[0][1] = prim.v[0].attr[0].x - prim.v[1].attr[0].x;
+	Edge[1][0] = prim.v[1].attr[0].y - prim.v[2].attr[0].y;
+	Edge[1][1] = prim.v[1].attr[0].x - prim.v[2].attr[0].x;
+	Edge[2][0] = prim.v[2].attr[0].y - prim.v[0].attr[0].y;
+	Edge[2][1] = prim.v[2].attr[0].x - prim.v[0].attr[0].x;
+
+	doubleArea = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
+
+	if (fabs(doubleArea) > 1000000)
+		printf("What the fuck!!\n");
+
+	area2Reciprocal = 1/doubleArea;
+
+	LY = MIN3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
+	LY = CLAMP(LY, viewPortLY, viewPortLY+viewPortH-1);
+	LX = MIN3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
+	LX = CLAMP(LX, viewPortLX, viewPortLX+viewPortW-1);
+	HY = MAX3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
+	HY = CLAMP(HY, viewPortLY, viewPortLY+viewPortH-1);
+	RX = MAX3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
+	RX = CLAMP(RX, viewPortLX, viewPortLX+viewPortW-1);
 }
 
+void GPU_Core::Culling()
+{
+	vertex tmp;
+	float tmp1, tmp2;
+
+	if (cullingEnable) {
+		if (cullFaceMode == GL_BACK) {
+			if (area2Reciprocal > 0)
+				prim.iskilled = true;
+		}
+		else if (cullFaceMode == GL_FRONT){
+			if (area2Reciprocal < 0)
+				prim.iskilled = true;
+		}
+		else if (cullFaceMode == GL_FRONT_AND_BACK)
+			prim.iskilled = false;
+		else
+			fprintf(stderr, "Culling: Undefined culling mode %x\n", cullFaceMode);
+	}
+
+	/* Eliminate all (area < 0) condition to simplify the operation in
+	 * tile split and interpolation.
+	 */
+	if (area2Reciprocal < 0) {
+		tmp = prim.v[2];
+		prim.v[2] = prim.v[1];
+		prim.v[1] = tmp;
+
+		Edge[1][0] = -Edge[1][0];
+		Edge[1][1] = -Edge[1][1];
+		tmp1 = Edge[0][0];
+		tmp2 = Edge[0][1];
+		Edge[0][0] = -Edge[2][0];
+		Edge[0][1] = -Edge[2][1];
+		Edge[2][0] = -tmp1;
+		Edge[2][1] = -tmp2;
+
+		area2Reciprocal = -area2Reciprocal;
+	}
+}
 

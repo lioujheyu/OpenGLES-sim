@@ -58,6 +58,14 @@ void GPU_Core::Run()
         //Primitive-based operation starts here
         if (primitiveRdy) {
             TriangleSetup();
+            Culling();
+
+            if (prim.iskilled) {
+				totalCulledPrimitive++;
+				prim.iskilled = false;
+				primitiveRdy = false;
+				continue;
+            }
 
             //printf("Primitive %d drawing. ", totalPrimitive);
             //printf("Area: %f\n", fabs(constantC/2));
@@ -92,6 +100,8 @@ void GPU_Core::Run()
 
     GPUPRINTF("Total processed vertex: %d\n",totalProcessingVtx);
     GPUPRINTF("Total processed Primitive: %d\n",totalProcessingPrimitive);
+    GPUPRINTF("Total culled Primitive: %d\n",totalCulledPrimitive);
+    GPUPRINTF("Tile Split Count: %d\n",tileSplitCnt);
     GPUPRINTF("Total processed pixel: %d\n",totalProcessingPix);
 	GPUPRINTF("Ghost pixel: %d\n",totalGhostPix);
 	GPUPRINTF("Normal/All processed pixel ratio: %f\n",
@@ -137,7 +147,8 @@ GPU_Core::GPU_Core()
 	blendEnable = false;
 
 	totalProcessingPrimitive = totalProcessingPix = totalProcessingVtx =
-		totalGhostPix = totalLivePix = 0;
+		totalGhostPix = totalLivePix = totalCulledPrimitive = 0;
+	tileSplitCnt = 0;
 
 #if defined(DEBUG) && defined(GPU_INFO) && defined(GPU_INFO_FILE)
 	GPUINFOfp = fopen((std::string(GPU_INFO_FILE)+".txt").c_str(),"w");

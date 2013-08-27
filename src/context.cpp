@@ -23,10 +23,14 @@ Context::Context()
 		texCtx[i].magFilter = GL_LINEAR;
 	}
 
+	frontFace = GL_CCW;
+	cullFaceMode = GL_BACK;
+
 	clearDepth = 1.0;
 	clearMask = 0;
 	clearStat = GL_FALSE;
     blendEnable = GL_FALSE;
+    cullingEn = GL_FALSE;
 	depthTestEnable = GL_FALSE;
 }
 

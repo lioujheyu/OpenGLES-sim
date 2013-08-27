@@ -172,7 +172,7 @@ GL_APICALL GLuint GL_APIENTRY glCreateShader (GLenum type)
 
 GL_APICALL void GL_APIENTRY glCullFace (GLenum mode)
 {
-
+	CONTEXT_EXEC(CullFace(mode));
 }
 
 GL_APICALL void GL_APIENTRY glDeleteBuffers (GLsizei n, const GLuint* buffers)
@@ -277,7 +277,7 @@ GL_APICALL void GL_APIENTRY glFramebufferTexture2D (GLenum target, GLenum attach
 
 GL_APICALL void GL_APIENTRY glFrontFace (GLenum mode)
 {
-
+	CONTEXT_EXEC(FrontFace(mode));
 }
 
 GL_APICALL void GL_APIENTRY glGenBuffers (GLsizei n, GLuint* buffers)

@@ -6,35 +6,6 @@
 
 #include "gpu_core.h"
 
-void GPU_Core::TriangleSetup()
-{
-	float constantC;
-
-	Edge[0][0] = prim.v[0].attr[0].y - prim.v[1].attr[0].y;
-	Edge[0][1] = prim.v[0].attr[0].x - prim.v[1].attr[0].x;
-	Edge[1][0] = prim.v[1].attr[0].y - prim.v[2].attr[0].y;
-	Edge[1][1] = prim.v[1].attr[0].x - prim.v[2].attr[0].x;
-	Edge[2][0] = prim.v[2].attr[0].y - prim.v[0].attr[0].y;
-	Edge[2][1] = prim.v[2].attr[0].x - prim.v[0].attr[0].x;
-
-	constantC = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
-	if (fabs(constantC) > 1000000)
-	{
-		printf("What the fuck!!\n");
-	}
-
-	area2Reciprocal = 1/constantC;
-
-	LY = MIN3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
-	LY = CLAMP(LY, viewPortLY, viewPortLY+viewPortH-1);
-	LX = MIN3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
-	LX = CLAMP(LX, viewPortLX, viewPortLX+viewPortW-1);
-	HY = MAX3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
-	HY = CLAMP(HY, viewPortLY, viewPortLY+viewPortH-1);
-	RX = MAX3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
-	RX = CLAMP(RX, viewPortLX, viewPortLX+viewPortW-1);
-}
-
 void GPU_Core::tileSplit(int x, int y, int level)
 {
 	int lc; //loop counter
@@ -58,6 +29,8 @@ void GPU_Core::tileSplit(int x, int y, int level)
  * and texture scale factor calculation later time in shader core.
  */
 	pixel pixelStamp[4];
+
+	tileSplitCnt++;
 
 
 	PIXPRINTF("-------(%d,%d),Level:%d-----\n",x,y,level);
@@ -129,25 +102,17 @@ void GPU_Core::tileSplit(int x, int y, int level)
         /* Drop their ghost flag if they are pass the edge test. But those ghost
          * pixels will be still pushed into shader core.
 		 */
-		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)||
-            (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
+		if (cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)
             pixelStamp[0].isGhost = false;
-		}
 
-		if ((cornerTest[2][0]>=0 && cornerTest[2][1]>=0 && cornerTest[2][2]>=0)|
-            (cornerTest[2][0]<=0 && cornerTest[2][1]<=0 && cornerTest[2][2]<=0)) {
+		if (cornerTest[2][0]>=0 && cornerTest[2][1]>=0 && cornerTest[2][2]>=0)
             pixelStamp[1].isGhost = false;
-		}
 
-		if ((cornerTest[5][0]>=0 && cornerTest[5][1]>=0 && cornerTest[5][2]>=0)|
-            (cornerTest[5][0]<=0 && cornerTest[5][1]<=0 && cornerTest[5][2]<=0)) {
+		if (cornerTest[5][0]>=0 && cornerTest[5][1]>=0 && cornerTest[5][2]>=0)
             pixelStamp[2].isGhost = false;
-		}
 
-		if ((cornerTest[7][0]>=0 && cornerTest[7][1]>=0 && cornerTest[7][2]>=0)|
-            (cornerTest[7][0]<=0 && cornerTest[7][1]<=0 && cornerTest[7][2]<=0)) {
+		if (cornerTest[7][0]>=0 && cornerTest[7][1]>=0 && cornerTest[7][2]>=0)
             pixelStamp[3].isGhost = false;
-		}
 
 		if (pixelStamp[0].isGhost && pixelStamp[1].isGhost &&
 			pixelStamp[2].isGhost && pixelStamp[3].isGhost ) {
@@ -175,31 +140,24 @@ void GPU_Core::tileSplit(int x, int y, int level)
 			cornerTest[7][lc] = centralTest[lc] + ( Edge[lc][0]-Edge[lc][1])*(1<<level);
 		}
 
-		if (area2Reciprocal>=0) {
-            for(lc=0; lc<3; lc++) {
-                Zone[0][lc] = (cornerTest[0][lc]>=0) | (cornerTest[1][lc]>=0) | (cornerTest[3][lc]>=0) | (centralTest[lc]>=0);
-                Zone[1][lc] = (cornerTest[1][lc]>=0) | (cornerTest[2][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[4][lc]>=0);
-                Zone[2][lc] = (cornerTest[3][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[5][lc]>=0) | (cornerTest[6][lc]>=0);
-                Zone[3][lc] = (centralTest[lc]>=0) | (cornerTest[4][lc]>=0) | (cornerTest[6][lc]>=0) | (cornerTest[7][lc]>=0);
-            }
-        }
-        else{
-            for(lc=0; lc<3; lc++) {
-                Zone[0][lc] = (cornerTest[0][lc]<=0) | (cornerTest[1][lc]<=0) | (cornerTest[3][lc]<=0) | (centralTest[lc]<=0);
-                Zone[1][lc] = (cornerTest[1][lc]<=0) | (cornerTest[2][lc]<=0) | (centralTest[lc]<=0) | (cornerTest[4][lc]<=0);
-                Zone[2][lc] = (cornerTest[3][lc]<=0) | (centralTest[lc]<=0) | (cornerTest[5][lc]<=0) | (cornerTest[6][lc]<=0);
-                Zone[3][lc] = (centralTest[lc]<=0) | (cornerTest[4][lc]<=0) | (cornerTest[6][lc]<=0) | (cornerTest[7][lc]<=0);
-            }
-        }
+		for(lc=0; lc<3; lc++) {
+			Zone[0][lc] = (cornerTest[0][lc]>=0) | (cornerTest[1][lc]>=0) | (cornerTest[3][lc]>=0) | (centralTest[lc]>=0);
+			Zone[1][lc] = (cornerTest[1][lc]>=0) | (cornerTest[2][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[4][lc]>=0);
+			Zone[2][lc] = (cornerTest[3][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[5][lc]>=0) | (cornerTest[6][lc]>=0);
+			Zone[3][lc] = (centralTest[lc]>=0) | (cornerTest[4][lc]>=0) | (cornerTest[6][lc]>=0) | (cornerTest[7][lc]>=0);
+		}
 
 		if (Zone[0][0] == true && Zone[0][1] == true && Zone[0][2] == true )
 			tileSplit(x, y, level-1);
+
 		if (Zone[1][0] == true && Zone[1][1] == true && Zone[1][2] == true )
 			if ( (x + (1<<level)) <= RX )
 				tileSplit(x+(1<<level), y, level-1);
+
 		if (Zone[2][0] == true && Zone[2][1] == true && Zone[2][2] == true )
 			if ( (y + (1<<level)) <= HY )
 				tileSplit(x, y+(1<<level), level-1);
+
 		if (Zone[3][0] == true && Zone[3][1] == true && Zone[3][2] == true )
 			if ( ((x + (1<<level)) <= RX) && ((y + (1<<level)) <= HY) )
 				tileSplit(x+(1<<level), y+(1<<level), level-1);

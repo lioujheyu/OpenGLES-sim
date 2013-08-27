@@ -59,7 +59,8 @@ public:
     int         	viewPortLX, viewPortLY,
 					viewPortW, viewPortH;
 
-    bool            blendEnable, depthTestEnable;
+    bool            blendEnable, depthTestEnable, cullingEnable;
+    GLenum			cullFaceMode, frontFace;
     GLenum			depthTestMode;
     GLenum			blendingMode;
     float           DepthRef;
@@ -90,10 +91,12 @@ public:
     FILE 			*GPUINFOfp;
 	FILE 			*PIXELINFOfp;
     int				totalProcessingPrimitive,
+					totalCulledPrimitive,
 					totalProcessingVtx,
 					totalProcessingPix,
 					totalGhostPix,
 					totalLivePix;
+	int 			tileSplitCnt;
     ///@}
 
     void        	Run();
@@ -144,12 +147,12 @@ private:
     void        	InitPrimitiveAssembly();
     void        	PrimitiveAssembly();
     void        	Clipping();
+    void            TriangleSetup();
     void        	Culling();
     ///@}
 
     /// @name Rasterizer
     ///@{
-	void            TriangleSetup();
     void            tileSplit(int x, int y, int level);
     void            PerFragmentOp(pixel pixInput);
     void 			ClearBuffer(unsigned int mask);

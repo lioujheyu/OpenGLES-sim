@@ -76,6 +76,11 @@ void Context::ClearDepthf (GLfloat depth)
 	clearDepth = depth;
 }
 
+void Context::CullFace(GLenum mode)
+{
+	cullFaceMode = mode;
+}
+
 void Context::DeleteTextures(GLsizei n, const GLuint *textures)
 {
     if (n < 0) {
@@ -109,6 +114,7 @@ void Context::Disable(GLenum cap)
         blendEnable = false;
         break;
     case GL_CULL_FACE:
+    	cullingEn = false;
         break;
     case GL_DEPTH_TEST:
         depthTestEnable = false;
@@ -185,6 +191,7 @@ void Context::Enable(GLenum cap)
         blendEnable = true;
         break;
     case GL_CULL_FACE:
+    	cullingEn = true;
         break;
     case GL_DEPTH_TEST:
         depthTestEnable = true;
@@ -218,6 +225,11 @@ void Context::EnableVertexAttribArray(GLuint index)
     }
 
     vertexAttrib[index].enable = GL_TRUE;
+}
+
+void Context::FrontFace(GLenum mode)
+{
+	frontFace = mode;
 }
 
 void Context::GenerateMipmap(GLenum target)

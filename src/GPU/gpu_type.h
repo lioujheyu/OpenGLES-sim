@@ -57,6 +57,12 @@ public:
 };
 
 struct primitive{
+	primitive()
+	{
+		iskilled = false;
+	}
+
+	bool iskilled;
     vertex v[3];
 };
 

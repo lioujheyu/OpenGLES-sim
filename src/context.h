@@ -274,6 +274,7 @@ public:
     void		CompileShader(GLuint shader);
     GLuint 		CreateProgram (void);
     GLint		CreateShader (GLenum type);
+    void		CullFace (GLenum mode);
     void		DeleteProgram (GLuint program);
     void		DeleteShader (GLuint shader);
     void 		DeleteTextures (GLsizei n, const GLuint* textures);
@@ -283,6 +284,7 @@ public:
     void 		DrawArrays (GLenum mode, GLint first, GLsizei count);
     void 		Enable (GLenum cap);
     void 		EnableVertexAttribArray (GLuint index);
+    void		FrontFace(GLenum mode);
     void 		GenerateMipmap(GLenum target);
     void 		GenTextures (GLsizei n, GLuint* textures);
     int			GetAttribLocation (GLuint program, const GLchar* name);
@@ -326,6 +328,9 @@ public:
     void           *drawBuffer[2]; ///< 0 - color buffer, 1 - depth buffer
 
     viewPort        vp;
+    GLenum			frontFace;
+    GLboolean		cullingEn;
+    GLenum			cullFaceMode;
 
     /// @name clear function related variable
     ///@{
