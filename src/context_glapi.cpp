@@ -13,39 +13,30 @@ void Context::ActiveTexture(GLenum texture)
 {
     if (texture < GL_TEXTURE0) {
         RecordError(GL_INVALID_ENUM);
+        return;
     }
 
-    activeTexture = texture - GL_TEXTURE0;
+    activeTexCtx = texture - GL_TEXTURE0;
 }
 
 void Context::BindTexture(GLenum target, GLuint texture)
 {
-	switch(target){
+	if (texObjPool.find(texture) == texObjPool.end()) {
+		RecordError(GL_INVALID_VALUE);
+		return;
+	}
+
+	switch (target) {
 	case GL_TEXTURE_2D:
-		texCtx[activeTexture].tex2DBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-		texCtx[activeTexture].texCubeNXBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-		texCtx[activeTexture].texCubeNYBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-		texCtx[activeTexture].texCubeNZBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-		texCtx[activeTexture].texCubePXBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-		texCtx[activeTexture].texCubePYBindID = texture;
-		break;
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-		texCtx[activeTexture].texCubePZBindID = texture;
+	case GL_TEXTURE_3D:
+	case GL_TEXTURE_CUBE_MAP:
 		break;
 	default:
 		RecordError(GL_INVALID_ENUM);
-        return;
+		break;
 	}
+
+	texCtx[activeTexCtx].texObjBindID = texture;
 }
 
 void Context::Clear(GLbitfield mask)
@@ -56,10 +47,10 @@ void Context::Clear(GLbitfield mask)
     }
 
     clearMask = mask;
-    clearStat = true;
+    clearStat = GL_TRUE;
 
     ActiveGPU2CleanBuffer();
-    clearStat = false;
+    clearStat = GL_FALSE;
 }
 
 void Context::ClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
@@ -89,13 +80,31 @@ void Context::DeleteTextures(GLsizei n, const GLuint *textures)
     }
 
     for (int i=0; i<n; ++i) {
-        if (texImagePool.find(*(textures+i)) == texImagePool.end())
+        if (texObjPool.find(*(textures+i)) == texObjPool.end())
 			continue;
 
-        for (int l=0;l<=texImagePool[*(textures+i)].maxLevel;l++)
-			delete[] texImagePool[*(textures+i)].data[l];
+        for (int l=0;l<=texObjPool[*(textures+i)].tex2D.maxLevel;l++)
+			delete[] texObjPool[*(textures+i)].tex2D.data[l];
 
-        texImagePool.erase(*(textures+i));
+		for (int l=0;l<=texObjPool[*(textures+i)].texCubeNX.maxLevel;l++)
+			delete[] texObjPool[*(textures+i)].texCubeNX.data[l];
+
+		for (int l=0;l<=texObjPool[*(textures+i)].texCubeNY.maxLevel;l++)
+			delete[] texObjPool[*(textures+i)].texCubeNY.data[l];
+
+		for (int l=0;l<=texObjPool[*(textures+i)].texCubeNZ.maxLevel;l++)
+			delete[] texObjPool[*(textures+i)].texCubeNZ.data[l];
+
+		for (int l=0;l<=texObjPool[*(textures+i)].texCubePX.maxLevel;l++)
+			delete[] texObjPool[*(textures+i)].texCubePX.data[l];
+
+		for (int l=0;l<=texObjPool[*(textures+i)].texCubePY.maxLevel;l++)
+			delete[] texObjPool[*(textures+i)].texCubePY.data[l];
+
+		for (int l=0;l<=texObjPool[*(textures+i)].texCubePZ.maxLevel;l++)
+			delete[] texObjPool[*(textures+i)].texCubePZ.data[l];
+
+        texObjPool.erase(*(textures+i));
 
         printf("Del texture ID: %d\n",*(textures+i));
     }
@@ -111,13 +120,13 @@ void Context::Disable(GLenum cap)
 {
     switch (cap) {
     case GL_BLEND:
-        blendEnable = false;
+        blendEnable = GL_FALSE;
         break;
     case GL_CULL_FACE:
-    	cullingEn = false;
+    	cullingEn = GL_FALSE;
         break;
     case GL_DEPTH_TEST:
-        depthTestEnable = false;
+        depthTestEnable = GL_FALSE;
         break;
     case GL_DITHER:
         break;
@@ -139,7 +148,6 @@ void Context::Disable(GLenum cap)
         return;
     }
 }
-
 
 ///DrawArrays will also call driver to active GPU for drawing.
 void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
@@ -188,13 +196,13 @@ void Context::Enable(GLenum cap)
 {
     switch (cap) {
     case GL_BLEND:
-        blendEnable = true;
+        blendEnable = GL_TRUE;
         break;
     case GL_CULL_FACE:
-    	cullingEn = true;
+    	cullingEn = GL_TRUE;
         break;
     case GL_DEPTH_TEST:
-        depthTestEnable = true;
+        depthTestEnable = GL_TRUE;
         break;
     case GL_DITHER:
         break;
@@ -234,7 +242,16 @@ void Context::FrontFace(GLenum mode)
 
 void Context::GenerateMipmap(GLenum target)
 {
-	texCtx[activeTexture].genMipmap = GL_TRUE;
+	switch (target) {
+	case GL_TEXTURE_2D:
+		texCtx[activeTexCtx].genMipMap2D = GL_TRUE;
+		break;
+	case GL_TEXTURE_CUBE_MAP:
+		texCtx[activeTexCtx].genMipMapCubeMap = GL_TRUE;
+		break;
+	default:
+		RecordError(GL_INVALID_ENUM);
+	}
 }
 
 /// @note Searching the free texture id under std::map is not efficient.
@@ -245,13 +262,13 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
         return;
     }
 
-    textureImage texObj;
+    textureObject texObj;
 
 	int i = 0;
 	int key = 1;
 	while(i<n) {
-		if (texImagePool.find(key) == texImagePool.end()){
-			texImagePool[key] = texObj;
+		if (texObjPool.find(key) == texObjPool.end()) {
+			texObjPool[key] = texObj;
 			*(textures+i) = key;
 			printf("Gen Texture ID: %d\n",key);
 
@@ -278,31 +295,12 @@ GLenum Context::GetError(void)
 
 GLboolean Context::IsTexture(GLuint texture)
 {
-	return (texImagePool.find(texture) != texImagePool.end());
+	return (texObjPool.find(texture) != texObjPool.end());
 }
 
 void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels)
 {
-	int texImageID;
-
-	switch(target){
-	case GL_TEXTURE_2D:
-		break;
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-		if (width != height){
-			RecordError(GL_INVALID_VALUE);
-			return;
-		}
-		break;
-	default:
-		RecordError(GL_INVALID_ENUM);
-        return;
-	}
+	unsigned int texObjID;
 
     if (level < 0 || (float)level > log2f((float)std::max(width,height))) {
         RecordError(GL_INVALID_ENUM);
@@ -313,6 +311,13 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
         RecordError(GL_INVALID_VALUE);
         return;
     }
+
+    if (target != GL_TEXTURE_2D && target != GL_TEXTURE_3D) {
+		if (width != height) {
+			RecordError(GL_INVALID_VALUE);
+			return;
+		}
+	}
 
     GLint externalFormat = (GLint)format;
 
@@ -402,44 +407,6 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 		}
     }
 
-    //Create default texture object for texture2D if GenTexture() has not be called.
-    if(texImagePool.empty())
-    {
-        textureImage texObj;
-        texImagePool[0] = texObj;
-        texImageID = 0;
-        if (target = GL_TEXTURE_2D)
-			texCtx[activeTexture].tex2DBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_X)
-			texCtx[activeTexture].texCubeNXBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_Y)
-			texCtx[activeTexture].texCubeNYBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_Z)
-			texCtx[activeTexture].texCubeNZBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_X)
-			texCtx[activeTexture].texCubePXBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_Y)
-			texCtx[activeTexture].texCubePYBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_Z)
-			texCtx[activeTexture].texCubePZBindID = 0;
-    }
-    else {
-    	if (target == GL_TEXTURE_2D)
-			texImageID = texCtx[activeTexture].tex2DBindID;
-		else if (target = GL_TEXTURE_CUBE_MAP_NEGATIVE_X)
-			texImageID = texCtx[activeTexture].texCubeNXBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_Y)
-			texImageID = texCtx[activeTexture].texCubeNYBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_NEGATIVE_Z)
-			texImageID = texCtx[activeTexture].texCubeNZBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_X)
-			texImageID = texCtx[activeTexture].texCubePXBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_Y)
-			texImageID = texCtx[activeTexture].texCubePYBindID = 0;
-		else if (target == GL_TEXTURE_CUBE_MAP_POSITIVE_Z)
-			texImageID = texCtx[activeTexture].texCubePZBindID = 0;
-    }
-
 	textureImage temp;
 
     temp.border = border;
@@ -449,7 +416,34 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 
     temp.data[level] = image;
 
-	texImagePool[texImageID] = temp;
+	texObjID = texCtx[activeTexCtx].texObjBindID;
+
+	switch(target){
+	case GL_TEXTURE_2D:
+		texObjPool[texObjID].tex2D = temp;
+		break;
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
+		texObjPool[texObjID].texCubeNX = temp;
+		break;
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+		texObjPool[texObjID].texCubeNY = temp;
+		break;
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+		texObjPool[texObjID].texCubeNZ = temp;
+		break;
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
+		texObjPool[texObjID].texCubePX = temp;
+		break;
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+		texObjPool[texObjID].texCubePY = temp;
+		break;
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+		texObjPool[texObjID].texCubePZ = temp;
+		break;
+	default:
+		RecordError(GL_INVALID_ENUM);
+        return;
+	}
 }
 
 void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
@@ -477,7 +471,7 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
 		case GL_NEAREST_MIPMAP_LINEAR:
 		case GL_LINEAR_MIPMAP_NEAREST:
 		case GL_LINEAR_MIPMAP_LINEAR:
-			texCtx[activeTexture].minFilter = param;
+			texCtx[activeTexCtx].minFilter = param;
 			break;
 		default:
 			RecordError(GL_INVALID_OPERATION);
@@ -492,7 +486,7 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
         switch (param){
         case GL_NEAREST:
 		case GL_LINEAR:
-			texCtx[activeTexture].magFilter = param;
+			texCtx[activeTexCtx].magFilter = param;
 			break;
 		default:
 			RecordError(GL_INVALID_OPERATION);
@@ -501,20 +495,20 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
         break;
 
     case GL_TEXTURE_WRAP_S:
-        texCtx[activeTexture].wrapS = param;
+        texCtx[activeTexCtx].wrapS = param;
         break;
 
     case GL_TEXTURE_WRAP_T:
-        texCtx[activeTexture].wrapT = param;
+        texCtx[activeTexCtx].wrapT = param;
         break;
 
 /********  OpenGL ES 3.0 ***********/
 	case GL_TEXTURE_BASE_LEVEL:
-		texCtx[activeTexture].baseLevel = param;
+		texCtx[activeTexCtx].baseLevel = param;
 		break;
 
 	case GL_TEXTURE_MAX_LEVEL:
-		texCtx[activeTexture].maxLevel = param;
+		texCtx[activeTexCtx].maxLevel = param;
 		break;
 
 	case GL_TEXTURE_MIN_LOD:

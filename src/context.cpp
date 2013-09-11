@@ -11,7 +11,7 @@ static Context *currentContext = NULL;
 Context::Context()
 {
     m_current = false;
-    activeTexture = 0;
+    activeTexCtx = 0;
     usePID = 0;
     drawBuffer[0] = drawBuffer[1] = nullptr;
 

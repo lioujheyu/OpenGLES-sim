@@ -68,28 +68,35 @@ struct viewPort
     }
 };
 
+struct textureObject
+{
+	textureImage	tex2D;
+//	textureImage	tex3D;
+	textureImage	texCubeNX, texCubePX;
+	textureImage	texCubeNY, texCubePY;
+	textureImage	texCubeNZ, texCubePZ;
+};
+
 struct textureContext
 {
-    GLboolean		genMipmap;
+    GLboolean		genMipMap2D, genMipMapCubeMap;
     GLenum      	minFilter, magFilter;
     GLenum      	wrapS, wrapT;
     GLubyte			baseLevel;
     GLubyte			maxLevel;
 
-    ///Which Texture Image ID will be binded to this texture context.
-    GLuint			tex2DBindID;
-    GLuint			texCubeNXBindID, texCubePXBindID;
-    GLuint			texCubeNYBindID, texCubePYBindID;
-    GLuint			texCubeNZBindID, texCubePZBindID;
+    ///Which Texture object ID will be binded to this texture context.
+    GLuint			texObjBindID;
 
     inline textureContext() {
-        genMipmap = GL_FALSE;
+        genMipMap2D = genMipMapCubeMap = GL_FALSE;
         minFilter = GL_NEAREST_MIPMAP_LINEAR;
         magFilter = GL_LINEAR;
         wrapS = GL_REPEAT;
         wrapT = GL_REPEAT;
         baseLevel = 0;
         maxLevel = 12;
+        texObjBindID = 0;
     }
 };
 
@@ -355,10 +362,10 @@ public:
 ///@name Object Pool
 ///@{
 /**
- *	All created texture objects will push into texImagePool, and their ID from
+ *	All created texture objects will push into texObjPool, and their ID from
  *	their created function will also be used as std::map key value.
  */
-    std::map<GLuint, textureImage> texImagePool;
+    std::map<GLuint, textureObject> texObjPool;
 
 /**
  *	All created program objects will push into programPool, and their ID from
@@ -388,7 +395,7 @@ public:
 
 private:
 	bool            m_current;
-	GLubyte			activeTexture;
+	GLubyte			activeTexCtx;
 
 	std::stack<GLenum> errorStack;
 };

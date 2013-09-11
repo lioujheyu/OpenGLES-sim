@@ -6,89 +6,49 @@
 
 #include "driver.h"
 
-//void ActiveGPU2GenMipMap(int tid)
-//{
-//	Context * ctx = Context::GetCurrentContext();
-//
-//	float quad[] = {-1.0f, -1.0f,
-//					 1.0f, -1.0f,
-//					 1.0f,  1.0f,
-//					-1.0f,  1.0f
-//					};
-//
-//	float quad_tex[] = {0.0f, 0.0f,
-//						1.0f, 0.0f,
-//						1.0f, 1.0f,
-//						0.0f, 1.0f
-//						};
-//
-//	gpu.attrEnable[0] = true;
-//	gpu.vtxPointer[0] = quad;
-//	gpu.attrSize[0] = 2;
-//
-//	gpu.attrEnable[4] = true;
-//	gpu.vtxPointer[4] = quad_tex;
-//	gpu.attrSize[4] = 2;
-//
-//	gpu.attrEnable[1] = gpu.attrEnable[2] = gpu.attrEnable[3] =
-//		gpu.attrEnable[5] = gpu.attrEnable[6] = gpu.attrEnable[7] = false;
-//
-//    gpu.gm.drawMode = GL_TRIANGLE_FAN;
-//    gpu.rm.depthTestEnable = false;
-//    gpu.rm.blendEnable = false;
-//
-//    gpu.rm.minFilter[0] = GL_LINEAR_MIPMAP_NEAREST;
-//    gpu.rm.magFilter[0] = GL_LINEAR;
-//    gpu.rm.texImage[0] = ctx->texImagepool[ctx->texCtx[tid].texBindID];
-//}
-
-void GenMipMap(int tid)
+void BilinearFilter4MipMap(textureImage *texImage)
 {
-	Context * ctx = Context::GetCurrentContext();
-
 	unsigned int width, height;
 	unsigned int nextWidth, nextHeight;
 
 	unsigned char * image;
 
 	fixColor4 texel[4], texelAvg;
-
-	textureImage *tempImg = &ctx->texImagePool[ctx->texCtx[tid].tex2DBindID];
-	width = tempImg->widthLevel[0];
-	height = tempImg->heightLevel[0];
+	width = texImage->widthLevel[0];
+	height = texImage->heightLevel[0];
 
 	for (int i = 0;i<13;i++) {
 		if ((width < 1) || (height < 1)){
-			tempImg->maxLevel = i-1;
+			texImage->maxLevel = i-1;
 			break;
 		}
 
-		nextWidth = tempImg->widthLevel[i+1] = width >> 1;
-		nextHeight = tempImg->heightLevel[i+1] = height >> 1;
+		nextWidth = texImage->widthLevel[i+1] = width >> 1;
+		nextHeight = texImage->heightLevel[i+1] = height >> 1;
 
 		image = new unsigned char[nextWidth * nextHeight * 4];
 
 		for (unsigned int y=0;y<nextHeight;y++){
 			for (unsigned int x=0;x<nextWidth;x++){
-				texel[0].r = *(tempImg->data[i] + (2*y*width + 2*x)*4    );
-				texel[0].g = *(tempImg->data[i] + (2*y*width + 2*x)*4 + 1);
-				texel[0].b = *(tempImg->data[i] + (2*y*width + 2*x)*4 + 2);
-				texel[0].a = *(tempImg->data[i] + (2*y*width + 2*x)*4 + 3);
+				texel[0].r = *(texImage->data[i] + (2*y*width + 2*x)*4    );
+				texel[0].g = *(texImage->data[i] + (2*y*width + 2*x)*4 + 1);
+				texel[0].b = *(texImage->data[i] + (2*y*width + 2*x)*4 + 2);
+				texel[0].a = *(texImage->data[i] + (2*y*width + 2*x)*4 + 3);
 
-				texel[1].r = *(tempImg->data[i] + (2*y*width + 2*x + 1)*4    );
-				texel[1].g = *(tempImg->data[i] + (2*y*width + 2*x + 1)*4 + 1);
-				texel[1].b = *(tempImg->data[i] + (2*y*width + 2*x + 1)*4 + 2);
-				texel[1].a = *(tempImg->data[i] + (2*y*width + 2*x + 1)*4 + 3);
+				texel[1].r = *(texImage->data[i] + (2*y*width + 2*x + 1)*4    );
+				texel[1].g = *(texImage->data[i] + (2*y*width + 2*x + 1)*4 + 1);
+				texel[1].b = *(texImage->data[i] + (2*y*width + 2*x + 1)*4 + 2);
+				texel[1].a = *(texImage->data[i] + (2*y*width + 2*x + 1)*4 + 3);
 
-				texel[2].r = *(tempImg->data[i] + ((2*y+1)*width + 2*x)*4    );
-				texel[2].g = *(tempImg->data[i] + ((2*y+1)*width + 2*x)*4 + 1);
-				texel[2].b = *(tempImg->data[i] + ((2*y+1)*width + 2*x)*4 + 2);
-				texel[2].a = *(tempImg->data[i] + ((2*y+1)*width + 2*x)*4 + 3);
+				texel[2].r = *(texImage->data[i] + ((2*y+1)*width + 2*x)*4    );
+				texel[2].g = *(texImage->data[i] + ((2*y+1)*width + 2*x)*4 + 1);
+				texel[2].b = *(texImage->data[i] + ((2*y+1)*width + 2*x)*4 + 2);
+				texel[2].a = *(texImage->data[i] + ((2*y+1)*width + 2*x)*4 + 3);
 
-				texel[3].r = *(tempImg->data[i] + ((2*y+1)*width + 2*x + 1)*4    );
-				texel[3].g = *(tempImg->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 1);
-				texel[3].b = *(tempImg->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 2);
-				texel[3].a = *(tempImg->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 3);
+				texel[3].r = *(texImage->data[i] + ((2*y+1)*width + 2*x + 1)*4    );
+				texel[3].g = *(texImage->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 1);
+				texel[3].b = *(texImage->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 2);
+				texel[3].a = *(texImage->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 3);
 
 				texelAvg.r = (unsigned char)((int)(texel[0].r + texel[1].r + texel[2].r + texel[3].r)/4);
 				texelAvg.g = (unsigned char)((int)(texel[0].g + texel[1].g + texel[2].g + texel[3].g)/4);
@@ -102,7 +62,7 @@ void GenMipMap(int tid)
 			}
 		}
 
-		tempImg->data[i+1] = image;
+		texImage->data[i+1] = image;
 
 		width = nextWidth;
 		height = nextHeight;
@@ -111,15 +71,38 @@ void GenMipMap(int tid)
 #ifdef DEBUG
 	printf("\nMip-map generation complete!!!\n");
 	printf("Base level width:%d, height:%d\n",
-			tempImg->widthLevel[0],
-			tempImg->heightLevel[0] );
+			texImage->widthLevel[0],
+			texImage->heightLevel[0] );
 	printf("Max level:%d width:%d, height:%d\n",
-			tempImg->maxLevel,
-			tempImg->widthLevel[tempImg->maxLevel],
-			tempImg->heightLevel[tempImg->maxLevel] );
+			texImage->maxLevel,
+			texImage->widthLevel[texImage->maxLevel],
+			texImage->heightLevel[texImage->maxLevel] );
 #endif
+}
 
-	ctx->texCtx[tid].genMipmap = false;
+void GenMipMap(int tid, GLenum target)
+{
+	Context * ctx = Context::GetCurrentContext();
+	unsigned int texObjID = ctx->texCtx[tid].texObjBindID;
+
+	switch (target) {
+	case GL_TEXTURE_2D:
+		BilinearFilter4MipMap(&ctx->texObjPool[texObjID].tex2D);
+		ctx->texCtx[tid].genMipMap2D = false;
+		break;
+	case GL_TEXTURE_CUBE_MAP:
+		BilinearFilter4MipMap(&ctx->texObjPool[texObjID].texCubeNX);
+		BilinearFilter4MipMap(&ctx->texObjPool[texObjID].texCubeNY);
+		BilinearFilter4MipMap(&ctx->texObjPool[texObjID].texCubeNZ);
+		BilinearFilter4MipMap(&ctx->texObjPool[texObjID].texCubePX);
+		BilinearFilter4MipMap(&ctx->texObjPool[texObjID].texCubePY);
+		BilinearFilter4MipMap(&ctx->texObjPool[texObjID].texCubePZ);
+		ctx->texCtx[tid].genMipMapCubeMap = false;
+		break;
+	default:
+		printf("Driver: unknown target texture %x for mipmap generation\n", target);
+		break;
+	}
 }
 
 void ActiveGPU2CleanBuffer()
@@ -147,9 +130,10 @@ void ActiveGPU()
     programObject *t_program = &ctx->programPool[ctx->usePID];
 
     for (int i=0;i<MAX_TEXTURE_CONTEXT;i++){
-		if (ctx->texCtx[i].genMipmap)
-			GenMipMap(i);
-			//ActiveGPU2GenMipMap(i);
+		if (ctx->texCtx[i].genMipMap2D)
+			GenMipMap(i, GL_TEXTURE_2D);
+		if (ctx->texCtx[i].genMipMapCubeMap)
+			GenMipMap(i, GL_TEXTURE_CUBE_MAP);
     }
 
     for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++){
@@ -197,7 +181,13 @@ void ActiveGPU()
 		gpu.magFilter[i] = ctx->texCtx[ctx->samplePool[i]].magFilter;
 		gpu.wrapS[i] = ctx->texCtx[ctx->samplePool[i]].wrapS;
 		gpu.wrapT[i] = ctx->texCtx[ctx->samplePool[i]].wrapT;
-		gpu.texImage[i] = ctx->texImagePool[ctx->texCtx[ctx->samplePool[i]].tex2DBindID];
+		gpu.texImage[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].tex2D;
+		gpu.texCubeNX[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNX;
+		gpu.texCubeNY[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNY;
+		gpu.texCubeNZ[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNZ;
+		gpu.texCubePX[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubePX;
+		gpu.texCubePY[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubePY;
+		gpu.texCubePZ[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubePZ;
     }
 
     for (int i=0; i<t_program->uniformCnt; i++)

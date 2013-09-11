@@ -76,6 +76,12 @@ public:
     GLenum 			wrapS[MAX_TEXTURE_CONTEXT],
 					wrapT[MAX_TEXTURE_CONTEXT];
 	textureImage 	texImage[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubeNX[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubeNY[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubeNZ[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubePX[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubePY[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubePZ[MAX_TEXTURE_CONTEXT];
 	unsigned char	*cBufPtr;
     float			*dBufPtr;
 

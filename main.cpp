@@ -90,25 +90,31 @@ void draw_road()
 
     unsigned int texture[2];
 
-    glActiveTexture(GL_TEXTURE0);
-    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-    }
-
-    glActiveTexture(GL_TEXTURE1);
-    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-    }
-
+//    glActiveTexture(GL_TEXTURE0);
+//    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
+//		printf("Fail to load image\n");
+//		exit(1);
+//    }
+//
 //    glActiveTexture(GL_TEXTURE1);
-//    if (LoadRGBATexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
+//    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
 //    }
 
-	GLfloat vertexPos[] = { -1.0f, -0.7f, 0.0f, 1.0f,
+	glActiveTexture(GL_TEXTURE0);
+	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
+
+	glActiveTexture(GL_TEXTURE1);
+	if (LoadRGBATexture("data/four_NM_height.bmp", &texture[1]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
+
+    GLfloat vertexPos[] = { -1.0f, -0.7f, 0.0f, 1.0f,
                              1.0f, -0.7f, 0.0f, 1.0f,
                              1.0f, -0.7f, 4.0f, 1.0f,
                             -1.0f, -0.7f, 4.0f, 1.0f
@@ -119,16 +125,16 @@ void draw_road()
 							   0.0f, 1.0f, 0.0f
 							 };
 
-    GLfloat texCoord[] = { 0.0f, 1.0f,
-                           1.0f, 1.0f,
-                           1.0f, -1.0f,
-                           0.0f, -1.0f,
+    GLfloat texCoord[] = { 0.0f, 2.0f,
+                           1.0f, 2.0f,
+                           1.0f, 0.0f,
+                           0.0f, 0.0f,
                          };
 
     glEnable(GL_DEPTH_TEST);
 
     glViewport(0,0,1024,768);
-	glClearColor(0.0,0.0,0.0,1.0);
+	glClearColor(1.0,1.0,1.0,1.0);
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -242,6 +248,6 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-	//draw_road();
-	draw_banana();
+	draw_road();
+	//draw_banana();
 }
