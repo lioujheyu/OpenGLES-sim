@@ -9,6 +9,8 @@
 
 #include <GLES3/gl3.h>
 #include <string>
+#include <utility>
+#include <algorithm>
 
 #include "gpu_config.h"
 #include "gpu_type.h"

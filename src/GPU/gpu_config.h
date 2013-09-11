@@ -10,18 +10,18 @@
 /**
  *	@def USE_SSE
  *	Enable USE_SSE will use x86 SSE instruction set to accelerate vector
- *	operation involved with the variable whose data type is floatVec4.
+ *	operation involved with the variable declared as floatVec4.
  */
 #define USE_SSE
 
 /// @name GPU internal resource configuration.
 ///@{
 /** @def MAX_SHADER_CORE
- *	This option cannot be define less than 2 because 1 shader core for vertex
+ *	This option cannot be defined less than 2 because 1 shader core for vertex
  *	shader and another one for fragment shader. Currently it has no effect if
  *	it is larger than 2 until the task scheduler is finished.
  */
-#define MAX_SHADER_CORE					3
+#define MAX_SHADER_CORE					2
 
 #define MAX_ATTRIBUTE_NUMBER    		8
 #define MAX_VERTEX_UNIFORM_VECTORS		128
@@ -74,7 +74,7 @@
 
 /**
  *	@def DEBUG
- *	Enable Debug mode. The other debug marco define are directly dependent on
+ *	Enable Debug mode. The other debug macro define are directly dependent on
  *	this define.
  */
 #define DEBUG

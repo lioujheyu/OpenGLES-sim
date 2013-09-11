@@ -45,7 +45,7 @@ void GPU_Core::VertexShaderEXE(int sid, void *input)
 	sCore[sid].shaderType = VERTEX_SHADER;
 
 	sCore[sid].Init();
-	sCore[sid].enableFlag[0] = true;
+	sCore[sid].isEnable[0] = true;
 	sCore[sid].input[0] = input;
 	sCore[sid].Run();
 }
@@ -197,31 +197,32 @@ void GPU_Core::TriangleSetup()
 
 void GPU_Core::Culling()
 {
-	vertex tmp;
 	float tmp1, tmp2;
 
 	if (cullingEnable) {
-		if (cullFaceMode == GL_BACK) {
+		switch (cullFaceMode) {
+		case GL_BACK:
 			if (area2Reciprocal > 0)
 				prim.iskilled = true;
-		}
-		else if (cullFaceMode == GL_FRONT){
+			break;
+		case GL_FRONT:
 			if (area2Reciprocal < 0)
 				prim.iskilled = true;
-		}
-		else if (cullFaceMode == GL_FRONT_AND_BACK)
+			break;
+		case GL_FRONT_AND_BACK:
 			prim.iskilled = false;
-		else
+			break;
+		default:
 			fprintf(stderr, "Culling: Undefined culling mode %x\n", cullFaceMode);
+			break;
+		}
 	}
 
 	/* Eliminate all (area < 0) condition to simplify the operation in
 	 * tile split and interpolation.
 	 */
 	if (area2Reciprocal < 0) {
-		tmp = prim.v[2];
-		prim.v[2] = prim.v[1];
-		prim.v[1] = tmp;
+		std::swap(prim.v[1], prim.v[2]);
 
 		Edge[1][0] = -Edge[1][0];
 		Edge[1][1] = -Edge[1][1];

@@ -182,8 +182,8 @@ void GPU_Core::FragmentShaderEXE(int sid,
     sCore[sid].shaderType = FRAGMENT_SHADER;
 
 	sCore[sid].Init();
-	sCore[sid].enableFlag[0] = sCore[sid].enableFlag[1] =
-		sCore[sid].enableFlag[2] = sCore[sid].enableFlag[3] = true;
+	sCore[sid].isEnable[0] = sCore[sid].isEnable[1] =
+		sCore[sid].isEnable[2] = sCore[sid].isEnable[3] = true;
 	sCore[sid].input[0] = input0;
 	sCore[sid].input[1] = input1;
 	sCore[sid].input[2] = input2;
@@ -200,6 +200,9 @@ void GPU_Core::PerFragmentOp(pixel pixInput)
 		totalGhostPix++;
 		return;
 	}
+
+	if (pixInput.isKilled)
+		return;
 
 	bufOffset = (int)pixInput.attr[0].y*viewPortW + (int)pixInput.attr[0].x;
 

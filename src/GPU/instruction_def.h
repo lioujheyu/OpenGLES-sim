@@ -1,6 +1,3 @@
-#ifndef CONTEXT_LINK_GLAPI_H_INCLUDED
-#define CONTEXT_LINK_GLAPI_H_INCLUDED
-
 #define CG_IN	1
 #define CG_OUT	2
 
@@ -17,6 +14,7 @@
 
 /// @name Instruction OP code
 ///@{
+#define OP_END		0x0
 #define OP_ABS		0x1
 #define OP_CEIL		0x2
 #define OP_FLR		0x3
@@ -96,6 +94,9 @@
 #define OP_ENDREP	0x4d
 #define OP_POW		0x4e
 #define OP_SWZ		0x4f
+#define OP_KIL		0x50
+#define OP_DDX		0x51
+#define OP_DDY		0x52
 ///@}
 
 /// @name Instruction OPCODE Modifier
@@ -188,5 +189,3 @@
 #define CC_NSF0		0x35
 #define CC_NSF1		0x36
 ///@}
-
-#endif // CONTEXT_LINK_GLAPI_H_INCLUDED

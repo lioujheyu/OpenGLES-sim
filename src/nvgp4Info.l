@@ -60,7 +60,7 @@ unsigned int nvgp4Info_col = 0;
 		nvgp4Info_lval.ival = atof(nvgp4Info_text);
 		return FLOAT;
 	}
-[:\[\].$,;\-\+{}|()]  COL_NO; return *nvgp4Info_text;
+[:\[\].$,;\-\+{}|()<>]  COL_NO; return *nvgp4Info_text;
 
 [ \t]*	COL_NO;		/* remove all space-related char */
 \n		nvgp4Info_col = 0;

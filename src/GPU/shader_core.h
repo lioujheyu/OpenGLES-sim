@@ -62,7 +62,7 @@ public:
 	TextureUnit texUnit;
 
 	int shaderType; ///< Vertex/Fragment Shader
-	bool enableFlag[4];
+	bool isEnable[4];
 	void *input[4]; ///< Input pointer, can be further converted into vertex or pixel
 	int instCnt; ///< Program Length
 	instruction const *instPool; ///< Instruction Pool pointer
@@ -89,8 +89,9 @@ private:
 	instruction	curInst; ///< Current Instruction
 	vertex *vtxPtr[4];	vertex vtxTemp[4];
 	pixel *pixPtr[4];	pixel pixTemp[4];
-	bool curCCState[4];
-	std::stack<bool> ccStack[4];
+	bool curCCState[4]; ///< Current branch condition
+	bool isKilled[4]; ///< kill flag for pixel structure only
+	std::stack<bool> ccStack[4]; ///< Branch condition stack for nest IF block
 
 	floatVec4 reg[MAX_SHADER_REG_VECTOR*4];
 	floatVec4 CCisSigned[4][2], CCisZero[4][2];

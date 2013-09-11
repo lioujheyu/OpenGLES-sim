@@ -9,44 +9,45 @@
 void ShaderCore::Init()
 {
 	PC = 0;
-	enableFlag[0] = enableFlag[1] = enableFlag[2] = enableFlag[3] = false;
+	isEnable[0] = isEnable[1] = isEnable[2] = isEnable[3] = false;
 	curCCState[0] = curCCState[1] = curCCState[2] = curCCState[3] = true;
+	isKilled[0] = isKilled[1] = isKilled[2] = isKilled[3] = false;
 }
 
 void ShaderCore::Run()
 {
 	if (shaderType == VERTEX_SHADER) {
-		if (enableFlag[0]) {
+		if (isEnable[0]) {
 			vtxPtr[0]  = (vertex*)input[0];
 			vtxTemp[0] = *vtxPtr[0];
 		}
-		if (enableFlag[1]) {
+		if (isEnable[1]) {
 			vtxPtr[1]  = (vertex*)input[1];
 			vtxTemp[1] = *vtxPtr[1];
 		}
-		if (enableFlag[2]) {
+		if (isEnable[2]) {
 			vtxPtr[2]  = (vertex*)input[2];
 			vtxTemp[2] = *vtxPtr[2];
 		}
-		if (enableFlag[3]) {
+		if (isEnable[3]) {
 			vtxPtr[3]  = (vertex*)input[3];
 			vtxTemp[3] = *vtxPtr[3];
 		}
 	}
 	else {	//FRAGMENT_SHADER
-		if (enableFlag[0]) {
+		if (isEnable[0]) {
 			pixPtr[0]  = (pixel*)input[0];
 			pixTemp[0] = *pixPtr[0];
 		}
-		if (enableFlag[1]) {
+		if (isEnable[1]) {
 			pixPtr[1]  = (pixel*)input[1];
 			pixTemp[1] = *pixPtr[1];
 		}
-		if (enableFlag[2]) {
+		if (isEnable[2]) {
 			pixPtr[2]  = (pixel*)input[2];
 			pixTemp[2] = *pixPtr[2];
 		}
-		if (enableFlag[3]) {
+		if (isEnable[3]) {
 			pixPtr[3]  = (pixel*)input[3];
 			pixTemp[3] = *pixPtr[3];
 		}
@@ -63,16 +64,16 @@ void ShaderCore::Run()
  * like instruction(DDX, DDY, TEX with auto scale factor computation)'s
  * result is corrupted.
  */
-		if (enableFlag[0])
+		if (isEnable[0])
 			FetchData(0);
-		if (enableFlag[1])
+		if (isEnable[1])
 			FetchData(1);
-		if (enableFlag[2])
+		if (isEnable[2])
 			FetchData(2);
-		if (enableFlag[3])
+		if (isEnable[3])
 			FetchData(3);
 
-		if (enableFlag[0]){
+		if (isEnable[0]){
 			Exec(0);
 			if (curCCState[0] == true) {
 				totalInstructionCnt+=1;
@@ -80,7 +81,7 @@ void ShaderCore::Run()
 			}
 		}
 
-		if (enableFlag[1]){
+		if (isEnable[1]){
 			Exec(1);
 			if (curCCState[1] == true) {
 				totalInstructionCnt+=1;
@@ -88,7 +89,7 @@ void ShaderCore::Run()
 			}
 		}
 
-		if (enableFlag[2]){
+		if (isEnable[2]){
 			Exec(2);
 			if (curCCState[2] == true) {
 				totalInstructionCnt+=1;
@@ -96,7 +97,7 @@ void ShaderCore::Run()
 			}
 		}
 
-		if (enableFlag[3]){
+		if (isEnable[3]){
 			Exec(3);
 			if (curCCState[3] == true) {
 				totalInstructionCnt+=1;
@@ -105,6 +106,17 @@ void ShaderCore::Run()
 		}
 
 		PC++;
+	}
+
+	if (shaderType == FRAGMENT_SHADER) {
+		if (isEnable[0])
+			pixPtr[0]->isKilled = isKilled[0];
+		if (isEnable[1])
+			pixPtr[1]->isKilled = isKilled[1];
+		if (isEnable[2])
+			pixPtr[2]->isKilled = isKilled[2];
+		if (isEnable[0])
+			pixPtr[3]->isKilled = isKilled[3];
 	}
 }
 
@@ -317,7 +329,12 @@ void ShaderCore::Exec(int idx)
 										 curInst.tType,
 										 tid );
 		break;
-	case OP_TXP:
+//	case OP_TXP:
+//		break;
+//	case OP_TXQ:
+//		break;
+	//TXDop
+	case OP_TXD:
 		dst[idx] = texUnit.TextureSample(src[idx][0],
 										 -1,
 										 src[idx][1],
@@ -325,30 +342,25 @@ void ShaderCore::Exec(int idx)
 										 curInst.tType,
 										 tid );
 		break;
-//	case OP_TXQ:
-//		break;
-	//TXDop
-//	case OP_TXD:
-//		break;
 	//BRAop
 	//FLOWCCop
 	//IFop
 	case OP_IF:
 		switch (curInst.src[0].ccMask) {
 		case CC_EQ: case CC_EQ0: case CC_EQ1:
-			curCCState[idx] =
-				(!(src[idx][0].x == 1.0) && (src[idx][1].x == 1.0)) ||
-				(!(src[idx][0].y == 1.0) && (src[idx][1].y == 1.0)) ||
-				(!(src[idx][0].z == 1.0) && (src[idx][1].z == 1.0)) ||
-				(!(src[idx][0].w == 1.0) && (src[idx][1].w == 1.0));
+			curCCState[idx] = curCCState[idx] &&
+				( (!(src[idx][0].x == 1.0) && (src[idx][1].x == 1.0)) ||
+				  (!(src[idx][0].y == 1.0) && (src[idx][1].y == 1.0)) ||
+				  (!(src[idx][0].z == 1.0) && (src[idx][1].z == 1.0)) ||
+				  (!(src[idx][0].w == 1.0) && (src[idx][1].w == 1.0)) );
 			break;
 
 		case CC_NE: case CC_NE0: case CC_NE1:
-			curCCState[idx] =
-				((src[idx][0].x == 1.0) || !(src[idx][1].x == 1.0)) ||
-				((src[idx][0].y == 1.0) || !(src[idx][1].y == 1.0)) ||
-				((src[idx][0].z == 1.0) || !(src[idx][1].z == 1.0)) ||
-				((src[idx][0].w == 1.0) || !(src[idx][1].w == 1.0));
+			curCCState[idx] = curCCState[idx] &&
+				( ((src[idx][0].x == 1.0) || !(src[idx][1].x == 1.0)) ||
+				  ((src[idx][0].y == 1.0) || !(src[idx][1].y == 1.0)) ||
+				  ((src[idx][0].z == 1.0) || !(src[idx][1].z == 1.0)) ||
+				  ((src[idx][0].w == 1.0) || !(src[idx][1].w == 1.0)) );
 			break;
 
 		default:
@@ -377,6 +389,46 @@ void ShaderCore::Exec(int idx)
 	case OP_POW:
 		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
 			pow(src[idx][0].x, src[idx][1].x);
+		break;
+	//KILop
+	case OP_KIL:
+		switch (curInst.src[0].ccMask) {
+		case CC_EQ: case CC_EQ0: case CC_EQ1:
+			isKilled[idx] = curCCState[idx] &&
+				( (!(src[idx][0].x == 1.0) && (src[idx][1].x == 1.0)) ||
+				  (!(src[idx][0].y == 1.0) && (src[idx][1].y == 1.0)) ||
+				  (!(src[idx][0].z == 1.0) && (src[idx][1].z == 1.0)) ||
+				  (!(src[idx][0].w == 1.0) && (src[idx][1].w == 1.0)) );
+			break;
+
+		case CC_NE: case CC_NE0: case CC_NE1:
+			isKilled[idx] = curCCState[idx] &&
+				( ((src[idx][0].x == 1.0) || !(src[idx][1].x == 1.0)) ||
+				  ((src[idx][0].y == 1.0) || !(src[idx][1].y == 1.0)) ||
+				  ((src[idx][0].z == 1.0) || !(src[idx][1].z == 1.0)) ||
+				  ((src[idx][0].w == 1.0) || !(src[idx][1].w == 1.0)) );
+			break;
+
+		default:
+			printf("Shader: undefined or unimplemented ccMask:%d\n",
+					curInst.src[0].ccMask);
+			break;
+		}
+
+		break;
+	//DERIVEop
+	case OP_DDX:
+		if (idx==0 || idx==2)
+			dst[idx] = src[idx+1][0] - src[idx][0];
+		else // idx==1 || idx==3
+			dst[idx] = src[idx][0] - src[idx-1][0];
+		break;
+
+	case OP_DDY:
+		if (idx==0 || idx==1)
+			dst[idx] = src[idx+2][0] - src[idx][0];
+		else // idx==2 || idx==3
+			dst[idx] = src[idx][0] - src[idx-2][0];
 		break;
 
 	default:
