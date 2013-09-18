@@ -315,7 +315,6 @@ KILop_instruction
 				t_inst.src[0].id = 1;
 				break;
 			}
-			printf("test");
 		};
 //	|	KILOP opModifiers instOperand {
 //			t_inst.op = $1;

@@ -1538,7 +1538,7 @@ yyreduce:
 					t_program.FSuniformCnt+= t_element;
 				}
 			}
-			t_symbol.Print();
+			//t_symbol.Print();
 		;}
     break;
 

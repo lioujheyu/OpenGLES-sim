@@ -179,7 +179,7 @@ link_info
 					t_program.FSuniformCnt+= t_element;
 				}
 			}
-			t_symbol.Print();
+			//t_symbol.Print();
 		};
 		/* For special declaration when kill instruction is existed */
 	|	VAR '<' IDENTIFIER '>' INTEGER complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 

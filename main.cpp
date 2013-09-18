@@ -179,9 +179,15 @@ void draw_road()
 
 void draw_banana()
 {
-	Shader shader;
+	Shader shader, shader2;
+//	shader.init("shader_src/drawObj.vert", "shader_src/drawObj.frag");
+	shader2.init("shader_src/NormalMapping.vert",
+				"shader_src/NormalMapping.frag");
 	shader.init("shader_src/drawObj.vert", "shader_src/drawObj.frag");
+	shader2.bind();
 	shader.bind();
+
+	printf("test");
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -248,6 +254,6 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-	draw_road();
-	//draw_banana();
+	//draw_road();
+	draw_banana();
 }

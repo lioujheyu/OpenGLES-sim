@@ -118,20 +118,18 @@ void Context::CompileShader(GLuint shader)
 	else
 		compileCmd.append(" -profile gp4fp ");
 	compileCmd+=fileName;
-	system(compileCmd.c_str());
+
+	//compiler error or something happened make output there.
+	if (system(compileCmd.c_str()) != 0)
+		exit(1);
 
 	//Get Assembly code
 	std::ifstream ift;
 	ift.open(cFileName, std::ifstream::in);
-	if (ift.is_open()) {
-		std::stringstream buffer;
-		buffer << ift.rdbuf();
-		shaderPool[shader].asmSrc = (buffer.str());
-		shaderPool[shader].isCompiled = GL_TRUE;
-	}
-	else { // Compiler error or something wrong is happened
-
-	}
+	std::stringstream buffer;
+	buffer << ift.rdbuf();
+	shaderPool[shader].asmSrc = (buffer.str());
+	shaderPool[shader].isCompiled = GL_TRUE;
 }
 
 void Context::DeleteProgram(GLuint program)
