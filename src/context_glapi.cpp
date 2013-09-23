@@ -123,7 +123,7 @@ void Context::Disable(GLenum cap)
         blendEnable = GL_FALSE;
         break;
     case GL_CULL_FACE:
-    	cullingEn = GL_FALSE;
+    	cullingEnable = GL_FALSE;
         break;
     case GL_DEPTH_TEST:
         depthTestEnable = GL_FALSE;
@@ -185,11 +185,57 @@ void Context::DrawArrays(GLenum mode, GLint first, GLsizei count)
         drawCmd.mode = mode;
         drawCmd.first = first;
         drawCmd.count = count;
-        drawCmd.indices = NULL;
     }
 
-    ActiveGPU();
-    DumpImage();
+    ActiveGPU(0);
+}
+
+void Context::DrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid* indices)
+{
+    if (usePID == 0) {
+		printf("Current program is invalid.\n");
+		return;
+    }
+    else if (U_PROG.isLinked == GL_FALSE) {
+		printf("Current program is invalid.\n");
+		return;
+    }
+
+    if (count < 0)
+        RecordError(GL_INVALID_VALUE);
+    else {
+        switch (mode) {
+        case GL_TRIANGLES:
+        case GL_TRIANGLE_FAN:
+        case GL_TRIANGLE_STRIP:
+            break;
+        case GL_POINTS:
+        case GL_LINES:
+        case GL_LINE_LOOP:
+        case GL_LINE_STRIP:
+            printf("draw modes in points and lines are not implemented yet");
+            return;
+        default:
+            RecordError(GL_INVALID_ENUM);
+            return;
+        }
+
+        switch (type) {
+		case GL_UNSIGNED_BYTE:
+		case GL_UNSIGNED_SHORT:
+		case GL_UNSIGNED_INT:
+			drawCmd.type = type;
+			break;
+		default:
+			drawCmd.type = GL_UNSIGNED_INT;
+        }
+
+        drawCmd.mode = mode;
+        drawCmd.count = count;
+        drawCmd.indices = indices;
+    }
+
+    ActiveGPU(1);
 }
 
 void Context::Enable(GLenum cap)
@@ -199,7 +245,7 @@ void Context::Enable(GLenum cap)
         blendEnable = GL_TRUE;
         break;
     case GL_CULL_FACE:
-    	cullingEn = GL_TRUE;
+    	cullingEnable = GL_TRUE;
         break;
     case GL_DEPTH_TEST:
         depthTestEnable = GL_TRUE;
@@ -321,22 +367,28 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 
     GLint externalFormat = (GLint)format;
 
-    /// @todo check type between internalformat and externalformat
-    if (internalformat != externalFormat) {
-        RecordError(GL_INVALID_OPERATION);
-        return;
+    int biSizeImage = width*height;
+    unsigned char * image;
+
+    switch (internalformat) {
+	case GL_RGBA:
+		image = new unsigned char[biSizeImage*4];
+		break;
+
+	default:
+		RecordError(GL_INVALID_ENUM);
+		printf("glTexImage2D: Undefined or unimplemented internal format\n");
+		return;
     }
 
-    int biSizeImage = width*height;
-    unsigned char * image = new unsigned char[biSizeImage*4];
-
 	/// @note Unsure format conversion is performed in API implementation or in Hardware
-	for (int i=0; i<biSizeImage;i++){
-		switch (format) {
+	for (int i=0; i<biSizeImage;i++) {
+		switch (externalFormat) {
 		case GL_ALPHA:
 			switch (type){
 			case GL_UNSIGNED_BYTE:
-				image[i*4] = image[i*4+1] = image[i*4+2] = image[i*4+3] = *((unsigned char *)pixels+i);
+				image[i*4] = image[i*4+1] = image[i*4+2] = image[i*4+3] =
+					*((unsigned char *)pixels+i);
 				break;
 
 			default:
@@ -403,52 +455,54 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 
 		default:
 			RecordError(GL_INVALID_ENUM);
+			printf("glTexImage2D: Undefined or unimplemented format\n");
 			return;
 		}
     }
 
-	textureImage temp;
+	textureImage t_image;
 
-    temp.border = border;
-    temp.widthLevel[level] = width;
-    temp.heightLevel[level] = height;
-    temp.maxLevel = (level>temp.maxLevel)?level:temp.maxLevel;
+    t_image.border = border;
+    t_image.widthLevel[level] = width;
+    t_image.heightLevel[level] = height;
+    t_image.maxLevel = (level>t_image.maxLevel)?level:t_image.maxLevel;
 
-    temp.data[level] = image;
+    t_image.data[level] = image;
 
 	texObjID = texCtx[activeTexCtx].texObjBindID;
 
 	switch(target){
 	case GL_TEXTURE_2D:
-		texObjPool[texObjID].tex2D = temp;
+		texObjPool[texObjID].tex2D = t_image;
 		break;
 	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-		texObjPool[texObjID].texCubeNX = temp;
+		texObjPool[texObjID].texCubeNX = t_image;
 		break;
 	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-		texObjPool[texObjID].texCubeNY = temp;
+		texObjPool[texObjID].texCubeNY = t_image;
 		break;
 	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-		texObjPool[texObjID].texCubeNZ = temp;
+		texObjPool[texObjID].texCubeNZ = t_image;
 		break;
 	case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-		texObjPool[texObjID].texCubePX = temp;
+		texObjPool[texObjID].texCubePX = t_image;
 		break;
 	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-		texObjPool[texObjID].texCubePY = temp;
+		texObjPool[texObjID].texCubePY = t_image;
 		break;
 	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-		texObjPool[texObjID].texCubePZ = temp;
+		texObjPool[texObjID].texCubePZ = t_image;
 		break;
 	default:
 		RecordError(GL_INVALID_ENUM);
+		printf("glTexImage2D: undefined or unimplemented target\n");
         return;
 	}
 }
 
 void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
 {
-	if (target != GL_TEXTURE_2D) {
+	if (target != GL_TEXTURE_2D && target != GL_TEXTURE_CUBE_MAP) {
         RecordError(GL_INVALID_ENUM);
         return;
     }

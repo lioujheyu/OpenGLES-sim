@@ -50,13 +50,16 @@ public:
 	GPU_Core();
 	~GPU_Core();
 
+    GLenum			drawMode;
     int         	vtxCount;
+    int				vtxIndicesType;
     int         	vtxFirst;
     const void  	*vtxPointer[MAX_ATTRIBUTE_NUMBER];
+    const void  	*vtxIndicesPointer;
+    int				vtxInputMode; //0: DrawArray, 1:DrawElements
     int         	attrSize[MAX_ATTRIBUTE_NUMBER];
     bool        	attrEnable[MAX_ATTRIBUTE_NUMBER];
     bool        	varyEnable[MAX_ATTRIBUTE_NUMBER];
-	GLenum			drawMode;
     float       	depthRangeN, depthRangeF;
     int         	viewPortLX, viewPortLY,
 					viewPortW, viewPortH;

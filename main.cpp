@@ -29,42 +29,10 @@ bool LoadTexture(char *filename, unsigned int *texture)
 
     glBindTexture(GL_TEXTURE_2D, texture[0]);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, info->bmiHeader.biWidth,
-                 info->bmiHeader.biHeight, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                 bitmap);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    free(bitmap);
-    free(info);
-
-    return true;
-}
-
-bool LoadRGBATexture(char *filename, unsigned int *texture)
-{
-	unsigned char *bitmap;
-	_BITMAPINFO *info;
-
-    bitmap = LoadDIBitmap(filename, &info);
-
-    if (!bitmap)
-        return false;
-
-    glGenTextures(1, texture);
-
-    glBindTexture(GL_TEXTURE_2D, texture[0]);
-
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, info->bmiHeader.biWidth,
-                 info->bmiHeader.biHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 bitmap);
+                 info->bmiHeader.biHeight, 0,
+                 (info->bmiHeader.biBitCount==32)? GL_RGBA : GL_RGB,
+				 GL_UNSIGNED_BYTE, bitmap);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -109,7 +77,7 @@ void draw_road()
 	}
 
 	glActiveTexture(GL_TEXTURE1);
-	if (LoadRGBATexture("data/four_NM_height.bmp", &texture[1]) == false) {
+	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
 		printf("Fail to load image\n");
 		exit(1);
 	}
@@ -179,22 +147,16 @@ void draw_road()
 
 void draw_banana()
 {
-	Shader shader, shader2;
-//	shader.init("shader_src/drawObj.vert", "shader_src/drawObj.frag");
-	shader2.init("shader_src/NormalMapping.vert",
-				"shader_src/NormalMapping.frag");
+	Shader shader;
 	shader.init("shader_src/drawObj.vert", "shader_src/drawObj.frag");
-	shader2.bind();
 	shader.bind();
-
-	printf("test");
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW);
 	glCullFace(GL_FRONT);
 
-    glViewport(0,0,1024,768);
+	glViewport(0,0,1024,768);
 	glClearColor(0.0,0.0,0.0,1.0);
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -254,6 +216,8 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-	//draw_road();
-	draw_banana();
+	draw_road();
+//	draw_banana();
+
+	Context::GetCurrentContext()->DumpImage();
 }

@@ -11,7 +11,7 @@
 
 /**
  *	@def CONTEXT_EXEC(func)
- *	Use current context's OpenGL api which no return value is needed.
+ *	Use current context's OpenGL API which no return value is needed.
  */
 #define CONTEXT_EXEC(func)                                  \
 	Context * context = Context::GetCurrentContext();		\
@@ -22,7 +22,7 @@
 
 /**
  *	@def CONTEXT_EXEC_RETURN(func)
- *	Use current context's OpenGL api which has return value.
+ *	Use current context's OpenGL API which has return value.
  */
 #define CONTEXT_EXEC_RETURN(func)                           \
 	Context * context = Context::GetCurrentContext();		\
@@ -242,7 +242,7 @@ GL_APICALL void GL_APIENTRY glDrawArrays (GLenum mode, GLint first, GLsizei coun
 
 GL_APICALL void GL_APIENTRY glDrawElements (GLenum mode, GLsizei count, GLenum type, const GLvoid* indices)
 {
-
+	CONTEXT_EXEC(DrawElements(mode, count, type, indices));
 }
 
 GL_APICALL void GL_APIENTRY glEnable (GLenum cap)

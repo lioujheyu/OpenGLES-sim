@@ -30,7 +30,7 @@ Context::Context()
 	clearMask = 0;
 	clearStat = GL_FALSE;
     blendEnable = GL_FALSE;
-    cullingEn = GL_FALSE;
+    cullingEnable = GL_FALSE;
 	depthTestEnable = GL_FALSE;
 }
 

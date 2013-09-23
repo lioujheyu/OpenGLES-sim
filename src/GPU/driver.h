@@ -4,7 +4,7 @@
 #include "../context.h"
 #include "gpu_core.h"
 
-void ActiveGPU();
+void ActiveGPU(int vtxInputMode);
 //void ActiveGPU2GenMipMap(int tid);	//Use GPU to generate mipmap
 void ActiveGPU2CleanBuffer();
 

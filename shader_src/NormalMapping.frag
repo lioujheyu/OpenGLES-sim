@@ -18,8 +18,8 @@ void main(){
 	c1 = textureGrad( ColorMap, UV, abs(dFdx(UV)), abs(dFdy(UV))).rgb;
 	c2 = texture2D( NormalMap, UV ).rgb;
 	alpha = texture2D (NormalMap, UV).a;
-	if (alpha < 0.2)
-		discard;
+//	if (alpha < 0.2)
+//		discard;
 		
 	c2 = c2*2 - vec3(1.0, 1.0, 1.0);
 	

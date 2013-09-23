@@ -124,7 +124,7 @@ void ActiveGPU2CleanBuffer()
 /**	@todo Use link-list or command buffer to set the states only when they
  *	differ from previous context, not all of them.
  */
-void ActiveGPU()
+void ActiveGPU(int vtxInputMode)
 {
     Context *ctx = Context::GetCurrentContext();
     programObject *t_program = &ctx->programPool[ctx->usePID];
@@ -145,12 +145,21 @@ void ActiveGPU()
         gpu.varyEnable[i] = t_program->varyEnable[i];
     }
 
+    gpu.drawMode = ctx->drawCmd.mode;
     gpu.vtxCount = ctx->drawCmd.count;
-    gpu.vtxFirst = ctx->drawCmd.first;
+    if (vtxInputMode == 0) { //DrawArray
+		gpu.vtxInputMode = 0;
+		gpu.vtxFirst = ctx->drawCmd.first;
+    }
+    else { //DrawElements
+    	gpu.vtxInputMode = 1;
+		gpu.vtxIndicesType = ctx->drawCmd.type;
+		gpu.vtxIndicesPointer = ctx->drawCmd.indices;
+    }
+
 	gpu.clearStat = ctx->clearStat;
 	gpu.clearMask = ctx->clearMask;
 
-	gpu.drawMode = ctx->drawCmd.mode;
 	gpu.viewPortLX = ctx->vp.x;
     gpu.viewPortLY = ctx->vp.y;
     gpu.viewPortW = ctx->vp.w;
@@ -158,7 +167,7 @@ void ActiveGPU()
     gpu.depthRangeN = ctx->vp.n;
     gpu.depthRangeF = ctx->vp.f;
 
-    gpu.cullingEnable = ctx->cullingEn;
+    gpu.cullingEnable = ctx->cullingEnable;
     if (ctx->frontFace == GL_CCW)
 		gpu.cullFaceMode = ctx->cullFaceMode;
 	else if (ctx->frontFace == GL_CW) {

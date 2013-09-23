@@ -24,24 +24,30 @@ void GPU_Core::Run()
 	for (int i=0; i<MAX_SHADER_CORE; i++)
 		sCore[i].texUnit.ClearTexCache();
 
-    for (int vCnt=vtxFirst; vCnt<vtxCount; vCnt++) {
+    int vtxIdx;
+    for (int vCnt=0; vCnt<vtxCount; vCnt++) {
+
+		if (vtxInputMode == 0) //drawArray
+			vtxIdx = vtxFirst + vCnt;
+		else //drawElements
+			vtxIdx = *( (unsigned int*)vtxIndicesPointer + vCnt );
 
 		//Each vertex will be injected into Geometry's curVtx here
         for (int attrCnt=0; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++) {
             if (attrEnable[attrCnt]) {
                 curVtx.attr[attrCnt].x =
-                    *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt );
+                    *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vtxIdx );
                 curVtx.attr[attrCnt].y =
-                    *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 1 );
+                    *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vtxIdx + 1 );
                 if (attrSize[attrCnt] > 2)
                     curVtx.attr[attrCnt].z =
-                        *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 2 );
+                        *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vtxIdx + 2 );
                 else
                     curVtx.attr[attrCnt].z = 0.0;
 
                 if (attrSize[attrCnt] > 3)
                     curVtx.attr[attrCnt].w =
-                        *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vCnt + 3 );
+                        *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vtxIdx + 3 );
                 else
                     curVtx.attr[attrCnt].w = 1.0;
             }

@@ -43,10 +43,10 @@ struct attribute
 
 struct drawCommand
 {
-    char		name[20];
     GLenum      mode;
     GLint       first;
     GLsizei     count;
+    GLenum 		type;
     const GLvoid  * indices;
 };
 
@@ -289,6 +289,7 @@ public:
     void 		DetachShader (GLuint program, GLuint shader);
     void 		Disable (GLenum cap);
     void 		DrawArrays (GLenum mode, GLint first, GLsizei count);
+    void		DrawElements (GLenum mode, GLsizei count, GLenum type, const GLvoid* indices);
     void 		Enable (GLenum cap);
     void 		EnableVertexAttribArray (GLuint index);
     void		FrontFace(GLenum mode);
@@ -336,7 +337,7 @@ public:
 
     viewPort        vp;
     GLenum			frontFace;
-    GLboolean		cullingEn;
+    GLboolean		cullingEnable;
     GLenum			cullFaceMode;
 
     /// @name clear function related variable
