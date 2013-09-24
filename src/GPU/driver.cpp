@@ -190,7 +190,7 @@ void ActiveGPU(int vtxInputMode)
 		gpu.magFilter[i] = ctx->texCtx[ctx->samplePool[i]].magFilter;
 		gpu.wrapS[i] = ctx->texCtx[ctx->samplePool[i]].wrapS;
 		gpu.wrapT[i] = ctx->texCtx[ctx->samplePool[i]].wrapT;
-		gpu.texImage[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].tex2D;
+		gpu.tex2D[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].tex2D;
 		gpu.texCubeNX[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNX;
 		gpu.texCubeNY[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNY;
 		gpu.texCubeNZ[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNZ;

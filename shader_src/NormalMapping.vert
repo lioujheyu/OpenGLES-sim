@@ -10,8 +10,8 @@ out vec3 eyeVector_tangent;
 uniform mat4 MVP;
 uniform vec3 eye_pos;
 
-void main(){
-
+void main()
+{
 	mat3 tangent_mat = mat3(1.0, 0.0, 0.0,
 	                        0.0, 0.0, 1.0,
 						    0.0, -1.0, 0.0

@@ -10,8 +10,8 @@ out vec3 color;
 uniform sampler2D ColorMap;
 uniform sampler2D NormalMap;
 
-void main(){
-
+void main()
+{
 	vec3 c1, c2;
 	float cfactor, alpha;
 	//c1 = texture2D( ColorMap, UV ).rgb;
