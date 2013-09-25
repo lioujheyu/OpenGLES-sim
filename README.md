@@ -24,7 +24,7 @@ Cause this project is still under development, any unexpected situation is
 possible. Please email or report to me if you find any compiler error or bug.
 
 	
-Liou Jhe-Yu (¼B­õ¦t)<br>
+Liou Jhe-Yu <br>
 lioujheyu@gmail.com <br>
 National Cheng-kung University, EE Department, <br>
 [Computer Architecture and System Laboratory](http://caslab.ee.ncku.edu.tw/index.html) <br>
