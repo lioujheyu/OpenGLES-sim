@@ -78,7 +78,7 @@ public:
 
     GLenum 			wrapS[MAX_TEXTURE_CONTEXT],
 					wrapT[MAX_TEXTURE_CONTEXT];
-	textureImage 	texImage[MAX_TEXTURE_CONTEXT];
+	textureImage 	tex2D[MAX_TEXTURE_CONTEXT];
 	textureImage 	texCubeNX[MAX_TEXTURE_CONTEXT];
 	textureImage 	texCubeNY[MAX_TEXTURE_CONTEXT];
 	textureImage 	texCubeNZ[MAX_TEXTURE_CONTEXT];
@@ -118,14 +118,16 @@ private:
 
 	//Geometry
 	vertex      	curVtx;
-	primitive   	prim;
+	floatVec4		curClipCoord;
+
+	primitive   	prim, curPrim;
+	std::stack<primitive> primStack;
 
 	/// @name Primitive Assembly related member
 	///@{
 	///How many vertex are insufficient to form a primitive.
     int         	vtxCntDwn;
     bool         	stripIndicator;
-    bool        	primitiveRdy;
     ///@}
 
 	//Rasterizer
@@ -153,6 +155,7 @@ private:
 
     /// @name Geometry
     ///@{
+    void			FetchVertexData(unsigned int);
     void        	PerspectiveDivision();
     void        	ViewPort();
     void        	InitPrimitiveAssembly();

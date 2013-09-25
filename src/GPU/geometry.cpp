@@ -8,7 +8,6 @@
 
 void GPU_Core::InitPrimitiveAssembly()
 {
-    primitiveRdy = false;
     stripIndicator = false;
 
     switch (drawMode) {
@@ -84,7 +83,8 @@ void GPU_Core::PrimitiveAssembly()
 {
     switch (drawMode) {
     case GL_TRIANGLES:
-            prim.v[vtxCntDwn-1] = curVtx;
+            curPrim.v[vtxCntDwn-1] = curVtx;
+            curPrim.clipCoord[vtxCntDwn-1] = curClipCoord;
         break;
 
 	/*	Vertex order in Strip mode
@@ -98,20 +98,28 @@ void GPU_Core::PrimitiveAssembly()
     case GL_TRIANGLE_STRIP:
     	if (vtxCntDwn == 1) {
 			if (stripIndicator == false) {
-				prim.v[2] = prim.v[0];
-				prim.v[0] = curVtx;
+				curPrim.v[2] = curPrim.v[0];
+				curPrim.clipCoord[2] = curPrim.clipCoord[0];
+				curPrim.v[0] = curVtx;
+				curPrim.clipCoord[0] = curClipCoord;
 				stripIndicator = true;
 			}
 			else {
-				prim.v[2] = prim.v[1];
-				prim.v[1] = curVtx;
+				curPrim.v[2] = curPrim.v[1];
+				curPrim.clipCoord[2] = curPrim.clipCoord[1];
+				curPrim.v[1] = curVtx;
+				curPrim.clipCoord[1] = curClipCoord;
 				stripIndicator = false;
 			}
 		}
-    	else if (vtxCntDwn == 3)
-			prim.v[0] = curVtx;
-		else if (vtxCntDwn == 2)
-			prim.v[1] = curVtx;
+    	else if (vtxCntDwn == 3) {
+			curPrim.v[0] = curVtx;
+			curPrim.clipCoord[0] = curClipCoord;
+    	}
+		else if (vtxCntDwn == 2) {
+			curPrim.v[1] = curVtx;
+			curPrim.clipCoord[1] = curClipCoord;
+		}
         break;
 
 	/*	Vertex order in Fan mode
@@ -124,13 +132,19 @@ void GPU_Core::PrimitiveAssembly()
 	 */
     case GL_TRIANGLE_FAN:
         if (vtxCntDwn == 1) {
-			prim.v[1] = prim.v[0];
-			prim.v[0] = curVtx;
+			curPrim.v[1] = curPrim.v[0];
+			curPrim.clipCoord[1] = curPrim.clipCoord[0];
+			curPrim.v[0] = curVtx;
+			curPrim.clipCoord[0] = curClipCoord;
         }
-        else if (vtxCntDwn == 3)
-			prim.v[2] = curVtx;
-		else if (vtxCntDwn == 2)
-            prim.v[0] = curVtx;
+        else if (vtxCntDwn == 3) {
+			curPrim.v[2] = curVtx;
+			curPrim.clipCoord[2] = curClipCoord;
+        }
+		else if (vtxCntDwn == 2) {
+            curPrim.v[0] = curVtx;
+            curPrim.clipCoord[0] = curClipCoord;
+		}
         break;
     default:
     	printf("GPU_Core: Nonsupport draw mode: %x\n",drawMode);
@@ -143,7 +157,7 @@ void GPU_Core::PrimitiveAssembly()
     if (vtxCntDwn == 0)
     {
 		totalProcessingPrimitive++;
-        primitiveRdy = true;
+        primStack.push(curPrim);
 
         switch (drawMode) {
         case GL_TRIANGLES:
@@ -164,7 +178,17 @@ void GPU_Core::PrimitiveAssembly()
 /// @todo Clipping
 void GPU_Core::Clipping()
 {
+	int outsideGrade = 0;
 
+	for (int i=0; i<3; i++) {
+		if (prim.clipCoord[i].x > fabs(prim.clipCoord[i].w) ||
+			prim.clipCoord[i].y > fabs(prim.clipCoord[i].w) ||
+			prim.clipCoord[i].z > fabs(prim.clipCoord[i].w)  )
+			outsideGrade++;
+	}
+
+	if (outsideGrade == 3)
+		prim.iskilled = true;
 }
 
 void GPU_Core::TriangleSetup()
@@ -180,8 +204,8 @@ void GPU_Core::TriangleSetup()
 
 	doubleArea = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
 
-	if (fabs(doubleArea) > 1000000)
-		printf("What the fuck!!\n");
+//	if (fabs(doubleArea) > 1000000)
+//		printf("What the fuck!!\n");
 
 	area2Reciprocal = 1/doubleArea;
 

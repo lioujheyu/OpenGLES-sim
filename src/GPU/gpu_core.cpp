@@ -21,60 +21,44 @@ void GPU_Core::Run()
 	PassConfig2SubModule();
 
 	InitPrimitiveAssembly();
+	//Clear texture cache when new draw command is arrived.
+	///@todo Judge if cleaning texture cache is required.
 	for (int i=0; i<MAX_SHADER_CORE; i++)
 		sCore[i].texUnit.ClearTexCache();
 
-    int vtxIdx;
+    //Main loop
     for (int vCnt=0; vCnt<vtxCount; vCnt++) {
 
-		if (vtxInputMode == 0) //drawArray
-			vtxIdx = vtxFirst + vCnt;
-		else //drawElements
-			vtxIdx = *( (unsigned int*)vtxIndicesPointer + vCnt );
-
-		//Each vertex will be injected into Geometry's curVtx here
-        for (int attrCnt=0; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++) {
-            if (attrEnable[attrCnt]) {
-                curVtx.attr[attrCnt].x =
-                    *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vtxIdx );
-                curVtx.attr[attrCnt].y =
-                    *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vtxIdx + 1 );
-                if (attrSize[attrCnt] > 2)
-                    curVtx.attr[attrCnt].z =
-                        *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vtxIdx + 2 );
-                else
-                    curVtx.attr[attrCnt].z = 0.0;
-
-                if (attrSize[attrCnt] > 3)
-                    curVtx.attr[attrCnt].w =
-                        *( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vtxIdx + 3 );
-                else
-                    curVtx.attr[attrCnt].w = 1.0;
-            }
-        }
+		FetchVertexData(vCnt);
+		totalProcessingVtx++;
 
 		//Vertex-based operation starts here
-		totalProcessingVtx++;
 		///@todo Task scheduler for auto job dispatch
         VertexShaderEXE(0, &curVtx);
+		curClipCoord = curVtx.attr[0];
+
         PerspectiveDivision();
         ViewPort();
         PrimitiveAssembly();
 
         //Primitive-based operation starts here
-        if (primitiveRdy) {
+        while (!primStack.empty()) {
+			prim = primStack.top();
+			Clipping();
+
+			if (prim.iskilled) {
+				primStack.pop();
+				continue;
+            }
+
             TriangleSetup();
             Culling();
 
             if (prim.iskilled) {
 				totalCulledPrimitive++;
-				prim.iskilled = false;
-				primitiveRdy = false;
+				primStack.pop();
 				continue;
             }
-
-            //printf("Primitive %d drawing. ", totalPrimitive);
-            //printf("Area: %f\n", fabs(constantC/2));
 
             //Fragment-based operation starts here
 			for(int y=LY; y<=HY; y+=16) {
@@ -92,6 +76,7 @@ void GPU_Core::Run()
 										  &pixBuffer[i*4+1],
 										  &pixBuffer[i*4+2],
 										  &pixBuffer[i*4+3]);
+
 						PerFragmentOp(pixBuffer[i*4  ]);
 						PerFragmentOp(pixBuffer[i*4+1]);
 						PerFragmentOp(pixBuffer[i*4+2]);
@@ -100,7 +85,7 @@ void GPU_Core::Run()
 				}
 			}
 
-			primitiveRdy = false;
+			primStack.pop();
         }
     }
 
@@ -131,8 +116,9 @@ void GPU_Core::Run()
 			   sCore[1].totalInstructionCnt);
 	GPUPRINTF("FShader total executed scale operation: %d\n",
 			   sCore[1].totalScaleOperation);
-	GPUPRINTF("Fragment Shader Usage: %f\n\n",
+	GPUPRINTF("Fragment Shader Usage: %f\n",
 			   (float)(sCore[1].totalScaleOperation)/(sCore[1].totalInstructionCnt*4));
+	GPUPRINTF("==========================================================\n");
 
 }
 
@@ -180,6 +166,49 @@ GPU_Core::~GPU_Core()
 #endif //TEXEL_INFO && TEXEL_INFO_FILE
 }
 
+void GPU_Core::FetchVertexData(unsigned int vCnt)
+{
+	unsigned int vIdx;
+
+	//Get vertex index
+	if (vtxInputMode == 0) //drawArray
+		vIdx = vtxFirst + vCnt;
+	else { //drawElements
+		switch (vtxIndicesType) {
+		case GL_UNSIGNED_BYTE:
+			vIdx = *( (unsigned char*)vtxIndicesPointer + vCnt );
+			break;
+		case GL_UNSIGNED_SHORT:
+			vIdx = *( (unsigned short*)vtxIndicesPointer + vCnt );
+			break;
+		case GL_UNSIGNED_INT:
+			vIdx = *( (unsigned int*)vtxIndicesPointer + vCnt );
+			break;
+		}
+	}
+
+	//Fetch all data from a index-determined vertex
+	for (int attrCnt=0; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++) {
+		if (attrEnable[attrCnt]) {
+			curVtx.attr[attrCnt].x =
+				*( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vIdx );
+			curVtx.attr[attrCnt].y =
+				*( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vIdx + 1 );
+			if (attrSize[attrCnt] > 2)
+				curVtx.attr[attrCnt].z =
+					*( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vIdx + 2 );
+			else
+				curVtx.attr[attrCnt].z = 0.0;
+
+			if (attrSize[attrCnt] > 3)
+				curVtx.attr[attrCnt].w =
+					*( (float*)vtxPointer[attrCnt] + attrSize[attrCnt]*vIdx + 3 );
+			else
+				curVtx.attr[attrCnt].w = 1.0;
+		}
+	}
+}
+
 void GPU_Core::PassConfig2SubModule()
 {
 	int i,j;
@@ -189,7 +218,13 @@ void GPU_Core::PassConfig2SubModule()
 			sCore[j].texUnit.magFilter[i] = magFilter[i];
 			sCore[j].texUnit.wrapS[i] = wrapS[i];
 			sCore[j].texUnit.wrapT[i] = wrapT[i];
-			sCore[j].texUnit.texImage[i] = texImage[i];
+			sCore[j].texUnit.tex2D[i] = tex2D[i];
+			sCore[j].texUnit.texCubeNX[i] = texCubeNX[i];
+			sCore[j].texUnit.texCubeNY[i] = texCubeNY[i];
+			sCore[j].texUnit.texCubeNZ[i] = texCubeNZ[i];
+			sCore[j].texUnit.texCubePX[i] = texCubePX[i];
+			sCore[j].texUnit.texCubePY[i] = texCubePY[i];
+			sCore[j].texUnit.texCubePZ[i] = texCubePZ[i];
 		}
 #if defined(DEBUG) && defined(TEXEL_INFO) && defined(TEXEL_INFO_FILE)
 		sCore[j].texUnit.TEXELINFOfp =

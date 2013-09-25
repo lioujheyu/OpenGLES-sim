@@ -64,6 +64,7 @@ struct primitive{
 
 	bool iskilled;
     vertex v[3];
+    floatVec4 clipCoord[3];
 };
 
 #endif // GPU_TYPE_H_INCLUDED

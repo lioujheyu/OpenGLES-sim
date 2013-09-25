@@ -99,8 +99,8 @@ int LoadCubeMap(char *xneg, char *yneg, char *zneg,
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 //	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
 	return 0;
@@ -268,6 +268,12 @@ void draw_banana()
 	shader.unbind();
 }
 
+/**
+ *	Reference from http://www.keithlantz.net/2011/10/rendering-a-skybox-using-a-cube-map-with-opengl-and-glsl/
+ *	Seems image are coming from here
+ *	http://forums.epicgames.com/threads/506748-My-skies-and-and-cliff-textures-(large-images
+ *	Modified by Elvis.
+ */
 void draw_cubemap()
 {
 	Shader shader;
@@ -297,11 +303,11 @@ void draw_cubemap()
 	glm::mat4 Projection = glm::perspective(45.0f, 1024.0f / 768.0f, 0.1f, 100.0f);
 //	glm::mat4 View       = glm::mat4(1.0f);
 	glm::mat4 View = glm::lookAt(
-						glm::vec3(0.4f, 0.2f, -0.5f),          // Camera position in World space
+						glm::vec3(-0.4f, -0.4f, -0.5f),          // Camera position in World space
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.1,0.1,0.1)) * glm::rotate(glm::mat4(1.0f), 30.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(20,20,20));
 	glm::mat4 MVP		 = Projection * View * Model;
 
 	GLfloat cube_vertices[] = {
@@ -330,11 +336,7 @@ void draw_cubemap()
 	  1, 2, 6, 5,
 	};
 
-	int error;
-
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-//	glDrawElements(GL_QUADS, sizeof(cube_indices)/sizeof(GLushort), GL_UNSIGNED_SHORT, cube_indices);
 
 	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[0]);
 	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[4]);
@@ -342,8 +344,6 @@ void draw_cubemap()
 	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[12]);
 	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[16]);
 	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[20]);
-
-	error = glGetError();
 
 	glDeleteTextures(1, texture);
 
