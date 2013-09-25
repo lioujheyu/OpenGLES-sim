@@ -115,29 +115,29 @@ void draw_road()
 
     unsigned int texture[2];
 
-//    glActiveTexture(GL_TEXTURE0);
-//    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
+    glActiveTexture(GL_TEXTURE0);
+    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+    }
+
+    glActiveTexture(GL_TEXTURE1);
+    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+    }
+
+//	glActiveTexture(GL_TEXTURE0);
+//	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//    }
+//	}
 //
-//    glActiveTexture(GL_TEXTURE1);
-//    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
+//	glActiveTexture(GL_TEXTURE1);
+//	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//    }
-
-	glActiveTexture(GL_TEXTURE0);
-	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-	}
-
-	glActiveTexture(GL_TEXTURE1);
-	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-	}
+//	}
 
     GLfloat vertexPos[] = { -1.0f, -0.7f, 0.0f, 1.0f,
                              1.0f, -0.7f, 0.0f, 1.0f,
@@ -150,16 +150,16 @@ void draw_road()
 							   0.0f, 1.0f, 0.0f
 							 };
 
-    GLfloat texCoord[] = { 0.0f, 2.0f,
-                           1.0f, 2.0f,
+    GLfloat texCoord[] = { 0.0f, 0.0f,
                            1.0f, 0.0f,
-                           0.0f, 0.0f,
+                           1.0f, 2.0f,
+                           0.0f, 2.0f,
                          };
 
     glEnable(GL_DEPTH_TEST);
 
     glViewport(0,0,1024,768);
-	glClearColor(1.0,1.0,1.0,1.0);
+	glClearColor(0.0,0.0,0.0,1.0);
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -233,7 +233,7 @@ void draw_banana()
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
+	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(3.5f));
 	glm::mat4 VP = Projection * View;
 
 	int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
@@ -303,11 +303,11 @@ void draw_cubemap()
 	glm::mat4 Projection = glm::perspective(45.0f, 1024.0f / 768.0f, 0.1f, 100.0f);
 //	glm::mat4 View       = glm::mat4(1.0f);
 	glm::mat4 View = glm::lookAt(
-						glm::vec3(-0.4f, -0.4f, -0.5f),          // Camera position in World space
+						glm::vec3(0.4f, 0.4f, -0.5f),          // Camera position in World space
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(20,20,20));
+	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.2,0.2,0.2));
 	glm::mat4 MVP		 = Projection * View * Model;
 
 	GLfloat cube_vertices[] = {
@@ -356,8 +356,8 @@ int main()
     Context::SetCurrentContext(new Context());
 
 //	draw_road();
-//	draw_banana();
-	draw_cubemap();
+	draw_banana();
+//	draw_cubemap();
 
 	Context::GetCurrentContext()->DumpImage();
 }
