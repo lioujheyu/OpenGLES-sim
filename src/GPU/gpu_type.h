@@ -44,20 +44,27 @@ public:
 	pixel()
 	{
 		isKilled = false;
+		isGhost = true;
 	}
 
     //The position will always use the 1st attribute slot in whole GPU design.
     floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
-    floatVec4   scaleFacDX[MAX_ATTRIBUTE_NUMBER];//scaleFactor[0] is unused.
-    floatVec4   scaleFacDY[MAX_ATTRIBUTE_NUMBER];//scaleFactor[0] is unused.
 
     ///Barycentric Coordinate
     float       baryCenPos3[3];
     bool		isKilled;
+    bool		isGhost;
 };
 
 struct primitive{
+	primitive()
+	{
+		iskilled = false;
+	}
+
+	bool iskilled;
     vertex v[3];
+    floatVec4 clipCoord[3];
 };
 
 #endif // GPU_TYPE_H_INCLUDED

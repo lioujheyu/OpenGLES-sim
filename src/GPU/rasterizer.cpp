@@ -6,38 +6,9 @@
 
 #include "gpu_core.h"
 
-void GPU_Core::TriangleSetup()
+void GPU_Core::tileSplit(int x, int y, int level)
 {
-	float constantC;
-
-	Edge[0][0] = prim.v[0].attr[0].y - prim.v[1].attr[0].y;
-	Edge[0][1] = prim.v[0].attr[0].x - prim.v[1].attr[0].x;
-	Edge[1][0] = prim.v[1].attr[0].y - prim.v[2].attr[0].y;
-	Edge[1][1] = prim.v[1].attr[0].x - prim.v[2].attr[0].x;
-	Edge[2][0] = prim.v[2].attr[0].y - prim.v[0].attr[0].y;
-	Edge[2][1] = prim.v[2].attr[0].x - prim.v[0].attr[0].x;
-
-	constantC = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
-	if (fabs(constantC) > 1000000)
-	{
-		printf("What the fuck!!\n");
-	}
-
-	area2Reciprocal = 1/constantC;
-
-	LY = MIN3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
-	LY = CLAMP(LY, viewPortLY, viewPortLY+viewPortH-1);
-	LX = MIN3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
-	LX = CLAMP(LX, viewPortLX, viewPortLX+viewPortW-1);
-	HY = MAX3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
-	HY = CLAMP(HY, viewPortLY, viewPortLY+viewPortH-1);
-	RX = MAX3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
-	RX = CLAMP(RX, viewPortLX, viewPortLX+viewPortW-1);
-}
-
-void GPU_Core::pixelSplit(int x, int y, int level)
-{
-	int lc;
+	int lc; //loop counter
 
 /*
  * c - central
@@ -54,10 +25,12 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 /*
  * pixel stamp: 2 3
  *              0 1
- * We need to calculating 4 pixels in quad concurrently nomatter if
- * they are both falling into a triangle or not for scale factor calculation
+ * We need to calculate 4 pixels in quad concurrently for the DDX/Y instruction
+ * and texture scale factor calculation later time in shader core.
  */
 	pixel pixelStamp[4];
+
+	tileSplitCnt++;
 
 
 	PIXPRINTF("-------(%d,%d),Level:%d-----\n",x,y,level);
@@ -71,6 +44,13 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 
 	if (level == 0) {
 
+/*
+ * When split level is 0, the cornerTests are now for each pixel's center test,
+ * and not for corner test anymore.
+ *
+ * cornerTest: 5 7 for pixel stamp: 2 3
+ *             0 2                  0 1
+ */
 		for(lc=0; lc<3; lc++) {
 			cornerTest[0][lc] = centralTest[lc] + (-Edge[lc][0]+Edge[lc][1])*0.5;
 			cornerTest[2][lc] = centralTest[lc] + ( Edge[lc][0]+Edge[lc][1])*0.5;
@@ -97,84 +77,55 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 
 		//Interpolate the all 4 pixel's attributes, then perform perspective correction
 		for (int i=0;i<4;i++){
-			pixelStamp[i].attr[0].z = prim.v[0].attr[0].z +
-								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[0].z - prim.v[0].attr[0].z) +
-								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[0].z - prim.v[0].attr[0].z);
-			pixelStamp[i].attr[0].w = prim.v[0].attr[0].w +
-								pixelStamp[i].baryCenPos3[0]*(prim.v[1].attr[0].w - prim.v[0].attr[0].w) +
-								pixelStamp[i].baryCenPos3[1]*(prim.v[2].attr[0].w - prim.v[0].attr[0].w);
+			pixelStamp[i].attr[0].z =
+				prim.v[0].attr[0].z +
+				pixelStamp[i].baryCenPos3[0]*( prim.v[1].attr[0].z - prim.v[0].attr[0].z ) +
+				pixelStamp[i].baryCenPos3[1]*( prim.v[2].attr[0].z - prim.v[0].attr[0].z );
+			pixelStamp[i].attr[0].w =
+				prim.v[0].attr[0].w +
+				pixelStamp[i].baryCenPos3[0]*( prim.v[1].attr[0].w - prim.v[0].attr[0].w ) +
+				pixelStamp[i].baryCenPos3[1]*( prim.v[2].attr[0].w - prim.v[0].attr[0].w );
 
 			for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
 				if (!varyEnable[attrCnt])
 					continue;
 
-				pixelStamp[i].attr[attrCnt] = prim.v[0].attr[attrCnt] +
-												(prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt])*pixelStamp[i].baryCenPos3[0] +
-												(prim.v[2].attr[attrCnt] - prim.v[0].attr[attrCnt])*pixelStamp[i].baryCenPos3[1];
-				pixelStamp[i].attr[attrCnt] = pixelStamp[i].attr[attrCnt] / pixelStamp[i].attr[0].w;
+				pixelStamp[i].attr[attrCnt] =
+					prim.v[0].attr[attrCnt] +
+					( prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[0] +
+					( prim.v[2].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[1];
+				pixelStamp[i].attr[attrCnt] =
+					pixelStamp[i].attr[attrCnt] / pixelStamp[i].attr[0].w;
 			}
 		}
-		//each attribute needs to get its scale factor, and all 4 pixels' attribute will get theirs here.
-		for (int attrCnt=1; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++){
-			if (!varyEnable[attrCnt])
-				continue;
-			pixelStamp[0].scaleFacDX[attrCnt] = pixelStamp[1].scaleFacDX[attrCnt]
-												= fvabs(pixelStamp[1].attr[attrCnt]-pixelStamp[0].attr[attrCnt]);
-			pixelStamp[2].scaleFacDX[attrCnt] = pixelStamp[3].scaleFacDX[attrCnt]
-												= fvabs(pixelStamp[3].attr[attrCnt]-pixelStamp[2].attr[attrCnt]);
-			pixelStamp[0].scaleFacDY[attrCnt] = pixelStamp[2].scaleFacDY[attrCnt]
-												= fvabs(pixelStamp[2].attr[attrCnt]-pixelStamp[0].attr[attrCnt]);
-			pixelStamp[1].scaleFacDY[attrCnt] = pixelStamp[3].scaleFacDY[attrCnt]
-												= fvabs(pixelStamp[3].attr[attrCnt]-pixelStamp[1].attr[attrCnt]);
+
+        /* Drop their ghost flag if they are pass the edge test. But those ghost
+         * pixels will be still pushed into shader core.
+		 */
+		if (cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)
+            pixelStamp[0].isGhost = false;
+
+		if (cornerTest[2][0]>=0 && cornerTest[2][1]>=0 && cornerTest[2][2]>=0)
+            pixelStamp[1].isGhost = false;
+
+		if (cornerTest[5][0]>=0 && cornerTest[5][1]>=0 && cornerTest[5][2]>=0)
+            pixelStamp[2].isGhost = false;
+
+		if (cornerTest[7][0]>=0 && cornerTest[7][1]>=0 && cornerTest[7][2]>=0)
+            pixelStamp[3].isGhost = false;
+
+		if (pixelStamp[0].isGhost && pixelStamp[1].isGhost &&
+			pixelStamp[2].isGhost && pixelStamp[3].isGhost ) {
+			return;
 		}
-
-        //Write valid fragment into waiting buffer if they are truly pass the edge test.
-		if ((cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)||
-            (cornerTest[0][0]<=0 && cornerTest[0][1]<=0 && cornerTest[0][2]<=0)) {
-
-            pixBuffer[pixBufferP] = pixelStamp[0];
-
-            PIXPRINTF("P:(%3d,%3d)\t \n",
-                    (int)pixBuffer[pixBufferP].attr[0].x,
-                    (int)pixBuffer[pixBufferP].attr[0].y);
-
-            pixBufferP++;
-		}
-
-		if ((cornerTest[2][0]>=0 && cornerTest[2][1]>=0 && cornerTest[2][2]>=0)|
-            (cornerTest[2][0]<=0 && cornerTest[2][1]<=0 && cornerTest[2][2]<=0)) {
-
-            pixBuffer[pixBufferP] = pixelStamp[1];
-
-            PIXPRINTF("P:(%3d,%3d)\t \n",
-                    (int)pixBuffer[pixBufferP].attr[0].x,
-                    (int)pixBuffer[pixBufferP].attr[0].y);
-
-            pixBufferP++;
-		}
-
-		if ((cornerTest[5][0]>=0 && cornerTest[5][1]>=0 && cornerTest[5][2]>=0)|
-            (cornerTest[5][0]<=0 && cornerTest[5][1]<=0 && cornerTest[5][2]<=0)) {
-
-            pixBuffer[pixBufferP] = pixelStamp[2];
-
-            PIXPRINTF("P:(%3d,%3d)\t \n",
-                    (int)pixBuffer[pixBufferP].attr[0].x,
-                    (int)pixBuffer[pixBufferP].attr[0].y);
-
-            pixBufferP++;
-		}
-
-		if ((cornerTest[7][0]>=0 && cornerTest[7][1]>=0 && cornerTest[7][2]>=0)|
-            (cornerTest[7][0]<=0 && cornerTest[7][1]<=0 && cornerTest[7][2]<=0)) {
-
-            pixBuffer[pixBufferP] = pixelStamp[3];
-
-            PIXPRINTF("P:(%3d,%3d)\t \n",
-                    (int)pixBuffer[pixBufferP].attr[0].x,
-                    (int)pixBuffer[pixBufferP].attr[0].y);
-
-            pixBufferP++;
+		else {
+			pixBuffer[pixBufferP] = pixelStamp[0];
+			pixBuffer[pixBufferP+1] = pixelStamp[1];
+			pixBuffer[pixBufferP+2] = pixelStamp[2];
+			pixBuffer[pixBufferP+3] = pixelStamp[3];
+			pixBufferP += 4;
+//			PIXPRINTF("P:(%3d,%3d)\t \n", (int)pixBuffer[pixBufferP].attr[0].x,
+//										  (int)pixBuffer[pixBufferP].attr[0].y);
 		}
 	}
 	else {
@@ -189,34 +140,27 @@ void GPU_Core::pixelSplit(int x, int y, int level)
 			cornerTest[7][lc] = centralTest[lc] + ( Edge[lc][0]-Edge[lc][1])*(1<<level);
 		}
 
-		if (area2Reciprocal>=0) {
-            for(lc=0; lc<3; lc++) {
-                Zone[0][lc] = (cornerTest[0][lc]>=0) | (cornerTest[1][lc]>=0) | (cornerTest[3][lc]>=0) | (centralTest[lc]>=0);
-                Zone[1][lc] = (cornerTest[1][lc]>=0) | (cornerTest[2][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[4][lc]>=0);
-                Zone[2][lc] = (cornerTest[3][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[5][lc]>=0) | (cornerTest[6][lc]>=0);
-                Zone[3][lc] = (centralTest[lc]>=0) | (cornerTest[4][lc]>=0) | (cornerTest[6][lc]>=0) | (cornerTest[7][lc]>=0);
-            }
-        }
-        else{
-            for(lc=0; lc<3; lc++) {
-                Zone[0][lc] = (cornerTest[0][lc]<=0) | (cornerTest[1][lc]<=0) | (cornerTest[3][lc]<=0) | (centralTest[lc]<=0);
-                Zone[1][lc] = (cornerTest[1][lc]<=0) | (cornerTest[2][lc]<=0) | (centralTest[lc]<=0) | (cornerTest[4][lc]<=0);
-                Zone[2][lc] = (cornerTest[3][lc]<=0) | (centralTest[lc]<=0) | (cornerTest[5][lc]<=0) | (cornerTest[6][lc]<=0);
-                Zone[3][lc] = (centralTest[lc]<=0) | (cornerTest[4][lc]<=0) | (cornerTest[6][lc]<=0) | (cornerTest[7][lc]<=0);
-            }
-        }
+		for(lc=0; lc<3; lc++) {
+			Zone[0][lc] = (cornerTest[0][lc]>=0) | (cornerTest[1][lc]>=0) | (cornerTest[3][lc]>=0) | (centralTest[lc]>=0);
+			Zone[1][lc] = (cornerTest[1][lc]>=0) | (cornerTest[2][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[4][lc]>=0);
+			Zone[2][lc] = (cornerTest[3][lc]>=0) | (centralTest[lc]>=0) | (cornerTest[5][lc]>=0) | (cornerTest[6][lc]>=0);
+			Zone[3][lc] = (centralTest[lc]>=0) | (cornerTest[4][lc]>=0) | (cornerTest[6][lc]>=0) | (cornerTest[7][lc]>=0);
+		}
 
 		if (Zone[0][0] == true && Zone[0][1] == true && Zone[0][2] == true )
-			pixelSplit(x, y, level-1);
+			tileSplit(x, y, level-1);
+
 		if (Zone[1][0] == true && Zone[1][1] == true && Zone[1][2] == true )
 			if ( (x + (1<<level)) <= RX )
-				pixelSplit(x+(1<<level), y, level-1);
+				tileSplit(x+(1<<level), y, level-1);
+
 		if (Zone[2][0] == true && Zone[2][1] == true && Zone[2][2] == true )
 			if ( (y + (1<<level)) <= HY )
-				pixelSplit(x, y+(1<<level), level-1);
+				tileSplit(x, y+(1<<level), level-1);
+
 		if (Zone[3][0] == true && Zone[3][1] == true && Zone[3][2] == true )
 			if ( ((x + (1<<level)) <= RX) && ((y + (1<<level)) <= HY) )
-				pixelSplit(x+(1<<level), y+(1<<level), level-1);
+				tileSplit(x+(1<<level), y+(1<<level), level-1);
 	}
 }
 
@@ -226,24 +170,39 @@ void GPU_Core::pixelSplit(int x, int y, int level)
  *	@param sid Which shader core id will be used.
  *	@param input Input pointer
  */
-void GPU_Core::FragmentShaderEXE(int sid, void *input)
+void GPU_Core::FragmentShaderEXE(int sid,
+								 void *input0,
+								 void *input1,
+								 void *input2,
+								 void *input3 )
 {
-	totalPix++;
-
 	sCore[sid].instPool = FSinstPool;
 	sCore[sid].instCnt = FSinstCnt;
 	sCore[sid].uniformPool = uniformPool;
     sCore[sid].shaderType = FRAGMENT_SHADER;
 
 	sCore[sid].Init();
-	sCore[sid].input = input;
-	sCore[sid].Exec();
+	sCore[sid].isEnable[0] = sCore[sid].isEnable[1] =
+		sCore[sid].isEnable[2] = sCore[sid].isEnable[3] = true;
+	sCore[sid].input[0] = input0;
+	sCore[sid].input[1] = input1;
+	sCore[sid].input[2] = input2;
+	sCore[sid].input[3] = input3;
+	sCore[sid].Run();
 }
 
 void GPU_Core::PerFragmentOp(pixel pixInput)
 {
 	bool DepthPass = true;
 	int bufOffset;
+
+	if (pixInput.isGhost) {
+		totalGhostPix++;
+		return;
+	}
+
+	if (pixInput.isKilled)
+		return;
 
 	bufOffset = (int)pixInput.attr[0].y*viewPortW + (int)pixInput.attr[0].x;
 
@@ -284,6 +243,8 @@ void GPU_Core::PerFragmentOp(pixel pixInput)
     *(cBufPtr + bufOffset*4 + 1) = color.g;// G
     *(cBufPtr + bufOffset*4 + 2) = color.b;// B
     *(cBufPtr + bufOffset*4 + 3) = color.a;// A
+
+    totalLivePix++;
 }
 
 void GPU_Core::ClearBuffer(unsigned int mask)

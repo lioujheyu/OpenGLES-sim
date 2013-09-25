@@ -11,7 +11,7 @@ static Context *currentContext = NULL;
 Context::Context()
 {
     m_current = false;
-    activeTexture = 0;
+    activeTexCtx = 0;
     usePID = 0;
     drawBuffer[0] = drawBuffer[1] = nullptr;
 
@@ -23,10 +23,14 @@ Context::Context()
 		texCtx[i].magFilter = GL_LINEAR;
 	}
 
+	frontFace = GL_CCW;
+	cullFaceMode = GL_BACK;
+
 	clearDepth = 1.0;
 	clearMask = 0;
 	clearStat = GL_FALSE;
     blendEnable = GL_FALSE;
+    cullingEnable = GL_FALSE;
 	depthTestEnable = GL_FALSE;
 }
 

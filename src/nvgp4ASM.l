@@ -115,6 +115,9 @@ OUTPUT.*$
 "ELSE"              COL_NO;	nvgp4ASM_lval.ival=OP_ELSE; return ENDFLOWOP;
 "ENDIF"             COL_NO;	nvgp4ASM_lval.ival=OP_ENDIF; return ENDFLOWOP;
 "ENDREP"            COL_NO;	nvgp4ASM_lval.ival=OP_ENDREP; return ENDFLOWOP;
+"KIL"				COL_NO;	nvgp4ASM_lval.ival=OP_KIL; return KILOP;
+"DDX"				COL_NO;	nvgp4ASM_lval.ival=OP_DDX; return DERIVEOP;
+"DDY"				COL_NO;	nvgp4ASM_lval.ival=OP_DDY; return DERIVEOP;
 "F"                 COL_NO;	nvgp4ASM_lval.ival=OPM_F; return OPMODIFIER;
 "U"                 COL_NO;	nvgp4ASM_lval.ival=OPM_U; return OPMODIFIER;
 "S"                 COL_NO;	nvgp4ASM_lval.ival=OPM_S; return OPMODIFIER;
@@ -202,6 +205,7 @@ OUTPUT.*$
 "result_color0"     COL_NO; return RESULT_COLOR0;
 [xyzwrgbac]         COL_NO;	return *nvgp4ASM_text;
 "HC"				COL_NO; nvgp4ASM_lval.ival=-1; return REG;
+"RC"				COL_NO; nvgp4ASM_lval.ival=-1; return REG;
 
 R{D}+ { COL_NO;
 		char *temp = nvgp4ASM_text+1;

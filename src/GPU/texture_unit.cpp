@@ -68,8 +68,8 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	u = (unsigned short)coordIn.s;
 	v = (unsigned short)coordIn.t;
 
-	texTmpPtr = texImage[tid].data[level] +
-				(v*texImage[tid].widthLevel[level] + u)*4;
+	texTmpPtr = targetImage->data[level] +
+				(v*targetImage->widthLevel[level] + u)*4;
 
 	color.r = ((float)(*texTmpPtr++)/255);
 	color.g = ((float)(*texTmpPtr++)/255);
@@ -85,24 +85,28 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	unsigned char LRUbiggest = 0;
     bool isColdMiss = false;
 
-	if (level > texImage[tid].maxLevel) {
+	if (targetImage->maxLevel == -1) {
+		fprintf(stderr,"TexUnit: Using Null tex2D\n");
+		return floatVec4(0.0, 0.0, 0.0, 0.0);
+	}
+	else if (level > targetImage->maxLevel) {
 		fprintf(stderr,
 				"TexUnit: %d exceed maximum level %d\n",
 				level,
-				texImage[tid].maxLevel );
+				targetImage->maxLevel );
 		return floatVec4(0.0, 0.0, 0.0, 0.0);
 	}
 
 	u = (unsigned short)coordIn.s;
 	v = (unsigned short)coordIn.t;
 
-	if (u > texImage[tid].widthLevel[level] ||
-		v > texImage[tid].heightLevel[level]) {
+	if (u > targetImage->widthLevel[level] ||
+		v > targetImage->heightLevel[level]) {
 		fprintf(stderr,
 				"TexUnit: (%d,%d)Out of the texture image's bound(%d,%d)\n",
 				u, v,
-				texImage[tid].widthLevel[level],
-				texImage[tid].heightLevel[level] );
+				targetImage->widthLevel[level],
+				targetImage->heightLevel[level] );
 		return floatVec4(0.0, 0.0, 0.0, 0.0);
 	}
 
@@ -114,7 +118,8 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	V_Offset = v & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
 	tag = (int)( (V_Super << 12) | (U_Super&0x0fff) );
 
-	///@note Simply append level and texture_id after tag bit
+	///@note Simply append all texture related selection bit after tag bit
+	tag = (tag << 3) | (imageSelection&0x7);
 	tag = (tag << 4) | (level&0xf);
 	tag = (tag << 1) | (tid&0x1);
 
@@ -145,10 +150,10 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 
 	for (j=0; j<TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
 		for (i=0; i<TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
-			texTmpPtr = texImage[tid].data[level] +
+			texTmpPtr = targetImage->data[level] +
 						CalcTexAdd(U_Super,U_Block,i,
 								   V_Super,V_Block,j,
-								   texImage[tid].widthLevel[level]) * 4;
+								   targetImage->widthLevel[level]) * 4;
 
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r = ((float)(*texTmpPtr++)/255);
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g = ((float)(*texTmpPtr++)/255);
@@ -190,12 +195,12 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 		 *	fmod(x,y) in C++: x - y * trunc(x/y);
 		 *	fmod(x,y) in OpenGL: x - y * floor(x/y);
 		 */
-//		temp.s = fmod(coordIn.s,texImage[tid].widthLevel[level]);
-		temp.s = coordIn.s - texImage[tid].widthLevel[level] *
-				 floor(coordIn.s/texImage[tid].widthLevel[level]);
+//		temp.s = fmod(coordIn.s,targetImage->widthLevel[level]);
+		temp.s = coordIn.s - targetImage->widthLevel[level] *
+				 floor(coordIn.s/targetImage->widthLevel[level]);
 		break;
 	case GL_CLAMP_TO_EDGE:
-		temp.s = std::min(coordIn.s, (float)texImage[tid].widthLevel[level]-1);
+		temp.s = CLAMP(coordIn.s, 0.0f, (float)targetImage->widthLevel[level]-1);
 		break;
 	default:
 		fprintf(stderr, "TexUnit: Unknown Texture Wrap mode in x-axis!!\n");
@@ -204,12 +209,12 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
 
 	switch (wrapT[tid]){
 	case GL_REPEAT:
-//		temp.t = fmod(coordIn.t,texImage[tid].heightLevel[level]);
-		temp.t = coordIn.t - texImage[tid].heightLevel[level] *
-				 floor(coordIn.t/texImage[tid].heightLevel[level]);
+//		temp.t = fmod(coordIn.t,targetImage->heightLevel[level]);
+		temp.t = coordIn.t - targetImage->heightLevel[level] *
+				 floor(coordIn.t/targetImage->heightLevel[level]);
 		break;
 	case GL_CLAMP_TO_EDGE:
-		temp.t = std::min(coordIn.t, (float)texImage[tid].heightLevel[level]-1);
+		temp.t = CLAMP(coordIn.t, 0.0f, (float)targetImage->widthLevel[level]-1);
 		break;
 	default:
 		fprintf(stderr, "TexUnit: Unknown Texture Wrap mode in y-axis!!\n");
@@ -285,7 +290,7 @@ floatVec4 TextureUnit::TrilinearFilter(floatVec4 coordIn,
 									   int tid )
 {
 	floatVec4 color[2];
-	int maxLevel = texImage[tid].maxLevel;
+	int maxLevel = targetImage->maxLevel;
 	color[0] = BilinearFilter(coordIn, level, tid);
 	color[1] = BilinearFilter(coordIn, std::min(level+1, maxLevel), tid);
 
@@ -309,24 +314,66 @@ floatVec4 TextureUnit::TextureSample(floatVec4 coordIn,
 //	floatVec4 colorNextLevel;
 	int LoD, maxLevel;
 
-	//find absolutely coord in texture image
-	coord.s = coordIn.s*texImage[tid].widthLevel[0];
-	coord.t = coordIn.t*texImage[tid].heightLevel[0];
+	//find absolutely coordinate in texture image
+	switch (targetType) {
+	case TT_2D:
+		imageSelection = TEX_2D;
+		targetImage = &tex2D[tid];
+		coord.s = coordIn.s;
+		coord.t = coordIn.t;
+		break;
+	case TT_CUBE:
+		if (fabs(coordIn.s) > fabs(coordIn.t)) {
+			if (fabs(coordIn.s) > fabs(coordIn.p)) {
+				imageSelection = (coordIn.s<0.0f)? CUBE_NEG_X : CUBE_POS_X;
+				targetImage = (coordIn.s<0.0f)? &texCubeNX[tid] : &texCubePX[tid];
+				coord.s = ((coordIn.s<0.0f)? coordIn.p : -coordIn.p)/fabs(coordIn.s)/2 + 0.5f;
+				coord.t = -coordIn.t/fabs(coordIn.s)/2 + 0.5f;
+			}
+			else {
+				imageSelection = (coordIn.p<0.0f)? CUBE_NEG_Z : CUBE_POS_Z;
+				targetImage = (coordIn.p<0.0f)? &texCubeNZ[tid] : &texCubePZ[tid];
+				coord.s = ((coordIn.p<0.0f)? -coordIn.s : coordIn.s)/fabs(coordIn.p)/2 + 0.5f;
+				coord.t = -coordIn.t/fabs(coordIn.p)/2 + 0.5f;
+			}
+		}
+		else { // |coordIn.p| > |coordIn.s|
+			if (fabs(coordIn.t) > fabs(coordIn.p)) {
+				imageSelection = (coordIn.t<0.0f)? CUBE_NEG_Y : CUBE_POS_Y;
+				targetImage = (coordIn.t<0.0f)? &texCubeNY[tid] : &texCubePY[tid];
+				coord.s = coordIn.s/fabs(coordIn.t)/2 + 0.5f;
+				coord.t = ((coordIn.t<0.0f)? -coordIn.p : coordIn.p)/fabs(coordIn.t)/2 + 0.5f;
+			}
+			else {
+				imageSelection = (coordIn.p<0.0f)? CUBE_NEG_Z : CUBE_POS_Z;
+				targetImage = (coordIn.p<0.0f)? &texCubeNZ[tid] : &texCubePZ[tid];
+				coord.s = ((coordIn.p<0.0f)? -coordIn.s : coordIn.s)/fabs(coordIn.p)/2 + 0.5f;
+				coord.t = -coordIn.t/fabs(coordIn.p)/2 + 0.5f;
+			}
+		}
+		break;
+	default:
+		printf("Tex Unit: undefined or unimplemented texture target\n");
+		return floatVec4(0.0, 0.0, 0.0, 0.0);
+		break;
+	}
+	coord.s = coord.s*targetImage->widthLevel[0];
+	coord.t = coord.t*targetImage->heightLevel[0];
 	coord.p = coordIn.p;
 	coord.q = coordIn.q;
 
 	maxScaleFac = std::max(
-					std::max(scaleFacDX.s*texImage[tid].widthLevel[0],
-							 scaleFacDX.t*texImage[tid].heightLevel[0]),
-					std::max(scaleFacDY.s*texImage[tid].widthLevel[0],
-							 scaleFacDY.t*texImage[tid].heightLevel[0])
+					std::max(scaleFacDX.s*targetImage->widthLevel[0],
+							 scaleFacDX.t*targetImage->heightLevel[0]),
+					std::max(scaleFacDY.s*targetImage->widthLevel[0],
+							 scaleFacDY.t*targetImage->heightLevel[0])
 				);
 
 	w_ratio = frexp(maxScaleFac, &LoD);
 	w_ratio = w_ratio*2-1;
 	LoD--;
 
-	maxLevel = texImage[tid].maxLevel;
+	maxLevel = targetImage->maxLevel;
 
 	if (level == -1)
 		LoD = CLAMP(LoD, 0, maxLevel);

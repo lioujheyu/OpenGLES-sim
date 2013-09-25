@@ -9,6 +9,8 @@
 
 #include <GLES3/gl3.h>
 #include <string>
+#include <utility>
+#include <algorithm>
 
 #include "gpu_config.h"
 #include "gpu_type.h"
@@ -48,18 +50,22 @@ public:
 	GPU_Core();
 	~GPU_Core();
 
+    GLenum			drawMode;
     int         	vtxCount;
+    int				vtxIndicesType;
     int         	vtxFirst;
     const void  	*vtxPointer[MAX_ATTRIBUTE_NUMBER];
+    const void  	*vtxIndicesPointer;
+    int				vtxInputMode; //0: DrawArray, 1:DrawElements
     int         	attrSize[MAX_ATTRIBUTE_NUMBER];
     bool        	attrEnable[MAX_ATTRIBUTE_NUMBER];
     bool        	varyEnable[MAX_ATTRIBUTE_NUMBER];
-	GLenum			drawMode;
     float       	depthRangeN, depthRangeF;
     int         	viewPortLX, viewPortLY,
 					viewPortW, viewPortH;
 
-    bool            blendEnable, depthTestEnable;
+    bool            blendEnable, depthTestEnable, cullingEnable;
+    GLenum			cullFaceMode, frontFace;
     GLenum			depthTestMode;
     GLenum			blendingMode;
     float           DepthRef;
@@ -72,7 +78,13 @@ public:
 
     GLenum 			wrapS[MAX_TEXTURE_CONTEXT],
 					wrapT[MAX_TEXTURE_CONTEXT];
-	textureImage 	texImage[MAX_TEXTURE_CONTEXT];
+	textureImage 	tex2D[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubeNX[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubeNY[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubeNZ[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubePX[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubePY[MAX_TEXTURE_CONTEXT];
+	textureImage 	texCubePZ[MAX_TEXTURE_CONTEXT];
 	unsigned char	*cBufPtr;
     float			*dBufPtr;
 
@@ -89,9 +101,13 @@ public:
     ///@{
     FILE 			*GPUINFOfp;
 	FILE 			*PIXELINFOfp;
-    int				totalPrimitive,
-					totalVtx,
-					totalPix;
+    int				totalProcessingPrimitive,
+					totalCulledPrimitive,
+					totalProcessingVtx,
+					totalProcessingPix,
+					totalGhostPix,
+					totalLivePix;
+	int 			tileSplitCnt;
     ///@}
 
     void        	Run();
@@ -102,14 +118,16 @@ private:
 
 	//Geometry
 	vertex      	curVtx;
-	primitive   	prim;
+	floatVec4		curClipCoord;
+
+	primitive   	prim, curPrim;
+	std::stack<primitive> primStack;
 
 	/// @name Primitive Assembly related member
 	///@{
 	///How many vertex are insufficient to form a primitive.
     int         	vtxCntDwn;
     bool         	stripIndicator;
-    bool        	primitiveRdy;
     ///@}
 
 	//Rasterizer
@@ -128,23 +146,28 @@ private:
 	/// @name Invoke Shader Core
 	///@{
     void 			VertexShaderEXE(int sid, void *input);
-    void 			FragmentShaderEXE(int sid, void *input);
+    void 			FragmentShaderEXE(int sid,
+									  void *input0,
+									  void *input1,
+									  void *input2,
+									  void *input3);
 	///@}
 
     /// @name Geometry
     ///@{
+    void			FetchVertexData(unsigned int);
     void        	PerspectiveDivision();
     void        	ViewPort();
     void        	InitPrimitiveAssembly();
     void        	PrimitiveAssembly();
     void        	Clipping();
+    void            TriangleSetup();
     void        	Culling();
     ///@}
 
     /// @name Rasterizer
     ///@{
-	void            TriangleSetup();
-    void            pixelSplit(int x, int y, int level);
+    void            tileSplit(int x, int y, int level);
     void            PerFragmentOp(pixel pixInput);
     void 			ClearBuffer(unsigned int mask);
     ///@}

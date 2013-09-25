@@ -12,6 +12,7 @@
 
 #include "gpu_type.h"
 #include "gpu_config.h"
+#include "instruction_def.h"
 
 #ifdef TEXEL_INFO
 #	define TEXPRINTF(fmt, ...) \
@@ -32,6 +33,14 @@ const int TEX_CACHE_BLOCK_SIZE_ROOT_LOG = (int)log2(TEX_CACHE_BLOCK_SIZE_ROOT);
 const int TEX_CACHE_ENTRY_SIZE_ROOT = (int)sqrt(TEX_CACHE_ENTRY_SIZE);
 const int TEX_CACHE_ENTRY_SIZE_ROOT_LOG = (int)log2(TEX_CACHE_ENTRY_SIZE_ROOT);
 
+#define TEX_2D		0x0
+#define CUBE_NEG_X	0x1
+#define CUBE_NEG_Y	0x2
+#define CUBE_NEG_Z	0x3
+#define CUBE_POS_X	0x4
+#define CUBE_POS_Y	0x5
+#define CUBE_POS_Z	0x6
+
 class TextureUnit {
 public:
     TextureUnit()
@@ -49,9 +58,16 @@ public:
 	///@{
     GLenum wrapS[MAX_TEXTURE_CONTEXT];
     GLenum wrapT[MAX_TEXTURE_CONTEXT];
+    GLenum wrapR[MAX_TEXTURE_CONTEXT];
     ///@}
 
-	textureImage texImage[MAX_TEXTURE_CONTEXT];
+	textureImage tex2D[MAX_TEXTURE_CONTEXT];
+	textureImage texCubeNX[MAX_TEXTURE_CONTEXT];
+	textureImage texCubeNY[MAX_TEXTURE_CONTEXT];
+	textureImage texCubeNZ[MAX_TEXTURE_CONTEXT];
+	textureImage texCubePX[MAX_TEXTURE_CONTEXT];
+	textureImage texCubePY[MAX_TEXTURE_CONTEXT];
+	textureImage texCubePZ[MAX_TEXTURE_CONTEXT];
 
 	void		ClearTexCache();
 
@@ -80,6 +96,11 @@ private:
 	floatVec4 TexCoordWrap(floatVec4 coordIn, int level, int tid);
     floatVec4 BilinearFilter(floatVec4 coordIn, int level, int tid);
     floatVec4 TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, int tid);
+
+	/// Reference texture image address from 2D image or 1 of 6 cube map image;
+	textureImage 	*targetImage;
+	/// image face selection identifier from 2D image or 1 of 6 cube map image;
+	int 			imageSelection;
 
 	/**
 	*	@brief Texture cache structure

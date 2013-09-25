@@ -65,12 +65,14 @@
      IFOP = 282,
      REPOP = 283,
      ENDFLOWOP = 284,
-     OPMODIFIER = 285,
-     TEXTARGET = 286,
-     CCMASKRULE = 287,
-     XYZW_SWIZZLE = 288,
-     RGBA_SWIZZLE = 289,
-     REG = 290
+     KILOP = 285,
+     DERIVEOP = 286,
+     OPMODIFIER = 287,
+     TEXTARGET = 288,
+     CCMASKRULE = 289,
+     XYZW_SWIZZLE = 290,
+     RGBA_SWIZZLE = 291,
+     REG = 292
    };
 #endif
 
@@ -90,7 +92,7 @@ typedef union YYSTYPE
 
 
 /* Line 1685 of yacc.c  */
-#line 94 "nvgp4ASM.tab.h"
+#line 96 "nvgp4ASM.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

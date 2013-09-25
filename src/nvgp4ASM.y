@@ -33,6 +33,7 @@ extern unsigned int shaderType;
 %token <ival> VECTOROP SCALAROP BINSCOP VECSCAOP
 %token <ival> BINOP TRIOP SWZOP TEXOP TXDOP
 %token <ival> BRAOP FLOWCCOP IFOP REPOP ENDFLOWOP
+%token <ival> KILOP DERIVEOP
 
 %token <ival> OPMODIFIER
 %token <ival> TEXTARGET
@@ -76,6 +77,7 @@ instruction
 	:	ALUInstruction
 	|	TexInstruction
 	|	FlowInstruction
+	|	SpecialInstrution
 	;
 
 ALUInstruction
@@ -99,6 +101,11 @@ FlowInstruction
 	|	IFop_instruction
 	|	REPop_instruction
 	|	ENDFLOWop_instruction
+	;
+	
+SpecialInstrution
+	:	KILop_instruction
+	|	DERIVEop_instruction
 	;
 
 VECTORop_instruction: VECTOROP opModifiers instResult ',' instOperand {
@@ -240,6 +247,85 @@ REPop_instruction
 
 ENDFLOWop_instruction: ENDFLOWOP opModifiers {
 		t_inst.op = $1;
+	}
+	
+KILop_instruction
+	:	KILOP opModifiers ccTest {
+			t_inst.op = $1;
+			t_inst.src[0] = t_operand;
+			t_inst.src[0].type = INST_CCREG;
+			switch (t_operand.ccMask) {
+			case CC_EQ:
+			case CC_EQ0:
+			case CC_GE:
+			case CC_GE0:
+			case CC_GT:
+			case CC_GT0:
+			case CC_LE:
+			case CC_LE0:
+			case CC_LT:
+			case CC_LT0:
+			case CC_NE:
+			case CC_NE0:
+			case CC_TR:
+			case CC_TR0:
+			case CC_FL:
+			case CC_FL0:
+			case CC_NAN:
+			case CC_NAN0:
+			case CC_LEG:
+			case CC_LEG0:
+			case CC_CF:
+			case CC_CF0:
+			case CC_NCF:
+			case CC_NCF0:
+			case CC_OF:
+			case CC_OF0:
+			case CC_NOF:
+			case CC_NOF0:
+			case CC_AB:
+			case CC_AB0:
+			case CC_BLE:
+			case CC_BLE0:
+			case CC_SF:
+			case CC_SF0:
+			case CC_NSF:
+			case CC_NSF0:
+				t_inst.src[0].id = 0;
+				break;
+					
+			case CC_EQ1:
+			case CC_GE1:
+			case CC_GT1:
+			case CC_LE1:
+			case CC_LT1:
+			case CC_NE1:
+			case CC_TR1:
+			case CC_FL1:
+			case CC_NAN1:
+			case CC_LEG1:
+			case CC_CF1:
+			case CC_NCF1:
+			case CC_OF1:
+			case CC_NOF1:
+			case CC_AB1:
+			case CC_BLE1:
+			case CC_SF1:
+			case CC_NSF1:
+				t_inst.src[0].id = 1;
+				break;
+			}
+		};
+//	|	KILOP opModifiers instOperand {
+//			t_inst.op = $1;
+//			t_inst.src[0] = operandPool[0];
+//		};
+	;
+	
+DERIVEop_instruction: DERIVEOP opModifiers instResult ',' instOperand {
+		t_inst.op = $1;
+		t_inst.dst = operandPool[0];
+		t_inst.src[0] = operandPool[1];
 	}
 
 opModifiers
@@ -426,6 +512,7 @@ rgbaComponent
 	|	'b' {$$[0] = 'b'; $$[1] = '\0';};
 	|	'a' {$$[0] = 'a'; $$[1] = '\0';};
 	;
+	
 optSign
 	:	/* empty */	{$$[0] = '\0';};
 	|	'-'			{$$[0] = '-'; $$[1] = '\0';};

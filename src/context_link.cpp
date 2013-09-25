@@ -68,7 +68,7 @@ void Context::LinkProgram(GLuint program)
 	nvgp4Info_str_in(shaderPool[VS].asmSrc.c_str());
 	nvgp4Info_parse();
 
-	printf("\n");
+//	printf("\n");
 
 	nvgp4Info_lineno = 1;
 	nvgp4Info_str_in(shaderPool[FS].asmSrc.c_str());
@@ -97,7 +97,7 @@ void Context::LinkProgram(GLuint program)
  * 	2nd pass parsing for custom instruction structure establishing from NVGP4
  *	assembly code. Resource remapping is performed in this stage.
  */
- 	printf("\n");
+// 	printf("\n");
 
 	nvgp4ASM_lineno = 1;
 	nvgp4ASM_str_in(shaderPool[VS].asmSrc.c_str());
@@ -110,9 +110,9 @@ void Context::LinkProgram(GLuint program)
 	programPool[program] = t_program;
 	programPool[program].isLinked = GL_TRUE;
 
-	for (unsigned int i=0; i<t_program.VSinstructionPool.size(); i++)
-		t_program.VSinstructionPool[i].Print();
-	printf("\n");
-	for (unsigned int i=0; i<t_program.FSinstructionPool.size(); i++)
-		t_program.FSinstructionPool[i].Print();
+//	for (unsigned int i=0; i<t_program.VSinstructionPool.size(); i++)
+//		t_program.VSinstructionPool[i].Print();
+//	printf("\n");
+//	for (unsigned int i=0; i<t_program.FSinstructionPool.size(); i++)
+//		t_program.FSinstructionPool[i].Print();
 }

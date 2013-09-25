@@ -488,7 +488,6 @@ struct textureImage
 {
 	inline textureImage():maxLevel(-1),border(0){}
 
-//    int				GLtype;
     int				maxLevel;
     unsigned int	border;
 	unsigned int	widthLevel[13];
