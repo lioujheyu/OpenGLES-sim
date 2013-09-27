@@ -164,7 +164,7 @@ struct programObject
 
 /** @name Naming Table
  *	GLSL variable name <-> ASM symbol attribute.
- *	For location retrieving by user.
+ *	For location retrieving by user request.
  */
 ///@{
 	std::map<std::string, symbol> srcVSin;

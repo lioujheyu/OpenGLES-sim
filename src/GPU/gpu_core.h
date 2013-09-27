@@ -103,6 +103,7 @@ public:
 	FILE 			*PIXELINFOfp;
     int				totalProcessingPrimitive,
 					totalCulledPrimitive,
+					totalClippedPrimitive,
 					totalProcessingVtx,
 					totalProcessingPix,
 					totalGhostPix,
@@ -125,7 +126,7 @@ private:
 
 	/// @name Primitive Assembly related member
 	///@{
-	///How many vertex are insufficient to form a primitive.
+	///How many vertices are insufficient to form a primitive.
     int         	vtxCntDwn;
     bool         	stripIndicator;
     ///@}
@@ -155,7 +156,12 @@ private:
 
     /// @name Geometry
     ///@{
-    void			FetchVertexData(unsigned int);
+
+/**
+ *  Fetch vertex data
+ *  @param vCnt Vertex index
+ */
+    void			FetchVertexData(unsigned int vCnt);
     void        	PerspectiveDivision();
     void        	ViewPort();
     void        	InitPrimitiveAssembly();
@@ -167,6 +173,15 @@ private:
 
     /// @name Rasterizer
     ///@{
+
+/**
+ *  This function will start in level 3(16x16 tile) and execute recursively
+ *  until the level 0 is reached(2x2 quad), and then interpolation the all 4 pixel's
+ *  data.
+ *  @param x Start point(x,y)'s x
+ *  @param y Start point(x,y)'s y
+ *  @param level Indicate the tileSplit's executing level
+ */
     void            tileSplit(int x, int y, int level);
     void            PerFragmentOp(pixel pixInput);
     void 			ClearBuffer(unsigned int mask);

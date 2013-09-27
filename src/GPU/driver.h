@@ -4,7 +4,12 @@
 #include "../context.h"
 #include "gpu_core.h"
 
+/**
+ *  Write All context status into GPU, and then activate GPU.
+ *  @param vtxInputMode This active command is drawArray or drawElement
+ */
 void ActiveGPU(int vtxInputMode);
+
 //void ActiveGPU2GenMipMap(int tid);	//Use GPU to generate mipmap
 void ActiveGPU2CleanBuffer();
 
