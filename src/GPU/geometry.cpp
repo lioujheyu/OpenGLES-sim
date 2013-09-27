@@ -49,34 +49,41 @@ void GPU_Core::VertexShaderEXE(int sid, void *input)
 	sCore[sid].Run();
 }
 
-void GPU_Core::PerspectiveDivision()
+void GPU_Core::PerspectiveDivision(vertex *vtx)
 {
-	float w = 1.0/curVtx.attr[0].w;
-	curVtx.attr[0].w = 1.0;
+	float w = 1.0/vtx->attr[0].w;
+
+	vtx->attr[0].w = 1.0;
+
+//	if (w < 0) {
+//		curVtx.attr[0].x = -curVtx.attr[0].x;
+//		curVtx.attr[0].y = -curVtx.attr[0].y;
+//		curVtx.attr[0].z = -curVtx.attr[0].z;
+//	}
 
 	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
 		if (varyEnable[i] == false)
 			continue;
 		else
-			curVtx.attr[i] = curVtx.attr[i] * w;
+			vtx->attr[i] = vtx->attr[i] * w;
 	}
 }
 
-void GPU_Core::ViewPort()
+void GPU_Core::ViewPort(vertex *vtx)
 {
     float x,y,z;
 
-    x = curVtx.attr[0].x;
-    y = curVtx.attr[0].y;
-    z = curVtx.attr[0].z;
+    x = vtx->attr[0].x;
+    y = vtx->attr[0].y;
+    z = vtx->attr[0].z;
 
     x = x*viewPortW/2 + viewPortLX + viewPortW/2;
     y = y*viewPortH/2 + viewPortLY + viewPortH/2;
     z = z*(depthRangeF-depthRangeN)/2 + (depthRangeF+depthRangeN)/2;
 
-    curVtx.attr[0].x = x;
-    curVtx.attr[0].y = y;
-    curVtx.attr[0].z = z;
+    vtx->attr[0].x = x;
+    vtx->attr[0].y = y;
+    vtx->attr[0].z = z;
 }
 
 void GPU_Core::PrimitiveAssembly()
@@ -157,7 +164,7 @@ void GPU_Core::PrimitiveAssembly()
     if (vtxCntDwn == 0)
     {
 		totalProcessingPrimitive++;
-        primStack.push(curPrim);
+        primFIFO.push(curPrim);
 
         switch (drawMode) {
         case GL_TRIANGLES:
@@ -175,20 +182,110 @@ void GPU_Core::PrimitiveAssembly()
     }
 }
 
-/// @todo Clipping
 void GPU_Core::Clipping()
 {
-	int outsideGrade = 0;
+	bool outsideClipVolume = false;
+	int next;
+	float outRatio, outPart, inPart;
+	bool outsideZNear[3];
+	float clipRatio[3];
 
-	for (int i=0; i<3; i++) {
-		if (prim.clipCoord[i].x > fabs(prim.clipCoord[i].w) ||
-			prim.clipCoord[i].y > fabs(prim.clipCoord[i].w) ||
-			prim.clipCoord[i].z > fabs(prim.clipCoord[i].w)  )
-			outsideGrade++;
+	primitive newPrim;
+	vertex newVtx;
+	std::stack<vertex> vtxStack;
+
+	outsideZNear[0] = outsideZNear[1] = outsideZNear[2] = false;
+
+
+	//Check whether completely outside the clip volume.
+	outsideClipVolume = ((prim.clipCoord[0].x > prim.clipCoord[0].w) &&
+						 (prim.clipCoord[1].x > prim.clipCoord[1].w) &&
+						 (prim.clipCoord[2].x > prim.clipCoord[2].w)
+						) ||
+						((prim.clipCoord[0].y > prim.clipCoord[0].w) &&
+						 (prim.clipCoord[1].y > prim.clipCoord[1].w) &&
+						 (prim.clipCoord[2].y > prim.clipCoord[2].w)
+						) ||
+						((prim.clipCoord[0].z > prim.clipCoord[0].w) &&
+						 (prim.clipCoord[1].z > prim.clipCoord[1].w) &&
+						 (prim.clipCoord[2].z > prim.clipCoord[2].w)
+						) ||
+						((prim.clipCoord[0].x < -prim.clipCoord[0].w) &&
+						 (prim.clipCoord[1].x < -prim.clipCoord[1].w) &&
+						 (prim.clipCoord[2].x < -prim.clipCoord[2].w)
+						) ||
+						((prim.clipCoord[0].y < -prim.clipCoord[0].w) &&
+						 (prim.clipCoord[1].y < -prim.clipCoord[1].w) &&
+						 (prim.clipCoord[2].y < -prim.clipCoord[2].w)
+						) ||
+						((prim.clipCoord[0].z < -prim.clipCoord[0].w) &&
+						 (prim.clipCoord[1].z < -prim.clipCoord[1].w) &&
+						 (prim.clipCoord[2].z < -prim.clipCoord[2].w)
+						);
+
+	if (outsideClipVolume) { //Completely outside the clip volume
+		prim.iskilled = true;
+		return;
 	}
 
-	if (outsideGrade == 3)
+	//Only Clip zNear plane if the primitive is across this plane.
+	for (int i=0; i<3; i++) {
+		if ( prim.clipCoord[i].z < -prim.clipCoord[i].w )
+			outsideZNear[i] = true;
+	}
+	if (outsideZNear[0] || outsideZNear[1] || outsideZNear[2]) {
+		newPrim.isGenerated = true;
+
+		for (int i=0; i<3; i++) {
+			next = (i+1) % 3;
+/*
+ *	Sutherland-Hodgman Polygon Clipping Algorithm
+ */
+			// in-to-in
+			if (outsideZNear[i]==false && outsideZNear[next]==false)
+				vtxStack.push(prim.v[next]);
+			// out-to-out
+			else if (outsideZNear[i]==true && outsideZNear[next]==true)
+				continue;
+			// in-to-out (i:in, next:out)
+			else if (outsideZNear[i]==false && outsideZNear[next]==true) {
+				outPart = prim.clipCoord[next].w - prim.clipCoord[next].z;
+				inPart = prim.clipCoord[i].w - prim.clipCoord[i].z;
+				outRatio = outPart / (outPart + inPart);
+
+				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++) {
+					//if (prim.clipCoord[next].w > 0)
+					newVtx.attr[j] = prim.v[next].attr[j]*(1-outRatio) +
+									 prim.v[i].attr[j]*outRatio;
+				}
+				vtxStack.push(newVtx);
+			}
+			// out-to-in (i:out, next:in)
+			else {
+				outPart = prim.clipCoord[i].w - prim.clipCoord[i].z;
+				inPart = prim.clipCoord[next].w - prim.clipCoord[next].z;
+				outRatio = outPart / (outPart + inPart);
+
+				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++)
+					newVtx.attr[j] = prim.v[i].attr[j]*(1-outRatio) +
+									 prim.v[next].attr[j]*outRatio;
+				vtxStack.push(newVtx);
+				vtxStack.push(prim.v[next]);
+			}
+
+			//Assemble vertex into primitive once vtxQueue is full (3 for )
+			if (vtxStack.size() > 2) {
+				newPrim.v[2] = vtxStack.top();	vtxStack.pop();
+				newPrim.v[1] = vtxStack.top();	vtxStack.pop();
+				newPrim.v[0] = vtxStack.top();	vtxStack.push(newPrim.v[2]);
+
+				primFIFO.push(newPrim);
+			}
+		}
+
 		prim.iskilled = true;
+	}
+
 }
 
 void GPU_Core::TriangleSetup()
@@ -211,8 +308,10 @@ void GPU_Core::TriangleSetup()
 
 	LY = MIN3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
 	LY = CLAMP(LY, viewPortLY, viewPortLY+viewPortH-1);
+	LY = LY & 0xfffe;
 	LX = MIN3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
 	LX = CLAMP(LX, viewPortLX, viewPortLX+viewPortW-1);
+	LX = LX & 0xfffe;
 	HY = MAX3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
 	HY = CLAMP(HY, viewPortLY, viewPortLY+viewPortH-1);
 	RX = MAX3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);

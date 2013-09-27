@@ -303,11 +303,11 @@ void draw_cubemap()
 	glm::mat4 Projection = glm::perspective(45.0f, 1024.0f / 768.0f, 0.1f, 100.0f);
 //	glm::mat4 View       = glm::mat4(1.0f);
 	glm::mat4 View = glm::lookAt(
-						glm::vec3(0.4f, 0.4f, -0.5f),          // Camera position in World space
+						glm::vec3(-0.4f, -0.4f, -0.5f),          // Camera position in World space
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.2,0.2,0.2));
+	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(1.2,1.2,1.2));
 	glm::mat4 MVP		 = Projection * View * Model;
 
 	GLfloat cube_vertices[] = {
@@ -322,6 +322,10 @@ void draw_cubemap()
 	};
 
 	glUniformMatrix4fv(mvp_loc, 1, 0, &MVP[0][0]);
+	for (int i=0; i<4; i++)
+		printf("%f %f %f %f\n", *(&MVP[0][i]), *(&MVP[1][i]), *(&MVP[2][i]), *(&MVP[3][i]));
+	printf("\n");
+
 	glUniform1i(cubemap_loc, 0);
 
 	glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, cube_vertices);
@@ -356,8 +360,8 @@ int main()
     Context::SetCurrentContext(new Context());
 
 //	draw_road();
-	draw_banana();
-//	draw_cubemap();
+//	draw_banana();
+	draw_cubemap();
 
 	Context::GetCurrentContext()->DumpImage();
 }

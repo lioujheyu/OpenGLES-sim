@@ -60,9 +60,10 @@ struct primitive{
 	primitive()
 	{
 		iskilled = false;
+		isGenerated = false;
 	}
 
-	bool iskilled;
+	bool iskilled, isGenerated;
     vertex v[3];
     floatVec4 clipCoord[3];
 };

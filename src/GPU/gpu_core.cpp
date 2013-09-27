@@ -37,26 +37,35 @@ void GPU_Core::Run()
         VertexShaderEXE(0, &curVtx);
 		curClipCoord = curVtx.attr[0];
 
-        PerspectiveDivision();
-        ViewPort();
         PrimitiveAssembly();
 
         //Primitive-based operation starts here
-        while (!primStack.empty()) {
-			prim = primStack.top();
-			Clipping();
+        while (!primFIFO.empty()) {
+			prim = primFIFO.front();
 
-			if (prim.iskilled) {
-				primStack.pop();
-				continue;
-            }
+			if (prim.isGenerated == false) {
+				Clipping();
+
+				if (prim.iskilled) {
+					totalClippedPrimitive++;
+					primFIFO.pop();
+					continue;
+				}
+			}
+
+			PerspectiveDivision(&prim.v[0]);
+			PerspectiveDivision(&prim.v[1]);
+			PerspectiveDivision(&prim.v[2]);
+			ViewPort(&prim.v[0]);
+			ViewPort(&prim.v[1]);
+			ViewPort(&prim.v[2]);
 
             TriangleSetup();
             Culling();
 
             if (prim.iskilled) {
 				totalCulledPrimitive++;
-				primStack.pop();
+				primFIFO.pop();
 				continue;
             }
 
@@ -85,7 +94,7 @@ void GPU_Core::Run()
 				}
 			}
 
-			primStack.pop();
+			primFIFO.pop();
         }
     }
 

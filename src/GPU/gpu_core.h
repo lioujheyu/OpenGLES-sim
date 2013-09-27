@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <algorithm>
+#include <queue>
 
 #include "gpu_config.h"
 #include "gpu_type.h"
@@ -122,7 +123,7 @@ private:
 	floatVec4		curClipCoord;
 
 	primitive   	prim, curPrim;
-	std::stack<primitive> primStack;
+	std::queue<primitive> primFIFO;
 
 	/// @name Primitive Assembly related member
 	///@{
@@ -137,7 +138,7 @@ private:
 
     ///@name Boundary Box
     ///@{
-    int             LX,	RX, LY,	HY;
+    int				LX, RX, LY, HY;
     ///@}
 
     pixel           pixBuffer[256];
@@ -162,10 +163,15 @@ private:
  *  @param vCnt Vertex index
  */
     void			FetchVertexData(unsigned int vCnt);
-    void        	PerspectiveDivision();
-    void        	ViewPort();
+    void        	PerspectiveDivision(vertex *vtx);
+    void        	ViewPort(vertex *vtx);
     void        	InitPrimitiveAssembly();
     void        	PrimitiveAssembly();
+
+/**
+ *	The clipping function will only clip zNear plane cause whole system is at
+ *	high precious floating point and no need to clip except for w < 0 situation.
+ */
     void        	Clipping();
     void            TriangleSetup();
     void        	Culling();

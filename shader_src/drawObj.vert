@@ -36,6 +36,8 @@ void main ()
 		specular_factor = specular_factor / ( 1 + distance*distance*0.001);
 		specular_color = specular_factor * vec3(0.4, 0.4, 0.2);
 	}
+	else
+		specular_color = vec3(0.0f,0.0f,0.0f);
 	
 	lightIntensity = (lightIntensity>0.0)?lightIntensity:0.0;
 	lightIntensity = (lightIntensity + 0.25f) / ( 1 + distance*distance*0.002);
