@@ -168,26 +168,24 @@ void GPU_Core::tileSplit(int x, int y, int level)
  *	Invoke specified Shader Core for fragment shader processing
  *
  *	@param sid Which shader core id will be used.
- *	@param input Input pointer
+ *	@param pixIn Input pixel's pointer.
  */
-void GPU_Core::FragmentShaderEXE(int sid,
-								 void *input0,
-								 void *input1,
-								 void *input2,
-								 void *input3 )
+void GPU_Core::FragmentShaderEXE(int sid, pixel* pixIn0,
+										  pixel* pixIn1,
+										  pixel* pixIn2,
+										  pixel* pixIn3 )
 {
 	sCore[sid].instPool = FSinstPool;
 	sCore[sid].instCnt = FSinstCnt;
 	sCore[sid].uniformPool = uniformPool;
-    sCore[sid].shaderType = FRAGMENT_SHADER;
 
 	sCore[sid].Init();
 	sCore[sid].isEnable[0] = sCore[sid].isEnable[1] =
 		sCore[sid].isEnable[2] = sCore[sid].isEnable[3] = true;
-	sCore[sid].input[0] = input0;
-	sCore[sid].input[1] = input1;
-	sCore[sid].input[2] = input2;
-	sCore[sid].input[3] = input3;
+	sCore[sid].threadPtr[0] = pixIn0;
+	sCore[sid].threadPtr[1] = pixIn1;
+	sCore[sid].threadPtr[2] = pixIn2;
+	sCore[sid].threadPtr[3] = pixIn3;
 	sCore[sid].Run();
 }
 

@@ -11,45 +11,15 @@ void ShaderCore::Init()
 	PC = 0;
 	isEnable[0] = isEnable[1] = isEnable[2] = isEnable[3] = false;
 	curCCState[0] = curCCState[1] = curCCState[2] = curCCState[3] = true;
-	isKilled[0] = isKilled[1] = isKilled[2] = isKilled[3] = false;
 }
 
 void ShaderCore::Run()
 {
-	if (shaderType == VERTEX_SHADER) {
-		if (isEnable[0]) {
-			vtxPtr[0]  = (vertex*)input[0];
-			vtxTemp[0] = *vtxPtr[0];
-		}
-		if (isEnable[1]) {
-			vtxPtr[1]  = (vertex*)input[1];
-			vtxTemp[1] = *vtxPtr[1];
-		}
-		if (isEnable[2]) {
-			vtxPtr[2]  = (vertex*)input[2];
-			vtxTemp[2] = *vtxPtr[2];
-		}
-		if (isEnable[3]) {
-			vtxPtr[3]  = (vertex*)input[3];
-			vtxTemp[3] = *vtxPtr[3];
-		}
-	}
-	else {	//FRAGMENT_SHADER
-		if (isEnable[0]) {
-			pixPtr[0]  = (pixel*)input[0];
-			pixTemp[0] = *pixPtr[0];
-		}
-		if (isEnable[1]) {
-			pixPtr[1]  = (pixel*)input[1];
-			pixTemp[1] = *pixPtr[1];
-		}
-		if (isEnable[2]) {
-			pixPtr[2]  = (pixel*)input[2];
-			pixTemp[2] = *pixPtr[2];
-		}
-		if (isEnable[3]) {
-			pixPtr[3]  = (pixel*)input[3];
-			pixTemp[3] = *pixPtr[3];
+	int i;
+
+	for (i=0; i<4; i++) {
+		if (isEnable[i]) {
+			thread[i] = *threadPtr[i];
 		}
 	}
 
@@ -64,59 +34,27 @@ void ShaderCore::Run()
  * like instruction(DDX, DDY, TEX with auto scale factor computation)'s
  * result is corrupted.
  */
-		if (isEnable[0])
-			FetchData(0);
-		if (isEnable[1])
-			FetchData(1);
-		if (isEnable[2])
-			FetchData(2);
-		if (isEnable[3])
-			FetchData(3);
-
-		if (isEnable[0]){
-			Exec(0);
-			if (curCCState[0] == true) {
-				totalInstructionCnt+=1;
-				WriteBack(0);
-			}
+		for (i=0; i<4; i++) {
+			if (isEnable[i])
+				FetchData(i);
 		}
 
-		if (isEnable[1]){
-			Exec(1);
-			if (curCCState[1] == true) {
-				totalInstructionCnt+=1;
-				WriteBack(1);
-			}
-		}
-
-		if (isEnable[2]){
-			Exec(2);
-			if (curCCState[2] == true) {
-				totalInstructionCnt+=1;
-				WriteBack(2);
-			}
-		}
-
-		if (isEnable[3]){
-			Exec(3);
-			if (curCCState[3] == true) {
-				totalInstructionCnt+=1;
-				WriteBack(3);
+		for (i=0; i<4; i++) {
+			if (isEnable[i]){
+				Exec(i);
+				if (curCCState[i] == true) {
+					totalInstructionCnt+=1;
+					WriteBack(i);
+				}
 			}
 		}
 
 		PC++;
 	}
 
-	if (shaderType == FRAGMENT_SHADER) {
-		if (isEnable[0])
-			pixPtr[0]->isKilled = isKilled[0];
-		if (isEnable[1])
-			pixPtr[1]->isKilled = isKilled[1];
-		if (isEnable[2])
-			pixPtr[2]->isKilled = isKilled[2];
-		if (isEnable[0])
-			pixPtr[3]->isKilled = isKilled[3];
+	for (i=0; i<4; i++) {
+		if (isEnable[i])
+			threadPtr[i]->isKilled = thread[i].isKilled;
 	}
 }
 
@@ -394,7 +332,7 @@ void ShaderCore::Exec(int idx)
 	case OP_KIL:
 		switch (curInst.src[0].ccMask) {
 		case CC_EQ: case CC_EQ0: case CC_EQ1:
-			isKilled[idx] = curCCState[idx] &&
+			thread[idx].isKilled = curCCState[idx] &&
 				( (!(src[idx][0].x == 1.0) && (src[idx][1].x == 1.0)) ||
 				  (!(src[idx][0].y == 1.0) && (src[idx][1].y == 1.0)) ||
 				  (!(src[idx][0].z == 1.0) && (src[idx][1].z == 1.0)) ||
@@ -402,7 +340,7 @@ void ShaderCore::Exec(int idx)
 			break;
 
 		case CC_NE: case CC_NE0: case CC_NE1:
-			isKilled[idx] = curCCState[idx] &&
+			thread[idx].isKilled = curCCState[idx] &&
 				( ((src[idx][0].x == 1.0) || !(src[idx][1].x == 1.0)) ||
 				  ((src[idx][0].y == 1.0) || !(src[idx][1].y == 1.0)) ||
 				  ((src[idx][0].z == 1.0) || !(src[idx][1].z == 1.0)) ||
@@ -444,12 +382,8 @@ void ShaderCore::FetchData(int idx)
 		case INST_NO_TYPE:
 			return;
 		case INST_ATTRIB:
-			if (shaderType == VERTEX_SHADER)
-				src[idx][i] =ReadByMask(vtxTemp[idx].attr[curInst.src[i].id],
-										curInst.src[i].modifier );
-			else
-				src[idx][i] =ReadByMask(pixTemp[idx].attr[curInst.src[i].id],
-										curInst.src[i].modifier );
+			src[idx][i] =ReadByMask(thread[idx].attr[curInst.src[i].id],
+									curInst.src[i].modifier );
 			break;
 
 		case INST_UNIFORM:
@@ -496,10 +430,7 @@ void ShaderCore::WriteBack(int idx)
 {
 	switch (curInst.dst.type) {
 	case INST_ATTRIB:
-		if (shaderType == VERTEX_SHADER)
-			WriteByMask(dst[idx], &(vtxPtr[idx]->attr[curInst.dst.id]), curInst.dst.modifier, idx);
-		else
-			WriteByMask(dst[idx], &(pixPtr[idx]->attr[curInst.dst.id]), curInst.dst.modifier, idx);
+		WriteByMask(dst[idx], &(threadPtr[idx]->attr[curInst.dst.id]), curInst.dst.modifier, idx);
 		break;
 
 	case INST_REG:
@@ -510,10 +441,8 @@ void ShaderCore::WriteBack(int idx)
 		break;
 
 	case INST_COLOR:
-		if (shaderType == FRAGMENT_SHADER)
-			WriteByMask(dst[idx], &(pixPtr[idx]->attr[1]), curInst.dst.modifier, idx);
-		else
-			printf("Shader: Pix attribute color is not available in this shader type");
+		WriteByMask(dst[idx], &(threadPtr[idx]->attr[1]), curInst.dst.modifier, idx);
+		break;
 	}
 }
 

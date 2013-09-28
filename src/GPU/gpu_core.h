@@ -147,12 +147,11 @@ private:
 
 	/// @name Invoke Shader Core
 	///@{
-    void 			VertexShaderEXE(int sid, void *input);
-    void 			FragmentShaderEXE(int sid,
-									  void *input0,
-									  void *input1,
-									  void *input2,
-									  void *input3);
+    void 			VertexShaderEXE(int sid, vertex *vtxIn);
+    void 			FragmentShaderEXE(int sid, pixel *pixIn0,
+											   pixel *pixIn1,
+											   pixel *pixIn2,
+											   pixel *pixIn3 );
 	///@}
 
     /// @name Geometry

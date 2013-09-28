@@ -360,8 +360,8 @@ int main()
     Context::SetCurrentContext(new Context());
 
 //	draw_road();
-//	draw_banana();
-	draw_cubemap();
+	draw_banana();
+//	draw_cubemap();
 
 	Context::GetCurrentContext()->DumpImage();
 }

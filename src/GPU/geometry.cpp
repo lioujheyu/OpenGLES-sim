@@ -36,16 +36,15 @@ void GPU_Core::InitPrimitiveAssembly()
  */
 
 ///@todo Raise the usage of 4 exec units.
-void GPU_Core::VertexShaderEXE(int sid, void *input)
+void GPU_Core::VertexShaderEXE(int sid, vertex *vtx)
 {
 	sCore[sid].instPool = VSinstPool;
 	sCore[sid].instCnt = VSinstCnt;
 	sCore[sid].uniformPool = uniformPool;
-	sCore[sid].shaderType = VERTEX_SHADER;
 
 	sCore[sid].Init();
 	sCore[sid].isEnable[0] = true;
-	sCore[sid].input[0] = input;
+	sCore[sid].threadPtr[0] = vtx;
 	sCore[sid].Run();
 }
 
@@ -54,12 +53,6 @@ void GPU_Core::PerspectiveDivision(vertex *vtx)
 	float w = 1.0/vtx->attr[0].w;
 
 	vtx->attr[0].w = 1.0;
-
-//	if (w < 0) {
-//		curVtx.attr[0].x = -curVtx.attr[0].x;
-//		curVtx.attr[0].y = -curVtx.attr[0].y;
-//		curVtx.attr[0].z = -curVtx.attr[0].z;
-//	}
 
 	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
 		if (varyEnable[i] == false)
@@ -188,7 +181,7 @@ void GPU_Core::Clipping()
 	int next;
 	float outRatio, outPart, inPart;
 	bool outsideZNear[3];
-	float clipRatio[3];
+//	float clipRatio[3];
 
 	primitive newPrim;
 	vertex newVtx;

@@ -82,7 +82,6 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
 	unsigned int tag;
 	unsigned short entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
 	unsigned char tWay = 0;
-	unsigned char LRUbiggest = 0;
     bool isColdMiss = false;
 
 	if (targetImage->maxLevel == -1) {

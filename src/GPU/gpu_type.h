@@ -13,55 +13,47 @@
 /**
  *	@brief Unit thread class
  *
- *	Contain the thread's program counter and its id generated from thread pool.
+ *	Contain the thread's id generated from thread pool.
  */
 class unitThread
 {
 public:
-	int pc; ///< Program counter
+	unitThread() : isKilled(false) {}
+
+	bool isKilled;
 	int threadId; ///< Thread ID
+	floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
 };
 
 /**
- *	@brief Vertex thread class (child class to unit thread)
+ *	@brief Vertex thread class (derived class from unitThread)
  *
- *	Contain the vertex's attribute value pass from user.
+ *	The same as the unit thread, this derived class is for presevation of
+ *	future vertex specified data.
  */
-class vertex : unitThread {
+class vertex : public unitThread {
 public:
-    floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
 };
 
 /**
  *	@brief Pixel thread class (child class to unit thread)
  *
- *	In addition to attribute value, this pixel class also contain the x-axis and
- *	y-axis scale factors for each attribute. The pixel's special barycentric
- *	coordinate is also stored here.
+ *	In addition to attribute value, this pixel class also contains pixel's
+ *	barycentric coordinate and ghost flag.
+ *
+ *	@note The pixel thread's 1st attr slot will always be its screen position.
  */
-class pixel : unitThread {
+class pixel : public unitThread {
 public:
-	pixel()
-	{
-		isKilled = false;
-		isGhost = true;
-	}
-
-    //The position will always use the 1st attribute slot in whole GPU design.
-    floatVec4   attr[MAX_ATTRIBUTE_NUMBER];
+	pixel() : isGhost(true) {}
 
     ///Barycentric Coordinate
     float       baryCenPos3[3];
-    bool		isKilled;
     bool		isGhost;
 };
 
 struct primitive{
-	primitive()
-	{
-		iskilled = false;
-		isGenerated = false;
-	}
+	primitive() : iskilled(false), isGenerated(false) {}
 
 	bool iskilled, isGenerated;
     vertex v[3];
