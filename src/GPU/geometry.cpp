@@ -254,9 +254,9 @@ void GPU_Core::Clipping()
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++) {
-					//if (prim.clipCoord[next].w > 0)
-					newVtx.attr[j] = prim.v[next].attr[j]*(1-outRatio) +
-									 prim.v[i].attr[j]*outRatio;
+					if (varyEnable[j])
+						newVtx.attr[j] = prim.v[next].attr[j]*(1-outRatio) +
+										 prim.v[i].attr[j]*outRatio;
 				}
 				vtxStack.push(newVtx);
 			}

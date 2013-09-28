@@ -303,11 +303,11 @@ void draw_cubemap()
 	glm::mat4 Projection = glm::perspective(45.0f, 1024.0f / 768.0f, 0.1f, 100.0f);
 //	glm::mat4 View       = glm::mat4(1.0f);
 	glm::mat4 View = glm::lookAt(
-						glm::vec3(-0.4f, -0.4f, -0.5f),          // Camera position in World space
+						glm::vec3(-0.4f, -0.5f, -0.5f),          // Camera position in World space
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(1.2,1.2,1.2));
+	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.5,0.5,0.5));
 	glm::mat4 MVP		 = Projection * View * Model;
 
 	GLfloat cube_vertices[] = {
