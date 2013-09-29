@@ -233,7 +233,7 @@ void draw_banana()
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(3.5f));
+	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(15.5f));
 	glm::mat4 VP = Projection * View;
 
 	int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
@@ -307,8 +307,10 @@ void draw_cubemap()
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.5,0.5,0.5));
+//	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.5,0.5,0.5));
+	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(1.2,1.2,1.2));
 	glm::mat4 MVP		 = Projection * View * Model;
+
 
 	GLfloat cube_vertices[] = {
 	  -1.0,  1.0,  1.0,

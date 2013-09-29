@@ -35,8 +35,6 @@ void GPU_Core::Run()
 		//Vertex-based operation starts here
 		///@todo Task scheduler for auto job dispatch
         VertexShaderEXE(0, &curVtx);
-		curClipCoord = curVtx.attr[0];
-
         PrimitiveAssembly();
 
         //Primitive-based operation starts here
@@ -47,7 +45,6 @@ void GPU_Core::Run()
 				Clipping();
 
 				if (prim.iskilled) {
-					totalClippedPrimitive++;
 					primFIFO.pop();
 					continue;
 				}
@@ -100,7 +97,9 @@ void GPU_Core::Run()
 
     GPUPRINTF("Total processed vertex: %d\n",totalProcessingVtx);
     GPUPRINTF("Total processed Primitive: %d\n",totalProcessingPrimitive);
-    GPUPRINTF("Total culled Primitive: %d\n",totalCulledPrimitive);
+    GPUPRINTF("Total added primitives from clipping: %d\n",totalGeneratedPrimitive);
+    GPUPRINTF("Total clipped primitives: %d\n",totalClippedPrimitive);
+    GPUPRINTF("Total culled Primitive(Include completely outside the clip volume): %d\n",totalCulledPrimitive);
     GPUPRINTF("Tile Split Count: %d\n",tileSplitCnt);
     GPUPRINTF("Total processed pixel: %d\n",totalProcessingPix);
 	GPUPRINTF("Ghost pixel: %d\n",totalGhostPix);
@@ -148,7 +147,8 @@ GPU_Core::GPU_Core()
 	blendEnable = false;
 
 	totalProcessingPrimitive = totalProcessingPix = totalProcessingVtx =
-		totalGhostPix = totalLivePix = totalCulledPrimitive = 0;
+		totalGhostPix = totalLivePix = totalCulledPrimitive =
+		totalGeneratedPrimitive = 0;
 	tileSplitCnt = 0;
 
 #if defined(DEBUG) && defined(GPU_INFO) && defined(GPU_INFO_FILE)

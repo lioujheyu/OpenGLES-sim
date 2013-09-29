@@ -352,7 +352,6 @@ void ShaderCore::Exec(int idx)
 					curInst.src[0].ccMask);
 			break;
 		}
-
 		break;
 	//DERIVEop
 	case OP_DDX:
@@ -370,7 +369,8 @@ void ShaderCore::Exec(int idx)
 		break;
 
 	default:
-		printf("Shader: Undefined or unimplemented OPcode: %x\n",curInst.op);
+		fprintf(stderr,
+			"Shader: Undefined or unimplemented OPcode: %x\n",curInst.op);
 		break;
 	}
 }
@@ -382,8 +382,8 @@ void ShaderCore::FetchData(int idx)
 		case INST_NO_TYPE:
 			return;
 		case INST_ATTRIB:
-			src[idx][i] =ReadByMask(thread[idx].attr[curInst.src[i].id],
-									curInst.src[i].modifier );
+			src[idx][i] = ReadByMask(thread[idx].attr[curInst.src[i].id],
+									 curInst.src[i].modifier );
 			break;
 
 		case INST_UNIFORM:
@@ -409,7 +409,8 @@ void ShaderCore::FetchData(int idx)
 			break;
 
 		default:
-			printf("Shader(Exec): Unknown operand type \n");
+			fprintf(stderr,
+				"Shader(Exec): Unknown operand type \n");
 			return;
 		}
 
@@ -446,15 +447,7 @@ void ShaderCore::WriteBack(int idx)
 	}
 }
 
-/**
- *	Extract the source floatVec4 's component by mask
- *
- *	@param in 	A floatVec4 prepared for component extraction by mask.
- *	@param mask The component mask
- *
- *	@return A floatVec4
- */
-floatVec4 ShaderCore::ReadByMask(floatVec4 in, char *mask)
+floatVec4 ShaderCore::ReadByMask(const floatVec4 &in, char *mask)
 {
 	floatVec4 temp;
 	temp.x = (mask[0]=='x' || mask[0]=='r')? in.x:
@@ -494,15 +487,7 @@ floatVec4 ShaderCore::ReadByMask(floatVec4 in, char *mask)
 	return temp;
 }
 
-/**
- *	Write the destination floatVec4's floating component by mask including CC
- *	register's update if necessary.
- *
- *	@param val		A floatVec4 value prepared for writing.
- *	@param fvdst	The destination floatVec4 's pointer
- *	@param mask 	The component mask.
- */
-void ShaderCore::WriteByMask(floatVec4 val, floatVec4* fvdst, char *mask, int idx)
+void ShaderCore::WriteByMask(const floatVec4 &val, floatVec4* fvdst, char *mask, int idx)
 {
 	for (int i=0; i<4; i++) {
 		switch (mask[i]) {

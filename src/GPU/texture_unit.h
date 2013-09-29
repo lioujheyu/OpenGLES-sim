@@ -71,11 +71,11 @@ public:
 
 	void		ClearTexCache();
 
-	floatVec4	GetTexColor(floatVec4 coordIn, int level, int tid);
-    floatVec4	TextureSample(floatVec4 coordIn,
+	floatVec4	GetTexColor(const floatVec4 &coordIn, int level, int tid);
+    floatVec4	TextureSample(const floatVec4 &coordIn,
 							  int level,
-							  floatVec4 scaleFacDX,
-							  floatVec4 scaleFacDY,
+							  const floatVec4 &scaleFacDX,
+							  const floatVec4 &scaleFacDY,
 							  int targetType,
 							  int tid );
 
@@ -93,9 +93,9 @@ private:
 	int		CalcTexAdd( short int us, short int ub, short int uo,
 						short int vs, short int vb, short int vo,
 						int width);
-	floatVec4 TexCoordWrap(floatVec4 coordIn, int level, int tid);
-    floatVec4 BilinearFilter(floatVec4 coordIn, int level, int tid);
-    floatVec4 TrilinearFilter(floatVec4 coordIn, int level, float w_ratio, int tid);
+	floatVec4 TexCoordWrap(const floatVec4 &coordIn, int level, int tid);
+    floatVec4 BilinearFilter(const floatVec4 &coordIn, int level, int tid);
+    floatVec4 TrilinearFilter(const floatVec4 &coordIn, int level, float w_ratio, int tid);
 
 	/// Reference texture image address from 2D image or 1 of 6 cube map image;
 	textureImage 	*targetImage;

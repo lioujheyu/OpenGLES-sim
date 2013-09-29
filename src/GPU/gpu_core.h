@@ -43,7 +43,7 @@
 
 
 /**
- *	@brief The major class for whole GPU hardware design
+ *	The major class for whole GPU hardware design
  */
 class GPU_Core
 {
@@ -71,11 +71,11 @@ public:
     GLenum			blendingMode;
     float           DepthRef;
 
-	///Texture min/mag filter for each texture unit
-	///@{
+///Texture min/mag filter for each texture unit
+///@{
 	GLenum 			minFilter[MAX_TEXTURE_CONTEXT],
 					magFilter[MAX_TEXTURE_CONTEXT];
-	///@}
+///@}
 
     GLenum 			wrapS[MAX_TEXTURE_CONTEXT],
 					wrapT[MAX_TEXTURE_CONTEXT];
@@ -98,19 +98,20 @@ public:
 	floatVec4		clearColor;
     float			clearDepth;
 
-    /// @name Statistic
-    ///@{
+/// @name Statistic
+///@{
     FILE 			*GPUINFOfp;
 	FILE 			*PIXELINFOfp;
     int				totalProcessingPrimitive,
 					totalCulledPrimitive,
 					totalClippedPrimitive,
+					totalGeneratedPrimitive,
 					totalProcessingVtx,
 					totalProcessingPix,
 					totalGhostPix,
 					totalLivePix;
 	int 			tileSplitCnt;
-    ///@}
+///@}
 
     void        	Run();
     void 			PassConfig2SubModule();
@@ -125,40 +126,50 @@ private:
 	primitive   	prim, curPrim;
 	std::queue<primitive> primFIFO;
 
-	/// @name Primitive Assembly related member
-	///@{
-	///How many vertices are insufficient to form a primitive.
+/// @name Primitive Assembly related member
+///@{
+
+///How many vertices are insufficient to form a primitive.
     int         	vtxCntDwn;
     bool         	stripIndicator;
-    ///@}
+///@}
 
 	//Rasterizer
 	float           Edge[3][3]; ///< Edge equation's coefficient
     float           area2Reciprocal;
 
-    ///@name Boundary Box
-    ///@{
+/**
+ *	@name Boundary Box
+ *	Target primitive's draw boundary box
+ *	        *----------* (RX,HY)
+ *	        |          |
+ *	        |          |
+ *	        |          |
+ *	(LX,LY) *----------*
+ */
+///@{
     int				LX, RX, LY, HY;
-    ///@}
+///@}
 
     pixel           pixBuffer[256];
     int             pixBufferP;
 
 
-	/// @name Invoke Shader Core
-	///@{
+/// @name Invoke Shader Core
+///@{
     void 			VertexShaderEXE(int sid, vertex *vtxIn);
     void 			FragmentShaderEXE(int sid, pixel *pixIn0,
 											   pixel *pixIn1,
 											   pixel *pixIn2,
 											   pixel *pixIn3 );
-	///@}
+///@}
 
-    /// @name Geometry
-    ///@{
+/// @name Geometry
+///@{
 
 /**
  *  Fetch vertex data
+ *
  *  @param vCnt Vertex index
  */
     void			FetchVertexData(unsigned int vCnt);
@@ -174,23 +185,24 @@ private:
     void        	Clipping();
     void            TriangleSetup();
     void        	Culling();
-    ///@}
+///@}
 
-    /// @name Rasterizer
-    ///@{
+/// @name Rasterizer
+///@{
 
 /**
  *  This function will start in level 3(16x16 tile) and execute recursively
  *  until the level 0 is reached(2x2 quad), and then interpolation the all 4 pixel's
  *  data.
+ *
  *  @param x Start point(x,y)'s x
  *  @param y Start point(x,y)'s y
  *  @param level Indicate the tileSplit's executing level
  */
     void            tileSplit(int x, int y, int level);
-    void            PerFragmentOp(pixel pixInput);
+    void            PerFragmentOp(const pixel &pixInput);
     void 			ClearBuffer(unsigned int mask);
-    ///@}
+///@}
 
 };
 

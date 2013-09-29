@@ -189,7 +189,7 @@ void GPU_Core::FragmentShaderEXE(int sid, pixel* pixIn0,
 	sCore[sid].Run();
 }
 
-void GPU_Core::PerFragmentOp(pixel pixInput)
+void GPU_Core::PerFragmentOp(const pixel &pixInput)
 {
 	bool DepthPass = true;
 	int bufOffset;

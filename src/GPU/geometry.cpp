@@ -84,7 +84,6 @@ void GPU_Core::PrimitiveAssembly()
     switch (drawMode) {
     case GL_TRIANGLES:
             curPrim.v[vtxCntDwn-1] = curVtx;
-            curPrim.clipCoord[vtxCntDwn-1] = curClipCoord;
         break;
 
 	/*	Vertex order in Strip mode
@@ -99,27 +98,19 @@ void GPU_Core::PrimitiveAssembly()
     	if (vtxCntDwn == 1) {
 			if (stripIndicator == false) {
 				curPrim.v[2] = curPrim.v[0];
-				curPrim.clipCoord[2] = curPrim.clipCoord[0];
 				curPrim.v[0] = curVtx;
-				curPrim.clipCoord[0] = curClipCoord;
 				stripIndicator = true;
 			}
 			else {
 				curPrim.v[2] = curPrim.v[1];
-				curPrim.clipCoord[2] = curPrim.clipCoord[1];
 				curPrim.v[1] = curVtx;
-				curPrim.clipCoord[1] = curClipCoord;
 				stripIndicator = false;
 			}
 		}
-    	else if (vtxCntDwn == 3) {
+    	else if (vtxCntDwn == 3)
 			curPrim.v[0] = curVtx;
-			curPrim.clipCoord[0] = curClipCoord;
-    	}
-		else if (vtxCntDwn == 2) {
+		else if (vtxCntDwn == 2)
 			curPrim.v[1] = curVtx;
-			curPrim.clipCoord[1] = curClipCoord;
-		}
         break;
 
 	/*	Vertex order in Fan mode
@@ -133,18 +124,12 @@ void GPU_Core::PrimitiveAssembly()
     case GL_TRIANGLE_FAN:
         if (vtxCntDwn == 1) {
 			curPrim.v[1] = curPrim.v[0];
-			curPrim.clipCoord[1] = curPrim.clipCoord[0];
 			curPrim.v[0] = curVtx;
-			curPrim.clipCoord[0] = curClipCoord;
         }
-        else if (vtxCntDwn == 3) {
+        else if (vtxCntDwn == 3)
 			curPrim.v[2] = curVtx;
-			curPrim.clipCoord[2] = curClipCoord;
-        }
-		else if (vtxCntDwn == 2) {
+		else if (vtxCntDwn == 2)
             curPrim.v[0] = curVtx;
-            curPrim.clipCoord[0] = curClipCoord;
-		}
         break;
     default:
     	printf("GPU_Core: Nonsupport draw mode: %x\n",drawMode);
@@ -168,7 +153,8 @@ void GPU_Core::PrimitiveAssembly()
             vtxCntDwn = 1;
             break;
         default:
-        	printf("GPU_Core: Nonsupport draw mode: %x",drawMode);
+        	fprintf(stderr,
+				"GPU_Core: Nonsupport draw mode: %x",drawMode);
 			exit(1);
             break;
         }
@@ -189,44 +175,46 @@ void GPU_Core::Clipping()
 
 	outsideZNear[0] = outsideZNear[1] = outsideZNear[2] = false;
 
-
 	//Check whether completely outside the clip volume.
-	outsideClipVolume = ((prim.clipCoord[0].x > prim.clipCoord[0].w) &&
-						 (prim.clipCoord[1].x > prim.clipCoord[1].w) &&
-						 (prim.clipCoord[2].x > prim.clipCoord[2].w)
+	outsideClipVolume = ((prim.v[0].attr[0].x > prim.v[0].attr[0].w) &&
+						 (prim.v[1].attr[0].x > prim.v[1].attr[0].w) &&
+						 (prim.v[2].attr[0].x > prim.v[2].attr[0].w)
 						) ||
-						((prim.clipCoord[0].y > prim.clipCoord[0].w) &&
-						 (prim.clipCoord[1].y > prim.clipCoord[1].w) &&
-						 (prim.clipCoord[2].y > prim.clipCoord[2].w)
+						((prim.v[0].attr[0].y > prim.v[0].attr[0].w) &&
+						 (prim.v[1].attr[0].y > prim.v[1].attr[0].w) &&
+						 (prim.v[2].attr[0].y > prim.v[2].attr[0].w)
 						) ||
-						((prim.clipCoord[0].z > prim.clipCoord[0].w) &&
-						 (prim.clipCoord[1].z > prim.clipCoord[1].w) &&
-						 (prim.clipCoord[2].z > prim.clipCoord[2].w)
+						((prim.v[0].attr[0].z > prim.v[0].attr[0].w) &&
+						 (prim.v[1].attr[0].z > prim.v[1].attr[0].w) &&
+						 (prim.v[2].attr[0].z > prim.v[2].attr[0].w)
 						) ||
-						((prim.clipCoord[0].x < -prim.clipCoord[0].w) &&
-						 (prim.clipCoord[1].x < -prim.clipCoord[1].w) &&
-						 (prim.clipCoord[2].x < -prim.clipCoord[2].w)
+						((prim.v[0].attr[0].x < -prim.v[0].attr[0].w) &&
+						 (prim.v[1].attr[0].x < -prim.v[1].attr[0].w) &&
+						 (prim.v[2].attr[0].x < -prim.v[2].attr[0].w)
 						) ||
-						((prim.clipCoord[0].y < -prim.clipCoord[0].w) &&
-						 (prim.clipCoord[1].y < -prim.clipCoord[1].w) &&
-						 (prim.clipCoord[2].y < -prim.clipCoord[2].w)
+						((prim.v[0].attr[0].y < -prim.v[0].attr[0].w) &&
+						 (prim.v[1].attr[0].y < -prim.v[1].attr[0].w) &&
+						 (prim.v[2].attr[0].y < -prim.v[2].attr[0].w)
 						) ||
-						((prim.clipCoord[0].z < -prim.clipCoord[0].w) &&
-						 (prim.clipCoord[1].z < -prim.clipCoord[1].w) &&
-						 (prim.clipCoord[2].z < -prim.clipCoord[2].w)
+						((prim.v[0].attr[0].z < -prim.v[0].attr[0].w) &&
+						 (prim.v[1].attr[0].z < -prim.v[1].attr[0].w) &&
+						 (prim.v[2].attr[0].z < -prim.v[2].attr[0].w)
 						);
 
 	if (outsideClipVolume) { //Completely outside the clip volume
+		totalCulledPrimitive++;
 		prim.iskilled = true;
 		return;
 	}
 
 	//Only Clip zNear plane if the primitive is across this plane.
 	for (int i=0; i<3; i++) {
-		if ( prim.clipCoord[i].z < -prim.clipCoord[i].w )
+		if ( prim.v[i].attr[0].z < -prim.v[i].attr[0].w )
 			outsideZNear[i] = true;
 	}
 	if (outsideZNear[0] || outsideZNear[1] || outsideZNear[2]) {
+		totalClippedPrimitive++;
+
 		newPrim.isGenerated = true;
 
 		for (int i=0; i<3; i++) {
@@ -242,8 +230,10 @@ void GPU_Core::Clipping()
 				continue;
 			// in-to-out (i:in, next:out)
 			else if (outsideZNear[i]==false && outsideZNear[next]==true) {
-				outPart = prim.clipCoord[next].w - prim.clipCoord[next].z;
-				inPart = prim.clipCoord[i].w - prim.clipCoord[i].z;
+//				outPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
+//				inPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
+				outPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
+				inPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++) {
@@ -255,8 +245,8 @@ void GPU_Core::Clipping()
 			}
 			// out-to-in (i:out, next:in)
 			else {
-				outPart = prim.clipCoord[i].w - prim.clipCoord[i].z;
-				inPart = prim.clipCoord[next].w - prim.clipCoord[next].z;
+				outPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
+				inPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++)
@@ -273,12 +263,12 @@ void GPU_Core::Clipping()
 				newPrim.v[0] = vtxStack.top();	vtxStack.push(newPrim.v[2]);
 
 				primFIFO.push(newPrim);
+				totalGeneratedPrimitive++;
 			}
 		}
 
 		prim.iskilled = true;
 	}
-
 }
 
 void GPU_Core::TriangleSetup()
@@ -294,13 +284,13 @@ void GPU_Core::TriangleSetup()
 
 	doubleArea = Edge[0][1]*Edge[1][0] - Edge[0][0]*Edge[1][1];
 
-//	if (fabs(doubleArea) > 1000000)
-//		printf("What the fuck!!\n");
-
 	area2Reciprocal = 1/doubleArea;
 
 	LY = MIN3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
 	LY = CLAMP(LY, viewPortLY, viewPortLY+viewPortH-1);
+/*	Align boundary box to even coordinate to make sure the tile split will not
+ *	output any pixel outside the HY and RX boundary.
+ */
 	LY = LY & 0xfffe;
 	LX = MIN3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
 	LX = CLAMP(LX, viewPortLX, viewPortLX+viewPortW-1);
@@ -329,7 +319,8 @@ void GPU_Core::Culling()
 			prim.iskilled = false;
 			break;
 		default:
-			fprintf(stderr, "Culling: Undefined culling mode %x\n", cullFaceMode);
+			fprintf(stderr,
+				"Culling: Undefined culling mode %x\n", cullFaceMode);
 			break;
 		}
 	}

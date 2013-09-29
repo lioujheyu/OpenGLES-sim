@@ -45,8 +45,6 @@ public:
 		instCnt = 0;
 		totalInstructionCnt = 0;
 		totalScaleOperation = 0;
-		for (int i=0; i<MAX_SHADER_REG_VECTOR*4; i++)
-			reg[i].x = reg[i].y = reg[i].z = reg[i].w = 0.0f;
 
 		tid = -1; tType = 0;
 		instPool = nullptr;
@@ -77,8 +75,26 @@ public:
 	void Print();
 	void FetchData(int idx);
 	void WriteBack(int idx);
-	floatVec4 ReadByMask(floatVec4 in, char *mask);
-	void WriteByMask(floatVec4 val, floatVec4 *fvdst, char *mask, int idx);
+
+/**
+ *	Extract the source floatVec4 's component by mask
+ *
+ *	@param in 	A floatVec4 prepared for component extraction by the mask.
+ *	@param mask The component mask
+ *
+ *	@return A result floatVec4
+ */
+	floatVec4 ReadByMask(const floatVec4 &in, char *mask);
+
+/**
+ *	Write the destination floatVec4's floating component by mask, including CC
+ *	register's update if necessary.
+ *
+ *	@param val		A floatVec4 value prepared for writing.
+ *	@param fvdst	The destination floatVec4 's pointer
+ *	@param mask 	The component mask.
+ */
+	void WriteByMask(const floatVec4 &val, floatVec4 *fvdst, char *mask, int idx);
 
 private:
 	int PC; ///<Program Counter

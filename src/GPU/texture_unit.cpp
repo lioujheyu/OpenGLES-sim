@@ -58,7 +58,7 @@ int TextureUnit::CalcTexAdd(short int us,
  *	@return the target texel's color
  */
 
-floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
+floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 {
 	unsigned char *texTmpPtr = NULL;
 	unsigned short u,v;
@@ -183,7 +183,7 @@ floatVec4 TextureUnit::GetTexColor(floatVec4 coordIn, int level, int tid)
  *
  *	@return "Wrapped" texture coordinate.
  */
-floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
+floatVec4 TextureUnit::TexCoordWrap(const floatVec4 &coordIn, int level, int tid)
 {
 	floatVec4 temp;
 
@@ -232,7 +232,7 @@ floatVec4 TextureUnit::TexCoordWrap(floatVec4 coordIn, int level, int tid)
  *
  *	@return The final color.
  */
-floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
+floatVec4 TextureUnit::BilinearFilter(const floatVec4 &coordIn,int level, int tid)
 {
 	// coord[4]: 2 3
 	//			 0 1
@@ -283,7 +283,7 @@ floatVec4 TextureUnit::BilinearFilter(floatVec4 coordIn,int level, int tid)
  *
  *	@return The final color.
  */
-floatVec4 TextureUnit::TrilinearFilter(floatVec4 coordIn,
+floatVec4 TextureUnit::TrilinearFilter(const floatVec4 &coordIn,
 									   int level,
 									   float w_ratio,
 									   int tid )
@@ -298,10 +298,10 @@ floatVec4 TextureUnit::TrilinearFilter(floatVec4 coordIn,
 	return color[0];
 }
 
-floatVec4 TextureUnit::TextureSample(floatVec4 coordIn,
+floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 									 int level,
-									 floatVec4 scaleFacDX,
-									 floatVec4 scaleFacDY,
+									 const floatVec4 &scaleFacDX,
+									 const floatVec4 &scaleFacDY,
 									 int targetType,
 									 int tid )
 {
