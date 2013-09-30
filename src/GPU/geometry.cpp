@@ -167,7 +167,6 @@ void GPU_Core::Clipping()
 	int next;
 	float outRatio, outPart, inPart;
 	bool outsideZNear[3];
-//	float clipRatio[3];
 
 	primitive newPrim;
 	vertex newVtx;
@@ -175,7 +174,7 @@ void GPU_Core::Clipping()
 
 	outsideZNear[0] = outsideZNear[1] = outsideZNear[2] = false;
 
-	//Check whether completely outside the clip volume.
+	//Check if the primitive is completely outside the clip volume.
 	outsideClipVolume = ((prim.v[0].attr[0].x > prim.v[0].attr[0].w) &&
 						 (prim.v[1].attr[0].x > prim.v[1].attr[0].w) &&
 						 (prim.v[2].attr[0].x > prim.v[2].attr[0].w)
@@ -207,11 +206,13 @@ void GPU_Core::Clipping()
 		return;
 	}
 
-	//Only Clip zNear plane if the primitive is across this plane.
+	//Check if this primitive intersects zNear plane.
 	for (int i=0; i<3; i++) {
 		if ( prim.v[i].attr[0].z < -prim.v[i].attr[0].w )
 			outsideZNear[i] = true;
 	}
+
+	//Clip the primitive if one of the previous tests is true.
 	if (outsideZNear[0] || outsideZNear[1] || outsideZNear[2]) {
 		totalClippedPrimitive++;
 
@@ -230,10 +231,10 @@ void GPU_Core::Clipping()
 				continue;
 			// in-to-out (i:in, next:out)
 			else if (outsideZNear[i]==false && outsideZNear[next]==true) {
-//				outPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
-//				inPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
-				outPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
-				inPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
+				outPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
+				inPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
+//				outPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
+//				inPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++) {
@@ -241,30 +242,39 @@ void GPU_Core::Clipping()
 						newVtx.attr[j] = prim.v[next].attr[j]*(1-outRatio) +
 										 prim.v[i].attr[j]*outRatio;
 				}
+
+				newVtx.threadId = totalProcessingVtx;
+				totalProcessingVtx++;
 				vtxStack.push(newVtx);
 			}
 			// out-to-in (i:out, next:in)
 			else {
 				outPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
 				inPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
+//				outPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
+//				inPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++)
 					newVtx.attr[j] = prim.v[i].attr[j]*(1-outRatio) +
 									 prim.v[next].attr[j]*outRatio;
+
+				newVtx.threadId = totalProcessingVtx;
+				totalProcessingVtx++;
 				vtxStack.push(newVtx);
 				vtxStack.push(prim.v[next]);
 			}
+		}
 
-			//Assemble vertex into primitive once vtxQueue is full (3 for )
-			if (vtxStack.size() > 2) {
-				newPrim.v[2] = vtxStack.top();	vtxStack.pop();
-				newPrim.v[1] = vtxStack.top();	vtxStack.pop();
-				newPrim.v[0] = vtxStack.top();	vtxStack.push(newPrim.v[2]);
+		//Assemble vertex into primitive from vtxStack (GL_TRIANGLE_FAN mode)
+		newPrim.v[2] = vtxStack.top(); vtxStack.pop();
+		newPrim.v[0] = vtxStack.top();	vtxStack.pop();
+		while (!vtxStack.empty()) {
+			newPrim.v[1] = newPrim.v[0];
+			newPrim.v[0] = vtxStack.top(); vtxStack.pop();
 
-				primFIFO.push(newPrim);
-				totalGeneratedPrimitive++;
-			}
+			primFIFO.push(newPrim);
+			totalGeneratedPrimitive++;
 		}
 
 		prim.iskilled = true;
