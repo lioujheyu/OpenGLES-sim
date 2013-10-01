@@ -59,7 +59,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1685 of yacc.c  */
-#line 18 "nvgp4Info.y"
+#line 34 "nvgp4Info.y"
 
 	int		ival;
 	float	fval;

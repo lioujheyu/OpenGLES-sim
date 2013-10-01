@@ -816,7 +816,23 @@ int nvgp4ASM__flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *nvgp4ASM_text;
 #line 1 "nvgp4ASM.l"
-#line 10 "nvgp4ASM.l"
+/* 
+ * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+#line 26 "nvgp4ASM.l"
 #include "nvgp4ASM.tab.h"
 #include "GPU/instruction_def.h"
 #include "GPU/gpu_config.h"
@@ -824,7 +840,7 @@ char *nvgp4ASM_text;
 #define COL_NO nvgp4ASM_col+=strlen(nvgp4ASM_text)
 
 unsigned int nvgp4ASM_col = 0;
-#line 828 "nvgp4ASM.cpp"
+#line 844 "nvgp4ASM.cpp"
 
 #define INITIAL 0
 
@@ -1014,9 +1030,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 19 "nvgp4ASM.l"
+#line 35 "nvgp4ASM.l"
 
-#line 1020 "nvgp4ASM.cpp"
+#line 1036 "nvgp4ASM.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -1115,7 +1131,7 @@ case 1:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 20 "nvgp4ASM.l"
+#line 36 "nvgp4ASM.l"
 /* Comment */
 	YY_BREAK
 case 2:
@@ -1123,7 +1139,7 @@ case 2:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 21 "nvgp4ASM.l"
+#line 37 "nvgp4ASM.l"
 
 	YY_BREAK
 case 3:
@@ -1131,7 +1147,7 @@ case 3:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 22 "nvgp4ASM.l"
+#line 38 "nvgp4ASM.l"
 
 	YY_BREAK
 case 4:
@@ -1139,7 +1155,7 @@ case 4:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 23 "nvgp4ASM.l"
+#line 39 "nvgp4ASM.l"
 
 	YY_BREAK
 case 5:
@@ -1147,7 +1163,7 @@ case 5:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 24 "nvgp4ASM.l"
+#line 40 "nvgp4ASM.l"
 
 	YY_BREAK
 case 6:
@@ -1155,7 +1171,7 @@ case 6:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 25 "nvgp4ASM.l"
+#line 41 "nvgp4ASM.l"
 
 	YY_BREAK
 case 7:
@@ -1163,7 +1179,7 @@ case 7:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 26 "nvgp4ASM.l"
+#line 42 "nvgp4ASM.l"
 /* Comment */
 	YY_BREAK
 case 8:
@@ -1171,7 +1187,7 @@ case 8:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 27 "nvgp4ASM.l"
+#line 43 "nvgp4ASM.l"
 
 	YY_BREAK
 case 9:
@@ -1179,7 +1195,7 @@ case 9:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 28 "nvgp4ASM.l"
+#line 44 "nvgp4ASM.l"
 
 	YY_BREAK
 case 10:
@@ -1187,7 +1203,7 @@ case 10:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 29 "nvgp4ASM.l"
+#line 45 "nvgp4ASM.l"
 
 	YY_BREAK
 case 11:
@@ -1195,887 +1211,887 @@ case 11:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up nvgp4ASM_text again */
 YY_RULE_SETUP
-#line 30 "nvgp4ASM.l"
+#line 46 "nvgp4ASM.l"
 
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 32 "nvgp4ASM.l"
+#line 48 "nvgp4ASM.l"
 COL_NO; return PROF;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 33 "nvgp4ASM.l"
+#line 49 "nvgp4ASM.l"
 COL_NO; nvgp4ASM_lval.ival=0; return SHADERTYPE;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 34 "nvgp4ASM.l"
+#line 50 "nvgp4ASM.l"
 COL_NO; nvgp4ASM_lval.ival=1; return SHADERTYPE;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 35 "nvgp4ASM.l"
+#line 51 "nvgp4ASM.l"
 COL_NO; return END;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 37 "nvgp4ASM.l"
+#line 53 "nvgp4ASM.l"
 COL_NO;	return TEXTURE;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 39 "nvgp4ASM.l"
+#line 55 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_ABS; return VECTOROP;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 40 "nvgp4ASM.l"
+#line 56 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_CEIL; return VECTOROP;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 41 "nvgp4ASM.l"
+#line 57 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_FLR; return VECTOROP;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 42 "nvgp4ASM.l"
+#line 58 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_FRC; return VECTOROP;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 43 "nvgp4ASM.l"
+#line 59 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_I2F; return VECTOROP;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 44 "nvgp4ASM.l"
+#line 60 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_LIT; return VECTOROP;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 45 "nvgp4ASM.l"
+#line 61 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_MOV; return VECTOROP;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 46 "nvgp4ASM.l"
+#line 62 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_NOT; return VECTOROP;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 47 "nvgp4ASM.l"
+#line 63 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_NRM; return VECTOROP;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 48 "nvgp4ASM.l"
+#line 64 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_PK2H; return VECTOROP;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 49 "nvgp4ASM.l"
+#line 65 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_PK2US; return VECTOROP;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 50 "nvgp4ASM.l"
+#line 66 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_PK4B; return VECTOROP;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 51 "nvgp4ASM.l"
+#line 67 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_PK4UB; return VECTOROP;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 52 "nvgp4ASM.l"
+#line 68 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_ROUND; return VECTOROP;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 53 "nvgp4ASM.l"
+#line 69 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SSG; return VECTOROP;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 54 "nvgp4ASM.l"
+#line 70 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_TRUNC; return VECTOROP;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 55 "nvgp4ASM.l"
+#line 71 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_COS; return SCALAROP;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 56 "nvgp4ASM.l"
+#line 72 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_EX2; return SCALAROP;
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 57 "nvgp4ASM.l"
+#line 73 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_LG2; return SCALAROP;
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 58 "nvgp4ASM.l"
+#line 74 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_RCC; return SCALAROP;
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 59 "nvgp4ASM.l"
+#line 75 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_RCP; return SCALAROP;
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 60 "nvgp4ASM.l"
+#line 76 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_RSQ; return SCALAROP;
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 61 "nvgp4ASM.l"
+#line 77 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SCS; return SCALAROP;
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 62 "nvgp4ASM.l"
+#line 78 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SIN; return SCALAROP;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 63 "nvgp4ASM.l"
+#line 79 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_UP2H; return SCALAROP;
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 64 "nvgp4ASM.l"
+#line 80 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_UP2US; return SCALAROP;
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 65 "nvgp4ASM.l"
+#line 81 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_UP4B; return SCALAROP;
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 66 "nvgp4ASM.l"
+#line 82 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_UP4UB; return SCALAROP;
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 67 "nvgp4ASM.l"
+#line 83 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_POW;  return BINSCOP;
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 68 "nvgp4ASM.l"
+#line 84 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_DIV; return VECSCAOP;
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 69 "nvgp4ASM.l"
+#line 85 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SHL; return VECSCAOP;
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 70 "nvgp4ASM.l"
+#line 86 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SHR; return VECSCAOP;
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 71 "nvgp4ASM.l"
+#line 87 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_MOD; return VECSCAOP;
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 72 "nvgp4ASM.l"
+#line 88 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_ADD; return BINOP;
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 73 "nvgp4ASM.l"
+#line 89 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_AND; return BINOP;
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 74 "nvgp4ASM.l"
+#line 90 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_DP3; return BINOP;
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 75 "nvgp4ASM.l"
+#line 91 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_DP4; return BINOP;
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 76 "nvgp4ASM.l"
+#line 92 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_DPH; return BINOP;
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 77 "nvgp4ASM.l"
+#line 93 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_DST; return BINOP;
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 78 "nvgp4ASM.l"
+#line 94 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_MAX; return BINOP;
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 79 "nvgp4ASM.l"
+#line 95 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_MIN; return BINOP;
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 80 "nvgp4ASM.l"
+#line 96 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_MUL; return BINOP;
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 81 "nvgp4ASM.l"
+#line 97 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_OR; return BINOP;
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 82 "nvgp4ASM.l"
+#line 98 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_RFL; return BINOP;
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 83 "nvgp4ASM.l"
+#line 99 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SEQ; return BINOP;
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 84 "nvgp4ASM.l"
+#line 100 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SFL; return BINOP;
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 85 "nvgp4ASM.l"
+#line 101 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SGE; return BINOP;
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 86 "nvgp4ASM.l"
+#line 102 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SGT; return BINOP;
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 87 "nvgp4ASM.l"
+#line 103 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SLE; return BINOP;
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 88 "nvgp4ASM.l"
+#line 104 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SLT; return BINOP;
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 89 "nvgp4ASM.l"
+#line 105 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SNE; return BINOP;
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 90 "nvgp4ASM.l"
+#line 106 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_STR; return BINOP;
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 91 "nvgp4ASM.l"
+#line 107 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SUB; return BINOP;
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 92 "nvgp4ASM.l"
+#line 108 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_XPD; return BINOP;
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 93 "nvgp4ASM.l"
+#line 109 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_DP2; return BINOP;
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 94 "nvgp4ASM.l"
+#line 110 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_XOR; return BINOP;
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 95 "nvgp4ASM.l"
+#line 111 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_CMP; return TRIOP;
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 96 "nvgp4ASM.l"
+#line 112 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_DP2A; return TRIOP;
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 97 "nvgp4ASM.l"
+#line 113 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_LRP; return TRIOP;
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 98 "nvgp4ASM.l"
+#line 114 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_MAD; return TRIOP;
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 99 "nvgp4ASM.l"
+#line 115 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SAD; return TRIOP;
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 100 "nvgp4ASM.l"
+#line 116 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_X2D; return TRIOP;
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 101 "nvgp4ASM.l"
+#line 117 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_SWZ; return SWZOP;
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 102 "nvgp4ASM.l"
+#line 118 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_TEX; return TEXOP;
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 103 "nvgp4ASM.l"
+#line 119 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_TXB; return TEXOP;
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 104 "nvgp4ASM.l"
+#line 120 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_TXF; return TEXOP;
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 105 "nvgp4ASM.l"
+#line 121 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_TXL; return TEXOP;
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 106 "nvgp4ASM.l"
+#line 122 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_TXP; return TEXOP;
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 107 "nvgp4ASM.l"
+#line 123 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_TXQ; return TEXOP;
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 108 "nvgp4ASM.l"
+#line 124 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_TXD; return TXDOP;
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 109 "nvgp4ASM.l"
+#line 125 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_CAL; return BRAOP;
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 110 "nvgp4ASM.l"
+#line 126 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_RET; return FLOWCCOP;
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 111 "nvgp4ASM.l"
+#line 127 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_BRK; return FLOWCCOP;
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 112 "nvgp4ASM.l"
+#line 128 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_CONT; return FLOWCCOP;
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 113 "nvgp4ASM.l"
+#line 129 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_IF; return IFOP;
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 114 "nvgp4ASM.l"
+#line 130 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_REP; return REPOP;
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 115 "nvgp4ASM.l"
+#line 131 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_ELSE; return ENDFLOWOP;
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 116 "nvgp4ASM.l"
+#line 132 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_ENDIF; return ENDFLOWOP;
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 117 "nvgp4ASM.l"
+#line 133 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_ENDREP; return ENDFLOWOP;
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 118 "nvgp4ASM.l"
+#line 134 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_KIL; return KILOP;
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 119 "nvgp4ASM.l"
+#line 135 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_DDX; return DERIVEOP;
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 120 "nvgp4ASM.l"
+#line 136 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OP_DDY; return DERIVEOP;
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 121 "nvgp4ASM.l"
+#line 137 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_F; return OPMODIFIER;
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 122 "nvgp4ASM.l"
+#line 138 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_U; return OPMODIFIER;
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 123 "nvgp4ASM.l"
+#line 139 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_S; return OPMODIFIER;
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 124 "nvgp4ASM.l"
+#line 140 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_CC; return OPMODIFIER;
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 125 "nvgp4ASM.l"
+#line 141 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_CC0; return OPMODIFIER;
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 126 "nvgp4ASM.l"
+#line 142 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_CC1; return OPMODIFIER;
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 127 "nvgp4ASM.l"
+#line 143 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_SAT; return OPMODIFIER;
 	YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 128 "nvgp4ASM.l"
+#line 144 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_SSAT; return OPMODIFIER;
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 129 "nvgp4ASM.l"
+#line 145 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_NTC; return OPMODIFIER;
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 130 "nvgp4ASM.l"
+#line 146 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_S24; return OPMODIFIER;
 	YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 131 "nvgp4ASM.l"
+#line 147 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_U24; return OPMODIFIER;
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 132 "nvgp4ASM.l"
+#line 148 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=OPM_HI; return OPMODIFIER;
 	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 133 "nvgp4ASM.l"
+#line 149 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_1D; return TEXTARGET;
 	YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 134 "nvgp4ASM.l"
+#line 150 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_2D; return TEXTARGET;
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 135 "nvgp4ASM.l"
+#line 151 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_3D; return TEXTARGET;
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 136 "nvgp4ASM.l"
+#line 152 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_CUBE; return TEXTARGET;
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 137 "nvgp4ASM.l"
+#line 153 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_RECT; return TEXTARGET;
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 138 "nvgp4ASM.l"
+#line 154 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_SHADOW1D; return TEXTARGET;
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 139 "nvgp4ASM.l"
+#line 155 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_SHADOW2D; return TEXTARGET;
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 140 "nvgp4ASM.l"
+#line 156 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_SHADOWRECT; return TEXTARGET;
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 141 "nvgp4ASM.l"
+#line 157 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_ARRAY1D; return TEXTARGET;
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 142 "nvgp4ASM.l"
+#line 158 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_ARRAY2D; return TEXTARGET;
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 143 "nvgp4ASM.l"
+#line 159 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_SHADOWCUBE; return TEXTARGET;
 	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 144 "nvgp4ASM.l"
+#line 160 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_SHADOWARRAY1D; return TEXTARGET;
 	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 145 "nvgp4ASM.l"
+#line 161 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=TT_SHADOWARRAY2D; return TEXTARGET;
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 146 "nvgp4ASM.l"
+#line 162 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_EQ; return CCMASKRULE;
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 147 "nvgp4ASM.l"
+#line 163 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_GE; return CCMASKRULE;
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 148 "nvgp4ASM.l"
+#line 164 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_GT; return CCMASKRULE;
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 149 "nvgp4ASM.l"
+#line 165 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_LE; return CCMASKRULE;
 	YY_BREAK
 case 128:
 YY_RULE_SETUP
-#line 150 "nvgp4ASM.l"
+#line 166 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_LT; return CCMASKRULE;
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 151 "nvgp4ASM.l"
+#line 167 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NE; return CCMASKRULE;
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 152 "nvgp4ASM.l"
+#line 168 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_TR; return CCMASKRULE;
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 153 "nvgp4ASM.l"
+#line 169 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_FL; return CCMASKRULE;
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 154 "nvgp4ASM.l"
+#line 170 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_EQ0; return CCMASKRULE;
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 155 "nvgp4ASM.l"
+#line 171 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_GE0; return CCMASKRULE;
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 156 "nvgp4ASM.l"
+#line 172 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_GT0; return CCMASKRULE;
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 157 "nvgp4ASM.l"
+#line 173 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_LE0; return CCMASKRULE;
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
-#line 158 "nvgp4ASM.l"
+#line 174 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_LT0; return CCMASKRULE;
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 159 "nvgp4ASM.l"
+#line 175 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NE0; return CCMASKRULE;
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 160 "nvgp4ASM.l"
+#line 176 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_TR0; return CCMASKRULE;
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 161 "nvgp4ASM.l"
+#line 177 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_FL0; return CCMASKRULE;
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 162 "nvgp4ASM.l"
+#line 178 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_EQ1; return CCMASKRULE;
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 163 "nvgp4ASM.l"
+#line 179 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_GE1; return CCMASKRULE;
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 164 "nvgp4ASM.l"
+#line 180 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_GT1; return CCMASKRULE;
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 165 "nvgp4ASM.l"
+#line 181 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_LE1; return CCMASKRULE;
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 166 "nvgp4ASM.l"
+#line 182 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_LT1; return CCMASKRULE;
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 167 "nvgp4ASM.l"
+#line 183 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NE1; return CCMASKRULE;
 	YY_BREAK
 case 146:
 YY_RULE_SETUP
-#line 168 "nvgp4ASM.l"
+#line 184 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_TR1; return CCMASKRULE;
 	YY_BREAK
 case 147:
 YY_RULE_SETUP
-#line 169 "nvgp4ASM.l"
+#line 185 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_FL1; return CCMASKRULE;
 	YY_BREAK
 case 148:
 YY_RULE_SETUP
-#line 170 "nvgp4ASM.l"
+#line 186 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NAN; return CCMASKRULE;
 	YY_BREAK
 case 149:
 YY_RULE_SETUP
-#line 171 "nvgp4ASM.l"
+#line 187 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NAN0; return CCMASKRULE;
 	YY_BREAK
 case 150:
 YY_RULE_SETUP
-#line 172 "nvgp4ASM.l"
+#line 188 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NAN1; return CCMASKRULE;
 	YY_BREAK
 case 151:
 YY_RULE_SETUP
-#line 173 "nvgp4ASM.l"
+#line 189 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_LEG; return CCMASKRULE;
 	YY_BREAK
 case 152:
 YY_RULE_SETUP
-#line 174 "nvgp4ASM.l"
+#line 190 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_LEG0; return CCMASKRULE;
 	YY_BREAK
 case 153:
 YY_RULE_SETUP
-#line 175 "nvgp4ASM.l"
+#line 191 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_LEG1; return CCMASKRULE;
 	YY_BREAK
 case 154:
 YY_RULE_SETUP
-#line 176 "nvgp4ASM.l"
+#line 192 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_CF; return CCMASKRULE;
 	YY_BREAK
 case 155:
 YY_RULE_SETUP
-#line 177 "nvgp4ASM.l"
+#line 193 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_CF0; return CCMASKRULE;
 	YY_BREAK
 case 156:
 YY_RULE_SETUP
-#line 178 "nvgp4ASM.l"
+#line 194 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_CF1; return CCMASKRULE;
 	YY_BREAK
 case 157:
 YY_RULE_SETUP
-#line 179 "nvgp4ASM.l"
+#line 195 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NCF; return CCMASKRULE;
 	YY_BREAK
 case 158:
 YY_RULE_SETUP
-#line 180 "nvgp4ASM.l"
+#line 196 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NCF0; return CCMASKRULE;
 	YY_BREAK
 case 159:
 YY_RULE_SETUP
-#line 181 "nvgp4ASM.l"
+#line 197 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NCF1; return CCMASKRULE;
 	YY_BREAK
 case 160:
 YY_RULE_SETUP
-#line 182 "nvgp4ASM.l"
+#line 198 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_OF; return CCMASKRULE;
 	YY_BREAK
 case 161:
 YY_RULE_SETUP
-#line 183 "nvgp4ASM.l"
+#line 199 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_OF0; return CCMASKRULE;
 	YY_BREAK
 case 162:
 YY_RULE_SETUP
-#line 184 "nvgp4ASM.l"
+#line 200 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_OF1; return CCMASKRULE;
 	YY_BREAK
 case 163:
 YY_RULE_SETUP
-#line 185 "nvgp4ASM.l"
+#line 201 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NOF; return CCMASKRULE;
 	YY_BREAK
 case 164:
 YY_RULE_SETUP
-#line 186 "nvgp4ASM.l"
+#line 202 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NOF0; return CCMASKRULE;
 	YY_BREAK
 case 165:
 YY_RULE_SETUP
-#line 187 "nvgp4ASM.l"
+#line 203 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NOF1; return CCMASKRULE;
 	YY_BREAK
 case 166:
 YY_RULE_SETUP
-#line 188 "nvgp4ASM.l"
+#line 204 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_AB; return CCMASKRULE;
 	YY_BREAK
 case 167:
 YY_RULE_SETUP
-#line 189 "nvgp4ASM.l"
+#line 205 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_AB0; return CCMASKRULE;
 	YY_BREAK
 case 168:
 YY_RULE_SETUP
-#line 190 "nvgp4ASM.l"
+#line 206 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_AB1; return CCMASKRULE;
 	YY_BREAK
 case 169:
 YY_RULE_SETUP
-#line 191 "nvgp4ASM.l"
+#line 207 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_BLE; return CCMASKRULE;
 	YY_BREAK
 case 170:
 YY_RULE_SETUP
-#line 192 "nvgp4ASM.l"
+#line 208 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_BLE0; return CCMASKRULE;
 	YY_BREAK
 case 171:
 YY_RULE_SETUP
-#line 193 "nvgp4ASM.l"
+#line 209 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_BLE1; return CCMASKRULE;
 	YY_BREAK
 case 172:
 YY_RULE_SETUP
-#line 194 "nvgp4ASM.l"
+#line 210 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_SF; return CCMASKRULE;
 	YY_BREAK
 case 173:
 YY_RULE_SETUP
-#line 195 "nvgp4ASM.l"
+#line 211 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_SF0; return CCMASKRULE;
 	YY_BREAK
 case 174:
 YY_RULE_SETUP
-#line 196 "nvgp4ASM.l"
+#line 212 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_SF1; return CCMASKRULE;
 	YY_BREAK
 case 175:
 YY_RULE_SETUP
-#line 197 "nvgp4ASM.l"
+#line 213 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NSF; return CCMASKRULE;
 	YY_BREAK
 case 176:
 YY_RULE_SETUP
-#line 198 "nvgp4ASM.l"
+#line 214 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NSF0; return CCMASKRULE;
 	YY_BREAK
 case 177:
 YY_RULE_SETUP
-#line 199 "nvgp4ASM.l"
+#line 215 "nvgp4ASM.l"
 COL_NO;	nvgp4ASM_lval.ival=CC_NSF1; return CCMASKRULE;
 	YY_BREAK
 case 178:
 YY_RULE_SETUP
-#line 200 "nvgp4ASM.l"
+#line 216 "nvgp4ASM.l"
 COL_NO; return VERTEX;
 	YY_BREAK
 case 179:
 YY_RULE_SETUP
-#line 201 "nvgp4ASM.l"
+#line 217 "nvgp4ASM.l"
 COL_NO; return FRAGMENT;
 	YY_BREAK
 case 180:
 YY_RULE_SETUP
-#line 202 "nvgp4ASM.l"
+#line 218 "nvgp4ASM.l"
 COL_NO; return RESULT;
 	YY_BREAK
 case 181:
 YY_RULE_SETUP
-#line 203 "nvgp4ASM.l"
+#line 219 "nvgp4ASM.l"
 COL_NO; return ATTRIB;
 	YY_BREAK
 case 182:
 YY_RULE_SETUP
-#line 204 "nvgp4ASM.l"
+#line 220 "nvgp4ASM.l"
 COL_NO; return POSITION;
 	YY_BREAK
 case 183:
 YY_RULE_SETUP
-#line 205 "nvgp4ASM.l"
+#line 221 "nvgp4ASM.l"
 COL_NO; return RESULT_COLOR0;
 	YY_BREAK
 case 184:
 YY_RULE_SETUP
-#line 206 "nvgp4ASM.l"
+#line 222 "nvgp4ASM.l"
 COL_NO;	return *nvgp4ASM_text;
 	YY_BREAK
 case 185:
 YY_RULE_SETUP
-#line 207 "nvgp4ASM.l"
+#line 223 "nvgp4ASM.l"
 COL_NO; nvgp4ASM_lval.ival=-1; return REG;
 	YY_BREAK
 case 186:
 YY_RULE_SETUP
-#line 208 "nvgp4ASM.l"
+#line 224 "nvgp4ASM.l"
 COL_NO; nvgp4ASM_lval.ival=-1; return REG;
 	YY_BREAK
 case 187:
 YY_RULE_SETUP
-#line 210 "nvgp4ASM.l"
+#line 226 "nvgp4ASM.l"
 { COL_NO;
 		char *temp = nvgp4ASM_text+1;
 		nvgp4ASM_lval.ival=atoi(temp);
@@ -2084,7 +2100,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 188:
 YY_RULE_SETUP
-#line 215 "nvgp4ASM.l"
+#line 231 "nvgp4ASM.l"
 { COL_NO;
 		strcpy(nvgp4ASM_lval.sval,nvgp4ASM_text);
 		return XYZW_SWIZZLE;
@@ -2092,7 +2108,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 189:
 YY_RULE_SETUP
-#line 219 "nvgp4ASM.l"
+#line 235 "nvgp4ASM.l"
 { COL_NO;
 		strcpy(nvgp4ASM_lval.sval,nvgp4ASM_text);
 		return RGBA_SWIZZLE;
@@ -2100,7 +2116,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 190:
 YY_RULE_SETUP
-#line 223 "nvgp4ASM.l"
+#line 239 "nvgp4ASM.l"
 { COL_NO;
 		strcpy(nvgp4ASM_lval.sval,nvgp4ASM_text);
 		return IDENTIFIER;
@@ -2108,7 +2124,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 191:
 YY_RULE_SETUP
-#line 227 "nvgp4ASM.l"
+#line 243 "nvgp4ASM.l"
 { COL_NO;
 		nvgp4ASM_lval.ival = atoi(nvgp4ASM_text);
 		return INTEGER;
@@ -2116,7 +2132,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 192:
 YY_RULE_SETUP
-#line 231 "nvgp4ASM.l"
+#line 247 "nvgp4ASM.l"
 { COL_NO;
 		nvgp4ASM_lval.fval = atof(nvgp4ASM_text);
 		return FLOAT;
@@ -2124,26 +2140,26 @@ YY_RULE_SETUP
 	YY_BREAK
 case 193:
 YY_RULE_SETUP
-#line 235 "nvgp4ASM.l"
+#line 251 "nvgp4ASM.l"
 COL_NO; return *nvgp4ASM_text;
 	YY_BREAK
 case 194:
 YY_RULE_SETUP
-#line 237 "nvgp4ASM.l"
+#line 253 "nvgp4ASM.l"
 COL_NO;		/* remove all space-related char */
 	YY_BREAK
 case 195:
 /* rule 195 can match eol */
 YY_RULE_SETUP
-#line 238 "nvgp4ASM.l"
+#line 254 "nvgp4ASM.l"
 nvgp4ASM_col = 0;
 	YY_BREAK
 case 196:
 YY_RULE_SETUP
-#line 239 "nvgp4ASM.l"
+#line 255 "nvgp4ASM.l"
 ECHO;
 	YY_BREAK
-#line 2147 "nvgp4ASM.cpp"
+#line 2163 "nvgp4ASM.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -3151,7 +3167,7 @@ void nvgp4ASM_free (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 239 "nvgp4ASM.l"
+#line 255 "nvgp4ASM.l"
 
 
 
