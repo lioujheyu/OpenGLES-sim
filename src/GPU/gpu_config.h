@@ -106,6 +106,8 @@
 #	define DBG_ON 0
 #	undef SHOW_TEXCACHE_COLD_MISS
 #	undef SHOW_TEXCACHE_MISS
+#	undef GPU_INFO
+#	undef SHADER_INFO
 #endif
 
 #endif // GPU_CONFIG_H_INCLUDED

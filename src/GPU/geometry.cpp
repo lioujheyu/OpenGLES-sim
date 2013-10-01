@@ -50,7 +50,8 @@ void GPU_Core::VertexShaderEXE(int sid, vertex *vtx)
 
 void GPU_Core::PerspectiveDivision(vertex *vtx)
 {
-	float w = 1.0/vtx->attr[0].w;
+//	float w = 1.0/vtx->attr[0].w;
+	float w = fabs(1.0/vtx->attr[0].w);
 
 	vtx->attr[0].w = 1.0;
 
@@ -231,10 +232,10 @@ void GPU_Core::Clipping()
 				continue;
 			// in-to-out (i:in, next:out)
 			else if (outsideZNear[i]==false && outsideZNear[next]==true) {
-				outPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
-				inPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
-//				outPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
-//				inPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
+//				outPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
+//				inPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
+				outPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
+				inPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++) {
@@ -249,10 +250,10 @@ void GPU_Core::Clipping()
 			}
 			// out-to-in (i:out, next:in)
 			else {
-				outPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
-				inPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
-//				outPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
-//				inPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
+//				outPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
+//				inPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
+				outPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
+				inPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++)

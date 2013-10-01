@@ -52,6 +52,9 @@ struct _MM_ALIGN16 floatVec4
 
 	inline floatVec4() {}
 
+	inline floatVec4(float v) :
+		sse(_mm_set1_ps(v)) {}
+
 	inline floatVec4(float xv, float yv, float zv, float wv) :
 		sse(_mm_setr_ps(xv, yv, zv, wv)) {}
 
@@ -94,7 +97,7 @@ struct _MM_ALIGN16 floatVec4
 
     inline const floatVec4 operator/(const float other) const
     {
-    	return _mm_div_ps(sse, _mm_set1_ps(other));
+		return _mm_div_ps(sse, _mm_set1_ps(other));
     }
 #else
 struct floatVec4
@@ -108,13 +111,11 @@ struct floatVec4
 
 	inline floatVec4() {}
 
-	inline floatVec4(float xv, float yv, float zv, float wv)
-	{
-		x = xv;
-		y = yv;
-		z = zv;
-		w = wv;
-	}
+	inline floatVec4(float v) :
+		x(v), y(v), z(v), w(v) {}
+
+	inline floatVec4(float xv, float yv, float zv, float wv) :
+		x(xv), y(yv), z(zv), w(wv) {}
 
 	inline const floatVec4 operator+(const floatVec4 &other) const
 	{
@@ -391,6 +392,15 @@ inline const floatVec4 fvInt2Float(const floatVec4 &x)
 	tmp.z = (float)x.z;
 	tmp.w = (float)x.w;
 	return tmp;
+}
+
+inline const floatVec4 fvrcp(const floatVec4& x)
+{
+#ifdef USE_SSE
+	return _mm_rcp_ps(x.sse);
+#else
+	return floatVec4(1.0/x.x, 1.0/x.y, 1.0/x.z, 1.0/x.w);
+#endif
 }
 
 /**

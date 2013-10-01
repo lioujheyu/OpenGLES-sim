@@ -8,6 +8,7 @@
 #define SHADER_CORE_H_INCLUDED
 
 #include <stack>
+#include <cstring>
 
 #include "gpu_type.h"
 #include "gpu_config.h"

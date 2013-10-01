@@ -115,29 +115,29 @@ void draw_road()
 
     unsigned int texture[2];
 
-    glActiveTexture(GL_TEXTURE0);
-    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-    }
-
-    glActiveTexture(GL_TEXTURE1);
-    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-    }
-
-//	glActiveTexture(GL_TEXTURE0);
-//	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
+//    glActiveTexture(GL_TEXTURE0);
+//    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//	}
+//    }
 //
-//	glActiveTexture(GL_TEXTURE1);
-//	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
+//    glActiveTexture(GL_TEXTURE1);
+//    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//	}
+//    }
+
+	glActiveTexture(GL_TEXTURE0);
+	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
+
+	glActiveTexture(GL_TEXTURE1);
+	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
 
     GLfloat vertexPos[] = { -1.0f, -0.7f, 0.0f, 1.0f,
                              1.0f, -0.7f, 0.0f, 1.0f,
@@ -209,7 +209,7 @@ void draw_banana()
 	shader.bind();
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW);
 	glCullFace(GL_FRONT);
 
@@ -233,7 +233,7 @@ void draw_banana()
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(15.5f));
+	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(4.5f));
 	glm::mat4 VP = Projection * View;
 
 	int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
@@ -308,7 +308,7 @@ void draw_cubemap()
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
 //	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.5,0.5,0.5));
-	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(1.2,1.2,1.2));
+	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(31.2,31.2,31.2));
 	glm::mat4 MVP		 = Projection * View * Model;
 
 
@@ -361,8 +361,8 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-//	draw_road();
-	draw_banana();
+	draw_road();
+//	draw_banana();
 //	draw_cubemap();
 
 	Context::GetCurrentContext()->DumpImage();
