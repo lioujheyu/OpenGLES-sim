@@ -22,7 +22,8 @@ void main ()
 	model_space = model_mat * vec4(obj_vertex, 1.0);
 	distance = length(light_pos - model_space.xyz);
 	
-	light_vector = normalize(light_pos - model_space.xyz);
+	light_vector = normalize((model_mat*vec4(light_pos, 1.0f)).xyz - model_space.xyz);
+	//light_vector = normalize(light_pos - model_space.xyz);
 	view_vector = normalize(eye_pos - model_space.xyz);
 		
 	lightIntensity = dot(light_vector,obj_normal);

@@ -460,44 +460,41 @@ void Context::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsiz
 		}
     }
 
-	textureImage t_image;
-
-    t_image.border = border;
-    t_image.widthLevel[level] = width;
-    t_image.heightLevel[level] = height;
-    t_image.maxLevel = (level>t_image.maxLevel)?level:t_image.maxLevel;
-
-    t_image.data[level] = image;
-
+	textureImage *t_image;
 	texObjID = texCtx[activeTexCtx].texObjBindID;
-
 	switch(target){
 	case GL_TEXTURE_2D:
-		texObjPool[texObjID].tex2D = t_image;
+		t_image = &texObjPool[texObjID].tex2D;
 		break;
 	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-		texObjPool[texObjID].texCubeNX = t_image;
+		t_image = &texObjPool[texObjID].texCubeNX;
 		break;
 	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-		texObjPool[texObjID].texCubeNY = t_image;
+		t_image = &texObjPool[texObjID].texCubeNY;
 		break;
 	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-		texObjPool[texObjID].texCubeNZ = t_image;
+		t_image = &texObjPool[texObjID].texCubeNZ;
 		break;
 	case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-		texObjPool[texObjID].texCubePX = t_image;
+		t_image = &texObjPool[texObjID].texCubePX;
 		break;
 	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-		texObjPool[texObjID].texCubePY = t_image;
+		t_image = &texObjPool[texObjID].texCubePY;
 		break;
 	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-		texObjPool[texObjID].texCubePZ = t_image;
+		t_image = &texObjPool[texObjID].texCubePZ;
 		break;
 	default:
 		RecordError(GL_INVALID_ENUM);
-		printf("glTexImage2D: undefined or unimplemented target\n");
+		printf("TexImage2D: undefined or unimplemented target\n");
         return;
 	}
+
+	t_image->border = border;
+    t_image->widthLevel[level] = width;
+    t_image->heightLevel[level] = height;
+    t_image->maxLevel = (level>t_image->maxLevel)?level:t_image->maxLevel;
+    t_image->data[level] = image;
 }
 
 void Context::TexParameteri(GLenum target, GLenum pname, GLint param)

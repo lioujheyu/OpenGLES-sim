@@ -13,10 +13,10 @@
 /**
  *	@brief Unit thread class
  *
- *	Contain the thread's id generated from thread pool.
+ *	Contain the thread's id generated from thread pool, attribute data, and
+ *	kill flag.
  */
-class unitThread
-{
+class unitThread {
 public:
 	unitThread() : isKilled(false) {}
 
@@ -28,7 +28,7 @@ public:
 /**
  *	@brief Vertex thread class (derived class from unitThread)
  *
- *	The same as the unit thread, this derived class is for presevation of
+ *	The same as the unit thread, this derived class is for preservation of
  *	future vertex specified data.
  */
 class vertex : public unitThread {
@@ -39,7 +39,8 @@ public:
  *	@brief Pixel thread class (child class to unit thread)
  *
  *	In addition to attribute value, this pixel class also contains pixel's
- *	barycentric coordinate and ghost flag.
+ *	barycentric coordinate and ghost flag which is used to inform per-fragment
+ *	operation this pixel should by dropped.
  *
  *	@note The pixel thread's 1st attr slot will always be its screen position.
  */
@@ -52,7 +53,7 @@ public:
     bool		isGhost;
 };
 
-struct primitive{
+struct primitive {
 	primitive() : iskilled(false), isGenerated(false) {}
 
 	bool iskilled, isGenerated;

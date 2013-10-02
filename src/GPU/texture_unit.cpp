@@ -20,23 +20,9 @@ void TextureUnit::ClearTexCache()
 	coldMiss = 0;
 }
 
-/**
- *	This function is to convert 6D block-based texture address and return 1D
- *	address and fetch data in system memory.
- *
- *	@param u,v 		Texture coordinate in 2 dimension directions.
- *	@param s,b,o 	3 block-based hierarchy level, Super block, Block, Offset,
- *	in texture coordinate.
- *
- *	@return 1D address
- */
-int TextureUnit::CalcTexAdd(short int us,
-                            short int ub,
-                            short int uo,
-                            short int vs,
-                            short int vb,
-                            short int vo,
-                            int width)
+int TextureUnit::CalcTexAdd(short int us, short int ub, short int uo,
+							short int vs, short int vb, short int vo,
+							int width)
 {
 	return (vs*TEX_CACHE_BLOCK_SIZE_ROOT*TEX_CACHE_ENTRY_SIZE_ROOT
 			+ vb*TEX_CACHE_BLOCK_SIZE_ROOT
@@ -45,18 +31,6 @@ int TextureUnit::CalcTexAdd(short int us,
 			+ ub*TEX_CACHE_BLOCK_SIZE_ROOT
 			+ uo;
 }
-
-/**
- *	Get the texel's color in the specified texture coordinate. You can toggle
- *	\ref NO_TEX_CACHE in \ref gpu_config.h to determine whether this function
- *	use texture cache or not.
- *
- *	@param coordIn 	The target texture coordinate.
- *	@param level 	This target coordinate is belongs to which level.
- *	@param tid 		This target coordinate is belongs to which texContext.
- *
- *	@return the target texel's color
- */
 
 floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 {
@@ -174,15 +148,6 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 #endif // NO_TEX_CACHE
 }
 
-/**
- *	Perform texture wrap operation on texture coordinate.
- *
- *	@param coordIn 	The target texture coordinate.
- *	@param level 	This target coordinate is belongs to which level.
- *	@param tid 		This target coordinate is belongs to which texContext.
- *
- *	@return "Wrapped" texture coordinate.
- */
 floatVec4 TextureUnit::TexCoordWrap(const floatVec4 &coordIn, int level, int tid)
 {
 	floatVec4 temp;
@@ -223,15 +188,6 @@ floatVec4 TextureUnit::TexCoordWrap(const floatVec4 &coordIn, int level, int tid
 	return temp;
 }
 
-/**
- *	Perform Bi-linear filter on specified texture coordinate.
- *
- *	@param coordIn The target texture coordinate.
- *	@param level This target coordinate is belongs to which level.
- *	@param tid This target coordinate is belongs to which texture unit.
- *
- *	@return The final color.
- */
 floatVec4 TextureUnit::BilinearFilter(const floatVec4 &coordIn,int level, int tid)
 {
 	// coord[4]: 2 3
@@ -272,17 +228,6 @@ floatVec4 TextureUnit::BilinearFilter(const floatVec4 &coordIn,int level, int ti
 	return color;
 }
 
-/**
- *	Perform Tri-linear filter on specified texture coordinate, this operation is
- *	actually invokes TextureUnit::BilinearFilter() twice.
- *
- *	@param coordIn 	The target texture coordinate.
- *	@param level 	This target coordinate is belongs to which level.
- *	@param w_ratio 	The target coordinate's w-axis ratio for color interpolation.
- *	@param tid 		This target coordinate is belongs to which texContext.
- *
- *	@return The final color.
- */
 floatVec4 TextureUnit::TrilinearFilter(const floatVec4 &coordIn,
 									   int level,
 									   float w_ratio,
@@ -461,10 +406,10 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 	//TEXPRINTF("  %2x %2x %2x %2x",color.r,color.g,color.b,color.a);
 	TEXPRINTF("%2d %3.2f\t\t",LoD, w_ratio);
 	TEXPRINTF("%3.2f %3.2f %3.2f %3.2f\n",
-			  scaleFacDX.s*texImage[tid].widthLevel[LoD],
-			  scaleFacDX.t*texImage[tid].heightLevel[LoD],
-			  scaleFacDY.s*texImage[tid].widthLevel[LoD],
-			  scaleFacDY.t*texImage[tid].heightLevel[LoD]);
+			  scaleFacDX.s*targetImage->widthLevel[LoD],
+			  scaleFacDX.t*targetImage->heightLevel[LoD],
+			  scaleFacDY.s*targetImage->widthLevel[LoD],
+			  scaleFacDY.t*targetImage->heightLevel[LoD]);
 
 	return color;
 }

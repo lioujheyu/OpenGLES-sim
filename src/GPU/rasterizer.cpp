@@ -1,6 +1,6 @@
 /**
  *	@file rasterizer.cpp
- *  @brief  The Rasterizer related GPU function module implmentation
+ *  @brief  The Rasterizer related function implementation for GPU class
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
@@ -119,11 +119,14 @@ void GPU_Core::tileSplit(int x, int y, int level)
 			return;
 		}
 		else {
-			pixBuffer[pixBufferP] = pixelStamp[0];
-			pixBuffer[pixBufferP+1] = pixelStamp[1];
-			pixBuffer[pixBufferP+2] = pixelStamp[2];
-			pixBuffer[pixBufferP+3] = pixelStamp[3];
-			pixBufferP += 4;
+			pixBuffer[pixBufferP  ] = pixelStamp[0];
+			pixBuffer[pixBufferP++].threadId = totalProcessingPix++;
+			pixBuffer[pixBufferP  ] = pixelStamp[1];
+			pixBuffer[pixBufferP++].threadId = totalProcessingPix++;
+			pixBuffer[pixBufferP  ] = pixelStamp[2];
+			pixBuffer[pixBufferP++].threadId = totalProcessingPix++;
+			pixBuffer[pixBufferP  ] = pixelStamp[3];
+			pixBuffer[pixBufferP++].threadId = totalProcessingPix++;
 //			PIXPRINTF("P:(%3d,%3d)\t \n", (int)pixBuffer[pixBufferP].attr[0].x,
 //										  (int)pixBuffer[pixBufferP].attr[0].y);
 		}

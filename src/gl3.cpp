@@ -1,11 +1,10 @@
 /**
  *	@file gl3.cpp
- *  @brief OpenGL API hook level to Context management system
+ *  @brief OpenGL API hook for Context management system
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
 #include <GLES3/gl3.h>
-#include <stdio.h>
 
 #include "context.h"
 

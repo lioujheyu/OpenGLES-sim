@@ -1,6 +1,6 @@
 /**
  *	@file geometry.cpp
- *  @brief The Geometry related GPU function module
+ *  @brief The vertex and geometry related function implementation for GPU class
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
@@ -51,6 +51,7 @@ void GPU_Core::VertexShaderEXE(int sid, vertex *vtx)
 void GPU_Core::PerspectiveDivision(vertex *vtx)
 {
 	float w = 1.0/vtx->attr[0].w;
+//	float w = fabs(1.0/vtx->attr[0].w);
 
 	vtx->attr[0].w = 1.0;
 
@@ -199,7 +200,6 @@ void GPU_Core::Clipping()
 						 (prim.v[1].attr[0].z < -prim.v[1].attr[0].w) &&
 						 (prim.v[2].attr[0].z < -prim.v[2].attr[0].w)
 						);
-
 	if (outsideClipVolume) { //Completely outside the clip volume
 		totalCulledPrimitive++;
 		prim.iskilled = true;
@@ -211,7 +211,6 @@ void GPU_Core::Clipping()
 		if ( prim.v[i].attr[0].z < -prim.v[i].attr[0].w )
 			outsideZNear[i] = true;
 	}
-
 	//Clip the primitive if one of the previous tests is true.
 	if (outsideZNear[0] || outsideZNear[1] || outsideZNear[2]) {
 		totalClippedPrimitive++;
@@ -231,10 +230,10 @@ void GPU_Core::Clipping()
 				continue;
 			// in-to-out (i:in, next:out)
 			else if (outsideZNear[i]==false && outsideZNear[next]==true) {
-				outPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
-				inPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
-//				outPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
-//				inPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
+//				outPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
+//				inPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
+				outPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
+				inPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++) {
@@ -243,24 +242,20 @@ void GPU_Core::Clipping()
 										 prim.v[i].attr[j]*outRatio;
 				}
 
-				newVtx.threadId = totalProcessingVtx;
-				totalProcessingVtx++;
 				vtxStack.push(newVtx);
 			}
 			// out-to-in (i:out, next:in)
 			else {
-				outPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
-				inPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
-//				outPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
-//				inPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
+//				outPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
+//				inPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
+				outPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
+				inPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++)
 					newVtx.attr[j] = prim.v[i].attr[j]*(1-outRatio) +
 									 prim.v[next].attr[j]*outRatio;
 
-				newVtx.threadId = totalProcessingVtx;
-				totalProcessingVtx++;
 				vtxStack.push(newVtx);
 				vtxStack.push(prim.v[next]);
 			}
@@ -275,6 +270,7 @@ void GPU_Core::Clipping()
 
 			primFIFO.push(newPrim);
 			totalGeneratedPrimitive++;
+			totalProcessingPrimitive++;
 		}
 
 		prim.iskilled = true;
@@ -298,8 +294,8 @@ void GPU_Core::TriangleSetup()
 
 	LY = MIN3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
 	LY = CLAMP(LY, viewPortLY, viewPortLY+viewPortH-1);
-/*	Align boundary box to even coordinate to make sure the tile split will not
- *	output any pixel outside the HY and RX boundary.
+/*	Align boundary box onto even coordinate to make sure the tile split will not
+ *	output any 2x2 pixel quad outside the HY and RX boundary.
  */
 	LY = LY & 0xfffe;
 	LX = MIN3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
@@ -335,9 +331,9 @@ void GPU_Core::Culling()
 		}
 	}
 
-	/* Eliminate all (area < 0) condition to simplify the operation in
-	 * tile split and interpolation.
-	 */
+/*	Eliminate all (area < 0) condition to simplify the operation in tile split
+ *	and interpolation.
+ */
 	if (area2Reciprocal < 0) {
 		std::swap(prim.v[1], prim.v[2]);
 

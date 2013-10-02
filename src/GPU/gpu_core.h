@@ -1,6 +1,6 @@
 /**
  *	@file gpu_core.h
- *  @brief The GPU TOP module simulator header
+ *  @brief The GPU TOP module class
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 

@@ -71,7 +71,20 @@ public:
 
 	void		ClearTexCache();
 
+/**
+ *	Get the texel's color in the specified texture coordinate. You can toggle
+ *	\ref NO_TEX_CACHE in \ref gpu_config.h to determine whether this function
+ *	use texture cache or not.
+ *
+ *	@param coordIn 	The target texture coordinate.
+ *	@param level 	This target coordinate is belongs to which level.
+ *	@param tid 		This target coordinate is belongs to which texContext.
+ *
+ *	@return the target texel's color
+ */
 	floatVec4	GetTexColor(const floatVec4 &coordIn, int level, int tid);
+
+
     floatVec4	TextureSample(const floatVec4 &coordIn,
 							  int level,
 							  const floatVec4 &scaleFacDX,
@@ -90,11 +103,53 @@ public:
 
 private:
 
+/**
+ *	This function is to convert 6D block-based texture address and return 1D
+ *	address and fetch data in system memory.
+ *
+ *	@param u,v 		Texture coordinate in 2 dimension directions.
+ *	@param s,b,o 	3 block-based hierarchy level, Super block, Block, Offset,
+ *	in texture coordinate.
+ *
+ *	@return 1D address
+ */
 	int		CalcTexAdd( short int us, short int ub, short int uo,
 						short int vs, short int vb, short int vo,
 						int width);
+
+/**
+ *	Perform texture wrap operation on texture coordinate.
+ *
+ *	@param coordIn 	The target texture coordinate.
+ *	@param level 	This target coordinate is belongs to which level.
+ *	@param tid 		This target coordinate is belongs to which texContext.
+ *
+ *	@return "Wrapped" texture coordinate.
+ */
 	floatVec4 TexCoordWrap(const floatVec4 &coordIn, int level, int tid);
+
+/**
+ *	Perform Bi-linear filter on specified texture coordinate.
+ *
+ *	@param coordIn The target texture coordinate.
+ *	@param level This target coordinate is belongs to which level.
+ *	@param tid This target coordinate is belongs to which texture unit.
+ *
+ *	@return The final color.
+ */
     floatVec4 BilinearFilter(const floatVec4 &coordIn, int level, int tid);
+
+/**
+ *	Perform Tri-linear filter on specified texture coordinate, this operation is
+ *	actually invokes TextureUnit::BilinearFilter() twice.
+ *
+ *	@param coordIn 	The target texture coordinate.
+ *	@param level 	This target coordinate is belongs to which level.
+ *	@param w_ratio 	The target coordinate's w-axis ratio for color interpolation.
+ *	@param tid 		This target coordinate is belongs to which texContext.
+ *
+ *	@return The final color.
+ */
     floatVec4 TrilinearFilter(const floatVec4 &coordIn, int level, float w_ratio, int tid);
 
 	/// Reference texture image address from 2D image or 1 of 6 cube map image;

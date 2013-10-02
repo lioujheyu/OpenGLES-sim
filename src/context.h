@@ -1,6 +1,6 @@
 /**
  *	@file Context.h
- *  @brief Record all gl state from gl function
+ *  @brief gl Context clsss for recording all gl state from each gl function.
  *  @author Liou Jhe-Yu (lioujheyu@gmail.com)
  */
 

@@ -1,6 +1,6 @@
 /**
  *	@file gpu_core.cpp
- *  @brief GPU Top module
+ *  @brief The GPU main loop function Implementation
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
@@ -30,8 +30,6 @@ void GPU_Core::Run()
     for (int vCnt=0; vCnt<vtxCount; vCnt++) {
 
 		FetchVertexData(vCnt);
-		curVtx.threadId = totalProcessingVtx;
-		totalProcessingVtx++;
 
 		//Vertex-based operation starts here
 		///@todo Task scheduler for auto job dispatch
@@ -75,13 +73,6 @@ void GPU_Core::Run()
 
 					tileSplit(x,y,3);
 					for (int i=0; i<pixBufferP/4; i++) {
-						pixBuffer[i*4  ].threadId = totalProcessingPix;
-						pixBuffer[i*4+1].threadId = totalProcessingPix + 1;
-						pixBuffer[i*4+2].threadId = totalProcessingPix + 2;
-						pixBuffer[i*4+3].threadId = totalProcessingPix + 3;
-
-						totalProcessingPix += 4;
-
 						///@todo Task scheduler for auto job dispatch
 						FragmentShaderEXE(1,
 										  &pixBuffer[i*4  ],
@@ -222,6 +213,8 @@ void GPU_Core::FetchVertexData(unsigned int vCnt)
 				curVtx.attr[attrCnt].w = 1.0;
 		}
 	}
+
+	curVtx.threadId = totalProcessingVtx++;
 }
 
 void GPU_Core::PassConfig2SubModule()
