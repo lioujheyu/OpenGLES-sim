@@ -308,8 +308,8 @@ void draw_cubemap()
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.5,0.5,0.5));
-//	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(51.2,51.2,51.2));
+//	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.5,0.5,0.5));
+	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(1.2,1.2,1.2));
 	glm::mat4 MVP		 = Projection * View * Model;
 
 
@@ -347,10 +347,10 @@ void draw_cubemap()
 
 	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[0]);
 	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[4]);
-//	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[8]);
-//	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[12]);
+	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[8]);
+	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[12]);
 	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[16]);
-//	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[20]);
+	glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_SHORT, &cube_indices[20]);
 
 	glDeleteTextures(1, texture);
 
@@ -362,9 +362,9 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-	draw_road();
+//	draw_road();
 //	draw_banana();
-//	draw_cubemap();
+	draw_cubemap();
 
 	Context::GetCurrentContext()->DumpImage();
 }

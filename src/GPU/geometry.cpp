@@ -69,6 +69,10 @@ void GPU_Core::PerspectiveDivision(vertex *vtx)
 	float w = 1.0/vtx->attr[0].w;
 //	float w = fabs(1.0/vtx->attr[0].w);
 
+//	if (vtx->attr[0].w < 0) {
+//		vtx->attr[0].z = -vtx->attr[0].z;
+//	}
+
 	vtx->attr[0].w = 1.0;
 
 	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
@@ -234,7 +238,7 @@ void GPU_Core::Clipping()
 		newPrim.isGenerated = true;
 
 		for (int i=0; i<3; i++) {
-			next = (i+1) % 3;
+			next = (i==2)? 0 : (i+1); // (i+1) mod 3
 /*
  *	Sutherland-Hodgman Polygon Clipping Algorithm
  */
@@ -246,8 +250,6 @@ void GPU_Core::Clipping()
 				continue;
 			// in-to-out (i:in, next:out)
 			else if (outsideZNear[i]==false && outsideZNear[next]==true) {
-//				outPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
-//				inPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
 				outPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
 				inPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
@@ -262,15 +264,15 @@ void GPU_Core::Clipping()
 			}
 			// out-to-in (i:out, next:in)
 			else {
-//				outPart = prim.v[i].attr[0].w - prim.v[i].attr[0].z;
-//				inPart = prim.v[next].attr[0].w - prim.v[next].attr[0].z;
 				outPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
 				inPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
 
-				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++)
-					newVtx.attr[j] = prim.v[i].attr[j]*(1-outRatio) +
-									 prim.v[next].attr[j]*outRatio;
+				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++) {
+					if (varyEnable[j])
+						newVtx.attr[j] = prim.v[i].attr[j]*(1-outRatio) +
+										 prim.v[next].attr[j]*outRatio;
+				}
 
 				vtxStack.push(newVtx);
 				vtxStack.push(prim.v[next]);
