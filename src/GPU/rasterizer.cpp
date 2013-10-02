@@ -1,3 +1,19 @@
+/* 
+ * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /**
  *	@file rasterizer.cpp
  *  @brief  The Rasterizer related function implementation for GPU class
@@ -76,6 +92,8 @@ void GPU_Core::tileSplit(int x, int y, int level)
 		pixelStamp[3].baryCenPos3[1] = cornerTest[7][0]*area2Reciprocal;
 
 		//Interpolate the all 4 pixel's attributes, then perform perspective correction
+
+		floatVec4 invW;
 		for (int i=0;i<4;i++){
 			pixelStamp[i].attr[0].z =
 				prim.v[0].attr[0].z +
@@ -86,6 +104,8 @@ void GPU_Core::tileSplit(int x, int y, int level)
 				pixelStamp[i].baryCenPos3[0]*( prim.v[1].attr[0].w - prim.v[0].attr[0].w ) +
 				pixelStamp[i].baryCenPos3[1]*( prim.v[2].attr[0].w - prim.v[0].attr[0].w );
 
+			invW = fvrcp(floatVec4(pixelStamp[i].attr[0].w));
+
 			for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
 				if (!varyEnable[attrCnt])
 					continue;
@@ -95,7 +115,7 @@ void GPU_Core::tileSplit(int x, int y, int level)
 					( prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[0] +
 					( prim.v[2].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[1];
 				pixelStamp[i].attr[attrCnt] =
-					pixelStamp[i].attr[attrCnt] / pixelStamp[i].attr[0].w;
+					pixelStamp[i].attr[attrCnt] * invW;
 			}
 		}
 

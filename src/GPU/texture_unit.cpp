@@ -1,3 +1,19 @@
+/* 
+ * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /**
  *	@file texture_unit.h
  *  @brief Texture unit class implementation
@@ -255,8 +271,9 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 	float maxScaleFac;
 	floatVec4 TexColor[2];
 	floatVec4 color;
-//	floatVec4 colorNextLevel;
+	floatVec4 colorNextLevel;
 	int LoD, maxLevel;
+	floatVec4 deltaDX, deltaDY;
 
 	//find absolutely coordinate in texture image
 	switch (targetType) {
@@ -306,11 +323,14 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 	coord.p = coordIn.p;
 	coord.q = coordIn.q;
 
+	deltaDX.s = scaleFacDX.s*targetImage->widthLevel[0];
+	deltaDX.t = scaleFacDX.t*targetImage->heightLevel[0];
+	deltaDY.s = scaleFacDY.s*targetImage->widthLevel[0];
+	deltaDX.t = scaleFacDY.t*targetImage->heightLevel[0];
+
 	maxScaleFac = std::max(
-					std::max(scaleFacDX.s*targetImage->widthLevel[0],
-							 scaleFacDX.t*targetImage->heightLevel[0]),
-					std::max(scaleFacDY.s*targetImage->widthLevel[0],
-							 scaleFacDY.t*targetImage->heightLevel[0])
+					std::max(std::abs(deltaDX.s), std::abs(deltaDX.t)),
+					std::max(std::abs(deltaDY.s), std::abs(deltaDY.t))
 				);
 
 	w_ratio = frexp(maxScaleFac, &LoD);
@@ -366,27 +386,28 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 			color = TrilinearFilter(coord, LoD, w_ratio, tid);
 			break;
 
-//		case GL_ANISOTROPIC:
-//			float r1,r2,r3,r4;
+//		case GL_LINEAR_MIPMAP_LINEAR:
+//			float r1, r2, r3 ,r4;
+//			floatVec4 mainVec;
+//			r1 = sqrt(deltaDX.s*deltaDX.s + deltaDX.t*deltaDX.t);
+//			r2 = sqrt(deltaDY.s*deltaDY.s + deltaDY.t*deltaDX.t);
+////			if (r1/r2 < 1.5f || 0.75f < r1/r2 ){
+//				if (r1 > r2)
+//					mainVec = deltaDX;
+//				else
+//					mainVec = deltaDY;
 //
-//			r1 = sqrt(pixBuffer[i].scaleFactorDuDx[0]*pixBuffer[i].scaleFactorDuDx[0]+pixBuffer[i].scaleFactorDvDx[0]*pixBuffer[i].scaleFactorDvDx[0]);
-//			r2 = sqrt(pixBuffer[i].scaleFactorDuDy[0]*pixBuffer[i].scaleFactorDuDy[0]+pixBuffer[i].scaleFactorDvDy[0]*pixBuffer[i].scaleFactorDvDy[0]);
+//			color = TrilinearFilter(coord + mainVec/2,
+//									LoD, w_ratio, tid);
+//			colorNextLevel = TrilinearFilter(coord - mainVec/2,
+//											 LoD, w_ratio, tid);
+//			color = (color + colorNextLevel)/2;
 //
-//			r3 = max(r1,r2);
-//			r4 = min(r1,r2);
-//			if ((r3/r4) > 2.0f) {
-//				LoD = (LoD - 1)>0?LoD - 1:0;
-//
-//				color = TrilinearFilter(fabs(TexU-(pixBuffer[i].scaleFactorDuDx[0]+pixBuffer[i].scaleFactorDuDy[0])/2),
-//										fabs(TexV-(pixBuffer[i].scaleFactorDvDx[0]+pixBuffer[i].scaleFactorDvDy[0])/2),LoD,w_ratio);
-//				colorNextLevel = TrilinearFilter(fabs(TexU+(pixBuffer[i].scaleFactorDuDx[0]+pixBuffer[i].scaleFactorDuDy[0])/2),
-//												 fabs(TexV+(pixBuffer[i].scaleFactorDvDx[0]+pixBuffer[i].scaleFactorDvDy[0])/2),LoD,w_ratio);
-//
-//				color = color/2 + colorNextLevel/2;
-//			} else
-//				color = TrilinearFilter(TexU, TexV, LoD, w_ratio);
-//
-//			break;
+////			}
+////			else
+////				color = TrilinearFilter(coord, LoD, w_ratio, tid);
+
+			break;
 
 		}
 	} else {

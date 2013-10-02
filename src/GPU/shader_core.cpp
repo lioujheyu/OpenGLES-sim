@@ -1,3 +1,19 @@
+/* 
+ * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /**
  *	@file shader_core.cpp
  *  @brief Shader Core implementation
@@ -150,8 +166,7 @@ void ShaderCore::Exec(int idx)
 		totalScaleOperation+=2;
 		break;
 	case OP_DP4:
-		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
-			dot(src[idx][0], src[idx][1]);
+		dst[idx] = floatVec4( dot(src[idx][0], src[idx][1]) );
 		totalScaleOperation+=3;
 		break;
 //	case OP_DPH:
@@ -177,7 +192,7 @@ void ShaderCore::Exec(int idx)
 //		break;
 	case OP_RSQ:	//Reciprocal square root
 		//dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w = 1/sqrt(src[idx][0].x);
-		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w = Q_rsqrt(src[idx][0].x);
+		dst[idx] = floatVec4( Q_rsqrt(src[idx][0].x) );
 		break;
 	case OP_SEQ:
 		dst[idx] = src[idx][0] == src[idx][1];
@@ -215,7 +230,7 @@ void ShaderCore::Exec(int idx)
 		{
 			float dot;
 			dot = (src[idx][0].x * src[idx][1].x) + (src[idx][0].y * src[idx][1].y) + src[idx][2].x;
-			dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w  = dot;
+			dst[idx] = floatVec4(dot);
 			break;
 		}
 		break;
@@ -230,22 +245,22 @@ void ShaderCore::Exec(int idx)
 //		break;
 	//TEXop
 	case OP_TEX:
-	/* The scale factor in this instruction comes from directly subtracting
-	 * neighbor thread's requested texture coordinate. Therefore, it has a
-	 * big advantage that we don't need to know which attribute is used to
-	 * locate the texel position and even can accept non-attribute variable
-	 * as texture coordinate without additional DDX or DDY instruction involved
-	 * (Cause it performs DDX/DDY-like operation in default). The further
-	 * discussion of the position of finding the gradient of texture coordinate
-	 * (In shader core like right now or in texture unit) is needed.
-	 */
+/* The scale factor in this instruction comes from directly difference between
+ * current and neighbor thread's texture coordinate. Therefore, compare to get
+ * scale factor in texture unit, it has a big advantage that we don't need to
+ * know which attribute is used to locate the texel position and even can accept
+ * non-attribute variable as texture coordinate without additional DDX or DDY
+ * instruction involved (Cause it performs DDX/DDY-like operation in default).
+ * The further discussion of finding the gradient of texture coordinate in
+ * shader core like right now or in texture unit is needed.
+ */
 		if (idx == 0 || idx == 1) {
-			scaleFacDX = fvabs(src[1][0] - src[0][0]);
-			scaleFacDY = fvabs(src[idx+2][0] - src[idx][0]);
+			scaleFacDX = src[1][0] - src[0][0];
+			scaleFacDY = src[idx+2][0] - src[idx][0];
 		}
 		else {
-			scaleFacDX = fvabs(src[3][0] - src[2][0]);
-			scaleFacDY = fvabs(src[idx][0] - src[idx-2][0]);
+			scaleFacDX = src[3][0] - src[2][0];
+			scaleFacDY = src[idx][0] - src[idx-2][0];
 		}
 		dst[idx] = texUnit.TextureSample(src[idx][0],
 										 -1,
@@ -450,6 +465,10 @@ void ShaderCore::WriteBack(int idx)
 floatVec4 ShaderCore::ReadByMask(const floatVec4 &in, char *mask)
 {
 	floatVec4 temp;
+
+	if (strcmp(mask, "xyzw")==0 || strcmp(mask, "rgba")==0)
+		return in;
+
 	temp.x = (mask[0]=='x' || mask[0]=='r')? in.x:
 			 (mask[0]=='y' || mask[0]=='g')? in.y:
 			 (mask[0]=='z' || mask[0]=='b')? in.z:in.w;

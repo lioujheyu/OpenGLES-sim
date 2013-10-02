@@ -115,29 +115,29 @@ void draw_road()
 
     unsigned int texture[2];
 
-    glActiveTexture(GL_TEXTURE0);
-    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-    }
-
-    glActiveTexture(GL_TEXTURE1);
-    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-    }
-
-//	glActiveTexture(GL_TEXTURE0);
-//	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
+//    glActiveTexture(GL_TEXTURE0);
+//    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//	}
+//    }
 //
-//	glActiveTexture(GL_TEXTURE1);
-//	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
+//    glActiveTexture(GL_TEXTURE1);
+//    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//	}
+//    }
+
+	glActiveTexture(GL_TEXTURE0);
+	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
+
+	glActiveTexture(GL_TEXTURE1);
+	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
 
     GLfloat vertexPos[] = { -1.0f, -0.7f, 0.0f, 1.0f,
                              1.0f, -0.7f, 0.0f, 1.0f,
@@ -209,7 +209,7 @@ void draw_banana()
 	shader.bind();
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW);
 	glCullFace(GL_FRONT);
 
@@ -362,8 +362,8 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-//	draw_road();
-	draw_banana();
+	draw_road();
+//	draw_banana();
 //	draw_cubemap();
 
 	Context::GetCurrentContext()->DumpImage();

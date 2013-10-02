@@ -75,7 +75,7 @@
 /* Copy the first part of user declarations.  */
 
 /* Line 189 of yacc.c  */
-#line 1 "nvgp4Info.y"
+#line 17 "nvgp4Info.y"
 
 #include "context.h"
 
@@ -142,7 +142,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 18 "nvgp4Info.y"
+#line 34 "nvgp4Info.y"
 
 	int		ival;
 	float	fval;
@@ -457,9 +457,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    37,    37,    38,    41,    42,    43,    44,    47,    49,
-      52,    53,    57,   185,   189,   190,   196,   200,   201,   202,
-     203,   204,   205,   206,   210,   211,   212,   213
+       0,    53,    53,    54,    57,    58,    59,    60,    63,    65,
+      68,    69,    73,   201,   205,   206,   212,   216,   217,   218,
+     219,   220,   221,   222,   226,   227,   228,   229
 };
 #endif
 
@@ -1405,14 +1405,14 @@ yyreduce:
         case 8:
 
 /* Line 1464 of yacc.c  */
-#line 47 "nvgp4Info.y"
+#line 63 "nvgp4Info.y"
     {shaderType = (yyvsp[(2) - (2)].ival);}
     break;
 
   case 12:
 
 /* Line 1464 of yacc.c  */
-#line 57 "nvgp4Info.y"
+#line 73 "nvgp4Info.y"
     {
 			t_symbol.name = (yyvsp[(3) - (11)].sval);
 			t_symbol.declareType = (yyvsp[(2) - (11)].sval);
@@ -1545,14 +1545,14 @@ yyreduce:
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 189 "nvgp4Info.y"
+#line 205 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval));;}
     break;
 
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 190 "nvgp4Info.y"
+#line 206 "nvgp4Info.y"
     {
 			strcpy((yyval.sval), (yyvsp[(1) - (4)].sval)); 
 			strcat((yyval.sval), "[");
@@ -1564,84 +1564,84 @@ yyreduce:
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 196 "nvgp4Info.y"
+#line 212 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(2) - (2)].sval));;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 200 "nvgp4Info.y"
+#line 216 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 201 "nvgp4Info.y"
+#line 217 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval)); t_element = 1;;}
     break;
 
   case 19:
 
 /* Line 1464 of yacc.c  */
-#line 202 "nvgp4Info.y"
+#line 218 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval)); t_idx = (yyvsp[(3) - (4)].ival); t_element = 1;;}
     break;
 
   case 20:
 
 /* Line 1464 of yacc.c  */
-#line 203 "nvgp4Info.y"
+#line 219 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval)); t_idx = (yyvsp[(3) - (6)].ival); t_element = (yyvsp[(6) - (6)].ival);;}
     break;
 
   case 21:
 
 /* Line 1464 of yacc.c  */
-#line 204 "nvgp4Info.y"
+#line 220 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 22:
 
 /* Line 1464 of yacc.c  */
-#line 205 "nvgp4Info.y"
+#line 221 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); t_idx = (yyvsp[(2) - (2)].ival); t_element = 1;;}
     break;
 
   case 23:
 
 /* Line 1464 of yacc.c  */
-#line 206 "nvgp4Info.y"
+#line 222 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 24:
 
 /* Line 1464 of yacc.c  */
-#line 210 "nvgp4Info.y"
+#line 226 "nvgp4Info.y"
     {(yyval.ival) = 0;;}
     break;
 
   case 25:
 
 /* Line 1464 of yacc.c  */
-#line 211 "nvgp4Info.y"
+#line 227 "nvgp4Info.y"
     {(yyval.ival) = CG_IN;;}
     break;
 
   case 26:
 
 /* Line 1464 of yacc.c  */
-#line 212 "nvgp4Info.y"
+#line 228 "nvgp4Info.y"
     {(yyval.ival) = CG_OUT;;}
     break;
 
   case 27:
 
 /* Line 1464 of yacc.c  */
-#line 213 "nvgp4Info.y"
+#line 229 "nvgp4Info.y"
     {(yyval.ival) = 0;;}
     break;
 
@@ -1860,7 +1860,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 216 "nvgp4Info.y"
+#line 232 "nvgp4Info.y"
 
 
 
