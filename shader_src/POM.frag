@@ -12,18 +12,22 @@ in vec3 lightVector_tangent;
 
 out vec4 color;
 
+const int sampleNum = 40;
+
+const float step = 1.0 / sampleNum;
+
 vec2 TraceRay(in vec2 coords, in vec3 dir)
 {
 	vec2 NewCoords = coords;
-	vec2 dUV = dir.xy * 0.2 * 0.1; 
+	vec2 dUV = dir.xy / dir.z * 0.2 * step; 
 	float SearchHeight = 1.0;
 	float curHeight;
 	float hitHeight = 0.0;
 	vec2 hitCoord;
 	float touch;
 	
-	for (int i=0; i<10; i++) {
-		SearchHeight-=0.1;
+	for (int i=0; i<sampleNum; i++) {
+		SearchHeight-=step;
 		NewCoords += dUV;
 		curHeight = texture2D(NM_height_Map,NewCoords).w;
 		//touch = (SearchHeight < curHeight)? 1.0 : 0.0;
@@ -35,23 +39,23 @@ vec2 TraceRay(in vec2 coords, in vec3 dir)
 		}
 	}
 	
-	NewCoords = (hitHeight == 0.0)? NewCoords : hitCoord;
-	NewCoords -= dUV;
-	SearchHeight = hitHeight + 0.1;
-	hitHeight = 0.0;
-	dUV = dUV * 0.2;
-	
-	for (int i=0; i<5; i++) {
-		SearchHeight-=0.02;
-		NewCoords += dUV;
-		curHeight = texture2D(NM_height_Map,NewCoords).w;
-		touch = clamp((curHeight - SearchHeight) * 499999.0, 0.0, 1.0);
-
-		if (touch==1.0 && hitHeight == 0.0) {
-			hitHeight = SearchHeight;
-			hitCoord = NewCoords;
-		}
-	}
+	//NewCoords = (hitHeight == 0.0)? NewCoords : hitCoord;
+	//NewCoords -= dUV;
+	//SearchHeight = hitHeight + 0.1;
+	//hitHeight = 0.0;
+	//dUV = dUV * 0.2;
+	//
+	//for (int i=0; i<5; i++) {
+	//	SearchHeight-=0.02;
+	//	NewCoords += dUV;
+	//	curHeight = texture2D(NM_height_Map,NewCoords).w;
+	//	touch = clamp((curHeight - SearchHeight) * 499999.0, 0.0, 1.0);
+    //
+	//	if (touch==1.0 && hitHeight == 0.0) {
+	//		hitHeight = SearchHeight;
+	//		hitCoord = NewCoords;
+	//	}
+	//}
 	
 	return (hitCoord + dUV);
 }
