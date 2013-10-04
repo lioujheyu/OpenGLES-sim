@@ -12,7 +12,7 @@ in vec3 lightVector_tangent;
 
 out vec4 color;
 
-const int sampleNum = 40;
+const int sampleNum = 10;
 
 const float step = 1.0 / sampleNum;
 
@@ -37,25 +37,30 @@ vec2 TraceRay(in vec2 coords, in vec3 dir)
 			hitHeight = SearchHeight;
 			hitCoord = NewCoords;
 		}
+		
+		//float test = touch*clamp(1.0 - hitHeight*500, 0.0, 1.0);
+		//
+		//hitHeight = SearchHeight * test;
+		//hitCoord = NewCoords * test;
 	}
 	
-	//NewCoords = (hitHeight == 0.0)? NewCoords : hitCoord;
-	//NewCoords -= dUV;
-	//SearchHeight = hitHeight + 0.1;
-	//hitHeight = 0.0;
-	//dUV = dUV * 0.2;
-	//
-	//for (int i=0; i<5; i++) {
-	//	SearchHeight-=0.02;
-	//	NewCoords += dUV;
-	//	curHeight = texture2D(NM_height_Map,NewCoords).w;
-	//	touch = clamp((curHeight - SearchHeight) * 499999.0, 0.0, 1.0);
-    //
-	//	if (touch==1.0 && hitHeight == 0.0) {
-	//		hitHeight = SearchHeight;
-	//		hitCoord = NewCoords;
-	//	}
-	//}
+	NewCoords = (hitHeight == 0.0)? NewCoords : hitCoord;
+	NewCoords -= dUV;
+	SearchHeight = hitHeight + 0.1;
+	hitHeight = 0.0;
+	dUV = dUV * 0.2;
+	
+	for (int i=0; i<5; i++) {
+		SearchHeight-=(step*0.2);
+		NewCoords += dUV;
+		curHeight = texture2D(NM_height_Map,NewCoords).w;
+		touch = clamp((curHeight - SearchHeight) * 499999.0, 0.0, 1.0);
+    
+		if (touch==1.0 && hitHeight == 0.0) {
+			hitHeight = SearchHeight;
+			hitCoord = NewCoords;
+		} 
+	}
 	
 	return (hitCoord + dUV);
 }
@@ -98,13 +103,14 @@ vec3 TraceRay4(in float height, in vec2 coords, in vec3 dir){
 void main( void )
 {
 	vec3 fvLightDirection = normalize( lightVector_tangent );
-	vec3 fvViewDirection  = normalize( eyeVector_tangent );
+	//vec3 fvViewDirection  = normalize( eyeVector_tangent );
+	vec3 fvViewDirection  = eyeVector_tangent;
 	
 	//vec3 NewCoord = TraceRay4(0.2,TexCoord,fvViewDirection);
 	vec2 NewCoord = TraceRay(TexCoord,fvViewDirection);
 	//vec3 NewCoord = vec3(TexCoord, 1.0);
 	
-	vec3  fvNormal		= texture2D(NM_height_Map, NewCoord.xy).xyz * 2.0 - 1.0;
+	vec3  fvNormal		= normalize(texture2D(NM_height_Map, NewCoord.xy).xyz * 2.0 - 1.0);
 	float lightIntensity	= clamp (dot( fvNormal, fvLightDirection ), 0.0, 1.0); 
 	
 	float Shadow = 1.0;

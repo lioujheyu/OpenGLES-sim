@@ -15,7 +15,7 @@ uniform mat4 project_mat;
 
 out vec2 TexCoord;
 out vec3 eyeVector_tangent;
-out vec3 lightVector_tangent;
+flat centroid out vec3 lightVector_tangent;
    
 void main( void )
 {
