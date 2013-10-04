@@ -522,13 +522,13 @@ static const yytype_uint16 yyrline[] =
       94,    95,    96,   100,   101,   102,   103,   104,   105,   106,
      110,   111,   115,   116,   117,   118,   119,   123,   124,   127,
      133,   139,   146,   153,   160,   168,   174,   180,   188,   190,
-     192,   260,   261,   264,   269,   341,   347,   349,   352,   354,
-     367,   369,   371,   375,   376,   379,   382,   392,   407,   414,
-     423,   424,   428,   429,   432,   435,   440,   445,   450,   456,
-     458,   463,   466,   470,   474,   479,   488,   489,   493,   494,
-     495,   496,   499,   502,   503,   507,   508,   511,   514,   515,
-     519,   520,   521,   522,   526,   527,   528,   529,   533,   534,
-     535,   537,   539
+     194,   262,   266,   271,   276,   348,   354,   356,   359,   361,
+     374,   376,   378,   382,   383,   386,   389,   399,   414,   421,
+     430,   431,   435,   436,   439,   442,   447,   452,   457,   463,
+     465,   470,   473,   477,   481,   486,   495,   496,   500,   501,
+     502,   503,   506,   509,   510,   514,   515,   518,   521,   522,
+     526,   527,   528,   529,   533,   534,   535,   536,   540,   541,
+     542,   544,   546
 };
 #endif
 
@@ -1719,10 +1719,19 @@ yyreduce:
 	;}
     break;
 
+  case 39:
+
+/* Line 1464 of yacc.c  */
+#line 190 "nvgp4ASM.y"
+    {
+		
+	;}
+    break;
+
   case 40:
 
 /* Line 1464 of yacc.c  */
-#line 192 "nvgp4ASM.y"
+#line 194 "nvgp4ASM.y"
     {
 		t_inst.op = (yyvsp[(1) - (3)].ival);
 		t_inst.src[0] = t_operand;
@@ -1791,10 +1800,29 @@ yyreduce:
 	;}
     break;
 
+  case 41:
+
+/* Line 1464 of yacc.c  */
+#line 262 "nvgp4ASM.y"
+    {
+			t_inst.op = (yyvsp[(1) - (3)].ival);
+			t_inst.src[0] = operandPool[0];
+		;}
+    break;
+
+  case 42:
+
+/* Line 1464 of yacc.c  */
+#line 266 "nvgp4ASM.y"
+    {
+			t_inst.op = (yyvsp[(1) - (2)].ival);
+		;}
+    break;
+
   case 43:
 
 /* Line 1464 of yacc.c  */
-#line 264 "nvgp4ASM.y"
+#line 271 "nvgp4ASM.y"
     {
 		t_inst.op = (yyvsp[(1) - (2)].ival);
 	;}
@@ -1803,7 +1831,7 @@ yyreduce:
   case 44:
 
 /* Line 1464 of yacc.c  */
-#line 269 "nvgp4ASM.y"
+#line 276 "nvgp4ASM.y"
     {
 			t_inst.op = (yyvsp[(1) - (3)].ival);
 			t_inst.src[0] = t_operand;
@@ -1875,7 +1903,7 @@ yyreduce:
   case 45:
 
 /* Line 1464 of yacc.c  */
-#line 341 "nvgp4ASM.y"
+#line 348 "nvgp4ASM.y"
     {
 		t_inst.op = (yyvsp[(1) - (5)].ival);
 		t_inst.dst = operandPool[0];
@@ -1886,14 +1914,14 @@ yyreduce:
   case 48:
 
 /* Line 1464 of yacc.c  */
-#line 352 "nvgp4ASM.y"
+#line 359 "nvgp4ASM.y"
     {t_inst.opModifiers[(yyvsp[(2) - (2)].ival)] = true;;}
     break;
 
   case 49:
 
 /* Line 1464 of yacc.c  */
-#line 354 "nvgp4ASM.y"
+#line 361 "nvgp4ASM.y"
     {
 		if (shaderType == 0) { // Vertex shader {
 			//Use idx to record the array element if target is array type.
@@ -1911,35 +1939,35 @@ yyreduce:
   case 50:
 
 /* Line 1464 of yacc.c  */
-#line 367 "nvgp4ASM.y"
+#line 374 "nvgp4ASM.y"
     {(yyval.ival) = (yyvsp[(3) - (4)].ival);;}
     break;
 
   case 53:
 
 /* Line 1464 of yacc.c  */
-#line 375 "nvgp4ASM.y"
+#line 382 "nvgp4ASM.y"
     {operandPool.push_back(t_operand); t_operand.Init();;}
     break;
 
   case 54:
 
 /* Line 1464 of yacc.c  */
-#line 376 "nvgp4ASM.y"
+#line 383 "nvgp4ASM.y"
     {operandPool.push_back(t_operand); t_operand.Init();;}
     break;
 
   case 55:
 
 /* Line 1464 of yacc.c  */
-#line 379 "nvgp4ASM.y"
+#line 386 "nvgp4ASM.y"
     {t_operand.abs = true;;}
     break;
 
   case 56:
 
 /* Line 1464 of yacc.c  */
-#line 382 "nvgp4ASM.y"
+#line 389 "nvgp4ASM.y"
     {
 			if (shaderType == 0) // Vertex shader {
 				t_operand.id = (yyvsp[(6) - (8)].ival);
@@ -1955,7 +1983,7 @@ yyreduce:
   case 57:
 
 /* Line 1464 of yacc.c  */
-#line 392 "nvgp4ASM.y"
+#line 399 "nvgp4ASM.y"
     {
 			if (shaderType == 0) { // Vertex shader {
 				//Use idx to record the array element if target is array type.
@@ -1976,7 +2004,7 @@ yyreduce:
   case 58:
 
 /* Line 1464 of yacc.c  */
-#line 407 "nvgp4ASM.y"
+#line 414 "nvgp4ASM.y"
     {
 			t_operand.id = (yyvsp[(2) - (3)].ival);
 			t_operand.type = INST_REG;
@@ -1989,7 +2017,7 @@ yyreduce:
   case 59:
 
 /* Line 1464 of yacc.c  */
-#line 414 "nvgp4ASM.y"
+#line 421 "nvgp4ASM.y"
     {
 			t_operand.type = INST_CONSTANT;
 			strncpy(t_operand.modifier, (yyvsp[(3) - (3)].sval), 5);
@@ -2001,14 +2029,14 @@ yyreduce:
   case 63:
 
 /* Line 1464 of yacc.c  */
-#line 429 "nvgp4ASM.y"
+#line 436 "nvgp4ASM.y"
     {operandPool.push_back(t_operand);;}
     break;
 
   case 65:
 
 /* Line 1464 of yacc.c  */
-#line 435 "nvgp4ASM.y"
+#line 442 "nvgp4ASM.y"
     {
 			t_operand.id = (yyvsp[(1) - (2)].ival);
 			t_operand.type = INST_REG;
@@ -2019,7 +2047,7 @@ yyreduce:
   case 66:
 
 /* Line 1464 of yacc.c  */
-#line 440 "nvgp4ASM.y"
+#line 447 "nvgp4ASM.y"
     {
 			t_operand.id = 0;
 			t_operand.type = INST_ATTRIB;
@@ -2030,7 +2058,7 @@ yyreduce:
   case 67:
 
 /* Line 1464 of yacc.c  */
-#line 445 "nvgp4ASM.y"
+#line 452 "nvgp4ASM.y"
     {
 			t_operand.id = (yyvsp[(5) - (7)].ival) + 1;
 			t_operand.type = INST_ATTRIB;
@@ -2041,7 +2069,7 @@ yyreduce:
   case 68:
 
 /* Line 1464 of yacc.c  */
-#line 450 "nvgp4ASM.y"
+#line 457 "nvgp4ASM.y"
     {
 			t_operand.type = INST_COLOR;
 			strncpy(t_operand.modifier, (yyvsp[(2) - (2)].sval), 5);
@@ -2051,7 +2079,7 @@ yyreduce:
   case 70:
 
 /* Line 1464 of yacc.c  */
-#line 458 "nvgp4ASM.y"
+#line 465 "nvgp4ASM.y"
     {
 		t_operand.ccMask = (yyvsp[(1) - (2)].ival);
 		strncpy(t_operand.ccModifier, (yyvsp[(2) - (2)].sval), 5);
@@ -2061,7 +2089,7 @@ yyreduce:
   case 72:
 
 /* Line 1464 of yacc.c  */
-#line 466 "nvgp4ASM.y"
+#line 473 "nvgp4ASM.y"
     {
 			t_operand.val.x = t_operand.val.y =
 			t_operand.val.z = t_operand.val.w = (yyvsp[(1) - (1)].fval);
@@ -2071,7 +2099,7 @@ yyreduce:
   case 73:
 
 /* Line 1464 of yacc.c  */
-#line 470 "nvgp4ASM.y"
+#line 477 "nvgp4ASM.y"
     {
 			t_operand.val.x = (yyvsp[(1) - (3)].fval);
 			t_operand.val.y = t_operand.val.z = t_operand.val.w = (yyvsp[(3) - (3)].fval);
@@ -2081,7 +2109,7 @@ yyreduce:
   case 74:
 
 /* Line 1464 of yacc.c  */
-#line 474 "nvgp4ASM.y"
+#line 481 "nvgp4ASM.y"
     {
 			t_operand.val.x = (yyvsp[(1) - (5)].fval);
 			t_operand.val.y = (yyvsp[(3) - (5)].fval);
@@ -2092,7 +2120,7 @@ yyreduce:
   case 75:
 
 /* Line 1464 of yacc.c  */
-#line 479 "nvgp4ASM.y"
+#line 486 "nvgp4ASM.y"
     {
 			t_operand.val.x = (yyvsp[(1) - (7)].fval);
 			t_operand.val.y = (yyvsp[(3) - (7)].fval);
@@ -2104,140 +2132,140 @@ yyreduce:
   case 76:
 
 /* Line 1464 of yacc.c  */
-#line 488 "nvgp4ASM.y"
+#line 495 "nvgp4ASM.y"
     {(yyval.fval) = (yyvsp[(1) - (1)].ival);;}
     break;
 
   case 77:
 
 /* Line 1464 of yacc.c  */
-#line 489 "nvgp4ASM.y"
+#line 496 "nvgp4ASM.y"
     {(yyval.fval) = (yyvsp[(1) - (1)].fval);;}
     break;
 
   case 78:
 
 /* Line 1464 of yacc.c  */
-#line 493 "nvgp4ASM.y"
+#line 500 "nvgp4ASM.y"
     {strcpy((yyval.sval), "xyzw");;}
     break;
 
   case 79:
 
 /* Line 1464 of yacc.c  */
-#line 494 "nvgp4ASM.y"
+#line 501 "nvgp4ASM.y"
     {strcpy((yyval.sval), (yyvsp[(2) - (2)].sval));;}
     break;
 
   case 80:
 
 /* Line 1464 of yacc.c  */
-#line 495 "nvgp4ASM.y"
+#line 502 "nvgp4ASM.y"
     {strcpy((yyval.sval), (yyvsp[(2) - (2)].sval));;}
     break;
 
   case 81:
 
 /* Line 1464 of yacc.c  */
-#line 496 "nvgp4ASM.y"
+#line 503 "nvgp4ASM.y"
     {strcpy((yyval.sval), (yyvsp[(2) - (2)].sval));;}
     break;
 
   case 88:
 
 /* Line 1464 of yacc.c  */
-#line 514 "nvgp4ASM.y"
+#line 521 "nvgp4ASM.y"
     {strcpy((yyval.sval), (yyvsp[(1) - (1)].sval));;}
     break;
 
   case 89:
 
 /* Line 1464 of yacc.c  */
-#line 515 "nvgp4ASM.y"
+#line 522 "nvgp4ASM.y"
     {strcpy((yyval.sval), (yyvsp[(1) - (1)].sval));;}
     break;
 
   case 90:
 
 /* Line 1464 of yacc.c  */
-#line 519 "nvgp4ASM.y"
+#line 526 "nvgp4ASM.y"
     {(yyval.sval)[0] = 'x'; (yyval.sval)[1] = '\0';;}
     break;
 
   case 91:
 
 /* Line 1464 of yacc.c  */
-#line 520 "nvgp4ASM.y"
+#line 527 "nvgp4ASM.y"
     {(yyval.sval)[0] = 'y'; (yyval.sval)[1] = '\0';;}
     break;
 
   case 92:
 
 /* Line 1464 of yacc.c  */
-#line 521 "nvgp4ASM.y"
+#line 528 "nvgp4ASM.y"
     {(yyval.sval)[0] = 'z'; (yyval.sval)[1] = '\0';;}
     break;
 
   case 93:
 
 /* Line 1464 of yacc.c  */
-#line 522 "nvgp4ASM.y"
+#line 529 "nvgp4ASM.y"
     {(yyval.sval)[0] = 'w'; (yyval.sval)[1] = '\0';;}
     break;
 
   case 94:
 
 /* Line 1464 of yacc.c  */
-#line 526 "nvgp4ASM.y"
+#line 533 "nvgp4ASM.y"
     {(yyval.sval)[0] = 'r'; (yyval.sval)[1] = '\0';;}
     break;
 
   case 95:
 
 /* Line 1464 of yacc.c  */
-#line 527 "nvgp4ASM.y"
+#line 534 "nvgp4ASM.y"
     {(yyval.sval)[0] = 'g'; (yyval.sval)[1] = '\0';;}
     break;
 
   case 96:
 
 /* Line 1464 of yacc.c  */
-#line 528 "nvgp4ASM.y"
+#line 535 "nvgp4ASM.y"
     {(yyval.sval)[0] = 'b'; (yyval.sval)[1] = '\0';;}
     break;
 
   case 97:
 
 /* Line 1464 of yacc.c  */
-#line 529 "nvgp4ASM.y"
+#line 536 "nvgp4ASM.y"
     {(yyval.sval)[0] = 'a'; (yyval.sval)[1] = '\0';;}
     break;
 
   case 98:
 
 /* Line 1464 of yacc.c  */
-#line 533 "nvgp4ASM.y"
+#line 540 "nvgp4ASM.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 99:
 
 /* Line 1464 of yacc.c  */
-#line 534 "nvgp4ASM.y"
+#line 541 "nvgp4ASM.y"
     {(yyval.sval)[0] = '-'; (yyval.sval)[1] = '\0';;}
     break;
 
   case 100:
 
 /* Line 1464 of yacc.c  */
-#line 535 "nvgp4ASM.y"
+#line 542 "nvgp4ASM.y"
     {(yyval.sval)[0] = '+'; (yyval.sval)[1] = '\0';;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 2241 "nvgp4ASM.tab.c"
+#line 2269 "nvgp4ASM.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2449,7 +2477,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 541 "nvgp4ASM.y"
+#line 548 "nvgp4ASM.y"
 
 
 

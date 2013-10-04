@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -119,6 +119,9 @@ private:
 	unitThread thread[4];
 	bool curCCState[4]; ///< Current branch condition
 	std::stack<bool> ccStack[4]; ///< Branch condition stack for nest IF block
+	std::stack<int> RepCntStack; ///< Repeat Counter for each nest REP block
+	std::stack<int> RepNumStack; ///< Repeat number for each nest REP block
+	std::stack<int> RepPCStack; ///< Start PC for each nest REP block
 
 	floatVec4 reg[MAX_SHADER_REG_VECTOR*4];
 	floatVec4 CCisSigned[4][2], CCisZero[4][2];

@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -148,8 +148,13 @@ void ShaderCore::Exec(int idx)
 	case OP_ADD:
 		dst[idx] = src[idx][0] + src[idx][1];
 		break;
-//	case OP_AND:
-//		break;
+/// @todo Have to rewrite after integer data type been implemented
+	case OP_AND:
+		dst[idx].x = int(src[idx][0].x) & int(src[idx][1].x);
+		dst[idx].y = int(src[idx][0].y) & int(src[idx][1].y);
+		dst[idx].z = int(src[idx][0].z) & int(src[idx][1].z);
+		dst[idx].w = int(src[idx][0].w) & int(src[idx][1].w);
+		break;
 	case OP_DIV:
 		dst[idx] = src[idx][0] / src[idx][1];
 		break;
@@ -286,7 +291,7 @@ void ShaderCore::Exec(int idx)
 //		break;
 //	case OP_TXQ:
 //		break;
-	//TXDop
+	//TXDop.
 	case OP_TXD:
 		dst[idx] = texUnit.TextureSample(src[idx][0],
 										 -1,
@@ -297,8 +302,24 @@ void ShaderCore::Exec(int idx)
 		break;
 	//BRAop
 	//FLOWCCop
+	case OP_ENDREP:
+		totalScaleOperation+=1;
+		if (idx == 0) {
+			RepCntStack.top()++;
+
+			if (RepCntStack.top() == RepNumStack.top()) {
+				RepPCStack.pop();
+				RepCntStack.pop();
+				RepNumStack.pop();
+			}
+			else {
+				PC = RepPCStack.top();
+			}
+		}
+		break;
 	//IFop
 	case OP_IF:
+		totalScaleOperation+=1;
 		switch (curInst.src[0].ccMask) {
 		case CC_EQ: case CC_EQ0: case CC_EQ1:
 			curCCState[idx] = curCCState[idx] &&
@@ -325,12 +346,22 @@ void ShaderCore::Exec(int idx)
 		ccStack[idx].push(curCCState[idx]);
 		break;
 	//REPop
+	case OP_REP:
+		totalScaleOperation+=1;
+		if (idx == 0) {
+			RepPCStack.push(PC);
+			RepCntStack.push(0);
+			RepNumStack.push((int)src[idx][0].x);
+		}
+		break;
 	//ENDFLOWop
 	case OP_ELSE:
+		totalScaleOperation+=1;
 		curCCState[idx] = !ccStack[idx].top();
 		break;
 
 	case OP_ENDIF:
+		totalScaleOperation+=1;
 		ccStack[idx].pop();
 
 		if (ccStack[idx].empty())

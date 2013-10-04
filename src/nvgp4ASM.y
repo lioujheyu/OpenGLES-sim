@@ -187,7 +187,9 @@ TXDop_instruction: TXDOP opModifiers instResult ',' instOperand ',' instOperand 
 
 BRAop_instruction: BRAOP opModifiers instTarget optBranchCond
 
-FLOWCCop_instruction: FLOWCCOP opModifiers optBranchCond
+FLOWCCop_instruction: FLOWCCOP opModifiers optBranchCond {
+		
+	};
 
 IFop_instruction: IFOP opModifiers ccTest {
 		t_inst.op = $1;
@@ -257,8 +259,13 @@ IFop_instruction: IFOP opModifiers ccTest {
 	}
 
 REPop_instruction
-	:	REPOP opModifiers instOperand
-	|	REPOP opModifiers
+	:	REPOP opModifiers instOperand {
+			t_inst.op = $1;
+			t_inst.src[0] = operandPool[0];
+		};
+	|	REPOP opModifiers {
+			t_inst.op = $1;
+		}
 	;
 
 ENDFLOWop_instruction: ENDFLOWOP opModifiers {

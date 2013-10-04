@@ -175,7 +175,7 @@ void draw_road()
 
     int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
     int v_tex0_loc = glGetAttribLocation(shader.id(), "obj_texCoord");
-    int v_normal_loc = glGetAttribLocation(shader.id(), "obj_texCoord");
+    int v_normal_loc = glGetAttribLocation(shader.id(), "obj_normal");
     int c_map = glGetUniformLocation(shader.id(), "ColorMap");
     int n_map = glGetUniformLocation(shader.id(), "NormalMap");
     int mvp = glGetUniformLocation(shader.id(), "MVP");
@@ -357,6 +357,92 @@ void draw_cubemap()
 	shader.unbind();
 }
 
+void ParallaxOcclusionMapping()
+{
+	Shader shader;
+	shader.init("shader_src/POM.vert", "shader_src/POM.frag");
+	shader.bind();
+
+	unsigned int texture[2];
+	glActiveTexture(GL_TEXTURE0);
+	if (LoadTexture("data/wood.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
+
+	glActiveTexture(GL_TEXTURE1);
+	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
+
+	GLfloat cubeVertex[] = { -1.0f, -1.0f, 0.0f,
+						      1.0f, -1.0f, 0.0f,
+						      1.0f,  1.0f, 0.0f,
+						     -1.0f,  1.0f, 0.0f	 };
+	GLfloat cubeTexCoord[] = { 0.0f, 0.0f,
+							   1.0f, 0.0f,
+							   1.0f, 1.0f,
+							   0.0f, 1.0f   };
+	GLfloat cubeNormal[] = { 0.0f, 0.0f, 1.0 };
+	GLfloat cubeBiNormal[] = { 0.0f, -1.0f, 0.0f };
+	GLfloat cubeTangent[] = { -1.0f, 0.0f, 0.0f };
+
+	glViewport(0,0,1024,768);
+	glClearColor(0.0,0.0,0.0,1.0);
+	glClearDepthf(1.0);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	glm::vec3 light_pos = glm::vec3(2.0f, 0.0f, 1.f);
+	glm::vec3 eye_pos = glm::vec3(0.0f, -1.5f, 1.0f);
+	glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
+    glm::mat4 View = glm::lookAt(
+						eye_pos,          // Camera position in World space
+						glm::vec3(0,0,0), // and looks at the origin
+						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+					);
+	//glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
+	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
+
+	int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
+    int v_tex0_loc = glGetAttribLocation(shader.id(), "obj_texCoord");
+    int v_normal_loc = glGetAttribLocation(shader.id(), "obj_normal");
+    int c_map = glGetUniformLocation(shader.id(), "ColorMap");
+    int nh_map = glGetUniformLocation(shader.id(), "NM_height_Map");
+    int model_loc = glGetUniformLocation(shader.id(), "model_mat");
+    int view_loc = glGetUniformLocation(shader.id(), "view_mat");
+    int project_loc = glGetUniformLocation(shader.id(), "project_mat");
+    int light_loc = glGetUniformLocation(shader.id(), "light_pos");
+    int eye_loc = glGetUniformLocation(shader.id(), "eye_pos");
+    int normal_loc = glGetUniformLocation(shader.id(), "obj_normal");
+    int biNormal_loc = glGetUniformLocation(shader.id(), "obj_Binormal");
+    int tangent_loc = glGetUniformLocation(shader.id(), "obj_Tangent");
+
+    glUniform1i(c_map, 0);
+    glUniform1i(nh_map, 1);
+    glUniform3fv(eye_loc, 1, &eye_pos[0]);
+    glUniform3fv(light_loc, 1, &light_pos[0]);
+    glUniform3fv(normal_loc, 1, cubeNormal);
+    glUniform3fv(biNormal_loc, 1, cubeBiNormal);
+    glUniform3fv(tangent_loc, 1, cubeTangent);
+    glUniformMatrix4fv(model_loc, 1, 0, &Model[0][0]);
+    glUniformMatrix4fv(view_loc, 1, 0, &View[0][0]);
+    glUniformMatrix4fv(project_loc, 1, 0, &Projection[0][0]);
+
+    glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, cubeVertex);
+    glEnableVertexAttribArray(v_coord_loc);
+
+    glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, cubeTexCoord);
+    glEnableVertexAttribArray(v_tex0_loc);
+
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+
+    glDeleteTextures(2, texture);
+
+    shader.unbind();
+
+}
+
 int main()
 {
     //Initial a new context, need to be hidden after egl or glfw library is imported.
@@ -364,7 +450,8 @@ int main()
 
 //	draw_road();
 //	draw_banana();
-	draw_cubemap();
+//	draw_cubemap();
+	ParallaxOcclusionMapping();
 
 	Context::GetCurrentContext()->DumpImage();
 }

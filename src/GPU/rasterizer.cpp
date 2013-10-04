@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -260,6 +260,7 @@ void GPU_Core::PerFragmentOp(const pixel &pixInput)
     //Color buffer write back
     fixColor4 color;
     color = fv2bv(pixInput.attr[1]);
+
     *(cBufPtr + bufOffset*4 + 0) = color.r;// R
     *(cBufPtr + bufOffset*4 + 1) = color.g;// G
     *(cBufPtr + bufOffset*4 + 2) = color.b;// B
