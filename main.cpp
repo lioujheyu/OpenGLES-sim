@@ -393,7 +393,7 @@ void ParallaxOcclusionMapping()
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	glm::vec3 light_pos = glm::vec3(0.0f, 0.5f, 1.0f);
+	glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 0.4f);
 	glm::vec3 eye_pos = glm::vec3(0.0f, -1.0f, 0.3f);
 	glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
     glm::mat4 View = glm::lookAt(
