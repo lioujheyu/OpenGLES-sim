@@ -12,22 +12,25 @@ in vec3 lightVector_tangent;
 
 out vec4 color;
 
-const int sampleNum = 10;
+const int sampleNum = 35;
+const int sampleNum2nd = 5;
 
-const float step = 1.0 / sampleNum;
+const float step = -1.0 / sampleNum;
+
+const float heightScale = 0.2;
 
 vec2 TraceRay(in vec2 coords, in vec3 dir)
 {
 	vec2 NewCoords = coords;
-	vec2 dUV = dir.xy / dir.z * 0.2 * step; 
+	vec2 dUV = dir.xy / dir.z * heightScale * step; 
 	float SearchHeight = 1.0;
 	float curHeight;
 	float hitHeight = 0.0;
-	vec2 hitCoord;
+	vec2 hitCoord = coords;
 	float touch;
 	
 	for (int i=0; i<sampleNum; i++) {
-		SearchHeight-=step;
+		SearchHeight+=step;
 		NewCoords += dUV;
 		curHeight = texture2D(NM_height_Map,NewCoords).w;
 		//touch = (SearchHeight < curHeight)? 1.0 : 0.0;
@@ -37,21 +40,16 @@ vec2 TraceRay(in vec2 coords, in vec3 dir)
 			hitHeight = SearchHeight;
 			hitCoord = NewCoords;
 		}
-		
-		//float test = touch*clamp(1.0 - hitHeight*500, 0.0, 1.0);
-		//
-		//hitHeight = SearchHeight * test;
-		//hitCoord = NewCoords * test;
 	}
 	
 	NewCoords = (hitHeight == 0.0)? NewCoords : hitCoord;
 	NewCoords -= dUV;
-	SearchHeight = hitHeight + 0.1;
+	SearchHeight = hitHeight - step;
 	hitHeight = 0.0;
-	dUV = dUV * 0.2;
+	dUV = dUV / sampleNum2nd;
 	
-	for (int i=0; i<5; i++) {
-		SearchHeight-=(step*0.2);
+	for (int i=0; i<sampleNum2nd; i++) {
+		SearchHeight+=(step / sampleNum2nd);
 		NewCoords += dUV;
 		curHeight = texture2D(NM_height_Map,NewCoords).w;
 		touch = clamp((curHeight - SearchHeight) * 499999.0, 0.0, 1.0);
@@ -59,10 +57,9 @@ vec2 TraceRay(in vec2 coords, in vec3 dir)
 		if (touch==1.0 && hitHeight == 0.0) {
 			hitHeight = SearchHeight;
 			hitCoord = NewCoords;
-		} 
+		}
 	}
-	
-	return (hitCoord + dUV);
+	return hitCoord;
 }
 
 vec3 TraceRay4(in float height, in vec2 coords, in vec3 dir){
@@ -93,7 +90,7 @@ vec3 TraceRay4(in float height, in vec2 coords, in vec3 dir){
 		NewCoords += dUV;
 		float CurrentHeight = texture2D(NM_height_Map,NewCoords.xy).w;
 		float first_hit = clamp((CurrentHeight - SearchHeight - prev_hits) * 499999.0,0.0,1.0);
-		hit_h += first_hit * SearchHeight;
+		hit_h += first_hit * SearchHeight ;
 		prev_hits += first_hit;    
 	}
 	NewCoords = Temp + dUV * (Start - hit_h) * 50.0;
@@ -103,26 +100,27 @@ vec3 TraceRay4(in float height, in vec2 coords, in vec3 dir){
 void main( void )
 {
 	vec3 fvLightDirection = normalize( lightVector_tangent );
-	//vec3 fvViewDirection  = normalize( eyeVector_tangent );
-	vec3 fvViewDirection  = eyeVector_tangent;
+	vec3 fvViewDirection  = normalize( eyeVector_tangent );
 	
 	//vec3 NewCoord = TraceRay4(0.2,TexCoord,fvViewDirection);
 	vec2 NewCoord = TraceRay(TexCoord,fvViewDirection);
-	//vec3 NewCoord = vec3(TexCoord, 1.0);
+	//vec2 NewCoord = TexCoord;
 	
 	vec3  fvNormal		= normalize(texture2D(NM_height_Map, NewCoord.xy).xyz * 2.0 - 1.0);
-	float lightIntensity	= clamp (dot( fvNormal, fvLightDirection ), 0.0, 1.0); 
+	float lightIntensity	= dot( fvNormal, fvLightDirection ); 
 	
 	float Shadow = 1.0;
 	
-	//vec3  fvReflection     = normalize( ( ( 2.0 * fvNormal ) * lightIntensity ) - fvLightDirection ); 
-	//float fRDotV           = max( 0.0, dot( fvReflection, fvViewDirection ) );
+	vec3  fvReflection     = reflect(-fvLightDirection, fvNormal); 
+	float fRDotV           = max( 0.0, dot( fvReflection, fvViewDirection ) );
 	
 	vec4  fvBaseColor      = texture2D( colorMap, NewCoord.xy);
 	
 	vec4  fvTotalAmbient   = 0.25f * fvBaseColor; 
-	vec4  fvTotalDiffuse   = lightIntensity * fvBaseColor; 
-	//vec4  fvTotalSpecular  = fvSpecular * ( pow( fRDotV, fSpecularPower ) );
+	vec4  fvTotalDiffuse   = max(lightIntensity, 0.0) * fvBaseColor; 
+	vec4  fvTotalSpecular  = vec4(0.6, 0.6, 0.6, 1.0) * pow(fRDotV, 20);
 	
-	color = clamp (( fvTotalAmbient + (fvTotalDiffuse /*+ fvTotalSpecular*/) * Shadow ), 0.0, 1.0);
+	color = clamp ( fvTotalAmbient + (fvTotalDiffuse + fvTotalSpecular)*Shadow, 0.0, 1.0);
+	//color = (vec4(fvNormal, 1.0) + 1.0)/2;
+	//color = fvTotalSpecular;
 }       

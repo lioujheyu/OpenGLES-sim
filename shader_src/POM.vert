@@ -4,7 +4,6 @@ in vec3 obj_vertex;
 in vec2 obj_texCoord;
 
 uniform vec3 light_pos;
-uniform vec3 eye_pos;
 uniform vec3 obj_normal;
 uniform vec3 obj_Binormal;
 uniform vec3 obj_Tangent;
@@ -15,18 +14,18 @@ uniform mat4 project_mat;
 
 out vec2 TexCoord;
 out vec3 eyeVector_tangent;
-flat centroid out vec3 lightVector_tangent;
+out vec3 lightVector_tangent;
    
 void main( void )
 {
-	vec4 eye_space, view_space;
+	vec4 eye_space;
 	vec3 light_vector, reflect_vector, view_vector;
 	float distance, specular_factor;
 	
 	eye_space = view_mat * model_mat * vec4(obj_vertex, 1.0);
    
-	light_vector = (view_mat * vec4(light_pos, 1.0) - eye_space).xyz;
-	view_vector = (view_mat * vec4(eye_pos, 1.0) - eye_space).xyz;
+	light_vector = (view_mat * model_mat * vec4(light_pos, 1.0) - eye_space).xyz;
+	view_vector = -eye_space.xyz;
 	
 	vec3 fvBinormal	= (view_mat* model_mat * vec4(obj_Binormal, 0.0f)).xyz;
 	vec3 fvTangent	= (view_mat* model_mat * vec4(obj_Tangent, 0.0f)).xyz;

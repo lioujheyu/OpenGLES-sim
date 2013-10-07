@@ -14,7 +14,7 @@ void main()
 {
 	mat3 tangent_mat = mat3(1.0, 0.0, 0.0,
 	                        0.0, 0.0, 1.0,
-						    0.0, -1.0, 0.0
+						    0.0, 1.0, 0.0
 	                        );
 	eyeVector_tangent = tangent_mat * (eye_pos + vec3(0.0,0.0,2.5) - obj_vertex.xyz);
 

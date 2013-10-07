@@ -115,29 +115,29 @@ void draw_road()
 
     unsigned int texture[2];
 
-//    glActiveTexture(GL_TEXTURE0);
-//    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
+    glActiveTexture(GL_TEXTURE0);
+    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+    }
+
+    glActiveTexture(GL_TEXTURE1);
+    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+    }
+
+//	glActiveTexture(GL_TEXTURE0);
+//	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//    }
+//	}
 //
-//    glActiveTexture(GL_TEXTURE1);
-//    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
+//	glActiveTexture(GL_TEXTURE1);
+//	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//    }
-
-	glActiveTexture(GL_TEXTURE0);
-	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-	}
-
-	glActiveTexture(GL_TEXTURE1);
-	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-	}
+//	}
 
     GLfloat vertexPos[] = { -1.0f, -0.7f, 0.0f, 1.0f,
                              1.0f, -0.7f, 0.0f, 1.0f,
@@ -384,17 +384,17 @@ void ParallaxOcclusionMapping()
 							   1.0f, 0.0f,
 							   1.0f, 1.0f,
 							   0.0f, 1.0f   };
-	GLfloat cubeNormal[] = { 0.0f, 0.0f, 1.0 };
-	GLfloat cubeBiNormal[] = { 0.0f, -1.0f, 0.0f };
-	GLfloat cubeTangent[] = { -1.0f, 0.0f, 0.0f };
+	GLfloat cubeNormal[] = { 0.0f, 0.0f, 1.0f };
+	GLfloat cubeBiNormal[] = { 0.0f, 1.0f, 0.0f };
+	GLfloat cubeTangent[] = { 1.0f, 0.0f, 0.0f };
 
 	glViewport(0,0,1024,768);
 	glClearColor(0.0,0.0,0.0,1.0);
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	glm::vec3 light_pos = glm::vec3(2.0f, 0.0f, 1.f);
-	glm::vec3 eye_pos = glm::vec3(0.0f, -1.5f, 1.0f);
+	glm::vec3 light_pos = glm::vec3(0.0f, 0.5f, 1.0f);
+	glm::vec3 eye_pos = glm::vec3(0.0f, -1.0f, 0.3f);
 	glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
     glm::mat4 View = glm::lookAt(
 						eye_pos,          // Camera position in World space
@@ -407,20 +407,18 @@ void ParallaxOcclusionMapping()
 	int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
     int v_tex0_loc = glGetAttribLocation(shader.id(), "obj_texCoord");
     int v_normal_loc = glGetAttribLocation(shader.id(), "obj_normal");
-    int c_map = glGetUniformLocation(shader.id(), "ColorMap");
+    int c_map = glGetUniformLocation(shader.id(), "colorMap");
     int nh_map = glGetUniformLocation(shader.id(), "NM_height_Map");
     int model_loc = glGetUniformLocation(shader.id(), "model_mat");
     int view_loc = glGetUniformLocation(shader.id(), "view_mat");
     int project_loc = glGetUniformLocation(shader.id(), "project_mat");
     int light_loc = glGetUniformLocation(shader.id(), "light_pos");
-    int eye_loc = glGetUniformLocation(shader.id(), "eye_pos");
     int normal_loc = glGetUniformLocation(shader.id(), "obj_normal");
     int biNormal_loc = glGetUniformLocation(shader.id(), "obj_Binormal");
     int tangent_loc = glGetUniformLocation(shader.id(), "obj_Tangent");
 
     glUniform1i(c_map, 0);
     glUniform1i(nh_map, 1);
-    glUniform3fv(eye_loc, 1, &eye_pos[0]);
     glUniform3fv(light_loc, 1, &light_pos[0]);
     glUniform3fv(normal_loc, 1, cubeNormal);
     glUniform3fv(biNormal_loc, 1, cubeBiNormal);
