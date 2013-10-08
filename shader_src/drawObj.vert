@@ -30,12 +30,13 @@ void main ()
 	
 	reflect_vector = normalize(2*lightIntensity*obj_normal - light_vector);
 	
+	
 	if (lightIntensity > 0.0) {
 		specular_factor = dot(reflect_vector,view_vector);
 		specular_factor = (specular_factor>0.0)?specular_factor:0.0;
-		specular_factor = pow(specular_factor,20);
-		specular_factor = specular_factor / ( 1 + distance*distance*0.001);
-		specular_color = specular_factor * vec3(0.4, 0.4, 0.2);
+		specular_factor = pow(specular_factor,5);
+		//specular_factor = specular_factor / ( 1 + distance*distance*0.001);
+		specular_color = specular_factor * vec3(0.4, 0.4, 0.4)*2;
 	}
 	else
 		specular_color = vec3(0.0f,0.0f,0.0f);
