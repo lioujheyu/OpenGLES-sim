@@ -481,7 +481,7 @@ void draw_teapot()
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
-	bool res = loadOBJ("data/teapot.obj", vertices, uvs, normals);
+	//bool res = loadOBJ("data/teapot.obj", vertices, uvs, normals);
 
 
 	int v_coord_loc     = glGetAttribLocation(shader.id(), "obj_vertex");
@@ -683,6 +683,7 @@ int main()
 {
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
+
     //draw_road();
     //draw_cubemap();
 	//draw_banana();
@@ -690,6 +691,7 @@ int main()
 	//tutorial3();
 	//tutorial4();
 	ParallaxOcclusionMapping();
+
 	Context::GetCurrentContext()->DumpImage();
 
 }

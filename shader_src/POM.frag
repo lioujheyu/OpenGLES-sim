@@ -11,6 +11,7 @@ out vec4 color;
 
 const int sampleNum = 35;
 const int sampleNum2nd = 5;
+const int shadowSampleNum = 20;
 
 const float step = -1.0 / sampleNum;
 
@@ -72,16 +73,16 @@ float TraceShadow(in vec3 coords, in vec3 dir)
 	
 	//SearchHeight = coords.z;
 	SearchHeight = texture2D(NM_height_Map,NewCoords.xy).w;
-	float diff = (1.0 - SearchHeight) / 20;
+	float diff = (1.0 - SearchHeight) / shadowSampleNum;
 	vec2 dUV = dir.xy / dir.z * heightScale * diff; 
 	
-	for (int i=0; i<20; i++) {
+	for (int i=0; i<shadowSampleNum; i++) {
 		SearchHeight+=diff;
 		NewCoords += dUV;
 		curHeight = texture2D(NM_height_Map,NewCoords).w;
 		touch = clamp((curHeight - SearchHeight) * 499999.0, 0.0, 1.0);
 
-		shadow += clamp(touch + shadow, 0.0, 1.0)*0.07;
+		shadow += clamp(touch + shadow, 0.0, 1.0)* (1.4/shadowSampleNum);
 	}
 	
 	return shadow;
@@ -93,7 +94,7 @@ void main( void )
 	vec3 fvViewDirection  = normalize( eyeVector_tangent );
 	
 	vec3 NewCoord = TraceRay(TexCoord,fvViewDirection);
-	//vec2 NewCoord = TexCoord;
+	//vec3 NewCoord = vec3(TexCoord, 0.0f);
 	
 	vec3  fvNormal		= normalize(texture2D(NM_height_Map, NewCoord.xy).xyz * 2.0 - 1.0);
 	float lightIntensity	= dot( fvNormal, fvLightDirection ); 
