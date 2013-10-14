@@ -271,7 +271,7 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 	float maxScaleFac;
 	floatVec4 TexColor[2];
 	floatVec4 color;
-	floatVec4 colorNextLevel;
+	floatVec4 colorAni[4];
 	int LoD, maxLevel;
 	floatVec4 deltaDX, deltaDY;
 
@@ -332,6 +332,8 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 					std::max(std::abs(deltaDX.s), std::abs(deltaDX.t)),
 					std::max(std::abs(deltaDY.s), std::abs(deltaDY.t))
 				);
+//	maxScaleFac = std::max(sqrt(deltaDX.s*deltaDX.s + deltaDX.t*deltaDX.t),
+//						   sqrt(deltaDY.s*deltaDY.s + deltaDY.t*deltaDY.t));
 
 	w_ratio = frexp(maxScaleFac, &LoD);
 	w_ratio = w_ratio*2-1;
@@ -382,30 +384,50 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 				color = TexColor[0];
 			break;
 
-		case GL_LINEAR_MIPMAP_LINEAR:   //u,v,w trilinear filter
-			color = TrilinearFilter(coord, LoD, w_ratio, tid);
-			break;
+//		case GL_LINEAR_MIPMAP_LINEAR:   //u,v,w trilinear filter
+//			color = TrilinearFilter(coord, LoD, w_ratio, tid);
+//			break;
 
-//		case GL_LINEAR_MIPMAP_LINEAR:
-//			float r1, r2, r3 ,r4;
-//			floatVec4 mainVec;
+		case GL_LINEAR_MIPMAP_LINEAR:
+			float r1, r2, r3 ,r4;
+			unsigned char sampleN;
+			floatVec4 mainAxis;
+			r1 = std::max(std::abs(deltaDX.s), std::abs(deltaDX.t));
+			r2 = std::max(std::abs(deltaDY.s), std::abs(deltaDY.t));
 //			r1 = sqrt(deltaDX.s*deltaDX.s + deltaDX.t*deltaDX.t);
-//			r2 = sqrt(deltaDY.s*deltaDY.s + deltaDY.t*deltaDX.t);
-////			if (r1/r2 < 1.5f || 0.75f < r1/r2 ){
-//				if (r1 > r2)
-//					mainVec = deltaDX;
-//				else
-//					mainVec = deltaDY;
-//
-//			color = TrilinearFilter(coord + mainVec/2,
-//									LoD, w_ratio, tid);
-//			colorNextLevel = TrilinearFilter(coord - mainVec/2,
-//											 LoD, w_ratio, tid);
-//			color = (color + colorNextLevel)/2;
-//
-////			}
-////			else
-////				color = TrilinearFilter(coord, LoD, w_ratio, tid);
+//			r2 = sqrt(deltaDY.s*deltaDY.s + deltaDY.t*deltaDY.t);
+			if (r1 > r2) {
+				mainAxis = deltaDX;
+				sampleN = std::min(ceil(r1/r2),4.0);
+				sampleN = (sampleN==1)? sampleN: sampleN & 0xE;
+				maxScaleFac = r1/sampleN;
+			}
+			else{
+				mainAxis = deltaDY;
+				sampleN = std::min(ceil(r2/r1),4.0);
+				sampleN = (sampleN==1)? sampleN: sampleN & 0xE;
+				maxScaleFac = r2/sampleN;
+			}
+
+			w_ratio = frexp(maxScaleFac, &LoD);
+			w_ratio = w_ratio*2-1;
+			LoD--;
+			LoD = CLAMP(LoD, 0, maxLevel);
+
+			color = floatVec4(0.0, 0.0, 0.0, 0.0);
+			for (int i=0; i<sampleN; i++) {
+				if (sampleN == 4)
+					colorAni[i] = TrilinearFilter(coord + mainAxis*(2*i - 3)/8,
+												  LoD, w_ratio, tid);
+				else if (sampleN == 2)
+					colorAni[i] = TrilinearFilter(coord + mainAxis*(2*i - 1)/4,
+												  LoD, w_ratio, tid);
+				else
+					colorAni[i] = TrilinearFilter(coord, LoD, w_ratio, tid);
+
+				color = color + colorAni[i];
+			}
+			color = color/sampleN;
 
 			break;
 
