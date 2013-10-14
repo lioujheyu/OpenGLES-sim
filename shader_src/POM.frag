@@ -85,7 +85,7 @@ float TraceShadow(in vec3 coords, in vec3 dir)
 		shadow += clamp(touch + shadow, 0.0, 1.0)* (1.4/shadowSampleNum);
 	}
 	
-	return shadow;
+	return min(shadow, 1.0f);
 }
 
 void main( void )
