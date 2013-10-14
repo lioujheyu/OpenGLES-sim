@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -62,6 +62,7 @@ struct _MM_ALIGN16 floatVec4
 	union {
 		__m128 sse;
 		struct { float x, y, z, w; };
+		struct { int ix, iy, iz, iw;};
 		struct { float r, g, b, a; };
 		struct { float s, t, p, q; };
 	};
@@ -121,6 +122,7 @@ struct floatVec4
 	union
 	{
 		struct { float x, y, z, w; };
+		struct { int ix, iy, iz, iw;};
 		struct { float r, g, b, a; };
 		struct { float s, t, p, q; };
 	};
