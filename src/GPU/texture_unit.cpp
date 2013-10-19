@@ -268,10 +268,11 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 {
 	floatVec4 coord;
 	float w_ratio;
-	float maxScaleFac;
+	float maxScaleFac, maxScaleFacX, maxScaleFacY, scaleFacLoser;
 	floatVec4 TexColor[2];
 	floatVec4 color;
 	floatVec4 colorAni[4];
+	floatVec4 mainAxis;
 	int LoD, maxLevel;
 	floatVec4 deltaDX, deltaDY;
 
@@ -323,28 +324,32 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 	coord.p = coordIn.p;
 	coord.q = coordIn.q;
 
+	maxLevel = targetImage->maxLevel;
+
 	deltaDX.s = scaleFacDX.s*targetImage->widthLevel[0];
 	deltaDX.t = scaleFacDX.t*targetImage->heightLevel[0];
 	deltaDY.s = scaleFacDY.s*targetImage->widthLevel[0];
 	deltaDY.t = scaleFacDY.t*targetImage->heightLevel[0];
 
-	maxScaleFac = std::max(
-					std::max(std::abs(deltaDX.s), std::abs(deltaDX.t)),
-					std::max(std::abs(deltaDY.s), std::abs(deltaDY.t))
-				);
-//	maxScaleFac = std::max(sqrt(deltaDX.s*deltaDX.s + deltaDX.t*deltaDX.t),
-//						   sqrt(deltaDY.s*deltaDY.s + deltaDY.t*deltaDY.t));
+	maxScaleFacX = std::max(std::abs(deltaDX.s), std::abs(deltaDX.t));
+	maxScaleFacY = std::max(std::abs(deltaDY.s), std::abs(deltaDY.t));
+//	maxScaleFacX = sqrt(deltaDX.s*deltaDX.s + deltaDX.t*deltaDX.t);
+//	maxScaleFacY = sqrt(deltaDY.s*deltaDY.s + deltaDY.t*deltaDY.t);
+	if (maxScaleFacX > maxScaleFacY) {
+		mainAxis = deltaDX;
+		maxScaleFac = maxScaleFacX;
+		scaleFacLoser = maxScaleFacY;
+	}
+	else{
+		mainAxis = deltaDY;
+		maxScaleFac = maxScaleFacY;
+		scaleFacLoser = maxScaleFacX;
+	}
 
 	w_ratio = frexp(maxScaleFac, &LoD);
 	w_ratio = w_ratio*2-1;
 	LoD--;
-
-	maxLevel = targetImage->maxLevel;
-
-	if (level == -1)
-		LoD = CLAMP(LoD, 0, maxLevel);
-	else
-		LoD = level;
+	LoD = (level == -1)? CLAMP(LoD, 0, maxLevel): level;
 
 	if(maxScaleFac>1) {
 		switch (minFilter[tid]) {
@@ -388,31 +393,25 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 //			color = TrilinearFilter(coord, LoD, w_ratio, tid);
 //			break;
 
-		case GL_LINEAR_MIPMAP_LINEAR:
-			float r1, r2, r3 ,r4;
+		case GL_LINEAR_MIPMAP_LINEAR:	//u,v,w trilinear filter
 			unsigned char sampleN;
-			floatVec4 mainAxis;
-			r1 = std::max(std::abs(deltaDX.s), std::abs(deltaDX.t));
-			r2 = std::max(std::abs(deltaDY.s), std::abs(deltaDY.t));
-//			r1 = sqrt(deltaDX.s*deltaDX.s + deltaDX.t*deltaDX.t);
-//			r2 = sqrt(deltaDY.s*deltaDY.s + deltaDY.t*deltaDY.t);
-			if (r1 > r2) {
-				mainAxis = deltaDX;
-				sampleN = std::min(ceil(r1/r2),4.0);
-				sampleN = (sampleN==1)? sampleN: sampleN & 0xE;
-				maxScaleFac = r1/sampleN;
-			}
-			else{
-				mainAxis = deltaDY;
-				sampleN = std::min(ceil(r2/r1),4.0);
-				sampleN = (sampleN==1)? sampleN: sampleN & 0xE;
-				maxScaleFac = r2/sampleN;
-			}
+
+			/* Extension defines the sample number have to apply ceiling on the
+			 * ratio but I use floor to get a smaller ratio for better
+			 * performance. The result image seems OK so far, but have to aware
+			 * any unusual if it is just happened. Maybe this is why most GFX
+			 * has the configuration between quality and performance about
+			 * anisotropic filter.
+			 */
+			sampleN = std::min(floor(maxScaleFac/scaleFacLoser),2.0);
+			// floor to lowest power of 2, the same reason mentioned above.
+			sampleN = (sampleN == 3)? 2: sampleN;
+			maxScaleFac = maxScaleFac/sampleN;
 
 			w_ratio = frexp(maxScaleFac, &LoD);
 			w_ratio = w_ratio*2-1;
 			LoD--;
-			LoD = CLAMP(LoD, 0, maxLevel);
+			LoD = (level == -1)? CLAMP(LoD, 0, maxLevel): level;
 
 			color = floatVec4(0.0, 0.0, 0.0, 0.0);
 			for (int i=0; i<sampleN; i++) {
@@ -430,7 +429,6 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 			color = color/sampleN;
 
 			break;
-
 		}
 	} else {
 		switch (magFilter[tid]) {
