@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -569,7 +569,7 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
         texCtx[activeTexCtx].wrapT = param;
         break;
 
-/********  OpenGL ES 3.0 ***********/
+/*************** OpenGL ES 3.0 ***************/
 	case GL_TEXTURE_BASE_LEVEL:
 		texCtx[activeTexCtx].baseLevel = param;
 		break;
@@ -578,19 +578,29 @@ void Context::TexParameteri(GLenum target, GLenum pname, GLint param)
 		texCtx[activeTexCtx].maxLevel = param;
 		break;
 
-	case GL_TEXTURE_MIN_LOD:
-		break;
+//	case GL_TEXTURE_MIN_LOD:
+//		break;
+//
+//	case GL_TEXTURE_MAX_LOD:
+//		break;
+//
+//	case GL_TEXTURE_SWIZZLE_R:
+//	case GL_TEXTURE_SWIZZLE_G:
+//	case GL_TEXTURE_SWIZZLE_B:
+//	case GL_TEXTURE_SWIZZLE_A:
+//		break;
+//
+//	case GL_TEXTURE_WRAP_R:
+//		break;
 
-	case GL_TEXTURE_MAX_LOD:
-		break;
-
-	case GL_TEXTURE_SWIZZLE_R:
-	case GL_TEXTURE_SWIZZLE_G:
-	case GL_TEXTURE_SWIZZLE_B:
-	case GL_TEXTURE_SWIZZLE_A:
-		break;
-
-	case GL_TEXTURE_WRAP_R:
+/*************** OpenGL ES Extension ***************/
+	case GL_TEXTURE_MAX_ANISOTROPY_EXT:
+		if (param < 1) {
+			RecordError(GL_INVALID_VALUE);
+			return;
+		}
+		texCtx[activeTexCtx].maxAnisoFilterRatio =
+			std::min(param, MAX_TEXTURE_MAX_ANISOTROPY);
 		break;
 
     default:

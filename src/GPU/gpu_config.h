@@ -30,6 +30,15 @@
  */
 //#define USE_SSE
 
+/**
+ *	@def START_SPLIT_LEVEL
+ *	Which tile split level will the tile split unit start? 3 means starting in
+ *	16*16, 2 for 8*8, 1 for 4*4, 0 for 2*2. If this number is undefined, the
+ *	default value will be set in 3(16*16).
+ */
+#define START_SPLIT_LEVEL 3
+
+
 /// @name GPU internal resource configuration.
 ///@{
 /** @def MAX_SHADER_CORE
@@ -48,6 +57,12 @@
 #define MAX_UNIFORM_VECTORS  									\
 	( MAX_VERTEX_UNIFORM_VECTORS + MAX_FRAGMENT_UNIFORM_VECTORS )
 ///@}
+
+/**
+ *	@def MAX_TEXTURE_MAX_ANISOTROPY
+ *	The maximum anisotropic filter ratio that be accepted by texture unit
+ */
+#define MAX_TEXTURE_MAX_ANISOTROPY 8
 
 /**
  *	@def NO_TEX_CACHE

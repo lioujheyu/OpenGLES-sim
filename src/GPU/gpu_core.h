@@ -24,6 +24,7 @@
 #define GPU_CORE_H_INCLUDED
 
 #include <GLES3/gl3.h>
+#include <GLES3/gl2ext.h>
 #include <string>
 #include <utility>
 #include <algorithm>
@@ -57,6 +58,12 @@
 #	define PIXEL_INFO_PTR stderr
 #endif
 
+
+#ifndef START_SPLIT_LEVEL
+#	define START_SPLIT_LEVEL 3
+#endif // START_SPLIT_LEVEL
+
+const int SPLIT_WIDTH = pow(2,START_SPLIT_LEVEL+1);
 
 /**
  *	The major class for whole GPU hardware design
@@ -95,6 +102,7 @@ public:
 
     GLenum 			wrapS[MAX_TEXTURE_CONTEXT],
 					wrapT[MAX_TEXTURE_CONTEXT];
+	unsigned char	maxAnisoFilterRatio;
 	textureImage 	tex2D[MAX_TEXTURE_CONTEXT];
 	textureImage 	texCubeNX[MAX_TEXTURE_CONTEXT];
 	textureImage 	texCubeNY[MAX_TEXTURE_CONTEXT];
@@ -167,7 +175,7 @@ private:
     int				LX, RX, LY, HY;
 ///@}
 
-    pixel           pixBuffer[256];
+    pixel           pixBuffer[SPLIT_WIDTH * SPLIT_WIDTH];
     int             pixBufferP;
 
 

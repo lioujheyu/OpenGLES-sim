@@ -318,6 +318,7 @@ void GPU_Core::TriangleSetup()
 	LY = LY & 0xfffe;
 	LX = MIN3(prim.v[0].attr[0].x, prim.v[1].attr[0].x, prim.v[2].attr[0].x);
 	LX = CLAMP(LX, viewPortLX, viewPortLX+viewPortW-1);
+//  So does x-axis
 	LX = LX & 0xfffe;
 	HY = MAX3(prim.v[0].attr[0].y, prim.v[1].attr[0].y, prim.v[2].attr[0].y);
 	HY = CLAMP(HY, viewPortLY, viewPortLY+viewPortH-1);

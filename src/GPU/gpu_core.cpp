@@ -82,12 +82,12 @@ void GPU_Core::Run()
             }
 
             //Fragment-based operation starts here
-			for(int y=LY; y<=HY; y+=16) {
-				for(int x=LX; x<=RX; x+=16) {
+			for(int y=LY; y<=HY; y+=SPLIT_WIDTH) {
+				for(int x=LX; x<=RX; x+=SPLIT_WIDTH) {
 					PIXPRINTF("Recursive Entry:-------(%d,%d)-----\n",x,y);
 					pixBufferP = 0;
 
-					tileSplit(x,y,3);
+					tileSplit(x,y,START_SPLIT_LEVEL);
 					for (int i=0; i<pixBufferP/4; i++) {
 						///@todo Task scheduler for auto job dispatch
 						FragmentShaderEXE(1,
@@ -246,6 +246,7 @@ void GPU_Core::PassConfig2SubModule()
 			sCore[j].texUnit.magFilter[i] = magFilter[i];
 			sCore[j].texUnit.wrapS[i] = wrapS[i];
 			sCore[j].texUnit.wrapT[i] = wrapT[i];
+			sCore[j].texUnit.maxAnisoFilterRatio = maxAnisoFilterRatio;
 			sCore[j].texUnit.tex2D[i] = tex2D[i];
 			sCore[j].texUnit.texCubeNX[i] = texCubeNX[i];
 			sCore[j].texUnit.texCubeNY[i] = texCubeNY[i];

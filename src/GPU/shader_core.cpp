@@ -74,6 +74,7 @@ void ShaderCore::Run()
 	}
 }
 
+///@todo Separate vector operation into scalar operation.
 void ShaderCore::Exec(int idx)
 {
 	floatVec4 scaleFacDX, scaleFacDY;
@@ -251,7 +252,7 @@ void ShaderCore::Exec(int idx)
 	//TEXop
 	case OP_TEX:
 /* The scale factor in this instruction comes from directly difference between
- * current and neighbor thread's texture coordinate. Therefore, compare to get
+ * current and neighbor thread's incoming coordinate. Therefore, compare to get
  * scale factor in texture unit, it has a big advantage that we don't need to
  * know which attribute is used to locate the texel position and even can accept
  * non-attribute variable as texture coordinate without additional DDX or DDY
@@ -303,8 +304,8 @@ void ShaderCore::Exec(int idx)
 	//BRAop
 	//FLOWCCop
 	case OP_ENDREP:
-		totalScaleOperation+=1;
 		if (idx == 0) {
+			totalScaleOperation+=1;
 			RepCntStack.top()++;
 
 			if (RepCntStack.top() == RepNumStack.top()) {
@@ -347,8 +348,8 @@ void ShaderCore::Exec(int idx)
 		break;
 	//REPop
 	case OP_REP:
-		totalScaleOperation+=1;
 		if (idx == 0) {
+			totalScaleOperation+=1;
 			RepPCStack.push(PC);
 			RepCntStack.push(0);
 			RepNumStack.push((int)src[idx][0].x);
@@ -467,9 +468,8 @@ void ShaderCore::FetchData(int idx)
 			src[idx][i].w = -src[idx][i].w;
 		}
 
-		if (curInst.src[i].abs) {
+		if (curInst.src[i].abs)
 			src[idx][i] = fvabs(src[idx][i]);
-		}
 	}
 }
 

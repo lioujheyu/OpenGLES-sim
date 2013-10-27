@@ -58,14 +58,14 @@ void GPU_Core::tileSplit(int x, int y, int level)
 	centralTest[2] = (x+(1<<level)-prim.v[0].attr[0].x)*Edge[2][0]-
 					 (y+(1<<level)-prim.v[0].attr[0].y)*Edge[2][1];
 
-	if (level == 0) {
+	if (level == 0) { //Reach the 2x2 pixel stamp
 
 /*
- * When split level is 0, the cornerTests are now for each pixel's center test,
+ * When split level is 1, the cornerTests are used for each pixel's center test,
  * and not for corner test anymore.
  *
- * cornerTest: 5 7 for pixel stamp: 2 3
- *             0 2                  0 1
+ * cornerTest: 5 7 for the pixel in pixel stamp: 2 3
+ *             0 2                               0 1
  */
 		for(lc=0; lc<3; lc++) {
 			cornerTest[0][lc] = centralTest[lc] + (-Edge[lc][0]+Edge[lc][1])*0.5;

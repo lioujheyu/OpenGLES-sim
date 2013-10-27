@@ -245,9 +245,9 @@ floatVec4 TextureUnit::BilinearFilter(const floatVec4 &coordIn,int level, int ti
 }
 
 floatVec4 TextureUnit::TrilinearFilter(const floatVec4 &coordIn,
-									   int level,
-									   float w_ratio,
-									   int tid )
+									   const int level,
+									   const float w_ratio,
+									   const int tid )
 {
 	floatVec4 color[2];
 	int maxLevel = targetImage->maxLevel;
@@ -270,8 +270,7 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 	float w_ratio;
 	float maxScaleFac, maxScaleFacX, maxScaleFacY, scaleFacLoser;
 	floatVec4 TexColor[2];
-	floatVec4 color;
-	floatVec4 colorAni[4];
+	floatVec4 color, colorAni;
 	floatVec4 mainAxis;
 	int LoD, maxLevel;
 	floatVec4 deltaDX, deltaDY;
@@ -340,7 +339,7 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 		maxScaleFac = maxScaleFacX;
 		scaleFacLoser = maxScaleFacY;
 	}
-	else{
+	else {
 		mainAxis = deltaDY;
 		maxScaleFac = maxScaleFacY;
 		scaleFacLoser = maxScaleFacX;
@@ -403,9 +402,14 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 			 * has the configuration between quality and performance about
 			 * anisotropic filter.
 			 */
-			sampleN = std::min(floor(maxScaleFac/scaleFacLoser),2.0);
-			// floor to lowest power of 2, the same reason mentioned above.
-			sampleN = (sampleN == 3)? 2: sampleN;
+			sampleN = std::min((unsigned char)floor(maxScaleFac/scaleFacLoser),
+								maxAnisoFilterRatio);
+			// Round down to nearest power of 2, the same reason mentioned above
+			if (sampleN == 3)
+				sampleN = 2;
+			else if (sampleN > 4 && sampleN < 8)
+				sampleN = 4;
+
 			maxScaleFac = maxScaleFac/sampleN;
 
 			w_ratio = frexp(maxScaleFac, &LoD);
@@ -415,16 +419,19 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 
 			color = floatVec4(0.0, 0.0, 0.0, 0.0);
 			for (int i=0; i<sampleN; i++) {
-				if (sampleN == 4)
-					colorAni[i] = TrilinearFilter(coord + mainAxis*(2*i - 3)/8,
+				if (sampleN == 8)
+					colorAni = TrilinearFilter(coord + mainAxis*(2*i - 7)/16,
+												  LoD, w_ratio, tid);
+				else if (sampleN == 4)
+					colorAni = TrilinearFilter(coord + mainAxis*(2*i - 3)/8,
 												  LoD, w_ratio, tid);
 				else if (sampleN == 2)
-					colorAni[i] = TrilinearFilter(coord + mainAxis*(2*i - 1)/4,
+					colorAni = TrilinearFilter(coord + mainAxis*(2*i - 1)/4,
 												  LoD, w_ratio, tid);
-				else
-					colorAni[i] = TrilinearFilter(coord, LoD, w_ratio, tid);
+				else //sampleN == 1, isometric filter
+					colorAni = TrilinearFilter(coord, LoD, w_ratio, tid);
 
-				color = color + colorAni[i];
+				color = color + colorAni;
 			}
 			color = color/sampleN;
 

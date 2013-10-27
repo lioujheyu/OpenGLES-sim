@@ -37,6 +37,7 @@
 		</Compiler>
 		<Unit filename="bitmap.cpp" />
 		<Unit filename="bitmap.h" />
+		<Unit filename="include/GLES3/gl2ext.h" />
 		<Unit filename="include/GLES3/gl3.h" />
 		<Unit filename="include/GLES3/gl3platform.h" />
 		<Unit filename="include/KHR/khrplatform.h" />

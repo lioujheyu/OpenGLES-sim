@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -33,7 +33,7 @@ void BilinearFilter4MipMap(textureImage *texImage)
 	width = texImage->widthLevel[0];
 	height = texImage->heightLevel[0];
 
-	for (int i = 0;i<13;i++) {
+	for (int i=0; i<13; i++) {
 		if ((width < 1) || (height < 1)){
 			texImage->maxLevel = i-1;
 			break;
@@ -44,8 +44,8 @@ void BilinearFilter4MipMap(textureImage *texImage)
 
 		image = new unsigned char[nextWidth * nextHeight * 4];
 
-		for (unsigned int y=0;y<nextHeight;y++){
-			for (unsigned int x=0;x<nextWidth;x++){
+		for (unsigned int y=0;y<nextHeight;y++) {
+			for (unsigned int x=0;x<nextWidth;x++) {
 				texel[0].r = *(texImage->data[i] + (2*y*width + 2*x)*4    );
 				texel[0].g = *(texImage->data[i] + (2*y*width + 2*x)*4 + 1);
 				texel[0].b = *(texImage->data[i] + (2*y*width + 2*x)*4 + 2);
@@ -206,6 +206,7 @@ void ActiveGPU(int vtxInputMode)
 		gpu.magFilter[i] = ctx->texCtx[ctx->samplePool[i]].magFilter;
 		gpu.wrapS[i] = ctx->texCtx[ctx->samplePool[i]].wrapS;
 		gpu.wrapT[i] = ctx->texCtx[ctx->samplePool[i]].wrapT;
+		gpu.maxAnisoFilterRatio = ctx->texCtx[ctx->samplePool[i]].maxAnisoFilterRatio;
 		gpu.tex2D[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].tex2D;
 		gpu.texCubeNX[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNX;
 		gpu.texCubeNY[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNY;
