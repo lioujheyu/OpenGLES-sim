@@ -27,5 +27,6 @@ void main()
 	//cfactor = dot(c2, vec3(0.0,0.0,1.0));
 	cfactor = clamp(cfactor, 0.0, 1.0);
 	
-	color = c1 * cfactor;
+	//color = c1 * cfactor;
+	color = c1;
 }

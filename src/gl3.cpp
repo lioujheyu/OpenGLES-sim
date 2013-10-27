@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -537,7 +537,7 @@ GL_APICALL void GL_APIENTRY glScissor (GLint x, GLint y, GLsizei width, GLsizei 
 
 GL_APICALL void GL_APIENTRY glShaderBinary (GLsizei n, const GLuint* shaders, GLenum binaryformat, const GLvoid* binary, GLsizei length)
 {
-
+	CONTEXT_EXEC(ShaderBinary(n, shaders, binaryformat, binary, length));
 }
 
 GL_APICALL void GL_APIENTRY glShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length)

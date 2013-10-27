@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -358,6 +358,38 @@ void Context::ShaderSource(GLuint shader, GLsizei count, const GLchar* const* st
 	}
 
 	shaderPool[shader] = shaderPool[shader];
+}
+
+/**
+ *	@note Current implementation only supports NVGP4's assembly from text, not binary.
+ */
+void Context::ShaderBinary(GLsizei n, const GLuint* shaders, GLenum binaryformat, const GLvoid* binary, GLsizei length)
+{
+	if (n < 0 || length < 0) {
+		RecordError(GL_INVALID_VALUE);
+		return;
+	}
+
+	for(int i=0; i<n; i++) {
+		if (shaderPool.find(*(shaders+i)) == shaderPool.end()){
+			RecordError(GL_INVALID_VALUE);
+			return;
+		}
+
+		if (length == 0) {
+			std::string t_string;
+			for (int i=0; ; i++){
+				t_string.push_back(*((GLchar*)binary+i));
+				if (*((GLchar*)binary+i) == '\0')
+					break;
+			}
+			shaderPool[*(shaders+i)].asmSrc = t_string;
+		}
+		else
+			shaderPool[*(shaders+i)].asmSrc.assign((GLchar*)binary, length);
+
+		shaderPool[*(shaders+i)].isCompiled = GL_TRUE;
+	}
 }
 
 void Context::UseProgram(GLuint program)

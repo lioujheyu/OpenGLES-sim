@@ -106,6 +106,33 @@ void Shader::init(const char *vsFile, const char *fsFile) {
 	validateProgram(shader_id);
 }
 
+void Shader::initASM(const char *vsFileASM, const char *fsFileASM)
+{
+	shader_vp = glCreateShader(GL_VERTEX_SHADER);
+	printf("create vertex shader: %u\n",shader_vp);
+
+	shader_fp = glCreateShader(GL_FRAGMENT_SHADER);
+	printf("create fragment shader: %u\n",shader_fp);
+
+	const char* vsASM = textFileRead(vsFileASM);
+	const char* fsASM = textFileRead(fsFileASM);
+
+    if (vsASM == NULL || fsASM == NULL) {
+        cerr << "Either vertex shader or fragment shader file not found." << endl;
+        return;
+    }
+
+    glShaderBinary(1, &shader_vp, 0, (GLvoid*)vsASM, 0);
+    glShaderBinary(1, &shader_fp, 0, (GLvoid*)fsASM, 0);
+
+    shader_id = glCreateProgram();
+	printf("create program: %u\n",shader_id);
+	glAttachShader(shader_id, shader_fp);
+	glAttachShader(shader_id, shader_vp);
+	glLinkProgram(shader_id);
+	validateProgram(shader_id);
+}
+
 Shader::~Shader() {
 	glDetachShader(shader_id, shader_fp);
 	glDetachShader(shader_id, shader_vp);

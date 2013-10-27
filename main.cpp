@@ -42,6 +42,11 @@ bool LoadTexture(char *filename, unsigned int *texture)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
+
     glGenerateMipmap(GL_TEXTURE_2D);
 
     free(bitmap);
@@ -102,7 +107,7 @@ int LoadCubeMap(char *xneg, char *yneg, char *zneg,
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
 	return 0;
 }
@@ -110,40 +115,41 @@ int LoadCubeMap(char *xneg, char *yneg, char *zneg,
 void draw_road()
 {
 	Shader shader;
-	shader.init("shader_src/NormalMapping.vert",
-				"shader_src/NormalMapping.frag");
+//	shader.init("shader_src/NormalMapping.vert",
+//				"shader_src/NormalMapping.frag");
+	shader.initASM("1.vsasm", "2.fsasm");
 	shader.bind();
 
     unsigned int texture[2];
 
-    glActiveTexture(GL_TEXTURE0);
-    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-    }
-
-    glActiveTexture(GL_TEXTURE1);
-    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-    }
-
-//	glActiveTexture(GL_TEXTURE0);
-//	if (LoadTexture("data/road.bmp", &texture[0]) == false) {
+//    glActiveTexture(GL_TEXTURE0);
+//    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//	}
+//    }
 //
-//	glActiveTexture(GL_TEXTURE1);
-//	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
+//    glActiveTexture(GL_TEXTURE1);
+//    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//	}
+//    }
 
-    GLfloat vertexPos[] = { -1.0f, -0.7f, 0.0f, 1.0f,
-                             1.0f, -0.7f, 0.0f, 1.0f,
-                             1.0f, -0.7f, 4.0f, 1.0f,
-                            -1.0f, -0.7f, 4.0f, 1.0f
+	glActiveTexture(GL_TEXTURE0);
+	if (LoadTexture("data/word.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
+
+	glActiveTexture(GL_TEXTURE1);
+	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+	}
+
+    GLfloat vertexPos[] = { -30.0f, -0.7f, -1.0f, 1.0f,
+                             30.0f, -0.7f, -1.0f, 1.0f,
+                             30.0f, -0.7f, 80.0f, 1.0f,
+                            -30.0f, -0.7f, 80.0f, 1.0f
                           };
 
 	GLfloat vertexNormal[] = { 0.0f, 1.0f, 0.0f,
@@ -152,9 +158,9 @@ void draw_road()
 							 };
 
     GLfloat texCoord[] = { 0.0f, 0.0f,
-                           1.0f, 0.0f,
-                           1.0f, 2.0f,
-                           0.0f, 2.0f,
+                           -3.0f, 0.0f,
+                           -3.0f, 4.0f,
+                           0.0f, 4.0f,
                          };
 
     glEnable(GL_DEPTH_TEST);
@@ -164,11 +170,11 @@ void draw_road()
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	glm::vec3 eye_pos = glm::vec3(0.0f, 0.2f, -0.5f);
+	glm::vec3 eye_pos = glm::vec3(0.0f, 4.0f, -0.0f);
 	glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
     glm::mat4 View = glm::lookAt(
 						eye_pos,          // Camera position in World space
-						glm::vec3(0,0,0), // and looks at the origin
+						glm::vec3(1,0,4.0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
 	//glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
@@ -684,13 +690,13 @@ int main()
     //Initial a new context, need to be hidden after egl or glfw library is imported.
     Context::SetCurrentContext(new Context());
 
-    //draw_road();
-    //draw_cubemap();
-	//draw_banana();
-	//draw_teapot();
-	//tutorial3();
-	//tutorial4();
-	ParallaxOcclusionMapping();
+    draw_road();
+//	draw_cubemap();
+//	draw_banana();
+//	draw_teapot();
+//	tutorial3();
+//	tutorial4();
+//	ParallaxOcclusionMapping();
 
 	Context::GetCurrentContext()->DumpImage();
 

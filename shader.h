@@ -13,6 +13,7 @@ public:
 	~Shader();
 
     void init(const char *vsFile, const char *fsFile);
+    void initASM(const char *vsFileASM, const char *fsFileASM);
 
 	void bind();
 	void unbind();

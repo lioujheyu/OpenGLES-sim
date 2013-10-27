@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -33,6 +33,7 @@
 #include <map>
 #include <stack>
 #include <GLES3/gl3.h>
+#include <GLES3/gl2ext.h>
 
 #include "GPU/driver.h"
 #include "GPU/gpu_config.h"
@@ -100,6 +101,7 @@ struct textureContext
     GLenum      	wrapS, wrapT;
     GLubyte			baseLevel;
     GLubyte			maxLevel;
+    GLubyte			maxAnisoFilterRatio;
 
     ///Which Texture object ID will be binded to this texture context.
     GLuint			texObjBindID;
@@ -113,6 +115,7 @@ struct textureContext
         baseLevel = 0;
         maxLevel = 12;
         texObjBindID = 0;
+        maxAnisoFilterRatio = 1;
     }
 };
 
@@ -320,6 +323,7 @@ public:
     GLboolean	IsShader (GLuint shader);
     GLboolean	IsTexture (GLuint texture);
 	void 		LinkProgram (GLuint program);
+    void 		ShaderBinary (GLsizei n, const GLuint* shaders, GLenum binaryformat, const GLvoid* binary, GLsizei length);
     void 		ShaderSource (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
     void 		TexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
     void 		TexParameteri (GLenum target, GLenum pname, GLint param);
