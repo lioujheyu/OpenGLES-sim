@@ -91,10 +91,10 @@ void GPU_Core::tileSplit(int x, int y, int level)
 		pixelStamp[3].baryCenPos3[0] = cornerTest[7][2]*area2Reciprocal;
 		pixelStamp[3].baryCenPos3[1] = cornerTest[7][0]*area2Reciprocal;
 
-		//Interpolate the all 4 pixel's attributes, then perform perspective correction
+		//Interpolate the all 4 pixel's attributes, then perform perspective division
 
 		floatVec4 invW;
-		for (int i=0;i<4;i++){
+		for (int i=0; i<4; i++){
 			pixelStamp[i].attr[0].z =
 				prim.v[0].attr[0].z +
 				pixelStamp[i].baryCenPos3[0]*( prim.v[1].attr[0].z - prim.v[0].attr[0].z ) +
@@ -106,7 +106,7 @@ void GPU_Core::tileSplit(int x, int y, int level)
 
 			invW = fvrcp(floatVec4(pixelStamp[i].attr[0].w));
 
-			for (int attrCnt=1;attrCnt<MAX_ATTRIBUTE_NUMBER;attrCnt++){
+			for (int attrCnt=1; attrCnt<MAX_ATTRIBUTE_NUMBER; attrCnt++){
 				if (!varyEnable[attrCnt])
 					continue;
 
@@ -114,8 +114,24 @@ void GPU_Core::tileSplit(int x, int y, int level)
 					prim.v[0].attr[attrCnt] +
 					( prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[0] +
 					( prim.v[2].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[1];
-				pixelStamp[i].attr[attrCnt] =
-					pixelStamp[i].attr[attrCnt] * invW;
+
+				/* The normalize modifier here will perform normalization to the
+				 * specified attribute. This step will also avoid additional
+				 * perspective division.
+				 */
+				if (bool(varyInterpMode[attrCnt] & INTERP_NORMALIZE) == true) {
+					float invDistance = pixelStamp[i].attr[attrCnt].x * pixelStamp[i].attr[attrCnt].x +
+										pixelStamp[i].attr[attrCnt].y * pixelStamp[i].attr[attrCnt].y +
+										pixelStamp[i].attr[attrCnt].z * pixelStamp[i].attr[attrCnt].z;
+					invDistance = Q_rsqrt(invDistance);
+					pixelStamp[i].attr[attrCnt] =
+						pixelStamp[i].attr[attrCnt] * invDistance;
+				}
+				else {
+					if (bool(varyInterpMode[attrCnt] & INTERP_NOPERSPECTIVE) == false)
+						pixelStamp[i].attr[attrCnt] =
+							pixelStamp[i].attr[attrCnt] * invW;
+				}
 			}
 		}
 
@@ -124,15 +140,13 @@ void GPU_Core::tileSplit(int x, int y, int level)
 		 */
 		if (cornerTest[0][0]>=0 && cornerTest[0][1]>=0 && cornerTest[0][2]>=0)
             pixelStamp[0].isGhost = false;
-
 		if (cornerTest[2][0]>=0 && cornerTest[2][1]>=0 && cornerTest[2][2]>=0)
             pixelStamp[1].isGhost = false;
-
 		if (cornerTest[5][0]>=0 && cornerTest[5][1]>=0 && cornerTest[5][2]>=0)
             pixelStamp[2].isGhost = false;
-
 		if (cornerTest[7][0]>=0 && cornerTest[7][1]>=0 && cornerTest[7][2]>=0)
             pixelStamp[3].isGhost = false;
+
 
 		if (pixelStamp[0].isGhost && pixelStamp[1].isGhost &&
 			pixelStamp[2].isGhost && pixelStamp[3].isGhost ) {
@@ -140,15 +154,28 @@ void GPU_Core::tileSplit(int x, int y, int level)
 		}
 		else {
 			pixBuffer[pixBufferP  ] = pixelStamp[0];
+			PIXPRINTF("P:(%4d,%4d)\t", (int)pixBuffer[pixBufferP].attr[0].x,
+									   (int)pixBuffer[pixBufferP].attr[0].y);
 			pixBuffer[pixBufferP++].threadId = totalProcessingPix++;
+			PIXPRINTF("pixel ID: %d\n", totalProcessingPix);
+
 			pixBuffer[pixBufferP  ] = pixelStamp[1];
+			PIXPRINTF("P:(%4d,%4d)\t", (int)pixBuffer[pixBufferP].attr[0].x,
+									   (int)pixBuffer[pixBufferP].attr[0].y);
 			pixBuffer[pixBufferP++].threadId = totalProcessingPix++;
+			PIXPRINTF("pixel ID: %d\n", totalProcessingPix);
+
 			pixBuffer[pixBufferP  ] = pixelStamp[2];
+			PIXPRINTF("P:(%4d,%4d)\t", (int)pixBuffer[pixBufferP].attr[0].x,
+									   (int)pixBuffer[pixBufferP].attr[0].y);
 			pixBuffer[pixBufferP++].threadId = totalProcessingPix++;
+			PIXPRINTF("pixel ID: %d\n", totalProcessingPix);
+
 			pixBuffer[pixBufferP  ] = pixelStamp[3];
+			PIXPRINTF("P:(%4d,%4d)\t", (int)pixBuffer[pixBufferP].attr[0].x,
+									   (int)pixBuffer[pixBufferP].attr[0].y);
 			pixBuffer[pixBufferP++].threadId = totalProcessingPix++;
-//			PIXPRINTF("P:(%3d,%3d)\t \n", (int)pixBuffer[pixBufferP].attr[0].x,
-//										  (int)pixBuffer[pixBufferP].attr[0].y);
+			PIXPRINTF("pixel ID: %d\n", totalProcessingPix);
 		}
 	}
 	else {
