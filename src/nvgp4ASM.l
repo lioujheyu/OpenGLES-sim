@@ -40,7 +40,6 @@ unsigned int nvgp4ASM_col = 0;
 #semantic.*$
 #var.*$
 ^!.*$				/* Comment */
-ATTRIB.*$
 TEMP.*$
 PARAM.*$
 OUTPUT.*$
@@ -51,6 +50,12 @@ OUTPUT.*$
 "END"		COL_NO; return END;
 
 "texture"	COL_NO;	return TEXTURE;
+
+"SMOOTH"			COL_NO;	nvgp4ASM_lval.ival=INTERP_SMOOTH; return INTERP_MODE;
+"FLAT"				COL_NO;	nvgp4ASM_lval.ival=INTERP_FLAT; return INTERP_MODE;
+"CENTROID"			COL_NO;	nvgp4ASM_lval.ival=INTERP_CENTROID; return INTERP_MODE;
+"NOPERSPECTIVE"		COL_NO;	nvgp4ASM_lval.ival=INTERP_NOPERSPECTIVE; return INTERP_MODE;
+"NORMALIZE"			COL_NO;	nvgp4ASM_lval.ival=INTERP_NORMALIZE; return INTERP_MODE;
 
 "ABS"				COL_NO;	nvgp4ASM_lval.ival=OP_ABS; return VECTOROP;
 "CEIL"              COL_NO;	nvgp4ASM_lval.ival=OP_CEIL; return VECTOROP;
@@ -217,6 +222,7 @@ OUTPUT.*$
 "fragment"          COL_NO; return FRAGMENT;
 "result"            COL_NO; return RESULT;
 "attrib"            COL_NO; return ATTRIB;
+"ATTRIB"            COL_NO; return ATTRIB;
 "position"          COL_NO; return POSITION;
 "result_color0"     COL_NO; return RESULT_COLOR0;
 [xyzwrgbac]         COL_NO;	return *nvgp4ASM_text;
@@ -248,7 +254,7 @@ R{D}+ { COL_NO;
 		nvgp4ASM_lval.fval = atof(nvgp4ASM_text);
 		return FLOAT;
 	}
-[:\[\].$,;\-\+{}|()]  COL_NO; return *nvgp4ASM_text;
+[:\[\].$,;\-\+{}|()=]  COL_NO; return *nvgp4ASM_text;
 
 [ \t]*	COL_NO;		/* remove all space-related char */
 \n		nvgp4ASM_col = 0;

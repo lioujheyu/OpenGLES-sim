@@ -45,7 +45,7 @@ bool LoadTexture(char *filename, unsigned int *texture)
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
 
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -115,36 +115,37 @@ int LoadCubeMap(char *xneg, char *yneg, char *zneg,
 void draw_road()
 {
 	Shader shader;
-//	shader.init("shader_src/NormalMapping.vert",
-//				"shader_src/NormalMapping.frag");
-	shader.initASM("1.vsasm", "2.fsasm");
+	shader.init("shader_src/NormalMapping.vert",
+				"shader_src/NormalMapping.frag");
+//	shader.initASM("shader_src/NormalizeAttribute.vsasm",
+//				   "shader_src/NormalizeAttribute.fsasm");
 	shader.bind();
 
     unsigned int texture[2];
 
-//    glActiveTexture(GL_TEXTURE0);
-//    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
+    glActiveTexture(GL_TEXTURE0);
+    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+    }
+
+    glActiveTexture(GL_TEXTURE1);
+    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
+		printf("Fail to load image\n");
+		exit(1);
+    }
+
+//	glActiveTexture(GL_TEXTURE0);
+//	if (LoadTexture("data/word.bmp", &texture[0]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//    }
+//	}
 //
-//    glActiveTexture(GL_TEXTURE1);
-//    if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
+//	glActiveTexture(GL_TEXTURE1);
+//	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
 //		printf("Fail to load image\n");
 //		exit(1);
-//    }
-
-	glActiveTexture(GL_TEXTURE0);
-	if (LoadTexture("data/word.bmp", &texture[0]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-	}
-
-	glActiveTexture(GL_TEXTURE1);
-	if (LoadTexture("data/four_NM_height.bmp", &texture[1]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-	}
+//	}
 
     GLfloat vertexPos[] = { -30.0f, -0.7f, -1.0f, 1.0f,
                              30.0f, -0.7f, -1.0f, 1.0f,
@@ -158,8 +159,8 @@ void draw_road()
 							 };
 
     GLfloat texCoord[] = { 0.0f, 0.0f,
-                           -3.0f, 0.0f,
-                           -3.0f, 4.0f,
+                           3.0f, 0.0f,
+                           3.0f, 4.0f,
                            0.0f, 4.0f,
                          };
 
@@ -369,7 +370,8 @@ void draw_cubemap()
 void ParallaxOcclusionMapping()
 {
 	Shader shader;
-	shader.init("shader_src/POM.vert", "shader_src/POM.frag");
+//	shader.init("shader_src/POM.vert", "shader_src/POM.frag");
+	shader.initASM("1.vsasm", "2.fsasm");
 	shader.bind();
 
 	unsigned int texture[2];
@@ -687,7 +689,7 @@ void tutorial4()
 
 int main()
 {
-    //Initial a new context, need to be hidden after egl or glfw library is imported.
+    //Initial a new context, need to be hidden after egl or other context library is imported.
     Context::SetCurrentContext(new Context());
 
     draw_road();

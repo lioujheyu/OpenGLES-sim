@@ -60,7 +60,7 @@
 
 /**
  *	@def MAX_TEXTURE_MAX_ANISOTROPY
- *	The maximum anisotropic filter ratio that be accepted by texture unit
+ *	The maximum anisotropic filter ratio that accepts by texture unit
  */
 #define MAX_TEXTURE_MAX_ANISOTROPY 8
 

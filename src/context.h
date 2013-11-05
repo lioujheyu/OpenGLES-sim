@@ -126,8 +126,9 @@ struct shaderObject
 	GLsizei count;
 	GLenum type;
 
-	std::string src;
-	std::string asmSrc;
+	std::string src; ///< GLSL C language source
+	std::string asmSrc; ///< NVGP4 Assembly source from cg compiler.
+	///Program ID which attaches this shader will be stored in the attach list.
 	std::vector<GLuint> attachList;
 
 	inline shaderObject()
@@ -166,11 +167,12 @@ struct symbol
 
 struct programObject
 {
-	GLuint sid4VS;	///Shader ID for Vertex Shader
-	GLuint sid4FS;	///Shader ID for Fragment Shader
+	GLuint sid4VS;	///< Shader ID from shaderPool for Vertex Shader
+	GLuint sid4FS;	///< Shader ID from shaderPool for Fragment Shader
 	GLboolean isLinked;
 	GLboolean delFlag;
 	GLboolean varyEnable[MAX_ATTRIBUTE_NUMBER];
+	GLbyte varyInterpMode[MAX_ATTRIBUTE_NUMBER];
 
 	///@name Resource Statistic
 	///@{
@@ -232,8 +234,10 @@ struct programObject
 		sid4FS = 0;
 		isLinked = GL_FALSE;
 		delFlag = GL_FALSE;
-		for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++)
+		for (int i=0;i<MAX_ATTRIBUTE_NUMBER;i++) {
 			varyEnable[i] = GL_FALSE;
+			varyInterpMode[i] = 0; //SMOOTH
+		}
 		VSinCnt = 0;
 		VSoutCnt = 0;
 		VSuniformCnt = 0;

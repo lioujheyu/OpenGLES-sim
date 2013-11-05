@@ -76,7 +76,8 @@ void GPU_Core::PerspectiveDivision(vertex *vtx)
 	vtx->attr[0].w = 1.0;
 
 	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
-		if (varyEnable[i] == false)
+		if (varyEnable[i] == false ||
+			bool(varyInterpMode[i] & INTERP_NOPERSPECTIVE) == true )
 			continue;
 		else
 			vtx->attr[i] = vtx->attr[i] * w;
@@ -162,9 +163,6 @@ void GPU_Core::PrimitiveAssembly()
 
     if (vtxCntDwn == 0)
     {
-		totalProcessingPrimitive++;
-        primFIFO.push(curPrim);
-
         switch (drawMode) {
         case GL_TRIANGLES:
             vtxCntDwn = 3;
@@ -179,6 +177,17 @@ void GPU_Core::PrimitiveAssembly()
 			exit(1);
             break;
         }
+
+		//Check if flat shading is used
+        for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
+			if (bool(varyInterpMode[i] & INTERP_FLAT)) {
+				curPrim.v[0].attr[i] = curPrim.v[1].attr[i] = curPrim.v[2].attr[i]
+					= curVtx.attr[i];
+			}
+		}
+
+        totalProcessingPrimitive++;
+        primFIFO.push(curPrim);
     }
 }
 
@@ -250,14 +259,16 @@ void GPU_Core::Clipping()
 				continue;
 			// in-to-out (i:in, next:out)
 			else if (outsideZNear[i]==false && outsideZNear[next]==true) {
+///	@bug the varying result after clipping is incorrect when noperspective is enable.
 				outPart = fabs(prim.v[next].attr[0].w + prim.v[next].attr[0].z);
 				inPart = fabs(prim.v[i].attr[0].w + prim.v[i].attr[0].z);
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++) {
-					if (varyEnable[j])
+					if (varyEnable[j]) {
 						newVtx.attr[j] = prim.v[next].attr[j]*(1-outRatio) +
 										 prim.v[i].attr[j]*outRatio;
+					}
 				}
 
 				vtxStack.push(newVtx);
@@ -269,9 +280,10 @@ void GPU_Core::Clipping()
 				outRatio = outPart / (outPart + inPart);
 
 				for (int j=0; j<MAX_ATTRIBUTE_NUMBER; j++) {
-					if (varyEnable[j])
+					if (varyEnable[j]) {
 						newVtx.attr[j] = prim.v[i].attr[j]*(1-outRatio) +
 										 prim.v[next].attr[j]*outRatio;
+					}
 				}
 
 				vtxStack.push(newVtx);

@@ -84,6 +84,7 @@ public:
     int         	attrSize[MAX_ATTRIBUTE_NUMBER];
     bool        	attrEnable[MAX_ATTRIBUTE_NUMBER];
     bool        	varyEnable[MAX_ATTRIBUTE_NUMBER];
+    unsigned char	varyInterpMode[MAX_ATTRIBUTE_NUMBER];
     float       	depthRangeN, depthRangeF;
     int         	viewPortLX, viewPortLY,
 					viewPortW, viewPortH;

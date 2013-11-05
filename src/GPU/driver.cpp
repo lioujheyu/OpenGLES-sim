@@ -159,6 +159,7 @@ void ActiveGPU(int vtxInputMode)
             gpu.attrSize[i] = ctx->vertexAttrib[i].size;
         }
         gpu.varyEnable[i] = t_program->varyEnable[i];
+        gpu.varyInterpMode[i] = t_program->varyInterpMode[i];
     }
 
     gpu.drawMode = ctx->drawCmd.mode;

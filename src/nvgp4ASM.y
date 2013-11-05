@@ -42,6 +42,7 @@ extern unsigned int shaderType;
 %token TEXTURE VERTEX FRAGMENT RESULT PROF END
 %token ATTRIB POSITION RESULT_COLOR0
 %token <ival> SHADERTYPE
+%token <ival> INTERP_MODE
 %token <sval> IDENTIFIER
 %token <ival> INTEGER
 %token <fval> FLOAT
@@ -57,7 +58,7 @@ extern unsigned int shaderType;
 %token <sval> XYZW_SWIZZLE RGBA_SWIZZLE
 %token <ival> REG
 
-%type <ival> opModifierItem
+%type <ival> opModifierItem interpModifier
 %type <sval> component xyzwComponent rgbaComponent swizzleSuffix
 
 %type <fval> constantScalar
@@ -72,6 +73,7 @@ input
 	;
 
 line:	profile
+	|	namingStatement ';'
 	|	instruction ';' {
 			if (shaderType == 0)
 				t_program.VSinstructionPool.push_back(t_inst);
@@ -84,10 +86,23 @@ line:	profile
 		};
 	|	instLabel ':'
 	|	END
-/*	|	namingStatement ';'*/
 	;
 	
 profile: PROF SHADERTYPE {shaderType = $2;}
+
+namingStatement
+	:	interpModifier ATTRIB_statement '{' primitive '.' ATTRIB '[' INTEGER '.' '.' INTEGER ']' '}' {
+			for (int i= $8 + 1; i <= ($11+1); i++) {
+				t_program.varyInterpMode[i] = $1;
+			}
+		};
+
+interpModifier
+	:	/* empty */	{$$ = 0;}
+	|	interpModifier INTERP_MODE	{$$ = $1|$2;}
+	;
+	
+ATTRIB_statement: ATTRIB IDENTIFIER '[' ']' '=' 
 
 instruction
 	:	ALUInstruction

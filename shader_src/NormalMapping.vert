@@ -16,7 +16,7 @@ void main()
 	                        0.0, 0.0, 1.0,
 						    0.0, 1.0, 0.0
 	                        );
-	eyeVector_tangent = tangent_mat * (eye_pos + vec3(0.0,0.0,2.5) - obj_vertex.xyz);
+	eyeVector_tangent = tangent_mat * (eye_pos + vec3(0.0,0.0,8.5) - obj_vertex.xyz);
 
 	gl_Position =  MVP * obj_vertex;
 	
