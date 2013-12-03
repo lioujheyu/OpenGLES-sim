@@ -1,0 +1,26 @@
+!!NVfp4.0
+# cgc version 3.1.0013, build date Apr 18 2012
+# command line args: -q -oglsl -profile gp4fp
+# source file: 2.fssrc
+#vendor NVIDIA Corporation
+#version 3.1.0.13
+#profile gp4fp
+#program main
+#semantic ColorMap
+#semantic NormalMap
+#var float2 UV : $vin.ATTR0 : ATTR0 : -1 : 1
+#var float3 eyeVector_tangent : $vin.ATTR1 : ATTR1 : -1 : 1
+#var float3 color : $vout.COL00 : COL0[0] : -1 : 1
+#var sampler2D ColorMap :  : texunit 0 : -1 : 1
+#var sampler2D NormalMap :  : texunit 1 : -1 : 1
+NORMALIZE ATTRIB fragment_attrib1[] = { fragment.attrib[1..1] };
+ATTRIB fragment_attrib[] = { fragment.attrib[0..0] };
+TEMP R0;
+OUTPUT result_color0 = result.color;
+TEX.F R0.xyz, fragment.attrib[0], texture[1], 2D;
+MAD.F R0.xyz, R0, {2, -1}.x, {2, -1}.y;
+DP3.F.SAT R0.w, R0, fragment.attrib[1];
+TEX.F R0.xyz, fragment.attrib[0], texture[0], 2D;
+MUL.F result_color0.xyz, R0, R0.w;
+END
+# 5 instructions, 1 R-regs

@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2013, Liou Jhe-Yu <lioujheyu@gmail.com>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -113,7 +113,7 @@ void Context::LinkProgram(GLuint program)
  * 	2nd pass parsing for custom instruction structure establishing from NVGP4
  *	assembly code. Resource remapping is performed in this stage.
  */
-// 	printf("\n");
+ 	printf("\n");
 
 	nvgp4ASM_lineno = 1;
 	nvgp4ASM_str_in(shaderPool[VS].asmSrc.c_str());
@@ -126,9 +126,9 @@ void Context::LinkProgram(GLuint program)
 	programPool[program] = t_program;
 	programPool[program].isLinked = GL_TRUE;
 
-//	for (unsigned int i=0; i<t_program.VSinstructionPool.size(); i++)
-//		t_program.VSinstructionPool[i].Print();
-//	printf("\n");
-//	for (unsigned int i=0; i<t_program.FSinstructionPool.size(); i++)
-//		t_program.FSinstructionPool[i].Print();
+	for (unsigned int i=0; i<t_program.VSinstructionPool.size(); i++)
+		t_program.VSinstructionPool[i].Print();
+	printf("\n");
+	for (unsigned int i=0; i<t_program.FSinstructionPool.size(); i++)
+		t_program.FSinstructionPool[i].Print();
 }

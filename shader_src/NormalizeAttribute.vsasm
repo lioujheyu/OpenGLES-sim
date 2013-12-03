@@ -1,0 +1,35 @@
+!!NVvp4.0
+# cgc version 3.1.0013, build date Apr 18 2012
+# command line args: -q -oglsl -profile gp4vp
+# source file: 1.vssrc
+#vendor NVIDIA Corporation
+#version 3.1.0.13
+#profile gp4vp
+#program main
+#semantic MVP
+#semantic eye_pos
+#var float4 gl_Position : $vout.POSITION : HPOS : -1 : 1
+#var float4 obj_vertex : $vin.ATTR0 : ATTR0 : -1 : 1
+#var float3 obj_normal :  :  : -1 : 0
+#var float2 obj_texCoord : $vin.ATTR1 : ATTR1 : -1 : 1
+#var float2 UV : $vout.ATTR0 : ATTR0 : -1 : 1
+#var float3 eyeVector_tangent : $vout.ATTR1 : ATTR1 : -1 : 1
+#var float4x4 MVP :  : c[0], 4 : -1 : 1
+#var float3 eye_pos :  : c[4] : -1 : 1
+PARAM c[5] = { program.local[0..4] };
+ATTRIB vertex_attrib1[] = { vertex.attrib[1..1] };
+ATTRIB vertex_attrib[] = { vertex.attrib[0..0] };
+OUTPUT result_attrib[] = { result.attrib[0..1] };
+TEMP R0, R1;
+ADD.F R0.xyz, -vertex.attrib[0], c[4];
+ADD.F R0.xyz, R0, {0, 2.5}.xxyw;
+MUL.F R1, vertex.attrib[0].y, c[1];
+MUL.F R0.yw, R0.y, {0, 1}.xxzy;
+MAD.F R1, vertex.attrib[0].x, c[0], R1;
+MAD.F R0.xyw, R0.x, {1, 0}.xyzy, R0.yyzw;
+MAD.F R1, vertex.attrib[0].z, c[2], R1;
+MAD.F result.attrib[1].xyz, R0.z, {0, 1}.xyxw, R0.xyww;
+MAD.F result.position, vertex.attrib[0].w, c[3], R1;
+MOV.F result.attrib[0].xy, vertex.attrib[1];
+END
+# 10 instructions, 2 R-regs

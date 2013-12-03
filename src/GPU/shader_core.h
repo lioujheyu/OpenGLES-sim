@@ -101,7 +101,7 @@ public:
  *
  *	@return A result floatVec4
  */
-	floatVec4 ReadByMask(const floatVec4 &in, char *mask);
+	floatVec4 ReadByMask(const floatVec4 &in, int mask);
 
 /**
  *	Write the destination floatVec4's floating component by mask, including CC
@@ -111,7 +111,7 @@ public:
  *	@param fvdst	The destination floatVec4 's pointer
  *	@param mask 	The component mask.
  */
-	void WriteByMask(const floatVec4 &val, floatVec4 *fvdst, char *mask, int idx);
+	void WriteByMask(const floatVec4 &val, floatVec4 *fvdst, int mask, int idx);
 
 private:
 	int PC; ///<Program Counter

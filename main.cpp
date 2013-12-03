@@ -370,8 +370,8 @@ void draw_cubemap()
 void ParallaxOcclusionMapping()
 {
 	Shader shader;
-//	shader.init("shader_src/POM.vert", "shader_src/POM.frag");
-	shader.initASM("1.vsasm", "2.fsasm");
+	shader.init("shader_src/POM.vert", "shader_src/POM.frag");
+//	shader.initASM("1.vsasm", "2.fsasm");
 	shader.bind();
 
 	unsigned int texture[2];
@@ -692,14 +692,17 @@ int main()
     //Initial a new context, need to be hidden after egl or other context library is imported.
     Context::SetCurrentContext(new Context());
 
-    draw_road();
+//    draw_road();
+    printf("test");
 //	draw_cubemap();
 //	draw_banana();
 //	draw_teapot();
 //	tutorial3();
 //	tutorial4();
-//	ParallaxOcclusionMapping();
+	ParallaxOcclusionMapping();
 
-	Context::GetCurrentContext()->DumpImage();
+	Context::GetCurrentContext()->DumpImage(0);
+//	printf("test");
+//	Context::GetCurrentContext()->DumpImage(1);
 
 }
