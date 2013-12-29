@@ -63,7 +63,7 @@ public:
 		totalInstructionCnt = 0;
 		totalScaleOperation = 0;
 
-		tid = -1; tType = 0;
+		texID = -1; texType = 0;
 		instPool = nullptr;
 		uniformPool = nullptr;
 		threadPtr[0] = threadPtr[1] = threadPtr[2] = threadPtr[3] = nullptr;
@@ -126,7 +126,7 @@ private:
 	floatVec4 reg[MAX_SHADER_REG_VECTOR*4];
 	floatVec4 CCisSigned[4][2], CCisZero[4][2];
 	floatVec4 dst[4], src[4][3];
-	int tid, tType;
+	int texID, texType;
 };
 
 

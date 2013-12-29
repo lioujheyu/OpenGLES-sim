@@ -50,6 +50,7 @@ void GPU_Core::Run()
 		//Vertex-based operation starts here
 		///@todo Task scheduler for auto job dispatch
         VertexShaderEXE(0, &curVtx);
+
         PrimitiveAssembly();
 
         //Primitive-based operation starts here

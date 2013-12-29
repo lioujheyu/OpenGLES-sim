@@ -697,9 +697,9 @@ int main()
 //	draw_cubemap();
 //	draw_banana();
 //	draw_teapot();
-//	tutorial3();
+	tutorial3();
 //	tutorial4();
-	ParallaxOcclusionMapping();
+//	ParallaxOcclusionMapping();
 
 	Context::GetCurrentContext()->DumpImage(0);
 //	printf("test");

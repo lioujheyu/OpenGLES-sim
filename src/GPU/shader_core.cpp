@@ -42,9 +42,8 @@ void ShaderCore::Run()
 	while(PC < instCnt) {
 		curInst = instPool[PC];
 
-		tid = curInst.tid;
-		tType = curInst.tType;
-
+		texID = curInst.tid;
+		texType = curInst.tType;
 /* Each pipeline needs to fetch data before other pipeline write result
  * back when they are in the same instruction. It avoids the barrier-
  * like instruction(DDX, DDY, TEX with auto scale factor computation)'s
@@ -273,12 +272,12 @@ void ShaderCore::Exec(int idx)
 										 scaleFacDX,
 										 scaleFacDY,
 										 curInst.tType,
-										 tid );
+										 texID );
 		break;
 //	case OP_TXB:
 //		break;
 	case OP_TXF:
-		dst[idx] = texUnit.GetTexColor(src[idx][0], 0, tid);
+		dst[idx] = texUnit.GetTexColor(src[idx][0], 0, texID);
 		break;
 	case OP_TXL:
 		dst[idx] = texUnit.TextureSample(src[idx][0],
@@ -286,7 +285,7 @@ void ShaderCore::Exec(int idx)
 										 floatVec4(0.0, 0.0, 0.0, 0.0),
 										 floatVec4(0.0, 0.0, 0.0, 0.0),
 										 curInst.tType,
-										 tid );
+										 texID );
 		break;
 //	case OP_TXP:
 //		break;
@@ -299,7 +298,7 @@ void ShaderCore::Exec(int idx)
 										 src[idx][1],
 										 src[idx][2],
 										 curInst.tType,
-										 tid );
+										 texID );
 		break;
 	//BRAop
 	//FLOWCCop
