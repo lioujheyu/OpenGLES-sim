@@ -29,6 +29,7 @@
 #include <cstdint>
 
 #include "GPU/gpu_config.h"
+#include "GPU/instruction_def.h"
 
 #ifdef USE_SSE
 #	include <x86intrin.h>
@@ -567,11 +568,16 @@ struct operand
 
 	void Print()
 	{
-		if (type != 0) {
-			if (inverse)
-				printf(" -%d[%d].%x", type, id, modifier);
-			else
-				printf(" %d[%d].%x", type, id, modifier);
+		if (type != INST_NO_TYPE) {
+			if (type == INST_CONSTANT) {
+				printf(" (%f %f %f %f)",val.x,val.y,val.z,val.w);
+			}
+			else {
+				if (inverse)
+					printf(" -%d[%d].%x", type, id, modifier);
+				else
+					printf(" %d[%d].%x", type, id, modifier);
+			}
 		}
 	}
 };
@@ -601,11 +607,16 @@ struct scalarOperand
 
 	void Print()
 	{
-		if (type != 0) {
-			if (inverse)
-				printf(" -%d[%d]", type, id);
-			else
-				printf(" %d[%d]", type, id);
+		if (type != INST_NO_TYPE) {
+			if (type == INST_CONSTANT) {
+				printf(" (%f)",val);
+			}
+			else {
+				if (inverse)
+					printf(" -%d[%d]", type, id);
+				else
+					printf(" %d[%d]", type, id);
+			}
 		}
 	}
 };

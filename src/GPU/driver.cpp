@@ -158,6 +158,7 @@ int CheckSwizzleModifier(int modifier)
 int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool)
 {
 	int cnt;
+	scalarInstruction ts_instruction;
 
 	switch (in.op) {
 	//undefined or unimplemented
@@ -195,35 +196,17 @@ int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool)
 //	case OP_TXQ:
 
 	//Direct translation
-	case OP_ABS:
-	case OP_CEIL:
-	case OP_FLR:
-	case OP_FRC:
-	case OP_I2F:
-	case OP_MOV:
-	case OP_ROUND:
-	case OP_TRUNC:
-	case OP_RCP:
-	case OP_ADD:
-	case OP_AND:
-	case OP_DIV:
-	case OP_MAX:
-	case OP_MIN:
-	case OP_MUL:
-	case OP_SEQ:
-	case OP_SGE:
-	case OP_SGT:
-	case OP_SLE:
-	case OP_SLT:
-	case OP_SNE:
-	case OP_SUB:
-	case OP_MAD:
-	case OP_DDX:
+	case OP_ABS:	case OP_CEIL:	case OP_FLR:	case OP_FRC:
+	case OP_I2F:	case OP_MOV:	case OP_ROUND:	case OP_TRUNC:
+	case OP_RCP:	case OP_ADD:	case OP_AND:	case OP_DIV:
+	case OP_MAX:	case OP_MIN:	case OP_MUL:	case OP_SEQ:
+	case OP_SGE:	case OP_SGT:	case OP_SLE:	case OP_SLT:
+	case OP_SNE:	case OP_SUB:	case OP_MAD:	case OP_DDX:
 	case OP_DDY:
 		for (int cnt=0; cnt<4; cnt++) {
 			//check dst operand's each modifier zone to make sure this scalar part is activated.
 			if (CheckSwizzleModifier(in.dst.modifier>>cnt*4) != NO_MODIFIER) {
-				scalarInstruction ts_instruction;
+				ts_instruction.Init();
 
 				ts_instruction.op = in.op;
 				for (int i=0; i<12; i++)
@@ -255,15 +238,15 @@ int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool)
 					ts_instruction.src[i].ccModifier = in.src[i].ccModifier;
 					ts_instruction.src[i].abs = in.src[i].abs;
 					ts_instruction.src[i].inverse = in.src[i].inverse;
-					//decide which instant value element from the calculated ID before.
+					//decide the instant value from which element of instant vector by the ID.
 					ts_instruction.src[i].val =
-						(ts_instruction.src[i].id == 0)? in.src[0].val.x:
-						(ts_instruction.src[i].id == 1)? in.src[0].val.y:
-						(ts_instruction.src[i].id == 2)? in.src[0].val.z: in.src[0].val.w;
+						(ts_instruction.src[i].id == 0)? in.src[i].val.x:
+						(ts_instruction.src[i].id == 1)? in.src[i].val.y:
+						(ts_instruction.src[i].id == 2)? in.src[i].val.z: in.src[i].val.w;
 				}
 
 				ts_instruction.Print();
-				ISpool->assign(cnt+1, ts_instruction);
+				ISpool->assign(ISpool->size() + 1, ts_instruction);
 			}
 			else
 				continue;
@@ -273,6 +256,27 @@ int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool)
 //	//Only take care first modifier
 	case OP_REP:
 	case OP_ENDREP:
+	case OP_ELSE:
+	case OP_ENDIF:
+		ts_instruction.Init();
+
+		ts_instruction.op = in.op;
+		for (int i=0; i<12; i++)
+			ts_instruction.opModifiers[i] = in.opModifiers[i];
+
+		ts_instruction.src[0].type = in.src[0].type;
+		ts_instruction.src[0].ccMask = in.src[0].ccMask;
+		ts_instruction.src[0].ccModifier = in.src[0].ccModifier;
+		ts_instruction.src[0].abs = in.src[0].abs;
+		ts_instruction.src[0].inverse = in.src[0].inverse;
+		//decide which instant value element from the calculated ID before.
+		ts_instruction.src[0].val =
+			(ts_instruction.src[0].id == 0)? in.src[0].val.x:
+			(ts_instruction.src[0].id == 1)? in.src[0].val.y:
+			(ts_instruction.src[0].id == 2)? in.src[0].val.z: in.src[0].val.w;
+
+		ts_instruction.Print();
+		ISpool->assign(ISpool->size() + 1, ts_instruction);
 
 		break;
 //
@@ -381,21 +385,6 @@ int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool)
 //		}
 //
 //		ccStack[idx].push(curCCState[idx]);
-//		break;
-//	//ENDFLOWop
-//	case OP_ELSE:
-//		totalScaleOperation+=1;
-//		curCCState[idx] = !ccStack[idx].top();
-//		break;
-//
-//	case OP_ENDIF:
-//		totalScaleOperation+=1;
-//		ccStack[idx].pop();
-//
-//		if (ccStack[idx].empty())
-//			curCCState[idx] = true;
-//		else
-//			curCCState[idx] = ccStack[idx].top();
 //		break;
 //	//KILop
 //	case OP_KIL:

@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- *	@file shader_core.cpp
- *  @brief Shader Core implementation
+ *	@file shader_core_scalar.cpp
+ *  @brief Scalar Shader Core implementation
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
-#include "shader_core.h"
+#include "shader_core_scalar.h"
 
-void ShaderCore::Init()
+void ScalarShaderCore::Init()
 {
 	PC = 0;
 	isEnable[0] = isEnable[1] = isEnable[2] = isEnable[3] = false;
 	curCCState[0] = curCCState[1] = curCCState[2] = curCCState[3] = true;
 }
 
-void ShaderCore::Run()
+void ScalarShaderCore::Run()
 {
 	int i;
 
@@ -74,26 +74,26 @@ void ShaderCore::Run()
 }
 
 ///@todo Separate vector operation into scalar operation.
-void ShaderCore::Exec(int idx)
+void ScalarShaderCore::Exec(int idx)
 {
 	floatVec4 scaleFacDX, scaleFacDY;
 
 	switch (curInst.op) {
 	//VECTORop
 	case OP_ABS:
-		dst[idx] = fvabs(src[idx][0]);
+		dst[idx] = abs(src[idx][0]);
 		break;
 	case OP_CEIL:
-		dst[idx] = fvceil(src[idx][0]);
+		dst[idx] = ceil(src[idx][0]);
 		break;
 	case OP_FLR:
-		dst[idx] = fvfloor(src[idx][0]);
+		dst[idx] = floor(src[idx][0]);
 		break;
 	case OP_FRC:
-		dst[idx] = fvfrc(src[idx][0]);
+		dst[idx] = src[idx][0] - floor(src[idx][0]);
 		break;
 	case OP_I2F:
-		dst[idx] = fvInt2Float(src[idx][0]);
+		dst[idx] = float(src[idx][0]);
 		break;
 //	case OP_LIT:
 //		break;
@@ -113,12 +113,12 @@ void ShaderCore::Exec(int idx)
 //	case OP_PK4UB:
 //		break;
 	case OP_ROUND:
-		dst[idx] = fvround(src[idx][0]);
+		dst[idx] = round(src[idx][0]);
 		break;
 //	case OP_SSG:
 //		break;
 	case OP_TRUNC:
-		dst[idx] = fvtrunc(src[idx][0]);
+		dst[idx] = trunc(src[idx][0]);
 		break;
 	// SCALARop
 //	case OP_COS:
@@ -130,7 +130,7 @@ void ShaderCore::Exec(int idx)
 //	case OP_RCC:
 //		break;
 	case OP_RCP:
-		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w = (1/src[idx][0].x);
+		dst[idx] = 1/src[idx][0];
 		break;
 //	case OP_SCS:
 //		break;
@@ -150,43 +150,40 @@ void ShaderCore::Exec(int idx)
 		break;
 /// @todo Have to rewrite after integer data type been implemented
 	case OP_AND:
-		dst[idx].x = int(src[idx][0].x) & int(src[idx][1].x);
-		dst[idx].y = int(src[idx][0].y) & int(src[idx][1].y);
-		dst[idx].z = int(src[idx][0].z) & int(src[idx][1].z);
-		dst[idx].w = int(src[idx][0].w) & int(src[idx][1].w);
+		dst[idx] = int(src[idx][0]) & int(src[idx][1]);
 		break;
 	case OP_DIV:
 		dst[idx] = src[idx][0] / src[idx][1];
 		break;
-	case OP_DP2:
-		dst[idx] = src[idx][0] * src[idx][1];
-		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
-			(dst[idx].x + dst[idx].y);
-		totalScaleOperation+=1;
-		break;
-	case OP_DP3:
-		dst[idx] = src[idx][0] * src[idx][1];
-		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
-			(dst[idx].x + dst[idx].y + dst[idx].z);
-		totalScaleOperation+=2;
-		break;
-	case OP_DP4:
-		dst[idx] = floatVec4( dot(src[idx][0], src[idx][1]) );
-		totalScaleOperation+=3;
-		break;
+//	case OP_DP2:
+//		dst[idx] = src[idx][0] * src[idx][1];
+//		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
+//			(dst[idx].x + dst[idx].y);
+//		totalScaleOperation+=1;
+//		break;
+//	case OP_DP3:
+//		dst[idx] = src[idx][0] * src[idx][1];
+//		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
+//			(dst[idx].x + dst[idx].y + dst[idx].z);
+//		totalScaleOperation+=2;
+//		break;
+//	case OP_DP4:
+//		dst[idx] = floatVec4( dot(src[idx][0], src[idx][1]) );
+//		totalScaleOperation+=3;
+//		break;
 //	case OP_DPH:
 //		break;
-	case OP_DST:	//Distance vector
-		dst[idx].x = 1.0;
-		dst[idx].y = src[idx][0].y * src[idx][1].y;
-		dst[idx].z = src[idx][0].z;
-		dst[idx].w = src[idx][1].w;
-		break;
+//	case OP_DST:	//Distance vector
+//		dst[idx].x = 1.0;
+//		dst[idx].y = src[idx][0].y * src[idx][1].y;
+//		dst[idx].z = src[idx][0].z;
+//		dst[idx].w = src[idx][1].w;
+//		break;
 	case OP_MAX:
-		dst[idx] = fvmax(src[idx][0], src[idx][1]);
+		dst[idx] = std::max(src[idx][0], src[idx][1]);
 		break;
 	case OP_MIN:
-		dst[idx] = fvmin(src[idx][0], src[idx][1]);
+		dst[idx] = std::min(src[idx][0], src[idx][1]);
 		break;
 	case OP_MUL:
 		dst[idx] = src[idx][0] * src[idx][1];
@@ -195,35 +192,35 @@ void ShaderCore::Exec(int idx)
 //		break;
 //	case OP_RFL:
 //		break;
-	case OP_RSQ:	//Reciprocal square root
-		//dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w = 1/sqrt(src[idx][0].x);
-		dst[idx] = floatVec4( Q_rsqrt(src[idx][0].x) );
-		break;
-	case OP_SEQ:
-		dst[idx] = src[idx][0] == src[idx][1];
-		break;
+//	case OP_RSQ:	//Reciprocal square root
+//		//dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w = 1/sqrt(src[idx][0].x);
+//		dst[idx] = floatVec4( Q_rsqrt(src[idx][0].x) );
+//		break;
+//	case OP_SEQ:
+//		dst[idx] = src[idx][0] == src[idx][1];
+//		break;
 //	case OP_SFL:
 //		break;
-	case OP_SGE:
-		dst[idx] = src[idx][0] >= src[idx][1];
-		break;
-	case OP_SGT:
-		dst[idx] = src[idx][0] > src[idx][1];
-		break;
-	case OP_SLE:
-		dst[idx] = src[idx][0] <= src[idx][1];
-		break;
-	case OP_SLT:
-		dst[idx] = src[idx][0] < src[idx][1];
-		break;
-	case OP_SNE:
-		dst[idx] = src[idx][0] != src[idx][1];
-		break;
+//	case OP_SGE:
+//		dst[idx] = src[idx][0] >= src[idx][1];
+//		break;
+//	case OP_SGT:
+//		dst[idx] = src[idx][0] > src[idx][1];
+//		break;
+//	case OP_SLE:
+//		dst[idx] = src[idx][0] <= src[idx][1];
+//		break;
+//	case OP_SLT:
+//		dst[idx] = src[idx][0] < src[idx][1];
+//		break;
+//	case OP_SNE:
+//		dst[idx] = src[idx][0] != src[idx][1];
+//		break;
 //	case OP_STR:
 //		break;
-	case OP_SUB:
-		dst[idx] = src[idx][0] - src[idx][1];
-		break;
+//	case OP_SUB:
+//		dst[idx] = src[idx][0] - src[idx][1];
+//		break;
 //	case OP_XPD:
 //		break;
 //	case OP_XOR:
@@ -231,19 +228,19 @@ void ShaderCore::Exec(int idx)
 	//TRIop
 //	case OP_CMP:
 //		break;
-	case OP_DP2A:
-		{
-			float dot;
-			dot = (src[idx][0].x * src[idx][1].x) + (src[idx][0].y * src[idx][1].y) + src[idx][2].x;
-			dst[idx] = floatVec4(dot);
-			break;
-		}
-		break;
+//	case OP_DP2A:
+//		{
+//			float dot;
+//			dot = (src[idx][0].x * src[idx][1].x) + (src[idx][0].y * src[idx][1].y) + src[idx][2].x;
+//			dst[idx] = floatVec4(dot);
+//			break;
+//		}
+//		break;
 //	case OP_LRP:
 //		break;
-	case OP_MAD:
-		dst[idx] = src[idx][0] * src[idx][1] + src[idx][2];
-		break;
+//	case OP_MAD:
+//		dst[idx] = src[idx][0] * src[idx][1] + src[idx][2];
+//		break;
 //	case OP_SAD:
 //		break;
 //	case OP_X2D:
@@ -421,7 +418,7 @@ void ShaderCore::Exec(int idx)
 	}
 }
 
-void ShaderCore::FetchData(int idx)
+void ScalarShaderCore::FetchData(int idx)
 {
 	for (int i=0; i<3; i++) {
 		switch (curInst.src[i].type) {
@@ -472,7 +469,7 @@ void ShaderCore::FetchData(int idx)
 	}
 }
 
-void ShaderCore::WriteBack(int idx)
+void ScalarShaderCore::WriteBack(int idx)
 {
 	switch (curInst.dst.type) {
 	case INST_ATTRIB:
@@ -492,139 +489,7 @@ void ShaderCore::WriteBack(int idx)
 	}
 }
 
-floatVec4 ShaderCore::ReadByMask(const floatVec4 &in, int mask)
-{
-	floatVec4 temp;
-
-	if (mask == 0x8421) //mask == xyzw or rgba
-		return in;
-
-	temp.x = ( (mask&0x000f) == 0x1 )? in.x:
-			 ( (mask&0x000f) == 0x2 )? in.y:
-			 ( (mask&0x000f) == 0x4 )? in.z:in.w;
-
-	if ((mask&0x00f0) == 0x0) {
-		temp.y = temp.z = temp.w = temp.x;
-		return temp;
-	}
-	else {
-		temp.y = ( (mask&0x00f0) == (0x1<<4) )? in.x:
-				 ( (mask&0x00f0) == (0x2<<4) )? in.y:
-				 ( (mask&0x00f0) == (0x4<<4) )? in.z:in.w;
-	}
-
-	if ((mask&0x0f00) == 0x0) {
-		temp.z = temp.w = temp.y;
-		return temp;
-	}
-	else {
-		temp.z = ( (mask&0x0f00) == (0x1<<8) )? in.x:
-				 ( (mask&0x0f00) == (0x2<<8) )? in.y:
-				 ( (mask&0x0f00) == (0x4<<8) )? in.z:in.w;
-	}
-
-	if ((mask&0xf000) == 0x0) {
-		temp.w = temp.z;
-		return temp;
-	}
-	else {
-		temp.w = ( (mask&0xf000) == (0x1<<12) )? in.x:
-				 ( (mask&0xf000) == (0x2<<12) )? in.y:
-				 ( (mask&0xf000) == (0x4<<12) )? in.z:in.w;
-	}
-
-	return temp;
-}
-
-void ShaderCore::WriteByMask(const floatVec4 &val, floatVec4* fvdst, int mask, int idx)
-{
-	for (int i=0; i<4; i++) {
-		if ( ((mask>>i*4)&0xf) == 0x1 ) { // x | r
-			if (fvdst != nullptr) {
-				if(curInst.opModifiers[OPM_SAT])
-					fvdst->x = CLAMP(val.x, 0.0f, 1.0f);
-				else if(curInst.opModifiers[OPM_SSAT])
-					fvdst->x = CLAMP(val.x, -1.0f, 1.0f);
-				else
-					fvdst->x = val.x;
-			}
-
-			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
-				CCisSigned[idx][0].x = (val.x < 0)?1.0:0.0;
-				CCisZero[idx][0].x = (val.x == 0)?1.0:0.0;
-			}
-			else if (curInst.opModifiers[OPM_CC1]) {
-				CCisSigned[idx][1].x = (val.x < 0)?1.0:0.0;
-				CCisZero[idx][1].x = (val.x == 0)?1.0:0.0;
-			}
-			totalScaleOperation+=1;
-		}
-		else if ( ((mask>>i*4)&0xf) == 0x2) { // y | g
-			if (fvdst != nullptr) {
-				if(curInst.opModifiers[OPM_SAT])
-					fvdst->y = CLAMP(val.y, 0.0f, 1.0f);
-				else if(curInst.opModifiers[OPM_SSAT])
-					fvdst->y = CLAMP(val.y, -1.0f, 1.0f);
-				else
-					fvdst->y = val.y;
-			}
-
-			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
-				CCisSigned[idx][0].y = (val.y < 0)?1.0:0.0;
-				CCisZero[idx][0].y = (val.y == 0)?1.0:0.0;
-			}
-			else if (curInst.opModifiers[OPM_CC1]) {
-				CCisSigned[idx][1].y = (val.y < 0)?1.0:0.0;
-				CCisZero[idx][1].y = (val.y == 0)?1.0:0.0;
-			}
-			totalScaleOperation+=1;
-		}
-		else if ( ((mask>>i*4)&0xf) == 0x4) { // z | b
-			if (fvdst != nullptr)	{
-				if(curInst.opModifiers[OPM_SAT])
-					fvdst->z = CLAMP(val.z, 0.0f, 1.0f);
-				else if(curInst.opModifiers[OPM_SSAT])
-					fvdst->z = CLAMP(val.z, -1.0f, 1.0f);
-				else
-					fvdst->z = val.z;
-			}
-
-			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
-				CCisSigned[idx][0].z = (val.z < 0)?1.0:0.0;
-				CCisZero[idx][0].z = (val.z == 0)?1.0:0.0;
-			}
-			else if (curInst.opModifiers[OPM_CC1]) {
-				CCisSigned[idx][1].z = (val.z < 0)?1.0:0.0;
-				CCisZero[idx][1].z = (val.z == 0)?1.0:0.0;
-			}
-			totalScaleOperation+=1;
-		}
-		else if ( ((mask>>i*4)&0xf) == 0x8) { // w | a
-			if (fvdst != nullptr)	{
-				if(curInst.opModifiers[OPM_SAT])
-					fvdst->w = CLAMP(val.w, 0.0f, 1.0f);
-				else if(curInst.opModifiers[OPM_SSAT])
-					fvdst->w = CLAMP(val.w, -1.0f, 1.0f);
-				else
-					fvdst->w = val.w;
-			}
-
-			if (curInst.opModifiers[OPM_CC] || curInst.opModifiers[OPM_CC0]) {
-				CCisSigned[idx][0].w = (val.w < 0)?1.0:0.0;
-				CCisZero[idx][0].w = (val.w == 0)?1.0:0.0;
-			}
-			else if (curInst.opModifiers[OPM_CC1]) {
-				CCisSigned[idx][1].w = (val.w < 0)?1.0:0.0;
-				CCisZero[idx][1].w = (val.w == 0)?1.0:0.0;
-			}
-			totalScaleOperation+=1;
-		}
-		else // '\0'
-			return;
-	}
-}
-
-void ShaderCore::Print()
+void ScalarShaderCore::Print()
 {
 
 }
