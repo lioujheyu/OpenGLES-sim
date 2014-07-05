@@ -93,8 +93,8 @@ void main( void )
 	vec3 fvLightDirection = normalize( lightVector_tangent );
 	vec3 fvViewDirection  = normalize( eyeVector_tangent );
 	
-	vec3 NewCoord = TraceRay(TexCoord,fvViewDirection);
-	//vec3 NewCoord = vec3(TexCoord, 0.0f);
+	//vec3 NewCoord = TraceRay(TexCoord,fvViewDirection);
+	vec3 NewCoord = vec3(TexCoord, 0.0f);
 	
 	vec3  fvNormal		= normalize(texture2D(NM_height_Map, NewCoord.xy).xyz * 2.0 - 1.0);
 	float lightIntensity	= dot( fvNormal, fvLightDirection ); 

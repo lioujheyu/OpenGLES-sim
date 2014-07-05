@@ -296,7 +296,7 @@ void GPU_Core::PerFragmentOp(const pixel &pixInput)
     totalLivePix++;
 }
 
-void GPU_Core::ClearBuffer(unsigned int mask)
+void GPU_Core::ClearBuffer(uint32_t mask)
 {
 	int i;
 	if (mask & GL_COLOR_BUFFER_BIT) {

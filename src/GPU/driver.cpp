@@ -24,10 +24,10 @@
 
 void BilinearFilter4MipMap(textureImage *texImage)
 {
-	unsigned int width, height;
-	unsigned int nextWidth, nextHeight;
+	uint32_t width, height;
+	uint32_t nextWidth, nextHeight;
 
-	unsigned char * image;
+	uint8_t * image;
 
 	fixColor4 texel[4], texelAvg;
 	width = texImage->widthLevel[0];
@@ -42,10 +42,10 @@ void BilinearFilter4MipMap(textureImage *texImage)
 		nextWidth = texImage->widthLevel[i+1] = width >> 1;
 		nextHeight = texImage->heightLevel[i+1] = height >> 1;
 
-		image = new unsigned char[nextWidth * nextHeight * 4];
+		image = new uint8_t[nextWidth * nextHeight * 4];
 
-		for (unsigned int y=0;y<nextHeight;y++) {
-			for (unsigned int x=0;x<nextWidth;x++) {
+		for (uint32_t y=0;y<nextHeight;y++) {
+			for (uint32_t x=0;x<nextWidth;x++) {
 				texel[0].r = *(texImage->data[i] + (2*y*width + 2*x)*4    );
 				texel[0].g = *(texImage->data[i] + (2*y*width + 2*x)*4 + 1);
 				texel[0].b = *(texImage->data[i] + (2*y*width + 2*x)*4 + 2);
@@ -66,10 +66,10 @@ void BilinearFilter4MipMap(textureImage *texImage)
 				texel[3].b = *(texImage->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 2);
 				texel[3].a = *(texImage->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 3);
 
-				texelAvg.r = (unsigned char)((int)(texel[0].r + texel[1].r + texel[2].r + texel[3].r)/4);
-				texelAvg.g = (unsigned char)((int)(texel[0].g + texel[1].g + texel[2].g + texel[3].g)/4);
-				texelAvg.b = (unsigned char)((int)(texel[0].b + texel[1].b + texel[2].b + texel[3].b)/4);
-				texelAvg.a = (unsigned char)((int)(texel[0].a + texel[1].a + texel[2].a + texel[3].a)/4);
+				texelAvg.r = (uint8_t)((int)(texel[0].r + texel[1].r + texel[2].r + texel[3].r)/4);
+				texelAvg.g = (uint8_t)((int)(texel[0].g + texel[1].g + texel[2].g + texel[3].g)/4);
+				texelAvg.b = (uint8_t)((int)(texel[0].b + texel[1].b + texel[2].b + texel[3].b)/4);
+				texelAvg.a = (uint8_t)((int)(texel[0].a + texel[1].a + texel[2].a + texel[3].a)/4);
 
 				image[(y*nextWidth+x)*4    ] = texelAvg.r;
 				image[(y*nextWidth+x)*4 + 1] = texelAvg.g;
@@ -99,7 +99,7 @@ void BilinearFilter4MipMap(textureImage *texImage)
 void GenMipMap(int tid, GLenum target)
 {
 	Context * ctx = Context::GetCurrentContext();
-	unsigned int texObjID = ctx->texCtx[tid].texObjBindID;
+	uint32_t texObjID = ctx->texCtx[tid].texObjBindID;
 
 	switch (target) {
 	case GL_TEXTURE_2D:
@@ -131,7 +131,7 @@ void ActiveGPU2CleanBuffer()
     gpu.clearDepth = ctx->clearDepth;
     gpu.viewPortW = ctx->vp.w;
     gpu.viewPortH = ctx->vp.h;
-    gpu.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
+    gpu.cBufPtr = (uint8_t*)ctx->drawBuffer[0];
     gpu.dBufPtr = (float*)ctx->drawBuffer[1];
 
     gpu.Run();
@@ -422,11 +422,36 @@ int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool)
 	}
 }
 
+uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
+{
+	uint32_t pos = dram_ptr;
+	uint32_t pos_tmp;
+	for (int levelCount=0; levelCount<=tex_ptr->maxLevel; levelCount++) {
+		pos_tmp = pos;
+
+		for (uint32_t dataCount=0;
+			 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount] * 4);
+			 dataCount++) {
+			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount), pos, 1);
+			pos++;
+		}
+
+		printf("0x%08X \n",tex_ptr->data[levelCount]);
+		tex_ptr->data[levelCount] = (uint8_t* )pos_tmp;
+
+		printf("0x%08X \n",tex_ptr->data[levelCount]);
+	}
+
+	return pos;
+}
+
 /**	@todo Use link-list or command buffer to set the states only when they
  *	differ from previous context, not all of them.
  */
 void ActiveGPU(int vtxInputMode)
 {
+	uint32_t dram_ptr = 0x0;
+
     Context *ctx = Context::GetCurrentContext();
     programObject *t_program = &ctx->programPool[ctx->usePID];
 
@@ -485,7 +510,7 @@ void ActiveGPU(int vtxInputMode)
 
     gpu.blendEnable = ctx->blendEnable;
     gpu.depthTestEnable = ctx->depthTestEnable;
-    gpu.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
+    gpu.cBufPtr = (uint8_t*)ctx->drawBuffer[0];
     gpu.dBufPtr = (float*)ctx->drawBuffer[1];
 
     //Texture Statement
@@ -496,6 +521,7 @@ void ActiveGPU(int vtxInputMode)
 		gpu.wrapT[i] = ctx->texCtx[ctx->samplePool[i]].wrapT;
 		gpu.maxAnisoFilterRatio = ctx->texCtx[ctx->samplePool[i]].maxAnisoFilterRatio;
 		gpu.tex2D[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].tex2D;
+		dram_ptr = CopyTexData2Dram(&gpu.tex2D[i], dram_ptr);
 		gpu.texCubeNX[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNX;
 		gpu.texCubeNY[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNY;
 		gpu.texCubeNZ[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNZ;
@@ -514,14 +540,14 @@ void ActiveGPU(int vtxInputMode)
 	gpu.VSinstPool = new instruction[gpu.VSinstCnt];
 	for (int i=0; i<gpu.VSinstCnt; i++) {
 		*(gpu.VSinstPool + i) = t_program->VSinstructionPool[i];
-		NVGP4toScalar(t_program->VSinstructionPool[i], &scalarISpool);
+		//NVGP4toScalar(t_program->VSinstructionPool[i], &scalarISpool);
 	}
 
 	gpu.FSinstCnt = t_program->FSinstructionPool.size();
 	gpu.FSinstPool = new instruction[gpu.FSinstCnt];
 	for (int i=0; i<gpu.FSinstCnt; i++) {
 		*(gpu.FSinstPool + i) = t_program->FSinstructionPool[i];
-		NVGP4toScalar(t_program->FSinstructionPool[i], &scalarISpool);
+		//NVGP4toScalar(t_program->FSinstructionPool[i], &scalarISpool);
 	}
 
     gpu.Run();

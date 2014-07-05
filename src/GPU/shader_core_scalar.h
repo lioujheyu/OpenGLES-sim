@@ -97,6 +97,7 @@ private:
 	int PC; ///<Program Counter
 	instruction	curInst; ///< Current Instruction
 	unitThread thread[4];
+
 	bool curCCState[4]; ///< Current branch condition
 	std::stack<bool> ccStack[4]; ///< Branch condition stack for nest IF block
 	std::stack<int> RepCntStack; ///< Repeat Counter for each nest REP block
@@ -104,8 +105,10 @@ private:
 	std::stack<int> RepPCStack; ///< Start PC for each nest REP block
 
 	float reg[MAX_SHADER_REG_VECTOR*4*4];
+	bool predReg[8];
 	floatVec4 CCisSigned[4][2], CCisZero[4][2];
 	float dst[4], src[4][3];
+	floatVec4 dstVec4[4], srcVec4[4][3];
 	int texID, texType;
 };
 

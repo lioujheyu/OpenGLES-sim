@@ -50,7 +50,7 @@ int TextureUnit::CalcTexAdd(short int us, short int ub, short int uo,
 
 floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 {
-	unsigned char *texTmpPtr = NULL;
+	uint8_t *texTmpPtr = NULL;
 	unsigned short u,v;
 #ifdef NO_TEX_CACHE
 	floatVec4 color;
@@ -69,9 +69,10 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 	return color;
 #else
 	int i,j; //loop counter
-	unsigned int tag;
-	unsigned short entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
-	unsigned char tWay = 0;
+	uint32_t tag;
+	uint16_t entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
+	uint8_t tWay = 0;
+	uint32_t tmpData;
     bool isColdMiss = false;
 
 	if (targetImage->maxLevel == -1) {
@@ -144,10 +145,14 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 								   V_Super,V_Block,j,
 								   targetImage->widthLevel[level]) * 4;
 
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r = ((float)(*texTmpPtr++)/255);
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g = ((float)(*texTmpPtr++)/255);
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].b = ((float)(*texTmpPtr++)/255);
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].a = ((float)(*texTmpPtr++)/255);
+			dram->local_access(false, (uint32_t)texTmpPtr++, tmpData, 1, 1);
+			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r = ((float)tmpData/255);
+			dram->local_access(false, (uint32_t)texTmpPtr++, tmpData, 1, 1);
+			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g = ((float)tmpData/255);
+			dram->local_access(false, (uint32_t)texTmpPtr++, tmpData, 1, 1);
+			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].b = ((float)tmpData/255);
+			dram->local_access(false, (uint32_t)texTmpPtr++, tmpData, 1, 1);
+			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].a = ((float)tmpData/255);
 		}
 	}
 #	ifdef SHOW_TEXCACHE_COLD_MISS
@@ -393,7 +398,7 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 //			break;
 
 		case GL_LINEAR_MIPMAP_LINEAR:	//u,v,w trilinear filter
-			unsigned char sampleN;
+			uint8_t sampleN;
 
 			/* Extension defines the sample number have to apply ceiling on the
 			 * ratio but I use floor to get a smaller ratio for better
@@ -402,7 +407,7 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 			 * has the configuration between quality and performance about
 			 * anisotropic filter.
 			 */
-			sampleN = std::min((unsigned char)floor(maxScaleFac/scaleFacLoser),
+			sampleN = std::min((uint8_t)floor(maxScaleFac/scaleFacLoser),
 								maxAnisoFilterRatio);
 			// Round down to nearest power of 2, the same reason mentioned above
 			if (sampleN == 3)

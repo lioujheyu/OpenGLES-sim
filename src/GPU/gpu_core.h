@@ -34,6 +34,8 @@
 #include "gpu_type.h"
 #include "shader_core.h"
 
+#include "dram/dram.h"
+
 #ifdef GPU_INFO
 #	define GPUPRINTF(fmt, ...) \
 		do { if (DBG_ON) fprintf(GPU_INFO_PTR, fmt, ##__VA_ARGS__); } while (0)
@@ -74,6 +76,8 @@ public:
 	GPU_Core();
 	~GPU_Core();
 
+	DRAM			dram_128m = DRAM(0x8000000); //simulate an 128MB on-board dram;
+
     GLenum			drawMode;
     int         	vtxCount;
     int				vtxIndicesType;
@@ -84,7 +88,7 @@ public:
     int         	attrSize[MAX_ATTRIBUTE_NUMBER];
     bool        	attrEnable[MAX_ATTRIBUTE_NUMBER];
     bool        	varyEnable[MAX_ATTRIBUTE_NUMBER];
-    unsigned char	varyInterpMode[MAX_ATTRIBUTE_NUMBER];
+    uint8_t			varyInterpMode[MAX_ATTRIBUTE_NUMBER];
     float       	depthRangeN, depthRangeF;
     int         	viewPortLX, viewPortLY,
 					viewPortW, viewPortH;
@@ -103,7 +107,7 @@ public:
 
     GLenum 			wrapS[MAX_TEXTURE_CONTEXT],
 					wrapT[MAX_TEXTURE_CONTEXT];
-	unsigned char	maxAnisoFilterRatio;
+	uint8_t			maxAnisoFilterRatio;
 	textureImage 	tex2D[MAX_TEXTURE_CONTEXT];
 	textureImage 	texCubeNX[MAX_TEXTURE_CONTEXT];
 	textureImage 	texCubeNY[MAX_TEXTURE_CONTEXT];
@@ -111,14 +115,14 @@ public:
 	textureImage 	texCubePX[MAX_TEXTURE_CONTEXT];
 	textureImage 	texCubePY[MAX_TEXTURE_CONTEXT];
 	textureImage 	texCubePZ[MAX_TEXTURE_CONTEXT];
-	unsigned char	*cBufPtr;
+	uint8_t			*cBufPtr;
     float			*dBufPtr;
 
     floatVec4		uniformPool[MAX_VERTEX_UNIFORM_VECTORS+MAX_FRAGMENT_UNIFORM_VECTORS];
     int				VSinstCnt, FSinstCnt;
     instruction		*VSinstPool, *FSinstPool;
 
-    unsigned int	clearMask;
+    uint32_t		clearMask;
     bool			clearStat;
 	floatVec4		clearColor;
     float			clearDepth;
@@ -197,7 +201,7 @@ private:
  *
  *  @param vCnt Vertex index
  */
-    void			FetchVertexData(unsigned int vCnt);
+    void			FetchVertexData(uint32_t vCnt);
     void        	PerspectiveDivision(vertex *vtx);
     void        	ViewPort(vertex *vtx);
     void        	InitPrimitiveAssembly();
@@ -226,7 +230,7 @@ private:
  */
     void            tileSplit(int x, int y, int level);
     void            PerFragmentOp(const pixel &pixInput);
-    void 			ClearBuffer(unsigned int mask);
+    void 			ClearBuffer(uint32_t mask);
 ///@}
 
 };

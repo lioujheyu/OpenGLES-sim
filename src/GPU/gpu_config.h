@@ -112,6 +112,7 @@
 
 /// @name Definition for whether print the defined target's information.
 ///@{
+//#define ASM_INFO
 #define GPU_INFO
 #define SHADER_INFO
 //#define PIXEL_INFO

@@ -48,5 +48,10 @@ void BilinearFilter4MipMap();
 int CheckSwizzleModifier(int modifier);
 int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool);
 
+/**
+ *	Copy virtual texture state's data into simulated dram model
+ */
+uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr);
+
 
 #endif // DRIVER_H_INCLUDED

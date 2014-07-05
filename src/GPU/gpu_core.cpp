@@ -144,8 +144,10 @@ void GPU_Core::Run()
 
 }
 
-GPU_Core::GPU_Core()
+GPU_Core::GPU_Core() : sCore({&dram_128m, &dram_128m})
 {
+	//dram_128m("128MB", 0x8000000);
+
 	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
 		attrEnable[i] = false;
 		varyEnable[i] = false;
@@ -189,9 +191,9 @@ GPU_Core::~GPU_Core()
 #endif //TEXEL_INFO && TEXEL_INFO_FILE
 }
 
-void GPU_Core::FetchVertexData(unsigned int vCnt)
+void GPU_Core::FetchVertexData(uint32_t vCnt)
 {
-	unsigned int vIdx;
+	uint32_t vIdx;
 
 	//Get vertex index
 	if (vtxInputMode == 0) //drawArray
@@ -199,13 +201,13 @@ void GPU_Core::FetchVertexData(unsigned int vCnt)
 	else { //drawElements
 		switch (vtxIndicesType) {
 		case GL_UNSIGNED_BYTE:
-			vIdx = *( (unsigned char*)vtxIndicesPointer + vCnt );
+			vIdx = *( (uint8_t*)vtxIndicesPointer + vCnt );
 			break;
 		case GL_UNSIGNED_SHORT:
 			vIdx = *( (unsigned short*)vtxIndicesPointer + vCnt );
 			break;
 		case GL_UNSIGNED_INT:
-			vIdx = *( (unsigned int*)vtxIndicesPointer + vCnt );
+			vIdx = *( (uint32_t*)vtxIndicesPointer + vCnt );
 			break;
 		}
 	}

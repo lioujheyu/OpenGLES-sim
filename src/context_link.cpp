@@ -126,9 +126,11 @@ void Context::LinkProgram(GLuint program)
 	programPool[program] = t_program;
 	programPool[program].isLinked = GL_TRUE;
 
+#ifdef ASM_INFO
 	for (unsigned int i=0; i<t_program.VSinstructionPool.size(); i++)
 		t_program.VSinstructionPool[i].Print();
 	printf("\n");
 	for (unsigned int i=0; i<t_program.FSinstructionPool.size(); i++)
 		t_program.FSinstructionPool[i].Print();
+#endif
 }

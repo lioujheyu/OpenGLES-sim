@@ -57,8 +57,10 @@
  */
 class ShaderCore {
 public:
-	ShaderCore()
+	ShaderCore(DRAM *dram) : texUnit(dram)
 	{
+		this->dram = dram;
+
 		instCnt = 0;
 		totalInstructionCnt = 0;
 		totalScaleOperation = 0;
@@ -127,6 +129,8 @@ private:
 	floatVec4 CCisSigned[4][2], CCisZero[4][2];
 	floatVec4 dst[4], src[4][3];
 	int texID, texType;
+
+	DRAM *dram;
 };
 
 

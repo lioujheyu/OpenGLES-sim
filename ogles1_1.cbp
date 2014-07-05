@@ -45,6 +45,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="shader.cpp" />
 		<Unit filename="shader.h" />
+		<Unit filename="src/GPU/dram/dram.cpp" />
+		<Unit filename="src/GPU/dram/dram.h" />
 		<Unit filename="src/GPU/driver.cpp" />
 		<Unit filename="src/GPU/driver.h" />
 		<Unit filename="src/GPU/geometry.cpp" />

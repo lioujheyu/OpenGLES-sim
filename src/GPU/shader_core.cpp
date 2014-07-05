@@ -148,7 +148,7 @@ void ShaderCore::Exec(int idx)
 	case OP_ADD:
 		dst[idx] = src[idx][0] + src[idx][1];
 		break;
-/// @todo Have to rewrite after integer data type been implemented
+/// @todo Have to rewrite after integer data type has been implemented
 	case OP_AND:
 		dst[idx].x = int(src[idx][0].x) & int(src[idx][1].x);
 		dst[idx].y = int(src[idx][0].y) & int(src[idx][1].y);
