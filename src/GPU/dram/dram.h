@@ -43,7 +43,7 @@ class DRAM
 
         bool read(uint32_t*, uint32_t, int);
         bool write(uint32_t, uint32_t, int);
-        virtual bool local_access(bool write, uint32_t addr, uint32_t& data, unsigned int length,uint32_t burst_length);
+        virtual bool LocalAccess(bool write, uint32_t addr, uint32_t& data, unsigned int length,uint32_t burst_length);
 
         //DRAM Model
         void InitDramController();

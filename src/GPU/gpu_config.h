@@ -79,8 +79,8 @@
 
 ///@name Define the texture cache's block and entry size
 ///@{
-#define TEX_CACHE_BLOCK_SIZE 4
-#define TEX_CACHE_ENTRY_SIZE 64
+#define TEX_CACHE_BLOCK_SIZE 16
+#define TEX_CACHE_ENTRY_SIZE 16
 ///@}
 
 ///	@name Texture debugging option

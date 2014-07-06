@@ -436,10 +436,7 @@ uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
 			pos++;
 		}
 
-		printf("0x%08X \n",tex_ptr->data[levelCount]);
 		tex_ptr->data[levelCount] = (uint8_t* )pos_tmp;
-
-		printf("0x%08X \n",tex_ptr->data[levelCount]);
 	}
 
 	return pos;
@@ -549,6 +546,8 @@ void ActiveGPU(int vtxInputMode)
 		*(gpu.FSinstPool + i) = t_program->FSinstructionPool[i];
 		//NVGP4toScalar(t_program->FSinstructionPool[i], &scalarISpool);
 	}
+
+	printf("On-board Memory usage: %d KB\n",dram_ptr/1024);
 
     gpu.Run();
 }

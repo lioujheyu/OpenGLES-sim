@@ -16,7 +16,7 @@
 #include "dram.h"
 //#include <bit_opt_v2.h>
 
-//#define DDR2
+#define DDR2
 
 using namespace std;
 
@@ -192,14 +192,14 @@ bool DRAM::NeedPrecharge(unsigned int addr, unsigned int tRAS_count){
         return false ;
 }
 
-bool DRAM::local_access(bool write, uint32_t addr, uint32_t& data, unsigned int length,uint32_t burst_length)
+bool DRAM::LocalAccess(bool write, uint32_t addr, uint32_t& data, unsigned int length,uint32_t burst_length)
 {
     //uint32_t local_address = addr & get_address_mask();
     uint32_t local_address = addr;
 
-    accessB+=(length*burst_length);
+    accessB+=length;
 
-//#ifdef DDR2
+#ifdef DDR2
     if(burst_state == NO_BURST)
     {
         if(burst_length>1)
@@ -327,9 +327,10 @@ bool DRAM::local_access(bool write, uint32_t addr, uint32_t& data, unsigned int 
         pre_w_burst = false;
         pre_r_burst = false;
     }
-//#endif
+#endif
 
     AddrDecode(local_address);
+
     if(write)
     {
         return this->write(data, local_address, length);

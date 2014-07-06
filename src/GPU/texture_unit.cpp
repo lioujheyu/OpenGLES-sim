@@ -62,7 +62,7 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 	texTmpPtr = targetImage->data[level] +
 				(v*targetImage->widthLevel[level] + u)*4;
 
-	dram->local_access(false, (size_t)texTmpPtr, tmpData, 4, 1);
+	dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 1);
 	color.r = (float)(tmpData&0xff)/255;
 	color.g = (float)((tmpData>>8)&0xff)/255;
 	color.b = (float)((tmpData>>16)&0xff)/255;
@@ -148,7 +148,8 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 								   V_Super,V_Block,j,
 								   targetImage->widthLevel[level]) * 4;
 
-			dram->local_access(false, (size_t)texTmpPtr, tmpData, 4, 1);
+			dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, TEX_CACHE_BLOCK_SIZE_ROOT-i);
+//			dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 1);
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r =
 				(float)(tmpData&0xff)/255;
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g =
