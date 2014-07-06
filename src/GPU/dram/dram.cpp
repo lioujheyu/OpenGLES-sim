@@ -49,6 +49,10 @@ DRAM::DRAM(uint32_t mapping_size)
     pre_w_burst = false;
     pre_r_burst = false;
     burst_state = NO_BURST;
+
+    //Statstic
+    accessTime = 0;
+    accessB = 0;
 }
 
 DRAM::~DRAM()
@@ -193,7 +197,9 @@ bool DRAM::local_access(bool write, uint32_t addr, uint32_t& data, unsigned int 
     //uint32_t local_address = addr & get_address_mask();
     uint32_t local_address = addr;
 
-#ifdef DDR2
+    accessB+=(length*burst_length);
+
+//#ifdef DDR2
     if(burst_state == NO_BURST)
     {
         if(burst_length>1)
@@ -221,11 +227,13 @@ bool DRAM::local_access(bool write, uint32_t addr, uint32_t& data, unsigned int 
         if(state == RowActive){
             if(write){
                 state = WRITE;
-                wait(CWL, SC_NS);
+                //wait(CWL, SC_NS);
+                accessTime+=CWL;
             }
             else{//read
                 state = READ;
-            	wait(CL, SC_NS);
+            	//wait(CL, SC_NS);
+            	accessTime+=CL;
 				/*cout << sc_time_stamp() << endl;
 				wait(2);
 				cout << sc_time_stamp() << endl;*/
@@ -236,20 +244,25 @@ bool DRAM::local_access(bool write, uint32_t addr, uint32_t& data, unsigned int 
             {
                 //wait(CL);
                 //printf("read first Burst pipeline");
-                wait(DRAM_CLK, SC_NS);
+                //wait(DRAM_CLK, SC_NS);
+                accessTime+=DRAM_CLK;
             }
             else if(burst_state == FIRST_BURST){
                 //printm(d_ram,"read first Burst");
-                wait(CL, SC_NS);
+                //wait(CL, SC_NS);
+                accessTime+=CL;
             }
             else if(burst_state == BURST){
                 //printf("read Burst");
-                wait(DRAM_CLK, SC_NS);
+                //wait(DRAM_CLK, SC_NS);
+                accessTime+=DRAM_CLK;
             }
             else if(burst_state == NO_BURST)
-                wait(CL, SC_NS);
+                //wait(CL, SC_NS);
+                accessTime+=CL;
             else
-                wait(CL, SC_NS);
+                //wait(CL, SC_NS);
+                accessTime+=CL;
             break;
         }
         if(state == WRITE){
@@ -257,25 +270,31 @@ bool DRAM::local_access(bool write, uint32_t addr, uint32_t& data, unsigned int 
             {
                 //wait(CWL);
                 //printf("write first Burst pipeline");
-                wait(DRAM_CLK, SC_NS);
+                //wait(DRAM_CLK, SC_NS);
+                accessTime+=DRAM_CLK;
             }
             else if(burst_state == FIRST_BURST){
                 //printf("write first Burst");
-                wait(CWL, SC_NS);
+                //wait(CWL, SC_NS);
+                accessTime+=CWL;
             }
             else if(burst_state == BURST){
                 //printf("write Burst");
-                wait(DRAM_CLK, SC_NS);
+                //wait(DRAM_CLK, SC_NS);
+                accessTime+=DRAM_CLK;
             }
             else if(burst_state == NO_BURST){
-                wait(CWL, SC_NS);
+                //wait(CWL, SC_NS);
+                accessTime+=CWL;
             }
             else
-                wait(CWL, SC_NS);
+                //wait(CWL, SC_NS);
+                accessTime+=CWL;
             break;
         }
         if(state == PRECHARGE){
-            wait(tRP, SC_NS);
+            //wait(tRP, SC_NS);
+            accessTime+=tRP;
             precharge_counter++;
             state = RowActive;
         }
@@ -308,7 +327,7 @@ bool DRAM::local_access(bool write, uint32_t addr, uint32_t& data, unsigned int 
         pre_w_burst = false;
         pre_r_burst = false;
     }
-#endif
+//#endif
 
     AddrDecode(local_address);
     if(write)
@@ -319,5 +338,7 @@ bool DRAM::local_access(bool write, uint32_t addr, uint32_t& data, unsigned int 
     {
         return this->read(&data, local_address, length);
     }
+
+
 }
 

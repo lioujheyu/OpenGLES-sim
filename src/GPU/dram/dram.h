@@ -7,6 +7,7 @@
 #include <cmath>
 
 #define READ_PIPELINE
+#define DDR2
 #define REF_TIME    6400000 //#cycle @ 100MHz (10ns)
 #define REF_CYCLE   8192
 #define CL          10	//ns
@@ -48,6 +49,9 @@ class DRAM
         void InitDramController();
         bool NeedActive(unsigned int addr);
         bool NeedPrecharge(unsigned int addr, unsigned int tRAS_count);
+
+        uint64_t accessTime;
+        uint64_t accessB;
 
 
     private:

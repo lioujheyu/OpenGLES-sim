@@ -692,14 +692,13 @@ int main()
     //Initial a new context, need to be hidden after egl or other context library is imported.
     Context::SetCurrentContext(new Context());
 
-//    draw_road();
-    printf("test");
+//  draw_road();
 //	draw_cubemap();
-//	draw_banana();
+	draw_banana();
 //	draw_teapot();
 //	tutorial3();
 //	tutorial4();
-	ParallaxOcclusionMapping();
+//	ParallaxOcclusionMapping();
 
 	Context::GetCurrentContext()->DumpImage(0);
 //	printf("test");
