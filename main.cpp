@@ -115,20 +115,25 @@ int LoadCubeMap(char *xneg, char *yneg, char *zneg,
 
 //Without using vertex's index in our model, we dont need triangle variable here
 void CalculateTangentArray(long vertexCount, const float *vertex, const float *normal,
-        const float *texcoord, float *tangent)
+        const float *texcoord, float *tangent, float *bitangent)
 {
     glm::vec3 *tan1 = new glm::vec3[vertexCount * 2]();
     glm::vec3 *tan2 = tan1 + vertexCount;
 
-    for (long a = 0; a < (vertexCount/3); a++)
-    {
-        const glm::vec3 v1 = glm::vec3(vertex[a*3+0], vertex[a*3+1], vertex[a*3+2]);
-        const glm::vec3 v2 = glm::vec3(vertex[(a+1)*3+0], vertex[(a+1)*3+1], vertex[(a+1)*3+2]);
-        const glm::vec3 v3 = glm::vec3(vertex[(a+2)*3+0], vertex[(a+2)*3+1], vertex[(a+2)*3+2]);
+    glm::vec3 v1, v2, v3;
+    glm::vec2 w1, w2, w3;
 
-        const glm::vec2 w1 = glm::vec2(texcoord[a*3+0], texcoord[a*3+1]);
-        const glm::vec2 w2 = glm::vec2(texcoord[(a+1)*3+0], texcoord[(a+1)*3+1]);
-        const glm::vec2 w3 = glm::vec2(texcoord[(a+2)*3+0], texcoord[(a+2)*3+1]);
+    glm::vec3 n, t;
+
+    for (long a=0; a<vertexCount; a+=3)
+    {
+        v1 = glm::vec3(vertex[a*3+0], vertex[a*3+1], vertex[a*3+2]);
+        v2 = glm::vec3(vertex[a*3+3], vertex[a*3+4], vertex[a*3+5]);
+        v3 = glm::vec3(vertex[a*3+6], vertex[a*3+7], vertex[a*3+8]);
+
+        w1 = glm::vec2(texcoord[a*2+0], texcoord[a*2+1]);
+        w2 = glm::vec2(texcoord[a*2+2], texcoord[a*2+3]);
+        w3 = glm::vec2(texcoord[a*2+4], texcoord[a*2+5]);
 
         float x1 = v2.x - v1.x;
         float x2 = v3.x - v1.x;
@@ -152,28 +157,46 @@ void CalculateTangentArray(long vertexCount, const float *vertex, const float *n
         glm::vec3 tdir = glm::vec3((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
                 (s1 * z2 - s2 * z1) * r);
 
-        tan1[a*3+0] += sdir;
-        tan1[a*3+1] += sdir;
-        tan1[a*3+2] += sdir;
+        if (a==7257)
+			printf("test");
 
-        tan2[a*3+0] += tdir;
-        tan2[a*3+1] += tdir;
-        tan2[a*3+2] += tdir;
+        tan1[a+0] += sdir;
+        tan1[a+1] += sdir;
+        tan1[a+2] += sdir;
+
+        tan2[a+0] += tdir;
+        tan2[a+1] += tdir;
+        tan2[a+2] += tdir;
 
     }
 
     for (long a = 0; a < vertexCount; a++)
     {
-        const glm::vec3 n = glm::vec3(normal[a*3+0], normal[a*3+1], normal[a*3+2]);
-        const glm::vec3 t = tan1[a];
+    	glm::vec3 tmp;
+        n = glm::vec3(normal[a*3+0], normal[a*3+1], normal[a*3+2]);
+        t = tan1[a];
 
         // Gram-Schmidt orthogonalize
-        tangent[a*4+0] = glm::normalize(t - n * glm::dot(n, t)).x;
-        tangent[a*4+1] = glm::normalize(t - n * glm::dot(n, t)).y;
-		tangent[a*4+2] = glm::normalize(t - n * glm::dot(n, t)).z;
+        tmp = t - n * glm::dot(n, t);
+        if (tmp == glm::vec3(0.0, 0.0, 0.0)) {
+			tangent[a*4+0] = 0.0;
+			tangent[a*4+1] = 0.0;
+			tangent[a*4+2] = 0.0;
+			tangent[a*4+3] = 1.0;
+        }
+		else {
+			tmp = glm::normalize(tmp);
+			tangent[a*4+0] = tmp.x;
+			tangent[a*4+1] = tmp.y;
+			tangent[a*4+2] = tmp.z;
+			tangent[a*4+3] = (glm::dot(glm::cross(n, t), tan2[a]) < 0.0F) ? -1.0F : 1.0F;
+		}
+
+		bitangent[a*3+0] = tan2[a].x;
+		bitangent[a*3+1] = tan2[a].y;
+		bitangent[a*3+2] = tan2[a].z;
 
         // Calculate handedness
-        tangent[a*4+3] = (glm::dot(glm::cross(n, t), tan2[a]) < 0.0F) ? -1.0F : 1.0F;
     }
 
     delete[] tan1;
@@ -519,12 +542,11 @@ void ParallaxOcclusionMapping()
 
 }
 
-
-
 void draw_teapot()
 {
 	Shader shader;
-	shader.init("shader_src/drawObjNormalMap.vert", "shader_src/drawObjNormalMap.frag");
+	//shader.init("shader_src/drawObjNormalMap.vert", "shader_src/drawObjNormalMap.frag");
+	shader.init("shader_src/drawObj.vert", "shader_src/drawObj.frag");
 	shader.bind();
 
 	glEnable(GL_CULL_FACE);
@@ -537,62 +559,46 @@ void draw_teapot()
 	glClearDepthf(1.0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	GLfloat teapotTangent [teapotNumVerts*4];
 
-	CalculateTangentArray(teapotNumVerts, teapotVerts, teapotNormals,
-						  teapotTexCoords, teapotTangent);
-
-
+//	CalculateTangentArray(teapotNumVerts, teapotVerts, teapotNormals,
+//						  teapotTexCoords, teapotTangent, teapotBitangent);
 
 	unsigned int texture[2];
 	glActiveTexture(GL_TEXTURE0);
-    if (LoadTexture("data/stone_wall.bmp", &texture[0]) == false) {
+    if (LoadTexture("data/wood.bmp", &texture[0]) == false) {
 		printf("Fail to load image\n");
 		exit(1);
         }
 
-	glActiveTexture(GL_TEXTURE1);
-	if (LoadTexture("data/stone_wall_normal_map.bmp", &texture[1]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-	}
-
-	glm::vec3 eye_pos    = glm::vec3(0.0f, 1.5f, 1.5f);
-	glm::vec3 light_pos  = glm::vec3(5.0f, 5.0f, 5.0f);
+	glm::vec3 eye_pos    = glm::vec3(0.0f, 2.0f, 2.0f);
+	glm::vec3 light_pos  = glm::vec3(3.0f, 3.0f, 3.0f);
     glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
     glm::mat4 View       = glm::lookAt(
-                                eye_pos, // Camera is at (2,1,1), in World Space
+                                eye_pos, // in World Space
                                 glm::vec3(0,0,0), // and looks at the origin
                                 glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
                                 );
-	glm::mat4 Model      = glm::scale(glm::mat4(1.0f), glm::vec3(3.5f));
-	//glm::mat4 Model      = glm::mat4(1.0f);
+	glm::mat4 Model      = glm::scale(glm::mat4(1.0f), glm::vec3(4.0));
 	glm::mat4 VP         = Projection * View;
 
+
 	int v_coord_loc     = glGetAttribLocation(shader.id(), "obj_vertex");
-	int v_tangent_loc   = glGetAttribLocation(shader.id(), "obj_tangent");
 	int v_normal_loc    = glGetAttribLocation(shader.id(), "obj_normal");
     int v_tex0_loc      = glGetAttribLocation(shader.id(), "obj_texcoord");
     int c_map_loc       = glGetUniformLocation(shader.id(), "ColorMap");
-    int n_map_loc       = glGetUniformLocation(shader.id(), "NormalMap");
-    int vp_loc          = glGetUniformLocation(shader.id(), "VP");
     int model_loc       = glGetUniformLocation(shader.id(), "model_mat");
+    int vp_loc          = glGetUniformLocation(shader.id(), "VP");
     int light_loc       = glGetUniformLocation(shader.id(), "light_pos");
     int eye_loc         = glGetUniformLocation(shader.id(), "eye_pos");
-    printf("%d, %d, %d, %d, %d, %d, %d\n", v_coord_loc, v_normal_loc, v_tex0_loc, c_map_loc, vp_loc, model_loc, light_loc);
 
 	glUniform1i(c_map_loc, 0);
-	glUniform1i(n_map_loc, 1);
+    glUniformMatrix4fv(model_loc, 1, 0, &Model[0][0]);
     glUniformMatrix4fv(vp_loc, 1, 0, &VP[0][0]);
-	glUniformMatrix4fv(model_loc, 1, 0, &Model[0][0]);
     glUniform3fv(light_loc, 1, &light_pos[0]);
     glUniform3fv(eye_loc, 1, &eye_pos[0]);
 
     glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, teapotVerts);
     glEnableVertexAttribArray(v_coord_loc);
-
-    glVertexAttribPointer(v_tangent_loc, 4, GL_FLOAT, GL_FALSE, 0, teapotTangent);
-    glEnableVertexAttribArray(v_tangent_loc);
 
     glVertexAttribPointer(v_normal_loc, 3, GL_FLOAT, GL_FALSE, 0, teapotNormals);
     glEnableVertexAttribArray(v_normal_loc);
@@ -778,10 +784,10 @@ int main()
 //	draw_road();
 //	draw_cubemap();
 //	draw_banana();
-	draw_teapot();
+//	draw_teapot();
 //	tutorial3();
 //	tutorial4();
-//	ParallaxOcclusionMapping();
+	ParallaxOcclusionMapping();
 
 	Context::GetCurrentContext()->DumpImage(0);
 //	printf("test");
