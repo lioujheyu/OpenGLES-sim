@@ -140,7 +140,19 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 
 	if (TexCache.valid[entry][tWay] == false)
 		TexCache.valid[entry][tWay] = true;
+#	ifdef IMAGE_MEMORY_OPTIMIZE
+	texTmpPtr = targetImage->data[level] +
+	( (v>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG)*(targetImage->widthLevel[level]>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG)
+	 + (u>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG) )*TEX_CACHE_BLOCK_SIZE*4;
 
+	for (i=0; i<TEX_CACHE_BLOCK_SIZE; i++) {
+		dram->LocalAccess(false, (size_t)texTmpPtr+i*4, tmpData, 4, TEX_CACHE_BLOCK_SIZE-i);
+		TexCache.color[entry][i][tWay].r = (float)(tmpData&0xff)/255;
+		TexCache.color[entry][i][tWay].g = (float)((tmpData>>8)&0xff)/255;
+		TexCache.color[entry][i][tWay].b = (float)((tmpData>>16)&0xff)/255;
+		TexCache.color[entry][i][tWay].a = (float)((tmpData>>24)&0xff)/255;
+	}
+#	else
 	for (j=0; j<TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
 		for (i=0; i<TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
 			texTmpPtr = targetImage->data[level] +
@@ -162,6 +174,9 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 			texTmpPtr+=4;
 		}
 	}
+#	endif // IMAGE_MEMORY_OPTIMIZE
+
+
 #	ifdef SHOW_TEXCACHE_COLD_MISS
 	if (isColdMiss)
 		return floatVec4(1.0, 0.0, 0.0, 1.0);

@@ -71,6 +71,15 @@
 //#define NO_TEX_CACHE
 
 /**
+ *	@def IMAGE_MEMORY_OPTIMIZE
+ *	IMAGE_MEMORY_OPTIMIZE will tell driver to rearrange the texture image's
+ *	sequence in memory by texture cache's block size so that texture cache could
+ *	get a whole cache block data in one single burst read.
+ *	Note: if NO_TEX_CACHE is defined, IMAGE_MEMORY_OPTIMIZE will be undefined.
+ */
+#define IMAGE_MEMORY_OPTIMIZE
+
+/**
  *	@def TEX_WAY_ASSOCIATION
  *	Define how many way association texture cache will use. If
  *	\ref TEX_WAY_ASSOCIATION = 1, the cache is direct mapped.
@@ -79,8 +88,8 @@
 
 ///@name Define the texture cache's block and entry size
 ///@{
-#define TEX_CACHE_BLOCK_SIZE 16
-#define TEX_CACHE_ENTRY_SIZE 16
+#define TEX_CACHE_BLOCK_SIZE 4
+#define TEX_CACHE_ENTRY_SIZE 64
 ///@}
 
 ///	@name Texture debugging option
@@ -140,6 +149,10 @@
 #	undef SHOW_TEXCACHE_MISS
 #	undef GPU_INFO
 #	undef SHADER_INFO
+#endif
+
+#ifdef NO_TEX_CACHE
+#	undef IMAGE_MEMORY_OPTIMIZE
 #endif
 
 #endif // GPU_CONFIG_H_INCLUDED

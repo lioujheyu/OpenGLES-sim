@@ -18,6 +18,7 @@
 #define DRIVER_H_INCLUDED
 
 #include "../context.h"
+//#include "gpu_config.h"
 #include "gpu_core.h"
 
 #define NO_MODIFIER -1
@@ -49,7 +50,11 @@ int CheckSwizzleModifier(int modifier);
 int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool);
 
 /**
- *	Copy virtual texture state's data into simulated dram model
+ *	Copy texture image data into a simulated dram model. This also includes a
+ *	image data sequence rearrange in simulated dram model for better cache
+ *	performance if @def IMAGE_MEMORY_OPTIMIZE is defined in @file gpu_config.h.
+ *	@param tex_ptr The pointer for target textureImage object.
+ *	@param dram_ptr The destination address of the simulated dram model.
  */
 uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr);
 

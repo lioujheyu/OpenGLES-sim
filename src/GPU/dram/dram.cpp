@@ -24,6 +24,7 @@ using namespace std;
 DRAM::DRAM(uint32_t mapping_size)
 {
     //make sure the size is aligned to 32-bit word
+    this->mappint_size = mapping_size;
     if(mapping_size & mask(1, 0))
     {
         printf("DRAM: DRAM size is not aligned to 32-bit word\n");
@@ -74,6 +75,10 @@ void DRAM::InitDramController()
 /* read data from the RAM module */
 bool DRAM::read(uint32_t* data, uint32_t addr, int size)
 {
+    if (addr > mappint_size) {
+		printf("DRAM: read address out of boundary\n");
+		return false;
+    }
     switch(size)
     {
         case 4:
@@ -96,6 +101,11 @@ bool DRAM::read(uint32_t* data, uint32_t addr, int size)
 /* write data to the RAM module */
 bool DRAM::write(uint32_t data, uint32_t addr, int size)
 {
+    if (addr > mappint_size) {
+		printf("DRAM: write address out of boundary\n");
+		return false;
+    }
+
     switch(size)
     {
         case 4:

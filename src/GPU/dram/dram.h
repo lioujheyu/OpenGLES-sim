@@ -55,6 +55,8 @@ class DRAM
 
 
     private:
+
+    	uint32_t mappint_size;
         uint8_t* bank;
 
 		uint32_t bank_bit;

@@ -429,12 +429,48 @@ uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
 	for (int levelCount=0; levelCount<=tex_ptr->maxLevel; levelCount++) {
 		pos_tmp = pos;
 
-		for (uint32_t dataCount=0;
-			 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount] * 4);
-			 dataCount++) {
-			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount), pos, 1);
-			pos++;
+#ifdef IMAGE_MEMORY_OPTIMIZE//Block-based memory rearrangement for 6D cache architecture
+		if (tex_ptr->heightLevel[levelCount] >= TEX_CACHE_BLOCK_SIZE_ROOT) {
+			for (int y=0; y<tex_ptr->heightLevel[levelCount]; y+=TEX_CACHE_BLOCK_SIZE_ROOT) {
+			for (int x=0; x<tex_ptr->widthLevel[levelCount]; x+=TEX_CACHE_BLOCK_SIZE_ROOT) {
+				for (int t=0; t<TEX_CACHE_BLOCK_SIZE_ROOT; t++) {
+				for (int s=0; s<TEX_CACHE_BLOCK_SIZE_ROOT; s++) {
+
+					uint32_t imagePos = (y + t)*tex_ptr->widthLevel[levelCount] + x+s;
+					gpu.dram_128m.write(*(tex_ptr->data[levelCount] + imagePos*4), pos, 1);
+					gpu.dram_128m.write(*(tex_ptr->data[levelCount] + imagePos*4+1), pos+1, 1);
+					gpu.dram_128m.write(*(tex_ptr->data[levelCount] + imagePos*4+2), pos+2, 1);
+					gpu.dram_128m.write(*(tex_ptr->data[levelCount] + imagePos*4+3), pos+3, 1);
+					pos+=4;
+				}
+				}
+			}
+			}
 		}
+		else { //tex_ptr->heightLevel[levelCount] < TEX_CACHE_BLOCK_SIZE_ROOT
+			for (uint32_t dataCount=0;
+				 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount]);
+				 dataCount++) {
+
+				gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
+				gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
+				gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
+				gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
+				pos+=4;
+			}
+		}
+#else // No IMAGE_MEMORY_OPTIMIZE
+		for (uint32_t dataCount=0;
+			 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount]);
+			 dataCount++) {
+
+			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
+			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
+			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
+			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
+			pos+=4;
+		}
+#endif // IMAGE_MEMORY_OPTIMIZE
 
 		tex_ptr->data[levelCount] = (uint8_t* )pos_tmp;
 	}

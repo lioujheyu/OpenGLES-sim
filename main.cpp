@@ -784,10 +784,10 @@ int main()
 //	draw_road();
 //	draw_cubemap();
 //	draw_banana();
-//	draw_teapot();
+	draw_teapot();
 //	tutorial3();
 //	tutorial4();
-	ParallaxOcclusionMapping();
+//	ParallaxOcclusionMapping();
 
 	Context::GetCurrentContext()->DumpImage(0);
 //	printf("test");
