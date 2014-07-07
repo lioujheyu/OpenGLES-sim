@@ -121,8 +121,8 @@ void GPU_Core::Run()
 			  (float)(totalProcessingPix - totalGhostPix)/totalProcessingPix);
 	GPUPRINTF("Final living pixel: %d\n\n",totalLivePix);
 
-	GPUPRINTF("Texture memory access: %d KB\n",dram_128m.accessB/1024);
-	GPUPRINTF("Texture memory access time: %d us\n\n",dram_128m.accessTime/1000);
+	GPUPRINTF("Texture memory access: %d KB\n",dram_64m.accessB/1024);
+	GPUPRINTF("Texture memory access time: %d us\n\n",dram_64m.accessTime/1000);
 
     GPUPRINTF("Texture cache hit: %d\n",sCore[1].texUnit.hit);
     GPUPRINTF("Texture cache miss: %d\n",sCore[1].texUnit.miss);
@@ -147,7 +147,7 @@ void GPU_Core::Run()
 
 }
 
-GPU_Core::GPU_Core() : sCore({&dram_128m, &dram_128m})
+GPU_Core::GPU_Core() : sCore({&dram_64m, &dram_64m})
 {
 	//dram_128m("128MB", 0x8000000);
 

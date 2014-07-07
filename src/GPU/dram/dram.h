@@ -6,15 +6,17 @@
 //#include <systemc.h>
 #include <cmath>
 
+//MICRON Mobile LPDDR
 #define READ_PIPELINE
 #define DDR2
 #define REF_TIME    6400000 //#cycle @ 100MHz (10ns)
 #define REF_CYCLE   8192
-#define CL          10	//ns
-#define CWL         10	//ns
-#define tRAS        12000   // Active to Precharge
-#define tRP         10       // Precharge to Active ns
-#define DRAM_CLK	6		// NS
+#define CL          15	//ns
+#define CWL         15	//ns
+#define tRAS        40   // Active to Precharge
+#define tRP         15       // Precharge to Active ns
+#define tRCD        15       // RAS to CAS ns
+#define DRAM_CLK	5		// NS
 
 inline const uint32_t mask(uint32_t msb, uint32_t lsb)
 {

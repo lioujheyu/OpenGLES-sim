@@ -39,7 +39,7 @@ DRAM::DRAM(uint32_t mapping_size)
 
 	dw_bit = 0;
 	bank_bit = 0;
-	col_bit = 15;
+	col_bit = 10;
 	row_bit = log2(mapping_size/(pow(2,col_bit) * pow(2,bank_bit) * pow(2, dw_bit)));
 	precharge_counter = 0;
 

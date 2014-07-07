@@ -437,10 +437,10 @@ uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
 				for (int s=0; s<TEX_CACHE_BLOCK_SIZE_ROOT; s++) {
 
 					uint32_t imagePos = (y + t)*tex_ptr->widthLevel[levelCount] + x+s;
-					gpu.dram_128m.write(*(tex_ptr->data[levelCount] + imagePos*4), pos, 1);
-					gpu.dram_128m.write(*(tex_ptr->data[levelCount] + imagePos*4+1), pos+1, 1);
-					gpu.dram_128m.write(*(tex_ptr->data[levelCount] + imagePos*4+2), pos+2, 1);
-					gpu.dram_128m.write(*(tex_ptr->data[levelCount] + imagePos*4+3), pos+3, 1);
+					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4), pos, 1);
+					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4+1), pos+1, 1);
+					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4+2), pos+2, 1);
+					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4+3), pos+3, 1);
 					pos+=4;
 				}
 				}
@@ -452,10 +452,10 @@ uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
 				 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount]);
 				 dataCount++) {
 
-				gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
-				gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
-				gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
-				gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
+				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
+				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
+				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
+				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
 				pos+=4;
 			}
 		}
@@ -464,10 +464,10 @@ uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
 			 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount]);
 			 dataCount++) {
 
-			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
-			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
-			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
-			gpu.dram_128m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
+			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
+			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
+			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
+			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
 			pos+=4;
 		}
 #endif // IMAGE_MEMORY_OPTIMIZE
