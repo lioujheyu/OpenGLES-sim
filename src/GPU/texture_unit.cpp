@@ -146,7 +146,10 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 	 + (u>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG) )*TEX_CACHE_BLOCK_SIZE*4;
 
 	for (i=0; i<TEX_CACHE_BLOCK_SIZE; i++) {
-		dram->LocalAccess(false, (size_t)texTmpPtr+i*4, tmpData, 4, TEX_CACHE_BLOCK_SIZE-i);
+		if (TEX_CACHE_BLOCK_SIZE > 16) // Limit maximum burst length to 16
+			dram->LocalAccess(false, (size_t)texTmpPtr+i*4, tmpData, 4, 16-(i&0xf));
+		else
+			dram->LocalAccess(false, (size_t)texTmpPtr+i*4, tmpData, 4, TEX_CACHE_BLOCK_SIZE-i);
 		TexCache.color[entry][i][tWay].r = (float)(tmpData&0xff)/255;
 		TexCache.color[entry][i][tWay].g = (float)((tmpData>>8)&0xff)/255;
 		TexCache.color[entry][i][tWay].b = (float)((tmpData>>16)&0xff)/255;
@@ -159,8 +162,10 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 						CalcTexAdd(U_Super,U_Block,i,
 								   V_Super,V_Block,j,
 								   targetImage->widthLevel[level]) * 4;
-
-			dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, TEX_CACHE_BLOCK_SIZE_ROOT-i);
+			if (TEX_CACHE_BLOCK_SIZE_ROOT > 16) // Limit maximum burst length to 16
+				dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 16-(i&0xf));
+			else
+				dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, TEX_CACHE_BLOCK_SIZE_ROOT-i);
 //			dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 1);
 			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r =
 				(float)(tmpData&0xff)/255;

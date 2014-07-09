@@ -774,20 +774,18 @@ void tutorial4()
     shader.unbind();
 }
 
-
-
 int main()
 {
     //Initial a new context, need to be hidden after egl or other context library is imported.
     Context::SetCurrentContext(new Context());
 
-	draw_road();
-//	draw_cubemap();
-//	draw_banana();
 //	draw_teapot();
+//	draw_banana();
+	draw_road();
+//	ParallaxOcclusionMapping();
+//	draw_cubemap();
 //	tutorial3();
 //	tutorial4();
-//	ParallaxOcclusionMapping();
 
 	Context::GetCurrentContext()->DumpImage(0);
 //	printf("test");
