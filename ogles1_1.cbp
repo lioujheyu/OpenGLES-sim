@@ -58,8 +58,6 @@
 		<Unit filename="src/GPU/rasterizer.cpp" />
 		<Unit filename="src/GPU/shader_core.cpp" />
 		<Unit filename="src/GPU/shader_core.h" />
-		<Unit filename="src/GPU/shader_core_scalar.cpp" />
-		<Unit filename="src/GPU/shader_core_scalar.h" />
 		<Unit filename="src/GPU/texture_unit.cpp" />
 		<Unit filename="src/GPU/texture_unit.h" />
 		<Unit filename="src/common.h" />
