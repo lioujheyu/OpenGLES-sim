@@ -50,6 +50,7 @@ void GPU_Core::Run()
 		//Vertex-based operation starts here
 		///@todo Task scheduler for auto job dispatch
         VertexShaderEXE(0, &curVtx);
+
         PrimitiveAssembly();
 
         //Primitive-based operation starts here
@@ -120,6 +121,11 @@ void GPU_Core::Run()
 			  (float)(totalProcessingPix - totalGhostPix)/totalProcessingPix);
 	GPUPRINTF("Final living pixel: %d\n\n",totalLivePix);
 
+	GPUPRINTF("Texture memory access: %d\n",dram_64m.accessB);
+	GPUPRINTF("Texture memory access time: %.2f ns\n\n",dram_64m.accessTime);
+	GPUPRINTF("Texture memory access: %.2f MB\n",(float)dram_64m.accessB/1024/1024);
+	GPUPRINTF("Texture memory access time: %.2f ms\n\n",dram_64m.accessTime/1000/1000);
+
     GPUPRINTF("Texture cache hit: %d\n",sCore[1].texUnit.hit);
     GPUPRINTF("Texture cache miss: %d\n",sCore[1].texUnit.miss);
     GPUPRINTF("Texture cache miss rate: %f\n\n",
@@ -143,8 +149,10 @@ void GPU_Core::Run()
 
 }
 
-GPU_Core::GPU_Core()
+GPU_Core::GPU_Core() : sCore({&dram_64m, &dram_64m})
 {
+	//dram_128m("128MB", 0x8000000);
+
 	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
 		attrEnable[i] = false;
 		varyEnable[i] = false;
@@ -188,9 +196,9 @@ GPU_Core::~GPU_Core()
 #endif //TEXEL_INFO && TEXEL_INFO_FILE
 }
 
-void GPU_Core::FetchVertexData(unsigned int vCnt)
+void GPU_Core::FetchVertexData(uint32_t vCnt)
 {
-	unsigned int vIdx;
+	uint32_t vIdx;
 
 	//Get vertex index
 	if (vtxInputMode == 0) //drawArray
@@ -198,13 +206,13 @@ void GPU_Core::FetchVertexData(unsigned int vCnt)
 	else { //drawElements
 		switch (vtxIndicesType) {
 		case GL_UNSIGNED_BYTE:
-			vIdx = *( (unsigned char*)vtxIndicesPointer + vCnt );
+			vIdx = *( (uint8_t*)vtxIndicesPointer + vCnt );
 			break;
 		case GL_UNSIGNED_SHORT:
 			vIdx = *( (unsigned short*)vtxIndicesPointer + vCnt );
 			break;
 		case GL_UNSIGNED_INT:
-			vIdx = *( (unsigned int*)vtxIndicesPointer + vCnt );
+			vIdx = *( (uint32_t*)vtxIndicesPointer + vCnt );
 			break;
 		}
 	}

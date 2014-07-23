@@ -58,8 +58,8 @@ extern unsigned int shaderType;
 %token <sval> XYZW_SWIZZLE RGBA_SWIZZLE
 %token <ival> REG
 
-%type <ival> opModifierItem interpModifier
-%type <sval> component xyzwComponent rgbaComponent swizzleSuffix
+%type <ival> opModifierItem interpModifier 
+%type <ival> component xyzwComponent rgbaComponent swizzleSuffix
 
 %type <fval> constantScalar
 %type <ival> texImageUnit
@@ -407,7 +407,7 @@ instOperandBase
 			else // Fragment shader
 				t_operand.id = $6 + 1;
 			t_operand.type = INST_ATTRIB;
-			strncpy(t_operand.modifier, $8, 5);
+			t_operand.modifier = $8;
 			if ($1[0] == '-')
 				t_operand.inverse = true;
 		};
@@ -422,20 +422,20 @@ instOperandBase
 				t_operand.id = t_program.srcUniform[t_program.asmFSIdx[$4].name].idx + idx;
 			}
 			t_operand.type = INST_UNIFORM;
-			strncpy(t_operand.modifier, $6, 5);
+			t_operand.modifier = $6;
 			if ($1[0] == '-')
 				t_operand.inverse = true;
 		};
 	|	optSign REG swizzleSuffix {
 			t_operand.id = $2;
 			t_operand.type = INST_REG;
-			strncpy(t_operand.modifier, $3, 5);
+			t_operand.modifier = $3;
 			if ($1[0] == '-')
 				t_operand.inverse = true;
 		};
 	|	optSign constantVector swizzleSuffix {
 			t_operand.type = INST_CONSTANT;
-			strncpy(t_operand.modifier, $3, 5);
+			t_operand.modifier = $3;
 			if ($1[0] == '-')
 				t_operand.inverse = true;
 		};
@@ -457,21 +457,21 @@ instResultBase
 	:	REG swizzleSuffix {
 			t_operand.id = $1;
 			t_operand.type = INST_REG;
-			strncpy(t_operand.modifier, $2, 5);
+			t_operand.modifier = $2;
 		};
 	|	RESULT '.' POSITION swizzleSuffix {
 			t_operand.id = 0;
 			t_operand.type = INST_ATTRIB;
-			strncpy(t_operand.modifier, $4, 5);
+			t_operand.modifier = $4;
 		};
 	|	RESULT '.' ATTRIB '[' INTEGER ']' swizzleSuffix {
 			t_operand.id = $5 + 1;
 			t_operand.type = INST_ATTRIB;
-			strncpy(t_operand.modifier, $7, 5);
+			t_operand.modifier = $7;
 		};
 	|	RESULT_COLOR0 swizzleSuffix {
 			t_operand.type = INST_COLOR;
-			strncpy(t_operand.modifier, $2, 5);
+			t_operand.modifier = $2;
 		};
 	;
 
@@ -479,7 +479,7 @@ ccMask: '(' ccTest ')'
 
 ccTest: CCMASKRULE swizzleSuffix {
 		t_operand.ccMask = $1;
-		strncpy(t_operand.ccModifier, $2, 5);
+		t_operand.ccModifier = $2;
 	}
 
 constantVector: '{' constantVectorList '}'
@@ -512,10 +512,52 @@ constantScalar
 	;
 
 swizzleSuffix
-	:	/* empty */			{strcpy($$, "xyzw");}
-	|	'.' component		{strcpy($$, $2);}
-	|	'.' XYZW_SWIZZLE	{strcpy($$, $2);}
-	|	'.' RGBA_SWIZZLE	{strcpy($$, $2);}
+	:	/* empty */			{$$ = 0x8421;} // w=b1000(w) z=b0100(z) y=0010(y) x=0001(x)
+	|	'.' component		{$$ = $2;}
+	|	'.' XYZW_SWIZZLE	{
+			$$ = 0;
+			for (int i=0; i<4; i++) {
+				if ($2[i] == '/0')
+					break;
+					
+				switch ($2[i]) {
+				case 'x':
+					$$ = $$ | (0x1 << i*4);
+					break;
+				case 'y':
+					$$ = $$ | (0x2 << i*4);
+					break;
+				case 'z':
+					$$ = $$ | (0x4 << i*4);
+					break;
+				case 'w':
+					$$ = $$ | (0x8 << i*4);
+					break;
+				}
+			}
+		}
+	|	'.' RGBA_SWIZZLE	{
+			$$ = 0;
+			for (int i=0; i<4; i++) {
+				if ($2[i] == '/0')
+					break;
+					
+				switch ($2[i]) {
+				case 'r':
+					$$ = $$ | (0x1 << i*4);
+					break;
+				case 'g':
+					$$ = $$ | (0x2 << i*4);
+					break;
+				case 'b':
+					$$ = $$ | (0x4 << i*4);
+					break;
+				case 'a':
+					$$ = $$ | (0x8 << i*4);
+					break;
+				}
+			}
+		}
 	;
 
 extendedSwizzle: extSwizComp ',' extSwizComp ',' extSwizComp ',' extSwizComp
@@ -533,22 +575,22 @@ xyzwExtSwizSel
 rgbaExtSwizSel: rgbaComponent
 
 component
-	:	xyzwComponent {strcpy($$, $1);}
-	|	rgbaComponent {strcpy($$, $1);}
+	:	xyzwComponent {$$ = $1;}
+	|	rgbaComponent {$$ = $1;}
 	;
 
 xyzwComponent
-	:	'x'	{$$[0] = 'x'; $$[1] = '\0';};
-	|	'y' {$$[0] = 'y'; $$[1] = '\0';};
-	|	'z' {$$[0] = 'z'; $$[1] = '\0';};
-	|	'w' {$$[0] = 'w'; $$[1] = '\0';};
-	;
-
+	:	'x'	{$$ = 0x1;};
+	|	'y' {$$ = 0x2;};
+	|	'z' {$$ = 0x4;};
+	|	'w' {$$ = 0x8;};
+	;        
+             
 rgbaComponent
-	:	'r' {$$[0] = 'r'; $$[1] = '\0';};
-	|	'g' {$$[0] = 'g'; $$[1] = '\0';};
-	|	'b' {$$[0] = 'b'; $$[1] = '\0';};
-	|	'a' {$$[0] = 'a'; $$[1] = '\0';};
+	:	'r' {$$ = 0x1;};
+	|	'g' {$$ = 0x2;};
+	|	'b' {$$ = 0x4;};
+	|	'a' {$$ = 0x8;};
 	;
 	
 optSign

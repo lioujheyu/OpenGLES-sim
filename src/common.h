@@ -29,6 +29,7 @@
 #include <cstdint>
 
 #include "GPU/gpu_config.h"
+#include "GPU/instruction_def.h"
 
 #ifdef USE_SSE
 #	include <x86intrin.h>
@@ -545,10 +546,10 @@ struct operand
 	int id;
 	int type;
 	int ccMask;
-	char ccModifier[5];
+	int ccModifier;
 	bool abs;
 	bool inverse;
-	char modifier[5];
+	int modifier;
 	floatVec4 val;
 
 	inline operand() { Init(); }
@@ -558,20 +559,64 @@ struct operand
 		id = 0;
 		type = 0;
 		ccMask = 0;
-		ccModifier[0] = '\0';
+		ccModifier = 0;
 		abs = false;
 		inverse = false;
-		modifier[0] = '\0';
+		modifier = 0;
 		val.x = val.y = val.z = val.w = 0;
 	}
 
-	void print()
+	void Print()
 	{
-		if (type != 0) {
-			if (inverse)
-				printf(" -%d[%d].%s", type, id, modifier);
-			else
-				printf(" %d[%d].%s", type, id, modifier);
+		if (type != INST_NO_TYPE) {
+			if (type == INST_CONSTANT) {
+				printf(" (%f %f %f %f)",val.x,val.y,val.z,val.w);
+			}
+			else {
+				if (inverse)
+					printf(" -%d[%d].%x", type, id, modifier);
+				else
+					printf(" %d[%d].%x", type, id, modifier);
+			}
+		}
+	}
+};
+
+struct scalarOperand
+{
+	int id;
+	int type;
+	int ccMask;
+	int ccModifier;
+	bool abs;
+	bool inverse;
+	float val;
+
+	inline scalarOperand() { Init(); }
+
+	inline void Init()
+	{
+		id = 0;
+		type = 0;
+		ccMask = 0;
+		ccModifier = 0;
+		abs = false;
+		inverse = false;
+		val = 0;
+	}
+
+	void Print()
+	{
+		if (type != INST_NO_TYPE) {
+			if (type == INST_CONSTANT) {
+				printf(" (%f)",val);
+			}
+			else {
+				if (inverse)
+					printf(" -%d[%d]", type, id);
+				else
+					printf(" %d[%d]", type, id);
+			}
 		}
 	}
 };
@@ -604,17 +649,53 @@ struct instruction
 		printf("%d.",op);
 		for (unsigned int i=0; i<12; i++)
 			printf("%d",(opModifiers[i])?1:0);
-		dst.print();
-		src[0].print();
-		src[1].print();
-		src[2].print();
+		dst.Print();
+		src[0].Print();
+		src[1].Print();
+		src[2].Print();
 		if (tid != -1)
 			printf(" Tex%d.%d", tid, tType);
 		printf("\n");
 	}
 };
 
+struct scalarInstruction
+{
+	int op;
+	bool opModifiers[12];
+	scalarOperand dst;
+	scalarOperand src[3];
+	int tid, tType;
 
+	inline scalarInstruction() { Init(); }
+
+	inline void Init()
+	{
+		op = 0;
+		for (unsigned int i=0; i<12; i++)
+			opModifiers[i] = false;
+		tid = -1;
+		tType = 0;
+		dst.Init();
+		src[0].Init();
+		src[1].Init();
+		src[2].Init();
+	}
+
+	void Print()
+	{
+		printf("%d.",op);
+		for (unsigned int i=0; i<12; i++)
+			printf("%d",(opModifiers[i])?1:0);
+		dst.Print();
+		src[0].Print();
+		src[1].Print();
+		src[2].Print();
+		if (tid != -1)
+			printf(" Tex%d.%d", tid, tType);
+		printf("\n");
+	}
+};
 
 template <typename T> const T& MIN3(const T& a, const T& b, const T& c)
 {

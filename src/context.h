@@ -290,7 +290,7 @@ public:
     static void         SetCurrentContext(Context * context);
     static Context *    GetCurrentContext();
     void                RecordError(GLenum error);
-    void                DumpImage();
+    void                DumpImage(int mode);
     ///@}
 
 	/// @name OpenGL ES 2.0 API

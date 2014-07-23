@@ -24,10 +24,10 @@
 
 void BilinearFilter4MipMap(textureImage *texImage)
 {
-	unsigned int width, height;
-	unsigned int nextWidth, nextHeight;
+	uint32_t width, height;
+	uint32_t nextWidth, nextHeight;
 
-	unsigned char * image;
+	uint8_t * image;
 
 	fixColor4 texel[4], texelAvg;
 	width = texImage->widthLevel[0];
@@ -42,10 +42,10 @@ void BilinearFilter4MipMap(textureImage *texImage)
 		nextWidth = texImage->widthLevel[i+1] = width >> 1;
 		nextHeight = texImage->heightLevel[i+1] = height >> 1;
 
-		image = new unsigned char[nextWidth * nextHeight * 4];
+		image = new uint8_t[nextWidth * nextHeight * 4];
 
-		for (unsigned int y=0;y<nextHeight;y++) {
-			for (unsigned int x=0;x<nextWidth;x++) {
+		for (uint32_t y=0;y<nextHeight;y++) {
+			for (uint32_t x=0;x<nextWidth;x++) {
 				texel[0].r = *(texImage->data[i] + (2*y*width + 2*x)*4    );
 				texel[0].g = *(texImage->data[i] + (2*y*width + 2*x)*4 + 1);
 				texel[0].b = *(texImage->data[i] + (2*y*width + 2*x)*4 + 2);
@@ -66,10 +66,10 @@ void BilinearFilter4MipMap(textureImage *texImage)
 				texel[3].b = *(texImage->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 2);
 				texel[3].a = *(texImage->data[i] + ((2*y+1)*width + 2*x + 1)*4 + 3);
 
-				texelAvg.r = (unsigned char)((int)(texel[0].r + texel[1].r + texel[2].r + texel[3].r)/4);
-				texelAvg.g = (unsigned char)((int)(texel[0].g + texel[1].g + texel[2].g + texel[3].g)/4);
-				texelAvg.b = (unsigned char)((int)(texel[0].b + texel[1].b + texel[2].b + texel[3].b)/4);
-				texelAvg.a = (unsigned char)((int)(texel[0].a + texel[1].a + texel[2].a + texel[3].a)/4);
+				texelAvg.r = (uint8_t)((int)(texel[0].r + texel[1].r + texel[2].r + texel[3].r)/4);
+				texelAvg.g = (uint8_t)((int)(texel[0].g + texel[1].g + texel[2].g + texel[3].g)/4);
+				texelAvg.b = (uint8_t)((int)(texel[0].b + texel[1].b + texel[2].b + texel[3].b)/4);
+				texelAvg.a = (uint8_t)((int)(texel[0].a + texel[1].a + texel[2].a + texel[3].a)/4);
 
 				image[(y*nextWidth+x)*4    ] = texelAvg.r;
 				image[(y*nextWidth+x)*4 + 1] = texelAvg.g;
@@ -99,7 +99,7 @@ void BilinearFilter4MipMap(textureImage *texImage)
 void GenMipMap(int tid, GLenum target)
 {
 	Context * ctx = Context::GetCurrentContext();
-	unsigned int texObjID = ctx->texCtx[tid].texObjBindID;
+	uint32_t texObjID = ctx->texCtx[tid].texObjBindID;
 
 	switch (target) {
 	case GL_TEXTURE_2D:
@@ -131,10 +131,351 @@ void ActiveGPU2CleanBuffer()
     gpu.clearDepth = ctx->clearDepth;
     gpu.viewPortW = ctx->vp.w;
     gpu.viewPortH = ctx->vp.h;
-    gpu.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
+    gpu.cBufPtr = (uint8_t*)ctx->drawBuffer[0];
     gpu.dBufPtr = (float*)ctx->drawBuffer[1];
 
     gpu.Run();
+}
+
+int CheckSwizzleModifier(int modifier)
+{
+	if ( (modifier&0xf) == 0x0)
+		return NO_MODIFIER;
+	else if ( (modifier&0xf) == 0x1)
+		return 0;
+	else if ( (modifier&0xf) == 0x2)
+		return 1;
+	else if ( (modifier&0xf) == 0x4)
+		return 2;
+	else if ( (modifier&0xf) == 0x8)
+		return 3;
+	else {
+		printf("CheckSwizzleModifier: Swizzle rule undefied!!\n");
+		return -2;
+	}
+}
+
+int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool)
+{
+	int cnt;
+	scalarInstruction ts_instruction;
+
+	switch (in.op) {
+	//undefined or unimplemented
+//	case OP_LIT:
+//	case OP_NOT:
+//	case OP_NRM:
+//	case OP_PK2H:
+//	case OP_PK2US:
+//	case OP_PK4B:
+//	case OP_PK4UB:
+//	case OP_SSG:
+//	case OP_COS:
+//	case OP_EX2:
+//	case OP_LG2;
+//	case OP_RCC:
+//	case OP_SCS:
+//	case OP_SIN:
+//	case OP_UP2H:
+//	case OP_UP2US:
+//	case OP_UP4B:
+//	case OP_UP4UB:
+//	case OP_DPH:
+//	case OP_OR:
+//	case OP_RFL:
+//	case OP_SFL:
+//	case OP_STR:
+//	case OP_XPD:
+//	case OP_XOR:
+//	case OP_CMP:
+//	case OP_LRP:
+//	case OP_SAD:
+//	case OP_X2D:
+//	case OP_TXB:
+//	case OP_TXP:
+//	case OP_TXQ:
+
+	//Direct translation
+	case OP_ABS:	case OP_CEIL:	case OP_FLR:	case OP_FRC:
+	case OP_I2F:	case OP_MOV:	case OP_ROUND:	case OP_TRUNC:
+	case OP_RCP:	case OP_ADD:	case OP_AND:	case OP_DIV:
+	case OP_MAX:	case OP_MIN:	case OP_MUL:	case OP_SEQ:
+	case OP_SGE:	case OP_SGT:	case OP_SLE:	case OP_SLT:
+	case OP_SNE:	case OP_SUB:	case OP_MAD:	case OP_DDX:
+	case OP_DDY:
+		for (int cnt=0; cnt<4; cnt++) {
+			//check dst operand's each modifier zone to make sure this scalar part is activated.
+			if (CheckSwizzleModifier(in.dst.modifier>>cnt*4) != NO_MODIFIER) {
+				ts_instruction.Init();
+
+				ts_instruction.op = in.op;
+				for (int i=0; i<12; i++)
+					ts_instruction.opModifiers[i] = in.opModifiers[i];
+				ts_instruction.tid = in.tid;
+				ts_instruction.tType = in.tType;
+
+				ts_instruction.dst.id =
+					in.dst.id*4 + CheckSwizzleModifier(in.dst.modifier>>cnt*4);
+				ts_instruction.dst.type = in.dst.type;
+				ts_instruction.dst.ccMask = in.dst.ccMask;
+				ts_instruction.dst.ccModifier = in.dst.ccModifier;
+				ts_instruction.dst.abs = in.dst.abs;
+				ts_instruction.dst.inverse = in.dst.inverse;
+				//dst operand's val is not necessary to take care.
+
+				for (int i=0; i<3; i++) {
+					if (in.src[i].type == INST_NO_TYPE)
+						continue;
+
+					if (CheckSwizzleModifier(in.src[i].modifier>>cnt*4) == NO_MODIFIER)
+						ts_instruction.src[i].id =
+							in.src[i].id*4 + CheckSwizzleModifier(in.src[i].modifier);
+					else
+						ts_instruction.src[i].id =
+							in.src[i].id*4 + CheckSwizzleModifier(in.src[i].modifier>>cnt*4);
+					ts_instruction.src[i].type = in.src[i].type;
+					ts_instruction.src[i].ccMask = in.src[i].ccMask;
+					ts_instruction.src[i].ccModifier = in.src[i].ccModifier;
+					ts_instruction.src[i].abs = in.src[i].abs;
+					ts_instruction.src[i].inverse = in.src[i].inverse;
+					//decide the instant value from which element of instant vector by the ID.
+					ts_instruction.src[i].val =
+						(ts_instruction.src[i].id == 0)? in.src[i].val.x:
+						(ts_instruction.src[i].id == 1)? in.src[i].val.y:
+						(ts_instruction.src[i].id == 2)? in.src[i].val.z: in.src[i].val.w;
+				}
+
+				ts_instruction.Print();
+				ISpool->assign(ISpool->size() + 1, ts_instruction);
+			}
+			else
+				continue;
+		}
+		break;
+
+//	//Only take care first modifier
+	case OP_REP:
+	case OP_ENDREP:
+	case OP_ELSE:
+	case OP_ENDIF:
+		ts_instruction.Init();
+
+		ts_instruction.op = in.op;
+		for (int i=0; i<12; i++)
+			ts_instruction.opModifiers[i] = in.opModifiers[i];
+
+		ts_instruction.src[0].type = in.src[0].type;
+		ts_instruction.src[0].ccMask = in.src[0].ccMask;
+		ts_instruction.src[0].ccModifier = in.src[0].ccModifier;
+		ts_instruction.src[0].abs = in.src[0].abs;
+		ts_instruction.src[0].inverse = in.src[0].inverse;
+		//decide which instant value element from the calculated ID before.
+		ts_instruction.src[0].val =
+			(ts_instruction.src[0].id == 0)? in.src[0].val.x:
+			(ts_instruction.src[0].id == 1)? in.src[0].val.y:
+			(ts_instruction.src[0].id == 2)? in.src[0].val.z: in.src[0].val.w;
+
+		ts_instruction.Print();
+		ISpool->assign(ISpool->size() + 1, ts_instruction);
+
+		break;
+//
+//	//Indirect translation
+//	//move after executing
+//	case OP_RCP:
+//		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w = (1/src[idx][0].x);
+//		break;
+//	case OP_RSQ:	//Reciprocal square root
+//		//dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w = 1/sqrt(src[idx][0].x);
+//		dst[idx] = floatVec4( Q_rsqrt(src[idx][0].x) );
+//		break;
+//	case OP_POW:
+//		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
+//			pow(src[idx][0].x, src[idx][1].x);
+//		break;
+//	//Dot series, MUL MAD, and ADD are involved
+//	case OP_DP2:
+//		dst[idx] = src[idx][0] * src[idx][1];
+//		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
+//			(dst[idx].x + dst[idx].y);
+//		break;
+//	case OP_DP3:
+//		dst[idx] = src[idx][0] * src[idx][1];
+//		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
+//			(dst[idx].x + dst[idx].y + dst[idx].z);
+//		break;
+//	case OP_DP4:
+//		dst[idx] = floatVec4( dot(src[idx][0], src[idx][1]) );
+//		break;
+//	case OP_DST:	//Distance vector
+//		dst[idx].x = 1.0;
+//		dst[idx].y = src[idx][0].y * src[idx][1].y;
+//		dst[idx].z = src[idx][0].z;
+//		dst[idx].w = src[idx][1].w;
+//		break;
+//	case OP_DP2A:
+//		{
+//			float dot;
+//			dot = (src[idx][0].x * src[idx][1].x) + (src[idx][0].y * src[idx][1].y) + src[idx][2].x;
+//			dst[idx] = floatVec4(dot);
+//			break;
+//		}
+//		break;
+//	//Texture mapping series, need a new instruction format to fit these long instruction
+//	case OP_TEX:
+//		if (idx == 0 || idx == 1) {
+//			scaleFacDX = src[1][0] - src[0][0];
+//			scaleFacDY = src[idx+2][0] - src[idx][0];
+//		}
+//		else {
+//			scaleFacDX = src[3][0] - src[2][0];
+//			scaleFacDY = src[idx][0] - src[idx-2][0];
+//		}
+//		dst[idx] = texUnit.TextureSample(src[idx][0],
+//										 -1,
+//										 scaleFacDX,
+//										 scaleFacDY,
+//										 curInst.tType,
+//										 tid );
+//		break;
+//
+//	case OP_TXF:
+//		dst[idx] = texUnit.GetTexColor(src[idx][0], 0, tid);
+//		break;
+//	case OP_TXL:
+//		dst[idx] = texUnit.TextureSample(src[idx][0],
+//										 src[idx][0].w,
+//										 floatVec4(0.0, 0.0, 0.0, 0.0),
+//										 floatVec4(0.0, 0.0, 0.0, 0.0),
+//										 curInst.tType,
+//										 tid );
+//		break;
+//	case OP_TXD:
+//		dst[idx] = texUnit.TextureSample(src[idx][0],
+//										 -1,
+//										 src[idx][1],
+//										 src[idx][2],
+//										 curInst.tType,
+//										 tid );
+//		break;
+//	//IFop
+//	case OP_IF:
+//		totalScaleOperation+=1;
+//		switch (curInst.src[0].ccMask) {
+//		case CC_EQ: case CC_EQ0: case CC_EQ1:
+//			curCCState[idx] = curCCState[idx] &&
+//				( (!(src[idx][0].x == 1.0) && (src[idx][1].x == 1.0)) ||
+//				  (!(src[idx][0].y == 1.0) && (src[idx][1].y == 1.0)) ||
+//				  (!(src[idx][0].z == 1.0) && (src[idx][1].z == 1.0)) ||
+//				  (!(src[idx][0].w == 1.0) && (src[idx][1].w == 1.0)) );
+//			break;
+//
+//		case CC_NE: case CC_NE0: case CC_NE1:
+//			curCCState[idx] = curCCState[idx] &&
+//				( ((src[idx][0].x == 1.0) || !(src[idx][1].x == 1.0)) ||
+//				  ((src[idx][0].y == 1.0) || !(src[idx][1].y == 1.0)) ||
+//				  ((src[idx][0].z == 1.0) || !(src[idx][1].z == 1.0)) ||
+//				  ((src[idx][0].w == 1.0) || !(src[idx][1].w == 1.0)) );
+//			break;
+//
+//		default:
+//			printf("Shader: undefined or unimplemented ccMask:%d\n",
+//					curInst.src[0].ccMask);
+//			break;
+//		}
+//
+//		ccStack[idx].push(curCCState[idx]);
+//		break;
+//	//KILop
+//	case OP_KIL:
+//		switch (curInst.src[0].ccMask) {
+//		case CC_EQ: case CC_EQ0: case CC_EQ1:
+//			thread[idx].isKilled = curCCState[idx] &&
+//				( (!(src[idx][0].x == 1.0) && (src[idx][1].x == 1.0)) ||
+//				  (!(src[idx][0].y == 1.0) && (src[idx][1].y == 1.0)) ||
+//				  (!(src[idx][0].z == 1.0) && (src[idx][1].z == 1.0)) ||
+//				  (!(src[idx][0].w == 1.0) && (src[idx][1].w == 1.0)) );
+//			break;
+//
+//		case CC_NE: case CC_NE0: case CC_NE1:
+//			thread[idx].isKilled = curCCState[idx] &&
+//				( ((src[idx][0].x == 1.0) || !(src[idx][1].x == 1.0)) ||
+//				  ((src[idx][0].y == 1.0) || !(src[idx][1].y == 1.0)) ||
+//				  ((src[idx][0].z == 1.0) || !(src[idx][1].z == 1.0)) ||
+//				  ((src[idx][0].w == 1.0) || !(src[idx][1].w == 1.0)) );
+//			break;
+//
+//		default:
+//			printf("Shader: undefined or unimplemented ccMask:%d\n",
+//					curInst.src[0].ccMask);
+//			break;
+//		}
+//		break;
+//
+//	default:
+//		fprintf(stderr,
+//			"Shader: Undefined or unimplemented OPcode: %x\n",curInst.op);
+//		break;
+//	}
+
+
+	}
+}
+
+uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
+{
+	uint32_t pos = dram_ptr;
+	uint32_t pos_tmp;
+	for (int levelCount=0; levelCount<=tex_ptr->maxLevel; levelCount++) {
+		pos_tmp = pos;
+
+#ifdef IMAGE_MEMORY_OPTIMIZE//Block-based memory rearrangement for 6D cache architecture
+		if (tex_ptr->heightLevel[levelCount] >= TEX_CACHE_BLOCK_SIZE_ROOT) {
+			for (int y=0; y<tex_ptr->heightLevel[levelCount]; y+=TEX_CACHE_BLOCK_SIZE_ROOT) {
+			for (int x=0; x<tex_ptr->widthLevel[levelCount]; x+=TEX_CACHE_BLOCK_SIZE_ROOT) {
+				for (int t=0; t<TEX_CACHE_BLOCK_SIZE_ROOT; t++) {
+				for (int s=0; s<TEX_CACHE_BLOCK_SIZE_ROOT; s++) {
+
+					uint32_t imagePos = (y + t)*tex_ptr->widthLevel[levelCount] + x+s;
+					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4), pos, 1);
+					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4+1), pos+1, 1);
+					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4+2), pos+2, 1);
+					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4+3), pos+3, 1);
+					pos+=4;
+				}
+				}
+			}
+			}
+		}
+		else { //tex_ptr->heightLevel[levelCount] < TEX_CACHE_BLOCK_SIZE_ROOT
+			for (uint32_t dataCount=0;
+				 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount]);
+				 dataCount++) {
+
+				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
+				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
+				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
+				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
+				pos+=4;
+			}
+		}
+#else // No IMAGE_MEMORY_OPTIMIZE
+		for (uint32_t dataCount=0;
+			 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount]);
+			 dataCount++) {
+
+			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
+			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
+			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
+			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
+			pos+=4;
+		}
+#endif // IMAGE_MEMORY_OPTIMIZE
+
+		tex_ptr->data[levelCount] = (uint8_t* )pos_tmp;
+	}
+
+	return pos;
 }
 
 /**	@todo Use link-list or command buffer to set the states only when they
@@ -142,8 +483,12 @@ void ActiveGPU2CleanBuffer()
  */
 void ActiveGPU(int vtxInputMode)
 {
+	uint32_t dram_ptr = 0x0;
+
     Context *ctx = Context::GetCurrentContext();
     programObject *t_program = &ctx->programPool[ctx->usePID];
+
+	std::vector<scalarInstruction> scalarISpool;
 
     for (int i=0;i<MAX_TEXTURE_CONTEXT;i++){
 		if (ctx->texCtx[i].genMipMap2D)
@@ -198,7 +543,7 @@ void ActiveGPU(int vtxInputMode)
 
     gpu.blendEnable = ctx->blendEnable;
     gpu.depthTestEnable = ctx->depthTestEnable;
-    gpu.cBufPtr = (unsigned char*)ctx->drawBuffer[0];
+    gpu.cBufPtr = (uint8_t*)ctx->drawBuffer[0];
     gpu.dBufPtr = (float*)ctx->drawBuffer[1];
 
     //Texture Statement
@@ -209,6 +554,7 @@ void ActiveGPU(int vtxInputMode)
 		gpu.wrapT[i] = ctx->texCtx[ctx->samplePool[i]].wrapT;
 		gpu.maxAnisoFilterRatio = ctx->texCtx[ctx->samplePool[i]].maxAnisoFilterRatio;
 		gpu.tex2D[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].tex2D;
+		dram_ptr = CopyTexData2Dram(&gpu.tex2D[i], dram_ptr);
 		gpu.texCubeNX[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNX;
 		gpu.texCubeNY[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNY;
 		gpu.texCubeNZ[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNZ;
@@ -225,13 +571,19 @@ void ActiveGPU(int vtxInputMode)
  */
 	gpu.VSinstCnt = t_program->VSinstructionPool.size();
 	gpu.VSinstPool = new instruction[gpu.VSinstCnt];
-	for (int i=0; i<gpu.VSinstCnt; i++)
+	for (int i=0; i<gpu.VSinstCnt; i++) {
 		*(gpu.VSinstPool + i) = t_program->VSinstructionPool[i];
+		//NVGP4toScalar(t_program->VSinstructionPool[i], &scalarISpool);
+	}
 
 	gpu.FSinstCnt = t_program->FSinstructionPool.size();
 	gpu.FSinstPool = new instruction[gpu.FSinstCnt];
-	for (int i=0; i<gpu.FSinstCnt; i++)
+	for (int i=0; i<gpu.FSinstCnt; i++) {
 		*(gpu.FSinstPool + i) = t_program->FSinstructionPool[i];
+		//NVGP4toScalar(t_program->FSinstructionPool[i], &scalarISpool);
+	}
+
+	printf("On-board Memory usage: %d KB\n",dram_ptr/1024);
 
     gpu.Run();
 }

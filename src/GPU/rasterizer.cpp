@@ -91,7 +91,7 @@ void GPU_Core::tileSplit(int x, int y, int level)
 		pixelStamp[3].baryCenPos3[0] = cornerTest[7][2]*area2Reciprocal;
 		pixelStamp[3].baryCenPos3[1] = cornerTest[7][0]*area2Reciprocal;
 
-		//Interpolate the all 4 pixel's attributes, then perform perspective correction
+		//Interpolate the all 4 pixel's attributes, then perform perspective division
 
 		floatVec4 invW;
 		for (int i=0; i<4; i++){
@@ -114,8 +114,24 @@ void GPU_Core::tileSplit(int x, int y, int level)
 					prim.v[0].attr[attrCnt] +
 					( prim.v[1].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[0] +
 					( prim.v[2].attr[attrCnt] - prim.v[0].attr[attrCnt] )*pixelStamp[i].baryCenPos3[1];
-				pixelStamp[i].attr[attrCnt] =
-					pixelStamp[i].attr[attrCnt] * invW;
+
+				/* The normalize modifier here will perform normalization to the
+				 * specified attribute. This step will also avoid additional
+				 * perspective division.
+				 */
+				if (bool(varyInterpMode[attrCnt] & INTERP_NORMALIZE) == true) {
+					float invDistance = pixelStamp[i].attr[attrCnt].x * pixelStamp[i].attr[attrCnt].x +
+										pixelStamp[i].attr[attrCnt].y * pixelStamp[i].attr[attrCnt].y +
+										pixelStamp[i].attr[attrCnt].z * pixelStamp[i].attr[attrCnt].z;
+					invDistance = Q_rsqrt(invDistance);
+					pixelStamp[i].attr[attrCnt] =
+						pixelStamp[i].attr[attrCnt] * invDistance;
+				}
+				else {
+					if (bool(varyInterpMode[attrCnt] & INTERP_NOPERSPECTIVE) == false)
+						pixelStamp[i].attr[attrCnt] =
+							pixelStamp[i].attr[attrCnt] * invW;
+				}
 			}
 		}
 
@@ -280,7 +296,7 @@ void GPU_Core::PerFragmentOp(const pixel &pixInput)
     totalLivePix++;
 }
 
-void GPU_Core::ClearBuffer(unsigned int mask)
+void GPU_Core::ClearBuffer(uint32_t mask)
 {
 	int i;
 	if (mask & GL_COLOR_BUFFER_BIT) {

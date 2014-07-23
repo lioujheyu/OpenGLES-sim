@@ -42,9 +42,8 @@ void ShaderCore::Run()
 	while(PC < instCnt) {
 		curInst = instPool[PC];
 
-		tid = curInst.tid;
-		tType = curInst.tType;
-
+		texID = curInst.tid;
+		texType = curInst.tType;
 /* Each pipeline needs to fetch data before other pipeline write result
  * back when they are in the same instruction. It avoids the barrier-
  * like instruction(DDX, DDY, TEX with auto scale factor computation)'s
@@ -116,8 +115,8 @@ void ShaderCore::Exec(int idx)
 	case OP_ROUND:
 		dst[idx] = fvround(src[idx][0]);
 		break;
-//		case OP_SSG:
-//			break;
+//	case OP_SSG:
+//		break;
 	case OP_TRUNC:
 		dst[idx] = fvtrunc(src[idx][0]);
 		break;
@@ -149,7 +148,7 @@ void ShaderCore::Exec(int idx)
 	case OP_ADD:
 		dst[idx] = src[idx][0] + src[idx][1];
 		break;
-/// @todo Have to rewrite after integer data type been implemented
+/// @todo Have to rewrite after integer data type has been implemented
 	case OP_AND:
 		dst[idx].x = int(src[idx][0].x) & int(src[idx][1].x);
 		dst[idx].y = int(src[idx][0].y) & int(src[idx][1].y);
@@ -273,12 +272,12 @@ void ShaderCore::Exec(int idx)
 										 scaleFacDX,
 										 scaleFacDY,
 										 curInst.tType,
-										 tid );
+										 texID );
 		break;
 //	case OP_TXB:
 //		break;
 	case OP_TXF:
-		dst[idx] = texUnit.GetTexColor(src[idx][0], 0, tid);
+		dst[idx] = texUnit.GetTexColor(src[idx][0], 0, texID);
 		break;
 	case OP_TXL:
 		dst[idx] = texUnit.TextureSample(src[idx][0],
@@ -286,7 +285,7 @@ void ShaderCore::Exec(int idx)
 										 floatVec4(0.0, 0.0, 0.0, 0.0),
 										 floatVec4(0.0, 0.0, 0.0, 0.0),
 										 curInst.tType,
-										 tid );
+										 texID );
 		break;
 //	case OP_TXP:
 //		break;
@@ -299,7 +298,7 @@ void ShaderCore::Exec(int idx)
 										 src[idx][1],
 										 src[idx][2],
 										 curInst.tType,
-										 tid );
+										 texID );
 		break;
 	//BRAop
 	//FLOWCCop
@@ -493,57 +492,55 @@ void ShaderCore::WriteBack(int idx)
 	}
 }
 
-floatVec4 ShaderCore::ReadByMask(const floatVec4 &in, char *mask)
+floatVec4 ShaderCore::ReadByMask(const floatVec4 &in, int mask)
 {
 	floatVec4 temp;
 
-	if (strcmp(mask, "xyzw")==0 || strcmp(mask, "rgba")==0)
+	if (mask == 0x8421) //mask == xyzw or rgba
 		return in;
 
-	temp.x = (mask[0]=='x' || mask[0]=='r')? in.x:
-			 (mask[0]=='y' || mask[0]=='g')? in.y:
-			 (mask[0]=='z' || mask[0]=='b')? in.z:in.w;
+	temp.x = ( (mask&0x000f) == 0x1 )? in.x:
+			 ( (mask&0x000f) == 0x2 )? in.y:
+			 ( (mask&0x000f) == 0x4 )? in.z:in.w;
 
-	if (mask[1] == '\0') {
+	if ((mask&0x00f0) == 0x0) {
 		temp.y = temp.z = temp.w = temp.x;
 		return temp;
 	}
 	else {
-		temp.y = (mask[1]=='x' || mask[1]=='r')? in.x:
-				 (mask[1]=='y' || mask[1]=='g')? in.y:
-				 (mask[1]=='z' || mask[1]=='b')? in.z:in.w;
+		temp.y = ( (mask&0x00f0) == (0x1<<4) )? in.x:
+				 ( (mask&0x00f0) == (0x2<<4) )? in.y:
+				 ( (mask&0x00f0) == (0x4<<4) )? in.z:in.w;
 	}
 
-	if (mask[2] == '\0') {
+	if ((mask&0x0f00) == 0x0) {
 		temp.z = temp.w = temp.y;
 		return temp;
 	}
 	else {
-		temp.z = (mask[2]=='x' || mask[2]=='r')? in.x:
-				 (mask[2]=='y' || mask[2]=='g')? in.y:
-				 (mask[2]=='z' || mask[2]=='b')? in.z:in.w;
+		temp.z = ( (mask&0x0f00) == (0x1<<8) )? in.x:
+				 ( (mask&0x0f00) == (0x2<<8) )? in.y:
+				 ( (mask&0x0f00) == (0x4<<8) )? in.z:in.w;
 	}
 
-	if (mask[3] == '\0') {
+	if ((mask&0xf000) == 0x0) {
 		temp.w = temp.z;
 		return temp;
 	}
 	else {
-		temp.w = (mask[3]=='x' || mask[3]=='r')? in.x:
-				 (mask[3]=='y' || mask[3]=='g')? in.y:
-				 (mask[3]=='z' || mask[3]=='b')? in.z:in.w;
+		temp.w = ( (mask&0xf000) == (0x1<<12) )? in.x:
+				 ( (mask&0xf000) == (0x2<<12) )? in.y:
+				 ( (mask&0xf000) == (0x4<<12) )? in.z:in.w;
 	}
 
 	return temp;
 }
 
-void ShaderCore::WriteByMask(const floatVec4 &val, floatVec4* fvdst, char *mask, int idx)
+void ShaderCore::WriteByMask(const floatVec4 &val, floatVec4* fvdst, int mask, int idx)
 {
 	for (int i=0; i<4; i++) {
-		switch (mask[i]) {
-		case 'x':
-		case 'r':
-			if (fvdst != nullptr)	{
+		if ( ((mask>>i*4)&0xf) == 0x1 ) { // x | r
+			if (fvdst != nullptr) {
 				if(curInst.opModifiers[OPM_SAT])
 					fvdst->x = CLAMP(val.x, 0.0f, 1.0f);
 				else if(curInst.opModifiers[OPM_SSAT])
@@ -561,11 +558,9 @@ void ShaderCore::WriteByMask(const floatVec4 &val, floatVec4* fvdst, char *mask,
 				CCisZero[idx][1].x = (val.x == 0)?1.0:0.0;
 			}
 			totalScaleOperation+=1;
-			break;
-
-		case 'y':
-		case 'g':
-			if (fvdst != nullptr)	{
+		}
+		else if ( ((mask>>i*4)&0xf) == 0x2) { // y | g
+			if (fvdst != nullptr) {
 				if(curInst.opModifiers[OPM_SAT])
 					fvdst->y = CLAMP(val.y, 0.0f, 1.0f);
 				else if(curInst.opModifiers[OPM_SSAT])
@@ -583,10 +578,8 @@ void ShaderCore::WriteByMask(const floatVec4 &val, floatVec4* fvdst, char *mask,
 				CCisZero[idx][1].y = (val.y == 0)?1.0:0.0;
 			}
 			totalScaleOperation+=1;
-			break;
-
-		case 'z':
-		case 'b':
+		}
+		else if ( ((mask>>i*4)&0xf) == 0x4) { // z | b
 			if (fvdst != nullptr)	{
 				if(curInst.opModifiers[OPM_SAT])
 					fvdst->z = CLAMP(val.z, 0.0f, 1.0f);
@@ -605,10 +598,8 @@ void ShaderCore::WriteByMask(const floatVec4 &val, floatVec4* fvdst, char *mask,
 				CCisZero[idx][1].z = (val.z == 0)?1.0:0.0;
 			}
 			totalScaleOperation+=1;
-			break;
-
-		case 'w':
-		case 'a':
+		}
+		else if ( ((mask>>i*4)&0xf) == 0x8) { // w | a
 			if (fvdst != nullptr)	{
 				if(curInst.opModifiers[OPM_SAT])
 					fvdst->w = CLAMP(val.w, 0.0f, 1.0f);
@@ -627,11 +618,9 @@ void ShaderCore::WriteByMask(const floatVec4 &val, floatVec4* fvdst, char *mask,
 				CCisZero[idx][1].w = (val.w == 0)?1.0:0.0;
 			}
 			totalScaleOperation+=1;
-			break;
-
-		default: // '\0'
-			return;
 		}
+		else // '\0'
+			return;
 	}
 }
 

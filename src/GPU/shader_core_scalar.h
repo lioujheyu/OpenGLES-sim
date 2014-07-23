@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- *	@file shader_core.h
- *  @brief Shader Core class
+ *	@file shader_core_scalar.h
+ *  @brief Scalar Shader Core class
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
@@ -47,20 +47,18 @@
 /**
  *	@brief Unified shader core class
  *
- *	Responsible for executing NVGP4 assembly code. It also contains texture_unit
+ *	Respond for executing NVGP4 assembly code. It also contains texture_unit
  *	for TEX instruction execution. Currently, there are four fetch, execution,
  *	and write-back units in one shader core. Such architecture is served for one
  *	purpose - Find partial differential value from adjacent thread. It also has
  *	the ability to get texture scale factor without fixing hardware pipeline's
  *	help. But have a defect that it wastes resource on the ghost pixels which
- *	is already known as fail on edge test.
+ *	has already known as failed on edge test in previous stage.
  */
-class ShaderCore {
+class ScalarShaderCore {
 public:
-	ShaderCore(DRAM *dram) : texUnit(dram)
+	ScalarShaderCore()
 	{
-		this->dram = dram;
-
 		instCnt = 0;
 		totalInstructionCnt = 0;
 		totalScaleOperation = 0;
@@ -95,42 +93,23 @@ public:
 	void FetchData(int idx);
 	void WriteBack(int idx);
 
-/**
- *	Extract the source floatVec4 's component by mask
- *
- *	@param in 	A floatVec4 prepared for component extraction by the mask.
- *	@param mask The component mask
- *
- *	@return A result floatVec4
- */
-	floatVec4 ReadByMask(const floatVec4 &in, int mask);
-
-/**
- *	Write the destination floatVec4's floating component by mask, including CC
- *	register's update if necessary.
- *
- *	@param val		A floatVec4 value prepared for writing.
- *	@param fvdst	The destination floatVec4 's pointer
- *	@param mask 	The component mask.
- */
-	void WriteByMask(const floatVec4 &val, floatVec4 *fvdst, int mask, int idx);
-
 private:
 	int PC; ///<Program Counter
 	instruction	curInst; ///< Current Instruction
 	unitThread thread[4];
+
 	bool curCCState[4]; ///< Current branch condition
 	std::stack<bool> ccStack[4]; ///< Branch condition stack for nest IF block
 	std::stack<int> RepCntStack; ///< Repeat Counter for each nest REP block
 	std::stack<int> RepNumStack; ///< Repeat number for each nest REP block
 	std::stack<int> RepPCStack; ///< Start PC for each nest REP block
 
-	floatVec4 reg[MAX_SHADER_REG_VECTOR*4];
+	float reg[MAX_SHADER_REG_VECTOR*4*4];
+	bool predReg[8];
 	floatVec4 CCisSigned[4][2], CCisZero[4][2];
-	floatVec4 dst[4], src[4][3];
+	float dst[4], src[4][3];
+	floatVec4 dstVec4[4], srcVec4[4][3];
 	int texID, texType;
-
-	DRAM *dram;
 };
 
 

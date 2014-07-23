@@ -27,6 +27,7 @@
 #include <GLES3/gl3.h>
 #include <GLES3/gl2ext.h>
 
+#include "dram/dram.h"
 #include "gpu_type.h"
 #include "gpu_config.h"
 #include "instruction_def.h"
@@ -60,10 +61,11 @@ const int TEX_CACHE_ENTRY_SIZE_ROOT_LOG = (int)log2(TEX_CACHE_ENTRY_SIZE_ROOT);
 
 class TextureUnit {
 public:
-    TextureUnit()
-    {
-        ClearTexCache();
-    }
+    TextureUnit(DRAM *dram)
+	{
+		this->dram = dram;
+		ClearTexCache();
+	}
 
 	///@name Texture filtering mode
 	///@{
@@ -78,7 +80,7 @@ public:
     GLenum wrapR[MAX_TEXTURE_CONTEXT];
     ///@}
 
-    unsigned char maxAnisoFilterRatio;
+    uint8_t maxAnisoFilterRatio;
 
 	textureImage tex2D[MAX_TEXTURE_CONTEXT];
 	textureImage texCubeNX[MAX_TEXTURE_CONTEXT];
@@ -184,10 +186,12 @@ private:
 	*/
 	struct {
         bool            valid[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
-        unsigned int	tag[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
+        uint32_t	tag[TEX_CACHE_ENTRY_SIZE][TEX_WAY_ASSOCIATION];
         floatVec4       color[TEX_CACHE_ENTRY_SIZE][TEX_CACHE_BLOCK_SIZE][TEX_WAY_ASSOCIATION];
-		unsigned char	RRFlag[TEX_CACHE_ENTRY_SIZE];
+		uint8_t	RRFlag[TEX_CACHE_ENTRY_SIZE];
     }TexCache;
+
+	DRAM *dram;
 };
 
 #endif // TEXTURE_UNIT_H_INCLUDED

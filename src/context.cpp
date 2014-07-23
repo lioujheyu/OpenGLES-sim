@@ -107,10 +107,13 @@ void Context::RecordError(GLenum error)
 	}
 }
 
-void Context::DumpImage()
+void Context::DumpImage(int mode)
 {
 	FILE *CLRfp;
-	CLRfp = fopen("colormap.bmp","wb");
+	if (mode == 0)
+		CLRfp = fopen("colormap.bmp","wb");
+	else
+		CLRfp = fopen("depthmap.bmp","wb");
 
 	int x,y,i;
 
@@ -142,14 +145,26 @@ void Context::DumpImage()
 	}
 
 	//Put color data
-	for (y=0; y<vp.h; y++){
-		for (x=0; x<vp.w; x++) {
-//			putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 3), CLRfp);// A
-			putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 2), CLRfp);// B
-			putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 1), CLRfp);// G
-			putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 0), CLRfp);// R
+	if (mode == 0) {
+		for (y=0; y<vp.h; y++){
+			for (x=0; x<vp.w; x++) {
+//				putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 3), CLRfp);// A
+				putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 2), CLRfp);// B
+				putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 1), CLRfp);// G
+				putc(*((unsigned char*)drawBuffer[0] + y*vp.w*4 + x*4 + 0), CLRfp);// R
+			}
 		}
 	}
+	else {
+		for (y=0; y<vp.h; y++){
+			for (x=0; x<vp.w; x++) {
+				putc((unsigned char)(*((float*)drawBuffer[1] + y*vp.w + x)*255), CLRfp);// R
+				putc((unsigned char)(*((float*)drawBuffer[1] + y*vp.w + x)*255), CLRfp);// R
+				putc((unsigned char)(*((float*)drawBuffer[1] + y*vp.w + x)*255), CLRfp);// R
+			}
+		}
+	}
+
 
 	fclose(CLRfp);
 }
