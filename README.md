@@ -1,6 +1,6 @@
 # OpenGL ES 2.0 Simulator # 
 
-![POM with self shadow](gallery/FourShape1_POM_w_self_shadow.jpg)
+![POM with self shadow](/gallery/FourShape1_POM_w_self_shadow.jpg)
 
 Intorduction 
 ============
