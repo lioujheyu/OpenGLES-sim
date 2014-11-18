@@ -18,22 +18,33 @@ uniform vec3 light_pos;
 
 void main ()
 {
-	float lightIntensity;
-	vec4 eye_space, tangent_eyespace, normal_eyespace ,bitangent_eyespace;
-	vec3 light_vector, reflect_vector;
+	vec4 model_space;
+	vec3 light_vector, reflect_vector, view_vector;
 	float distance, specular_factor;
 	
-	eye_space = MV_mat * vec4(obj_vertex, 1.0);
-	tangent_eyespace = MV_mat * obj_tangent * obj_tangent.w;
-	bitangent_eyespace = MV_mat * vec4(obj_bitangent, 1.0);
-	normal_eyespace = MV_mat * vec4(obj_normal, 1.0);
+	model_space = model_mat * vec4(obj_vertex, 1.0);
+	distance = length(light_pos - model_space.xyz);
 	
-	light_vector = (V_mat * vec4(light_pos, 1.0) - eye_space).xyz;
-
-	mat3 tangent_mat = mat3(tangent_eyespace.xyz, bitangent_eyespace.xyz, normal_eyespace.xyz);
-	tangent_mat = inverse(tangent_mat);
-	lightVector_tangent = tangent_mat * light_vector;
+	light_vector = normalize(light_pos - model_space.xyz);
+	view_vector = normalize(eye_pos - model_space.xyz);
+		
+	lightIntensity = dot(light_vector,obj_normal);
 	
-	gl_Position =  P_mat * eye_space;
+	reflect_vector = normalize(2*lightIntensity*obj_normal - light_vector);
+	
+	if (lightIntensity > 0.0) {
+		specular_factor = dot(reflect_vector,view_vector);
+		specular_factor = (specular_factor>0.0)?specular_factor:0.0;
+		specular_factor = pow(specular_factor,20);
+		specular_factor = specular_factor / ( 1 + distance*distance*0.001);
+		specular_color = specular_factor * vec3(0.4, 0.4, 0.2);
+	}
+	else
+		specular_color = vec3(0.0f,0.0f,0.0f);
+	
+	lightIntensity = (lightIntensity>0.0)?lightIntensity:0.0;
+	lightIntensity = (lightIntensity + 0.25f) / ( 1 + distance*distance*0.002);
+	
+	gl_Position =  VP * model_space;
 	UV = obj_texcoord;
 }

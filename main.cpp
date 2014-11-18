@@ -262,6 +262,7 @@ void draw_road()
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	glm::vec3 eye_pos = glm::vec3(0.0f, 4.0f, -0.0f);
+	glm::vec3 light_pos = glm::vec3(0.0f, 4.0f, 8.0f);
 	glm::mat4 Projection = glm::perspective(90.0f, 1024.0f / 768.0f, 0.1f, 100.f);
     glm::mat4 View = glm::lookAt(
 						eye_pos,          // Camera position in World space
@@ -278,10 +279,12 @@ void draw_road()
     int n_map = glGetUniformLocation(shader.id(), "NormalMap");
     int mvp = glGetUniformLocation(shader.id(), "MVP");
     int eye_loc = glGetUniformLocation(shader.id(), "eye_pos");
+    int light_loc = glGetUniformLocation(shader.id(), "light_pos");
 
     glUniform1i(c_map, 0);
     glUniform1i(n_map, 1);
     glUniform3fv(eye_loc, 1, &eye_pos[0]);
+    glUniform3fv(light_loc, 1, &light_pos[0]);
     glUniformMatrix4fv(mvp, 1, 0, &MVP[0][0]);
 
     glVertexAttribPointer(v_coord_loc, 4, GL_FLOAT, GL_FALSE, 0, vertexPos);
@@ -292,6 +295,10 @@ void draw_road()
 
     glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, texCoord);
     glEnableVertexAttribArray(v_tex0_loc);
+
+    float i = 1.75;
+	light_pos = glm::vec3(sin(i)*8, 4.0, 12.0+cos(i)*8);
+	glUniform3fv(light_loc, 1, &light_pos[0]);
 
     glDrawArrays(GL_TRIANGLE_FAN,0,4);
 
