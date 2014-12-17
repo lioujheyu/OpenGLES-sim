@@ -405,7 +405,7 @@ instOperandBase
 			if (shaderType == VERTEX_SHADER)
 				t_operand.id = $6;
 			else // Fragment shader
-				t_operand.id = t_program.srcFSin[t_program.asmFSinIdx[$6]].idx;
+				t_operand.id = t_program.srcVarying[t_program.asmFSinIdx[$6]].idx;
 			t_operand.type = INST_ATTRIB;
 			t_operand.modifier = $8;
 			if ($1[0] == '-')

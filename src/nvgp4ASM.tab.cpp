@@ -2012,7 +2012,7 @@ yyreduce:
 			if (shaderType == VERTEX_SHADER)
 				t_operand.id = (yyvsp[(6) - (8)].ival);
 			else // Fragment shader
-				t_operand.id = t_program.srcFSin[t_program.asmFSinIdx[(yyvsp[(6) - (8)].ival)]].idx;
+				t_operand.id = t_program.srcVarying[t_program.asmFSinIdx[(yyvsp[(6) - (8)].ival)]].idx;
 			t_operand.type = INST_ATTRIB;
 			t_operand.modifier = (yyvsp[(8) - (8)].ival);
 			if ((yyvsp[(1) - (8)].sval)[0] == '-')

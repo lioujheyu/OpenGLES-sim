@@ -189,8 +189,7 @@ struct programObject
  */
 ///@{
 	std::map<std::string, symbol> srcVSin;
-	std::map<std::string, symbol> srcVSout;
-	std::map<std::string, symbol> srcFSin;
+	std::map<std::string, symbol> srcVarying;
 	std::map<std::string, symbol> srcFSout;
 	std::map<std::string, symbol> srcUniform;
 	std::map<std::string, symbol> srcTexture;
@@ -270,8 +269,7 @@ struct programObject
 		texCnt = 0;
 		linkInfo.clear();
 		srcVSin.clear();
-		srcVSout.clear();
-		srcFSin.clear();
+		srcVarying.clear();
 		srcFSout.clear();
 		srcUniform.clear();
 		srcTexture.clear();
@@ -291,14 +289,23 @@ public:
     Context();
     ~Context();
 
-    /// @name Context management function
-	///@{
+/// @name Context management function
+///@{
     void                SetCurrent(bool current);
+
+/**
+ *  Put target \ref Context pointer into current context and then return current
+ *  \ref Context pointer. Be careful, this function will delete old \ref Context
+ *  in the same time
+ *
+ *  @param context  target
+ *	@return current context pointer
+ */
     static void         SetCurrentContext(Context * context);
     static Context *    GetCurrentContext();
     void                RecordError(GLenum error);
     void                DumpImage(int mode);
-    ///@}
+///@}
 
 	/// @name OpenGL ES 2.0 API
 	///@{

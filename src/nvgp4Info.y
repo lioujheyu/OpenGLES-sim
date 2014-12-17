@@ -78,8 +78,8 @@ link_info
 			if (strcmp($7,"HPOS") == 0) {
 				t_symbol.idx = 0;
 				t_symbol.element = t_element;
-				t_program.VSoutCnt+= t_element;
-				t_program.srcVSout[t_symbol.name] = t_symbol;
+				t_program.VSoutCnt += t_element;
+				t_program.srcVarying[t_symbol.name] = t_symbol;
 				t_program.varyEnable[0] = true;
 			}
 			else if (strncmp($7,"ATTR",4) == 0) {
@@ -95,8 +95,8 @@ link_info
 						//Cause position has already occupy the attribute slot 0
 						t_symbol.idx = t_idx + 1;
 						t_symbol.element = t_element;
-						t_program.VSoutCnt+= t_element;
-						t_program.srcVSout[t_symbol.name]=t_symbol;
+						t_program.VSoutCnt += t_element;
+						t_program.srcVarying[t_symbol.name] = t_symbol;
 						t_program.varyEnable[t_symbol.idx] = true;
 					}
 				}
@@ -107,22 +107,19 @@ link_info
 					}
 					
 					//Check whether VS.output and FS.input are matched.
-					if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
+					if (t_program.srcVarying.find(t_symbol.name) == t_program.srcVarying.end()) {
 						t_program.linkInfo = "L0007: Fragment shader uses an input where there is no corresponding vertex output";
 						fprintf(stderr, "Linker: varying mismatch on %s \n", $3);
 						YYABORT;
 					}
 
-					if (t_program.srcVSout[t_symbol.name].declareType != $2) {
+					if (t_program.srcVarying[t_symbol.name].declareType != $2) {
 						t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
 						fprintf(stderr, "Linker: Varying type mismatch on %s \n", $3);
 						YYABORT;
 					}
 
-					t_symbol.idx = t_program.srcVSout[t_symbol.name].idx;
-					t_symbol.element = t_element;
 					t_program.FSinCnt+= t_element;
-					t_program.srcFSin[t_symbol.name]=t_symbol;
 					t_program.asmFSinIdx[t_idx] = t_symbol.name;
 				}
 			}

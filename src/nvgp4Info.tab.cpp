@@ -458,8 +458,8 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    53,    53,    54,    57,    58,    59,    60,    63,    65,
-      68,    69,    73,   206,   210,   211,   217,   221,   222,   223,
-     224,   225,   226,   227,   231,   232,   233,   234
+      68,    69,    73,   203,   207,   208,   214,   218,   219,   220,
+     221,   222,   223,   224,   228,   229,   230,   231
 };
 #endif
 
@@ -1421,8 +1421,8 @@ yyreduce:
 			if (strcmp((yyvsp[(7) - (11)].sval),"HPOS") == 0) {
 				t_symbol.idx = 0;
 				t_symbol.element = t_element;
-				t_program.VSoutCnt+= t_element;
-				t_program.srcVSout[t_symbol.name] = t_symbol;
+				t_program.VSoutCnt += t_element;
+				t_program.srcVarying[t_symbol.name] = t_symbol;
 				t_program.varyEnable[0] = true;
 			}
 			else if (strncmp((yyvsp[(7) - (11)].sval),"ATTR",4) == 0) {
@@ -1438,8 +1438,8 @@ yyreduce:
 						//Cause position has already occupy the attribute slot 0
 						t_symbol.idx = t_idx + 1;
 						t_symbol.element = t_element;
-						t_program.VSoutCnt+= t_element;
-						t_program.srcVSout[t_symbol.name]=t_symbol;
+						t_program.VSoutCnt += t_element;
+						t_program.srcVarying[t_symbol.name] = t_symbol;
 						t_program.varyEnable[t_symbol.idx] = true;
 					}
 				}
@@ -1450,22 +1450,19 @@ yyreduce:
 					}
 					
 					//Check whether VS.output and FS.input are matched.
-					if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
+					if (t_program.srcVarying.find(t_symbol.name) == t_program.srcVarying.end()) {
 						t_program.linkInfo = "L0007: Fragment shader uses an input where there is no corresponding vertex output";
 						fprintf(stderr, "Linker: varying mismatch on %s \n", (yyvsp[(3) - (11)].sval));
 						YYABORT;
 					}
 
-					if (t_program.srcVSout[t_symbol.name].declareType != (yyvsp[(2) - (11)].sval)) {
+					if (t_program.srcVarying[t_symbol.name].declareType != (yyvsp[(2) - (11)].sval)) {
 						t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
 						fprintf(stderr, "Linker: Varying type mismatch on %s \n", (yyvsp[(3) - (11)].sval));
 						YYABORT;
 					}
 
-					t_symbol.idx = t_program.srcVSout[t_symbol.name].idx;
-					t_symbol.element = t_element;
 					t_program.FSinCnt+= t_element;
-					t_program.srcFSin[t_symbol.name]=t_symbol;
 					t_program.asmFSinIdx[t_idx] = t_symbol.name;
 				}
 			}
@@ -1550,14 +1547,14 @@ yyreduce:
   case 14:
 
 /* Line 1464 of yacc.c  */
-#line 210 "nvgp4Info.y"
+#line 207 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval));;}
     break;
 
   case 15:
 
 /* Line 1464 of yacc.c  */
-#line 211 "nvgp4Info.y"
+#line 208 "nvgp4Info.y"
     {
 			strcpy((yyval.sval), (yyvsp[(1) - (4)].sval)); 
 			strcat((yyval.sval), "[");
@@ -1569,91 +1566,91 @@ yyreduce:
   case 16:
 
 /* Line 1464 of yacc.c  */
-#line 217 "nvgp4Info.y"
+#line 214 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(2) - (2)].sval));;}
     break;
 
   case 17:
 
 /* Line 1464 of yacc.c  */
-#line 221 "nvgp4Info.y"
+#line 218 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 18:
 
 /* Line 1464 of yacc.c  */
-#line 222 "nvgp4Info.y"
+#line 219 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (1)].sval)); t_element = 1;;}
     break;
 
   case 19:
 
 /* Line 1464 of yacc.c  */
-#line 223 "nvgp4Info.y"
+#line 220 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (4)].sval)); t_idx = (yyvsp[(3) - (4)].ival); t_element = 1;;}
     break;
 
   case 20:
 
 /* Line 1464 of yacc.c  */
-#line 224 "nvgp4Info.y"
+#line 221 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (6)].sval)); t_idx = (yyvsp[(3) - (6)].ival); t_element = (yyvsp[(6) - (6)].ival);;}
     break;
 
   case 21:
 
 /* Line 1464 of yacc.c  */
-#line 225 "nvgp4Info.y"
+#line 222 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 22:
 
 /* Line 1464 of yacc.c  */
-#line 226 "nvgp4Info.y"
+#line 223 "nvgp4Info.y"
     {strcpy((yyval.sval),(yyvsp[(1) - (2)].sval)); t_idx = (yyvsp[(2) - (2)].ival); t_element = 1;;}
     break;
 
   case 23:
 
 /* Line 1464 of yacc.c  */
-#line 227 "nvgp4Info.y"
+#line 224 "nvgp4Info.y"
     {(yyval.sval)[0] = '\0';;}
     break;
 
   case 24:
 
 /* Line 1464 of yacc.c  */
-#line 231 "nvgp4Info.y"
+#line 228 "nvgp4Info.y"
     {(yyval.ival) = 0;;}
     break;
 
   case 25:
 
 /* Line 1464 of yacc.c  */
-#line 232 "nvgp4Info.y"
+#line 229 "nvgp4Info.y"
     {(yyval.ival) = CG_IN;;}
     break;
 
   case 26:
 
 /* Line 1464 of yacc.c  */
-#line 233 "nvgp4Info.y"
+#line 230 "nvgp4Info.y"
     {(yyval.ival) = CG_OUT;;}
     break;
 
   case 27:
 
 /* Line 1464 of yacc.c  */
-#line 234 "nvgp4Info.y"
+#line 231 "nvgp4Info.y"
     {(yyval.ival) = 0;;}
     break;
 
 
 
 /* Line 1464 of yacc.c  */
-#line 1657 "nvgp4Info.tab.c"
+#line 1654 "nvgp4Info.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1865,7 +1862,7 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 237 "nvgp4Info.y"
+#line 234 "nvgp4Info.y"
 
 
 
