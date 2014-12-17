@@ -515,7 +515,7 @@ inline const fixColor4 fv2bv(const floatVec4 &fv)
 
 struct textureImage
 {
-	inline textureImage():maxLevel(-1),border(0){}
+	inline textureImage():maxLevel(-1),border(0),data{NULL}{}
 
     int				maxLevel;
     unsigned int	border;

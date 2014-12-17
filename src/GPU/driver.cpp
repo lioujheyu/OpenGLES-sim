@@ -586,4 +586,7 @@ void ActiveGPU(int vtxInputMode)
 	printf("On-board Memory usage: %d KB\n",dram_ptr/1024);
 
     gpu.Run();
+
+    delete [] gpu.VSinstPool;
+    delete [] gpu.FSinstPool;
 }

@@ -52,7 +52,10 @@ Context::Context()
 
 Context::~Context()
 {
-
+	if (this->drawBuffer[0] != nullptr)
+		delete [] this->drawBuffer[0];
+	if (this->drawBuffer[1] != nullptr)
+		delete [] this->drawBuffer[1];
 }
 
 void Context::SetCurrent(bool current)
@@ -168,3 +171,4 @@ void Context::DumpImage(int mode)
 
 	fclose(CLRfp);
 }
+

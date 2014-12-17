@@ -979,6 +979,9 @@ void Context::Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
     vp.h = height;
 
 /// @todo Correct buffer setting after buffer management is ready.
-    drawBuffer[0] = new unsigned char [width*height*4];
-    drawBuffer[1] = new float [width*height];
+	if (drawBuffer[0] == nullptr)
+		drawBuffer[0] = new unsigned char [width*height*4];
+
+	if (drawBuffer[1] == nullptr)
+		drawBuffer[1] = new float [width*height];
 }
