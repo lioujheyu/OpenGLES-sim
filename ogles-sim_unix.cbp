@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="ogles1_1" />
+		<Option title="ogles-sim" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -32,7 +32,6 @@
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions -march=native" />
-			<Add option="-DWIN32" />
 			<Add directory="include" />
 			<Add directory="external" />
 		</Compiler>
@@ -45,8 +44,6 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="shader.cpp" />
 		<Unit filename="shader.h" />
-		<Unit filename="src/GPU/dram/dram.cpp" />
-		<Unit filename="src/GPU/dram/dram.h" />
 		<Unit filename="src/GPU/driver.cpp" />
 		<Unit filename="src/GPU/driver.h" />
 		<Unit filename="src/GPU/geometry.cpp" />
