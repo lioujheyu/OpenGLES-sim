@@ -116,7 +116,7 @@ link_info
 							}
 							else {
 								//Cause position has already occupy the attribute slot 0
-								t_symbol.idx = t_idx + 1;
+								t_symbol.idx = t_program.srcVSout[t_symbol.name].idx;
 								t_symbol.element = t_element;
 								t_program.FSinCnt+= t_element;
 								t_program.srcFSin[t_symbol.name]=t_symbol;
@@ -195,7 +195,7 @@ link_info
 					t_program.FSuniformCnt+= t_element;
 				}
 			}
-			//t_symbol.Print();
+			t_symbol.Print();
 		};
 		/* For special declaration when kill instruction is existed */
 	|	VAR '<' IDENTIFIER '>' INTEGER complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 
