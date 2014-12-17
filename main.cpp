@@ -783,19 +783,55 @@ void tutorial4()
 
 int main()
 {
-    //Initial a new context, need to be hidden after egl or other context library is imported.
-    Context::SetCurrentContext(new Context());
+    int choice;
 
-//	draw_teapot();
-//	draw_banana();
-	draw_road();
-//	ParallaxOcclusionMapping();
-//	draw_cubemap();
-//	tutorial3();
-//	tutorial4();
+    while (1) {
+		printf("\n(1) Teapot               \
+				\n(2) Banana               \
+				\n(3) Road                 \
+				\n(4) Four shapes          \
+				\n(5) Cubemap              \
+				\n(6) Tutorial 3           \
+				\n(7) Tutorial 4           \
+				\n(0) Exit                 \
+				\nChose one test case: ");
 
-	Context::GetCurrentContext()->DumpImage(0);
-//	printf("test");
-//	Context::GetCurrentContext()->DumpImage(1);
 
+		scanf("%d",&choice);
+		printf("\n");
+
+		//Initial a new context, need to be hidden after egl or other context library is imported.
+		Context::SetCurrentContext(new Context());
+
+		switch (choice) {
+		case 1:
+			draw_teapot();
+			break;
+		case 2:
+			draw_banana();
+			break;
+		case 3:
+			draw_road();
+			break;
+		case 4:
+			ParallaxOcclusionMapping();
+			break;
+		case 5:
+			draw_cubemap();
+			break;
+		case 6:
+			tutorial3();
+			break;
+		case 7:
+			tutorial4();
+			break;
+		case 0:
+		default:
+			exit(EXIT_SUCCESS);
+		}
+
+		Context::GetCurrentContext()->DumpImage(0); //Dump color buffer
+//		Context::GetCurrentContext()->DumpImage(1); //Dump depth buffer
+
+    }
 }
