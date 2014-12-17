@@ -83,7 +83,7 @@ link_info
 				t_program.varyEnable[0] = true;
 			}
 			else if (strncmp($7,"ATTR",4) == 0) {
-				t_idx = (unsigned int)$7[4] - 48;
+				t_idx = (unsigned int)$7[4] - 48; //Convert "integer char" to real integer
 				t_symbol.element = t_element;
 				if (shaderType == VERTEX_SHADER) {
 					if ($5 == CG_IN) {
@@ -91,7 +91,7 @@ link_info
 						t_program.VSinCnt += t_element;
 						t_program.srcVSin[$3]=t_symbol;
 					}
-					else { //Varying
+					else { //CG_OUT : Varying
 						//Cause position has already occupy the attribute slot 0
 						t_symbol.idx = t_idx + 1;
 						t_symbol.element = t_element;
@@ -101,46 +101,45 @@ link_info
 					}
 				}
 				else { //Fragment Shader
-					if ($5 == CG_IN) { //Varying
-						//Check whether VS.output and FS.input are matched.
-						if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
-							t_program.linkInfo = "L0007: Fragment shader uses an input where there is no corresponding vertex output";
-							fprintf(stderr, "Linker: %s \n", $3);
-							YYABORT;
-						}
-						else {
-							if (t_program.srcVSout[t_symbol.name].declareType != $2) {
-								t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
-								fprintf(stderr, "Linker: Type mismatch %s \n", $3);
-								YYABORT;
-							}
-							else {
-								//Cause position has already occupy the attribute slot 0
-								t_symbol.idx = t_program.srcVSout[t_symbol.name].idx;
-								t_symbol.element = t_element;
-								t_program.FSinCnt+= t_element;
-								t_program.srcFSin[t_symbol.name]=t_symbol;
-							}
-						}
-					}
-					else
+					if ($5 == CG_OUT) {
 						fprintf(stderr, "Linker: ATTR can NOT be used under Fragment shader.\n");
+						YYABORT;
+					}
+					
+					//Check whether VS.output and FS.input are matched.
+					if (t_program.srcVSout.find(t_symbol.name) == t_program.srcVSout.end()) {
+						t_program.linkInfo = "L0007: Fragment shader uses an input where there is no corresponding vertex output";
+						fprintf(stderr, "Linker: varying mismatch on %s \n", $3);
+						YYABORT;
+					}
+
+					if (t_program.srcVSout[t_symbol.name].declareType != $2) {
+						t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
+						fprintf(stderr, "Linker: Varying type mismatch on %s \n", $3);
+						YYABORT;
+					}
+
+					t_symbol.idx = t_program.srcVSout[t_symbol.name].idx;
+					t_symbol.element = t_element;
+					t_program.FSinCnt+= t_element;
+					t_program.srcFSin[t_symbol.name]=t_symbol;
+					t_program.asmFSinIdx[t_idx] = t_symbol.name;
 				}
 			}
 			else if (strncmp($7,"texunit",7) == 0) {
-				if (t_program.srcTexture.find(t_symbol.name) == t_program.srcTexture.end()) {
-					t_symbol.idx = t_idx;
-					t_symbol.element = t_element;
-					t_program.texCnt+= t_element;
-					t_program.srcTexture[t_symbol.name] = t_symbol;
-				}
-				else { // VS has already declared this texture
+				// VS has already declared this texture
+				if (t_program.srcTexture.find(t_symbol.name) != t_program.srcTexture.end()) {
 					if (t_program.srcTexture[t_symbol.name].declareType != $2) {
 						t_program.linkInfo = "L0008: Type mismatch between vertex output and fragment input";
 						fprintf(stderr, "Linker: Type mismatch %s \n", $3);
 						YYABORT;
 					}
 				}
+				
+				t_symbol.idx = t_idx;
+				t_symbol.element = t_element;
+				t_program.texCnt+= t_element;
+				t_program.srcTexture[t_symbol.name] = t_symbol;
 				
 				if (shaderType == VERTEX_SHADER) {
 					for (int i=0;i<t_element; i++) {
@@ -176,26 +175,32 @@ link_info
 						fprintf(stderr, "Linker: %s \n",$3);
 						YYABORT;
 					}
-					else
-						t_symbol = t_program.srcUniform[t_symbol.name];
+
+					t_symbol = t_program.srcUniform[t_symbol.name];
 				}
 	
-				if (shaderType == 0) {
+				if (shaderType == VERTEX_SHADER) {
 					for (int i=0;i<t_element; i++) {
-						t_program.asmVSIdx[i + t_idx].name = t_symbol.name;
-						t_program.asmVSIdx[i + t_idx].idx = t_idx;
+						t_program.asmUniformVSIdx[i + t_idx].name = t_symbol.name;
+						t_program.asmUniformVSIdx[i + t_idx].idx = t_idx;
 					}
 					t_program.VSuniformCnt+= t_element;
 				}
-				else {
+				else { //Fragment Shader
 					for (int i=0;i<t_element; i++) {
-						t_program.asmFSIdx[i + t_idx].name = t_symbol.name;
-						t_program.asmFSIdx[i + t_idx].idx = t_idx;
+						t_program.asmUniformFSIdx[i + t_idx].name = t_symbol.name;
+						t_program.asmUniformFSIdx[i + t_idx].idx = t_idx;
 					}
 					t_program.FSuniformCnt+= t_element;
 				}
 			}
-			t_symbol.Print();
+			else {
+				t_symbol.idx = -1;
+				t_symbol.element = -1;
+				//printf("Compiler optimizes out -> ");
+			}
+			
+			//t_symbol.Print();
 		};
 		/* For special declaration when kill instruction is existed */
 	|	VAR '<' IDENTIFIER '>' INTEGER complex_id ':' io_type ':' resource ':' INTEGER ':' INTEGER 

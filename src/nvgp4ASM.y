@@ -402,10 +402,10 @@ instOperandAbs: optSign '|' instOperandBase '|' {t_operand.abs = true;}
 
 instOperandBase
 	:	optSign primitive '.' ATTRIB '[' INTEGER ']' swizzleSuffix {
-			if (shaderType == 0) // Vertex shader {
+			if (shaderType == VERTEX_SHADER)
 				t_operand.id = $6;
 			else // Fragment shader
-				t_operand.id = $6 + 1;
+				t_operand.id = t_program.srcFSin[t_program.asmFSinIdx[$6]].idx;
 			t_operand.type = INST_ATTRIB;
 			t_operand.modifier = $8;
 			if ($1[0] == '-')
@@ -414,12 +414,12 @@ instOperandBase
 	|	optSign 'c' '[' INTEGER ']' swizzleSuffix {
 			if (shaderType == 0) { // Vertex shader {
 				//Use idx to record the array element if target is array type.
-				int idx  = $4 - t_program.asmVSIdx[$4].idx;
-				t_operand.id = t_program.srcUniform[t_program.asmVSIdx[$4].name].idx + idx;
+				int idx  = $4 - t_program.asmUniformVSIdx[$4].idx;
+				t_operand.id = t_program.srcUniform[t_program.asmUniformVSIdx[$4].name].idx + idx;
 			}
 			else {// Fragment shader
-				int idx  = $4 - t_program.asmFSIdx[$4].idx;
-				t_operand.id = t_program.srcUniform[t_program.asmFSIdx[$4].name].idx + idx;
+				int idx  = $4 - t_program.asmUniformFSIdx[$4].idx;
+				t_operand.id = t_program.srcUniform[t_program.asmUniformFSIdx[$4].name].idx + idx;
 			}
 			t_operand.type = INST_UNIFORM;
 			t_operand.modifier = $6;

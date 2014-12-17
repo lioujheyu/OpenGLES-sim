@@ -207,9 +207,15 @@ struct programObject
  *	For grammar check and resource remapping.
  */
 ///@{
-	std::map<GLint, symbol> asmVSIdx;
-	std::map<GLint, symbol> asmFSIdx;
+	std::map<GLint, symbol> asmUniformVSIdx;
+	std::map<GLint, symbol> asmUniformFSIdx;
 ///@}
+
+/** @name Index Table
+ *  asm FS input index -> srcFSin symbol name
+ *  For fragment shader input(thread attribute) resource remapping.
+ */
+	std::map<GLint, std::string> asmFSinIdx;
 
 /**	@name Index Table
  *	asm texture index -> asm symbol attribute.
@@ -270,8 +276,9 @@ struct programObject
 		srcUniform.clear();
 		srcTexture.clear();
 		uniformUsage.clear();
-		asmVSIdx.clear();
-		asmFSIdx.clear();
+		asmFSinIdx.clear();
+		asmUniformVSIdx.clear();
+		asmUniformFSIdx.clear();
 		VSinstructionPool.clear();
 		FSinstructionPool.clear();
 	}
