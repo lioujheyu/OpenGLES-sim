@@ -16,7 +16,7 @@
  */
 /**
  *	@file texture_unit.h
- *  @brief Texture unit class
+ *  @brief TextureUnit class
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 

@@ -16,7 +16,7 @@
  */
 /**
  *	@file shader_core.cpp
- *  @brief Shader Core implementation
+ *  @brief ShaderCore implementation
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 

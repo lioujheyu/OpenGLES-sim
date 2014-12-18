@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- *	@file texture_unit.h
- *  @brief Texture unit class implementation
+ *	@file texture_unit.cpp
+ *  @brief TextureUnit class implementation
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 

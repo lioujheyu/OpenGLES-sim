@@ -1,7 +1,7 @@
 bin/
 obj/
 lib/
-doxygen/
+doxygen/html
 colormap.bmp
 
 *.depend

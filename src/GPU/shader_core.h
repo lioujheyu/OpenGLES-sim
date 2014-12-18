@@ -16,7 +16,7 @@
  */
 /**
  *	@file shader_core.h
- *  @brief Shader Core class
+ *  @brief ShaderCore class
  *  @author Liou Jhe-Yu(lioujheyu@gmail.com)
  */
 
