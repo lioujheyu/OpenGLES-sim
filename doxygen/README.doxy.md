@@ -1,11 +1,11 @@
 # OpenGL ES 2.0 Simulator # {#mainpage}
 
-![](gallery/banana.jpg)
-![](gallery/teapot.jpg)
-![](gallery/stone_floor.jpg)
-![](gallery/cubemap.jpg) 
-![](gallery/cubemap_inside.jpg) 
-![](gallery/FourShape1_POM_w_self_shadow.jpg)
+\image html banana.jpg
+\image html teapot.jpg
+\image html stone_floor.jpg
+\image html cubemap.jpg
+\image html cubemap_inside.jpg
+\image html FourShape1_POM_w_self_shadow.jpg
 
 [TOC]
 

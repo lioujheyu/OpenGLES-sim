@@ -4,11 +4,11 @@
 #include "src/context.h"
 
 // glm::vec3, glm::vec4, glm::ivec4, glm::mat4
-#include <glm/glm.hpp>
+#include <glm/glm/glm.hpp>
 // glm::perspective
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/glm/gtc/matrix_transform.hpp>
 // glm::value_ptr
-#include <glm/gtc/type_ptr.hpp>
+#include <glm/glm/gtc/type_ptr.hpp>
 
 #include "bitmap.h"
 #include "shader.h"
