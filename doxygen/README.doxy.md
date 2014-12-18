@@ -93,6 +93,12 @@ Use these git commands to get the code from github or my git server
 If you are a contributor and have my git server permission, please use this
 	
 	git clone git@lioujheyu.synology.me:ogles-sim
+
+Afterwards, download OpenGL Mathmatical library by using git submodule
+
+	git submodule update --init --recursive
+
+Or you can directly go to https://github.com/g-truc/glm to download and put it manually into external/glm/
 	
 You can use any git client to execute the above commands. If on Windows, go checking [MsysGit](http://msysgit.github.io/), [TortoiseGit](https://code.google.com/p/tortoisegit/), or even Msys/Cygwin with git.
 
