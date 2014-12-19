@@ -420,6 +420,8 @@ int NVGP4toScalar(instruction in, std::vector<scalarInstruction> *ISpool)
 
 
 	}
+
+	return 0;
 }
 
 uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
@@ -431,16 +433,16 @@ uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
 
 #ifdef IMAGE_MEMORY_OPTIMIZE//Block-based memory rearrangement for 6D cache architecture
 		if (tex_ptr->heightLevel[levelCount] >= TEX_CACHE_BLOCK_SIZE_ROOT) {
-			for (int y=0; y<tex_ptr->heightLevel[levelCount]; y+=TEX_CACHE_BLOCK_SIZE_ROOT) {
-			for (int x=0; x<tex_ptr->widthLevel[levelCount]; x+=TEX_CACHE_BLOCK_SIZE_ROOT) {
+			for (unsigned int y=0; y<tex_ptr->heightLevel[levelCount]; y+=TEX_CACHE_BLOCK_SIZE_ROOT) {
+			for (unsigned int x=0; x<tex_ptr->widthLevel[levelCount]; x+=TEX_CACHE_BLOCK_SIZE_ROOT) {
 				for (int t=0; t<TEX_CACHE_BLOCK_SIZE_ROOT; t++) {
 				for (int s=0; s<TEX_CACHE_BLOCK_SIZE_ROOT; s++) {
 
 					uint32_t imagePos = (y + t)*tex_ptr->widthLevel[levelCount] + x+s;
-					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4), pos, 1);
-					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4+1), pos+1, 1);
-					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4+2), pos+2, 1);
-					gpu.dram_64m.write(*(tex_ptr->data[levelCount] + imagePos*4+3), pos+3, 1);
+					gpu.dram.write(*(tex_ptr->data[levelCount] + imagePos*4), pos, 1);
+					gpu.dram.write(*(tex_ptr->data[levelCount] + imagePos*4+1), pos+1, 1);
+					gpu.dram.write(*(tex_ptr->data[levelCount] + imagePos*4+2), pos+2, 1);
+					gpu.dram.write(*(tex_ptr->data[levelCount] + imagePos*4+3), pos+3, 1);
 					pos+=4;
 				}
 				}
@@ -452,10 +454,10 @@ uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
 				 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount]);
 				 dataCount++) {
 
-				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
-				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
-				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
-				gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
+				gpu.dram.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
+				gpu.dram.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
+				gpu.dram.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
+				gpu.dram.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
 				pos+=4;
 			}
 		}
@@ -464,10 +466,10 @@ uint32_t CopyTexData2Dram (textureImage* tex_ptr, uint32_t dram_ptr)
 			 dataCount<(tex_ptr->heightLevel[levelCount] * tex_ptr->widthLevel[levelCount]);
 			 dataCount++) {
 
-			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
-			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
-			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
-			gpu.dram_64m.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
+			gpu.dram.write(*(tex_ptr->data[levelCount] + dataCount*4), pos, 1);
+			gpu.dram.write(*(tex_ptr->data[levelCount] + dataCount*4+1), pos+1, 1);
+			gpu.dram.write(*(tex_ptr->data[levelCount] + dataCount*4+2), pos+2, 1);
+			gpu.dram.write(*(tex_ptr->data[levelCount] + dataCount*4+3), pos+3, 1);
 			pos+=4;
 		}
 #endif // IMAGE_MEMORY_OPTIMIZE
@@ -556,11 +558,17 @@ void ActiveGPU(int vtxInputMode)
 		gpu.tex2D[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].tex2D;
 		dram_ptr = CopyTexData2Dram(&gpu.tex2D[i], dram_ptr);
 		gpu.texCubeNX[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNX;
+		dram_ptr = CopyTexData2Dram(&gpu.texCubeNX[i], dram_ptr);
 		gpu.texCubeNY[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNY;
+		dram_ptr = CopyTexData2Dram(&gpu.texCubeNY[i], dram_ptr);
 		gpu.texCubeNZ[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubeNZ;
+		dram_ptr = CopyTexData2Dram(&gpu.texCubeNZ[i], dram_ptr);
 		gpu.texCubePX[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubePX;
+		dram_ptr = CopyTexData2Dram(&gpu.texCubePX[i], dram_ptr);
 		gpu.texCubePY[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubePY;
+		dram_ptr = CopyTexData2Dram(&gpu.texCubePY[i], dram_ptr);
 		gpu.texCubePZ[i] = ctx->texObjPool[ ctx->texCtx[ctx->samplePool[i]].texObjBindID ].texCubePZ;
+		dram_ptr = CopyTexData2Dram(&gpu.texCubePZ[i], dram_ptr);
     }
 
     for (int i=0; i<t_program->uniformCnt; i++)
