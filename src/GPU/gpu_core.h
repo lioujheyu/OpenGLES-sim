@@ -76,7 +76,7 @@ public:
 	GPU_Core();
 	~GPU_Core();
 
-	DRAM			dram_64m = DRAM(0x4000000); //simulate an 128MB on-board dram;
+	DRAM			dram = DRAM(0x4000000); //simulate an 64MB on-board dram;
 
     GLenum			drawMode;
     int         	vtxCount;

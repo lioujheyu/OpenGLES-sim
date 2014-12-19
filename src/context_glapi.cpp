@@ -71,11 +71,7 @@ void Context::Clear(GLbitfield mask)
 
 void Context::ClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
 {
-    // Set RM's registers
-    clearColor.r = red;
-    clearColor.g = green;
-    clearColor.b = blue;
-    clearColor.a = alpha;
+    clearColor = floatVec4(red, green, blue, alpha);
 }
 
 void Context::ClearDepthf (GLfloat depth)
@@ -122,7 +118,7 @@ void Context::DeleteTextures(GLsizei n, const GLuint *textures)
 
         texObjPool.erase(*(textures+i));
 
-        printf("Del texture ID: %d\n",*(textures+i));
+        //printf("Del texture ID: %d\n",*(textures+i));
     }
 }
 
@@ -332,7 +328,7 @@ void Context::GenTextures(GLsizei n, GLuint* textures)
 		if (texObjPool.find(key) == texObjPool.end()) {
 			texObjPool[key] = texObj;
 			*(textures+i) = key;
-			printf("Gen Texture ID: %d\n",key);
+			//printf("Gen Texture ID: %d\n",key);
 
 			i++;
 			key++;

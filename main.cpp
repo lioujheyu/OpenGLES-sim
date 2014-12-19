@@ -17,7 +17,7 @@
 #include "data/teapot.h"
 //#include "objloader.hpp"
 
-bool LoadTexture(char *filename, unsigned int *texture)
+bool LoadTexture(const char *filename, unsigned int *texture)
 {
 	unsigned char *bitmap;
 	_BITMAPINFO *info;
@@ -56,8 +56,8 @@ bool LoadTexture(char *filename, unsigned int *texture)
     return true;
 }
 
-int LoadCubeMap(char *xneg, char *yneg, char *zneg,
-				 char *xpos, char *ypos, char *zpos,
+int LoadCubeMap(const char *xneg, const char *yneg, const char *zneg,
+				const char *xpos, const char *ypos, const char *zpos,
 				 unsigned int *texture)
 {
 	unsigned char *bitmap[6];
@@ -254,13 +254,6 @@ void draw_road()
                            0.0f, 4.0f,
                          };
 
-    glEnable(GL_DEPTH_TEST);
-
-    glViewport(0,0,1024,768);
-	glClearColor(0.0,0.0,0.0,1.0);
-	glClearDepthf(1.0);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
 	glm::vec3 eye_pos = glm::vec3(0.0f, 4.0f, -0.0f);
 	glm::vec3 light_pos = glm::vec3(0.0f, 4.0f, 8.0f);
 	glm::mat4 Projection = glm::perspective(glm::radians(90.0f), 1024.0f / 768.0f, 0.1f, 100.f);
@@ -312,16 +305,6 @@ void draw_banana()
 	Shader shader;
 	shader.init("shader_src/drawObj.vert", "shader_src/drawObj.frag");
 	shader.bind();
-
-	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
-	glCullFace(GL_FRONT);
-
-	glViewport(0,0,1024,768);
-	glClearColor(0.0,0.0,0.0,1.0);
-	glClearDepthf(1.0);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	unsigned int texture[2];
 	glActiveTexture(GL_TEXTURE0);
@@ -396,12 +379,7 @@ void draw_cubemap()
     }
 
 	glDisable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
-
-    glViewport(0,0,1024,768);
-	glClearColor(0.0,0.0,0.0,1.0);
-	glClearDepthf(1.0);
 
 	int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
 	int mvp_loc = glGetUniformLocation(shader.id(), "MVP");
@@ -414,8 +392,8 @@ void draw_cubemap()
 						glm::vec3(0,0,0), // and looks at the origin
 						glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 					);
-//	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.5,0.5,0.5));
-	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(1.2,1.2,1.2));
+	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(0.5,0.5,0.5));
+//	glm::mat4 Model      = glm::scale(glm::mat4(1.0f),glm::vec3(1.2,1.2,1.2));
 	glm::mat4 MVP		 = Projection * View * Model;
 
 
@@ -496,11 +474,6 @@ void ParallaxOcclusionMapping()
 	GLfloat cubeBiNormal[] = { 0.0f, 1.0f, 0.0f };
 	GLfloat cubeTangent[] = { 1.0f, 0.0f, 0.0f };
 
-	glViewport(0,0,1024,768);
-	glClearColor(0.0,0.0,0.0,1.0);
-	glClearDepthf(1.0);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
 	glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 0.4f);
 	glm::vec3 eye_pos = glm::vec3(0.0f, -1.0f, 0.3f);
 	glm::mat4 Projection = glm::perspective(glm::radians(90.0f), 1024.0f / 768.0f, 0.1f, 100.f);
@@ -514,7 +487,7 @@ void ParallaxOcclusionMapping()
 
 	int v_coord_loc = glGetAttribLocation(shader.id(), "obj_vertex");
     int v_tex0_loc = glGetAttribLocation(shader.id(), "obj_texCoord");
-    int v_normal_loc = glGetAttribLocation(shader.id(), "obj_normal");
+//    int v_normal_loc = glGetAttribLocation(shader.id(), "obj_normal");
     int c_map = glGetUniformLocation(shader.id(), "colorMap");
     int nh_map = glGetUniformLocation(shader.id(), "NM_height_Map");
     int model_loc = glGetUniformLocation(shader.id(), "model_mat");
@@ -555,17 +528,6 @@ void draw_teapot()
 	//shader.init("shader_src/drawObjNormalMap.vert", "shader_src/drawObjNormalMap.frag");
 	shader.init("shader_src/drawObj.vert", "shader_src/drawObj.frag");
 	shader.bind();
-
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
-	glCullFace(GL_FRONT);
-	glEnable(GL_DEPTH_TEST);
-
-    glViewport(0,0,1024,768);
-	glClearColor(0.0,0.0,0.0,1.0);
-	glClearDepthf(1.0);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
 
 //	CalculateTangentArray(teapotNumVerts, teapotVerts, teapotNormals,
 //						  teapotTexCoords, teapotTangent, teapotBitangent);
@@ -626,13 +588,6 @@ void tutorial3()
     shader.init("shader_src/tutorial3.vertexshader","shader_src/tutorial3.fragmentshader");
     shader.bind();
 
-    glEnable(GL_DEPTH_TEST);
-
-    glViewport(0,0,1024,768);
-    glClearColor(0.0f,0.0f,0.2f,1.0f);
-    glClearDepthf(1.0f);
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
     static GLfloat vertex_data[]={
             -1.0f,-1.0f,0.0f,
              1.0f,-1.0f,0.0f,
@@ -668,13 +623,7 @@ void tutorial4()
     Shader shader;
     shader.init("shader_src/tutorial4.vertexshader","shader_src/tutorial4.fragmentshader");
     shader.bind();
-    // PREPARE FOR DRAWING
-    glEnable(GL_DEPTH_TEST);
 
-    glViewport(0,0,1024,768);
-    glClearColor(0.0f,0.0f,0.2f,0.0f);
-    glClearDepthf(1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // PREPARE FOR MVP (MODEL VIEW PROECTION)
     glm::mat4 Projection = glm::perspective(glm::radians(45.0f),4.0f/3.0f,0.1f,100.0f);
     glm::mat4 View       = glm::lookAt(
@@ -802,6 +751,16 @@ int main()
 
 		//Initial a new context, need to be hidden after egl or other context library is imported.
 		Context::SetCurrentContext(new Context());
+
+		glFrontFace(GL_CW);
+		glCullFace(GL_FRONT);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+
+		glViewport(0,0,1024,768);
+		glClearColor(0.2f,0.2f,0.2f,1.0f);
+		glClearDepthf(1.0f);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		switch (choice) {
 		case 1:

@@ -52,13 +52,13 @@
 #ifdef USE_SSE
 struct _MM_ALIGN16 floatVec4
 {
-#ifdef WIN32
+#	ifdef WIN32
 	inline void* operator new[](size_t x) { return _aligned_malloc(x, 16); }
 	inline void  operator delete[](void* x) { if (x) _aligned_free(x); }
-#else
+#	else
 	inline void* operator new[](size_t x) { return memalign(16, x); }
 	inline void  operator delete[](void* x) { if(x) free(x); }
-#endif
+#	endif //WIN32
 
 	union {
 		__m128 sse;

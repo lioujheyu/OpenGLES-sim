@@ -121,12 +121,12 @@ void GPU_Core::Run()
 			  (float)(totalProcessingPix - totalGhostPix)/totalProcessingPix);
 	GPUPRINTF("Final living pixel: %d\n\n",totalLivePix);
 
-	GPUPRINTF("Texture memory access: %.2f MB (%d)\n",
-			  (float)dram_64m.accessB/1024/1024,
-			  dram_64m.accessB);
+	GPUPRINTF("Texture memory access: %.2f MB (%llu)\n",
+			  (float)dram.accessB/1024/1024,
+			  dram.accessB);
 	GPUPRINTF("Texture memory access time: %.2f ms (%.2f ns)\n\n",
-			  dram_64m.accessTime/1000/1000,
-			  dram_64m.accessTime);
+			  dram.accessTime/1000/1000,
+			  dram.accessTime);
 
     GPUPRINTF("Texture cache hit: %d\n",sCore[1].texUnit.hit);
     GPUPRINTF("Texture cache miss: %d\n",sCore[1].texUnit.miss);
@@ -151,10 +151,8 @@ void GPU_Core::Run()
 
 }
 
-GPU_Core::GPU_Core() : sCore({&dram_64m, &dram_64m})
+GPU_Core::GPU_Core() : sCore({&dram, &dram})
 {
-	//dram_128m("128MB", 0x8000000);
-
 	for (int i=0; i<MAX_ATTRIBUTE_NUMBER; i++) {
 		attrEnable[i] = false;
 		varyEnable[i] = false;
@@ -239,10 +237,6 @@ void GPU_Core::FetchVertexData(uint32_t vCnt)
 				curVtx.attr[attrCnt].w = 1.0;
 		}
 	}
-
-//	printf("%f, %d \n", curVtx.attr[0].x, curVtx.attr[0].ix);
-//	curVtx.attr[0].ix = 1;
-//	printf("%f, %d \n", curVtx.attr[0].x, curVtx.attr[0].ix);
 
 	curVtx.threadId = totalProcessingVtx++;
 }

@@ -130,7 +130,7 @@ void ShaderCore::Exec(int idx)
 //	case OP_RCC:
 //		break;
 	case OP_RCP:
-		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w = (1/src[idx][0].x);
+		dst[idx] = floatVec4(1/src[idx][0].x);
 		break;
 //	case OP_SCS:
 //		break;
@@ -371,8 +371,7 @@ void ShaderCore::Exec(int idx)
 		break;
 	//BINSCop
 	case OP_POW:
-		dst[idx].x = dst[idx].y = dst[idx].z = dst[idx].w =
-			pow(src[idx][0].x, src[idx][1].x);
+		dst[idx] = floatVec4( pow(src[idx][0].x, src[idx][1].x) );
 		break;
 	//KILop
 	case OP_KIL:

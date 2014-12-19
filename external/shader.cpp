@@ -35,6 +35,7 @@ static char* textFileRead(const char *fileName) {
 
 fail:
 	printf(": No such file!! \n");
+	return NULL;
 }
 
 static void validateShader(GLuint shader, const char* file = 0) {
@@ -77,10 +78,10 @@ Shader::Shader(const char *vsFile, const char *fsFile) {
 
 void Shader::init(const char *vsFile, const char *fsFile) {
 	shader_vp = glCreateShader(GL_VERTEX_SHADER);
-	printf("create vertex shader: %u\n",shader_vp);
+	//printf("create vertex shader: %u\n",shader_vp);
 
 	shader_fp = glCreateShader(GL_FRAGMENT_SHADER);
-	printf("create fragment shader: %u\n",shader_fp);
+	//printf("create fragment shader: %u\n",shader_fp);
 
 	const char* vsText = textFileRead(vsFile);
 	const char* fsText = textFileRead(fsFile);
@@ -99,7 +100,7 @@ void Shader::init(const char *vsFile, const char *fsFile) {
 	validateShader(shader_fp, fsFile);
 
 	shader_id = glCreateProgram();
-	printf("create program: %u\n",shader_id);
+	//printf("create program: %u\n",shader_id);
 	glAttachShader(shader_id, shader_fp);
 	glAttachShader(shader_id, shader_vp);
 	glLinkProgram(shader_id);
