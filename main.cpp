@@ -313,6 +313,10 @@ void draw_banana()
 		exit(1);
     }
 
+	glFrontFace(GL_CW);
+	glCullFace(GL_FRONT);
+	glEnable(GL_CULL_FACE);
+
 	glm::vec3 eye_pos = glm::vec3(2.0f, 1.0f, 1.0f);
 	glm::vec3 light_pos = glm::vec3(1.0f, 1.5f, -2.0f);
     glm::mat4 Projection = glm::perspective(glm::radians(90.0f), 1024.0f / 768.0f, 0.1f, 100.f);
@@ -474,6 +478,8 @@ void ParallaxOcclusionMapping()
 	GLfloat cubeBiNormal[] = { 0.0f, 1.0f, 0.0f };
 	GLfloat cubeTangent[] = { 1.0f, 0.0f, 0.0f };
 
+	glDisable(GL_CULL_FACE);
+
 	glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 0.4f);
 	glm::vec3 eye_pos = glm::vec3(0.0f, -1.0f, 0.3f);
 	glm::mat4 Projection = glm::perspective(glm::radians(90.0f), 1024.0f / 768.0f, 0.1f, 100.f);
@@ -538,6 +544,10 @@ void draw_teapot()
 		printf("Fail to load image\n");
 		exit(1);
         }
+
+	glFrontFace(GL_CW);
+	glCullFace(GL_FRONT);
+	glEnable(GL_CULL_FACE);
 
 	glm::vec3 eye_pos    = glm::vec3(0.0f, 2.0f, 2.0f);
 	glm::vec3 light_pos  = glm::vec3(3.0f, 3.0f, 3.0f);
@@ -752,9 +762,6 @@ int main()
 		//Initial a new context, need to be hidden after egl or other context library is imported.
 		Context::SetCurrentContext(new Context());
 
-		glFrontFace(GL_CW);
-		glCullFace(GL_FRONT);
-		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 
 		glViewport(0,0,1024,768);
