@@ -52,7 +52,7 @@
 #ifdef USE_SSE
 struct _MM_ALIGN16 floatVec4
 {
-#	ifdef WIN32
+#	ifdef __WIN32__
 	inline void* operator new[](size_t x) { return _aligned_malloc(x, 16); }
 	inline void  operator delete[](void* x) { if (x) _aligned_free(x); }
 #	else
