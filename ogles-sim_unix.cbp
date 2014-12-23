@@ -35,15 +35,15 @@
 			<Add directory="include" />
 			<Add directory="external" />
 		</Compiler>
-		<Unit filename="bitmap.cpp" />
-		<Unit filename="bitmap.h" />
+		<Unit filename="external/bitmap.cpp" />
+		<Unit filename="external/bitmap.h" />
+		<Unit filename="external/shader.cpp" />
+		<Unit filename="external/shader.h" />
 		<Unit filename="include/GLES3/gl2ext.h" />
 		<Unit filename="include/GLES3/gl3.h" />
 		<Unit filename="include/GLES3/gl3platform.h" />
 		<Unit filename="include/KHR/khrplatform.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="shader.cpp" />
-		<Unit filename="shader.h" />
 		<Unit filename="src/GPU/driver.cpp" />
 		<Unit filename="src/GPU/driver.h" />
 		<Unit filename="src/GPU/geometry.cpp" />
