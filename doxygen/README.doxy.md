@@ -111,10 +111,9 @@ How to Compile this project {#how_to_compile_this_project}
 
 - Use Code::Blocks
   
-  Direcly open ogles-sim.cbp(for Winddows) or ogles-sim_unix.cbp(for Linux) in 
-  codeblocks and push Ctrl-F9 (compile). If you have right gcc version or 
-  pathced mingw-gcc and correct toolchain setting in codeblocks compiler setting
-  page, there shall be no problem.
+  Direcly open ogles-sim.cbp in codeblocks and push Ctrl-F9 (compile). If you 
+  have right gcc version or pathced mingw-gcc and correct toolchain setting in 
+  codeblocks compiler setting page, there shall be no problem.
 
   Once if the project is compiled, hit F9 to run this project. the result image
   will be generated as colormap.bmp in project root.
@@ -129,10 +128,6 @@ How to Compile this project {#how_to_compile_this_project}
   are under Windows.
   
 		cbp2make -in ogles-sim.cbp -out Makefile
-
-  or this command if you are using linux.
-
-		cbp2make -in ogles-sim_unix.cbp -out Makefile
 
   And then type this command to compile.
 
