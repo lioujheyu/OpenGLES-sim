@@ -36,10 +36,7 @@ Compile Requirement {#compile_required}
 ===================
 - GCC: 4.6.4 or above with c++11(c++0x) support
   + [MinGW-builds](http://sourceforge.net/projects/mingwbuilds/) (Windows)
-	
-	Using mingw-gcc 4.8.1 should be no problem.
-	
-  + With Code::Blocks built-in mingw-gcc 4.6.4 (Windows)
+  + With Code::Blocks built-in mingw-gcc (Windows)
   
     There is a bug caused by Mingw-gcc 4.6.4-4.7.2 on Windows. Please see the
     [issue section](#known_issue) for the solution by patching or updating 
@@ -48,9 +45,9 @@ Compile Requirement {#compile_required}
   + On most Linux distribution, Update to gcc 4.6.4 or above should be a piece 
     of cake :)
 
-	If you are using RedHat or CentOS, please do what this [page]
-	(http://people.centos.org/tru/devtools-1.1/readme) say to add the updated
-	gcc into the independent environment.
+	If you are using RedHat or CentOS earlier than version 6.5, please 
+	follow this [page](http://people.centos.org/tru/devtools-1.1/readme) to 
+	add the updatedi gcc into the independent environment.
   
   
 - [Nvidia Cg Toolkits](https://developer.nvidia.com/cg-toolkit-download)
@@ -69,14 +66,14 @@ Compile Requirement {#compile_required}
   Makefile or use cbp2make converting .cbp to Makefile for yout comfortable.
   
   
-- Flex & Bison
-  + Use MSYS (Windows, recommend)
+- Flex & Bison (optional)
+  + Use [MSYS](http://www.mingw.org/wiki/MSYS) (Windows, recommend)
   + [win flex-bison](http://sourceforge.net/projects/winflexbison/) (Windows)
   + These tools on Linux are built-in. :)
 
   The assembly grammar and token is defined in .y and .l file and need Flex & 
   Bison to generate C code for compiling. Although these generated C code
-  already attached within the project and you can compiled them with no problem,
+  already attached within the project and you can compile them with no problem,
   you still need these tools if you want to adjust the grammar.
 
 * * *
@@ -111,7 +108,7 @@ How to Compile this project {#how_to_compile_this_project}
 
 - Use Code::Blocks
   
-  Direcly open ogles-sim.cbp in codeblocks and push Ctrl-F9 (compile). If you 
+  Direcly open **ogles-sim.cbp** in codeblocks and push Ctrl-F9 (compile). If you
   have right gcc version or pathced mingw-gcc and correct toolchain setting in 
   codeblocks compiler setting page, there shall be no problem.
 
@@ -120,18 +117,14 @@ How to Compile this project {#how_to_compile_this_project}
 
 - Makefile
 
-  If you prefer to use unix build system, cbp2make will do you a favor but you
+  If you prefer to use unix build system, **cbp2make** will do you a favor but you
   need to compile this tool from source. You can get its source from [here]
   (http://sourceforge.net/projects/cbp2make/)
 	
-  Once you get cbp2make's binary, use this command to generate Makefile if you 
-  are under Windows.
+  After cbp2make binary is ready, type
   
-		cbp2make -in ogles-sim.cbp -out Makefile
-
-  And then type this command to compile.
-
-		make all
+		cbp2make -in ogles-sim.cbp -out Makefile //Generate Makefile
+		make all                                 //Compile
 
   You still need to check you compiler's version if you encounter any standard
   library's problem.
