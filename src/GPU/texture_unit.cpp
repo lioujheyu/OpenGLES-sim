@@ -292,7 +292,7 @@ floatVec4 TextureUnit::TrilinearFilter(const floatVec4 &coordIn,
 }
 
 floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
-									 int level,
+									 float factor,
 									 const floatVec4 &scaleFacDX,
 									 const floatVec4 &scaleFacDY,
 									 int targetType,
@@ -357,30 +357,35 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 
 	maxLevel = targetImage->maxLevel;
 
-	deltaDX.s = scaleFacDX.s*targetImage->widthLevel[0];
-	deltaDX.t = scaleFacDX.t*targetImage->heightLevel[0];
-	deltaDY.s = scaleFacDY.s*targetImage->widthLevel[0];
-	deltaDY.t = scaleFacDY.t*targetImage->heightLevel[0];
+	if (factor < 0) {
+		deltaDX.s = scaleFacDX.s*targetImage->widthLevel[0];
+		deltaDX.t = scaleFacDX.t*targetImage->heightLevel[0];
+		deltaDY.s = scaleFacDY.s*targetImage->widthLevel[0];
+		deltaDY.t = scaleFacDY.t*targetImage->heightLevel[0];
 
-	maxScaleFacX = std::max(std::abs(deltaDX.s), std::abs(deltaDX.t));
-	maxScaleFacY = std::max(std::abs(deltaDY.s), std::abs(deltaDY.t));
-//	maxScaleFacX = sqrt(deltaDX.s*deltaDX.s + deltaDX.t*deltaDX.t);
-//	maxScaleFacY = sqrt(deltaDY.s*deltaDY.s + deltaDY.t*deltaDY.t);
-	if (maxScaleFacX > maxScaleFacY) {
-		mainAxis = deltaDX;
-		maxScaleFac = maxScaleFacX;
-		scaleFacLoser = maxScaleFacY;
+		maxScaleFacX = std::max(std::abs(deltaDX.s), std::abs(deltaDX.t));
+		maxScaleFacY = std::max(std::abs(deltaDY.s), std::abs(deltaDY.t));
+//		maxScaleFacX = sqrt(deltaDX.s*deltaDX.s + deltaDX.t*deltaDX.t);
+//		maxScaleFacY = sqrt(deltaDY.s*deltaDY.s + deltaDY.t*deltaDY.t);
+		if (maxScaleFacX > maxScaleFacY) {
+			mainAxis = deltaDX;
+			maxScaleFac = maxScaleFacX;
+			scaleFacLoser = maxScaleFacY;
+		}
+		else {
+			mainAxis = deltaDY;
+			maxScaleFac = maxScaleFacY;
+			scaleFacLoser = maxScaleFacX;
+		}
 	}
-	else {
-		mainAxis = deltaDY;
-		maxScaleFac = maxScaleFacY;
-		scaleFacLoser = maxScaleFacX;
+	else { // factor > 0
+		maxScaleFac = factor;
 	}
 
 	w_ratio = frexp(maxScaleFac, &LoD);
 	w_ratio = w_ratio*2-1;
 	LoD--;
-	LoD = (level == -1)? CLAMP(LoD, 0, maxLevel): level;
+	LoD = CLAMP(LoD, 0, maxLevel);
 
 	if(maxScaleFac>1) {
 		switch (minFilter[tid]) {
@@ -434,8 +439,12 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 			 * has the configuration between quality and performance about
 			 * anisotropic filter.
 			 */
-			sampleN = std::min((uint8_t)floor(maxScaleFac/scaleFacLoser),
-								maxAnisoFilterRatio);
+			if (factor < 0)
+				sampleN = std::min((uint8_t)floor(maxScaleFac/scaleFacLoser),
+									maxAnisoFilterRatio);
+			else // scale factor has been specified, perform isometric filter
+				sampleN = 1;
+
 			// Round down to nearest power of 2, the same reason mentioned above
 			if (sampleN == 3)
 				sampleN = 2;
@@ -447,7 +456,7 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 			w_ratio = frexp(maxScaleFac, &LoD);
 			w_ratio = w_ratio*2-1;
 			LoD--;
-			LoD = (level == -1)? CLAMP(LoD, 0, maxLevel): level;
+			LoD = CLAMP(LoD, 0, maxLevel);
 
 			color = floatVec4(0.0, 0.0, 0.0, 0.0);
 			for (int i=0; i<sampleN; i++) {
