@@ -32,6 +32,7 @@
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 			<Add option="-static -static-libgcc -static-libstdc++" />
+			<Add option="-DGLES" />
 			<Add directory="include" />
 			<Add directory="external" />
 		</Compiler>

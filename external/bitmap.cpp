@@ -26,14 +26,14 @@ static int            write_long(FILE *fp, int l);
  * Returns a pointer to the bitmap if successful, NULL otherwise...
  */
 
-GLubyte *                          /* O - Bitmap data */
+unsigned char *                          /* O - Bitmap data */
 LoadDIBitmap(const char *filename, /* I - File to load */
              _BITMAPINFO **info)    /* O - Bitmap information */
 {
     FILE             *fp;          /* Open file pointer */
-    GLubyte          *bits;        /* Bitmap pixel bits */
-    GLubyte          *ptr;         /* Pointer into bitmap */
-    GLubyte          temp;         /* Temporary variable to swap red and blue */
+    unsigned char          *bits;        /* Bitmap pixel bits */
+    unsigned char          *ptr;         /* Pointer into bitmap */
+    unsigned char          temp;         /* Temporary variable to swap red and blue */
     int              x, y;         /* X and Y position in image */
     int              length;       /* Line length */
     int              bitsize;      /* Size of bitmap */
@@ -97,7 +97,7 @@ LoadDIBitmap(const char *filename, /* I - File to load */
                   abs((*info)->bmiHeader.biHeight);
 
     printf("bitsize:%d\n", bitsize);
-    if ((bits = (GLubyte*)malloc(bitsize)) == NULL)
+    if ((bits = (unsigned char*)malloc(bitsize)) == NULL)
     {
         /* Couldn't allocate memory - return NULL! */
         free(*info);
@@ -146,7 +146,7 @@ LoadDIBitmap(const char *filename, /* I - File to load */
 int                                /* O - 0 = success, -1 = failure */
 SaveDIBitmap(const char *filename, /* I - File to load */
              _BITMAPINFO *info,     /* I - Bitmap information */
-             GLubyte    *bits)     /* I - Bitmap data */
+             unsigned char    *bits)     /* I - Bitmap data */
 {
     FILE *fp;                      /* Open file pointer */
     int  size,                     /* Size of file */

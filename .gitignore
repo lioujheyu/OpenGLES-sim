@@ -1,6 +1,5 @@
 bin/
 obj/
-lib/
 doxygen/html
 colormap.bmp
 

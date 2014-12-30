@@ -28,7 +28,7 @@
  *	Enable USE_SSE will use x86 SSE instruction set to accelerate vector
  *	operation involved with the variable declared as floatVec4.
  */
-//#define USE_SSE
+#define USE_SSE
 
 /**
  *	@def START_SPLIT_LEVEL

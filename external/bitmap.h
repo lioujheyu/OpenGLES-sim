@@ -11,10 +11,8 @@
  * Include necessary headers.
  */
 
-#include <GLES3/gl3.h>
 #include "stdio.h"
 #include "stdlib.h"
-//#  include <GL/glut.h>
 //#  ifdef WIN32
 //#    include <windows.h>
 //#    include <wingdi.h>
@@ -92,9 +90,9 @@ typedef struct                       /**** Bitmap information structure ****/
  * Prototypes...
  */
 
-extern GLubyte *LoadDIBitmap(const char *filename, _BITMAPINFO **info);
+extern unsigned char *LoadDIBitmap(const char *filename, _BITMAPINFO **info);
 extern int     SaveDIBitmap(const char *filename, _BITMAPINFO *info,
-                            GLubyte *bits);
+                            unsigned char *bits);
 
 #  ifdef __cplusplus
 }
