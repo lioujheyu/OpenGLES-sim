@@ -608,7 +608,7 @@ void tutorial3()
     // Setting up for MVP
     glm::mat4 Projection = glm::perspective(glm::radians(60.0f),1024.0f/768.0f,0.1f,100.0f);
     glm::mat4 View       = glm::lookAt(
-                                glm::vec3(0,3,3)* glm::rotate(),   // Camara from (4,3,3)
+                                glm::vec3(0,3,3),   // Camara from (4,3,3)
                                 glm::vec3(0,0,0),   // Look at (0,0,0)
                                 glm::vec3(0,1,0)    // (0,1,0,) is up
                                 );
