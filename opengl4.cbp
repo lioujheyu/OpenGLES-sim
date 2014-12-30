@@ -13,51 +13,51 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-static -static-libgcc -static-libstdc++" />
 				</Compiler>
 				<Linker>
+					<Add library="glfw3" />
 					<Add library="gdi32" />
+					<Add library="glu32" />
 					<Add library="opengl32" />
 					<Add directory="lib" />
 				</Linker>
 			</Target>
 			<Target title="linux">
 				<Option output="opengl4" prefix_auto="1" extension_auto="1" />
-				<Option type="0" />
+				<Option object_output="objs/linux" />
+				<Option type="1" />
 				<Option compiler="gcc" />
+				<Linker>
+					<Add library="Xi" />
+					<Add library="GL" />
+					<Add library="GLU" />
+					<Add library="glfw3" />
+					<Add library="Xxf86vm" />
+					<Add library="X11" />
+					<Add library="Xrandr" />
+					<Add library="pthread" />
+					<Add library="Xinerama" />
+					<Add library="Xcursor" />
+				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-std=c++11" />
 			<Add option="-Wall" />
-			<Add option="-static -static-libgcc -static-libstdc++" />
+			<Add option="-std=c++11" />
 			<Add option="-DGLEW_STATIC" />
 			<Add directory="include" />
 			<Add directory="external" />
 		</Compiler>
-		<Linker>
-			<Add library="glfw3" />
-			<Add library="glu32" />
-		</Linker>
-		<Unit filename="external/bitmap.cpp">
-			<Option target="win32" />
-		</Unit>
-		<Unit filename="external/bitmap.h">
-			<Option target="win32" />
-		</Unit>
+		<Unit filename="external/bitmap.cpp" />
+		<Unit filename="external/bitmap.h" />
 		<Unit filename="external/glew.c">
 			<Option compilerVar="CC" />
-			<Option target="win32" />
 		</Unit>
-		<Unit filename="external/shader.cpp">
-			<Option target="win32" />
-		</Unit>
-		<Unit filename="external/shader.h">
-			<Option target="win32" />
-		</Unit>
+		<Unit filename="external/shader.cpp" />
+		<Unit filename="external/shader.h" />
 		<Unit filename="include/GL/glew.h" />
-		<Unit filename="main_gl4.cpp">
-			<Option target="win32" />
-		</Unit>
+		<Unit filename="main_gl4.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
