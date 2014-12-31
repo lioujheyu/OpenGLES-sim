@@ -283,16 +283,22 @@ floatVec4 TextureUnit::TrilinearFilter(const floatVec4 &coordIn,
 {
 	floatVec4 color[2];
 	int maxLevel = targetImage->maxLevel;
-	color[0] = BilinearFilter(coordIn, level, tid);
-	color[1] = BilinearFilter(coordIn, std::min(level+1, maxLevel), tid);
 
-	color[0] = color[0]*(1-w_ratio) + color[1]*w_ratio;
+	if (w_ratio == 0.0)
+		color[0] = BilinearFilter(coordIn, level, tid);
+	if (w_ratio == 1.0)
+		color[0] = BilinearFilter(coordIn, std::min(level+1, maxLevel), tid);
+	else {
+		color[0] = BilinearFilter(coordIn, level, tid);
+		color[1] = BilinearFilter(coordIn, std::min(level+1, maxLevel), tid);
+		color[0] = color[0]*(1-w_ratio) + color[1]*w_ratio;
+	}
 
 	return color[0];
 }
 
 floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
-									 float factor,
+									 float level,
 									 const floatVec4 &scaleFacDX,
 									 const floatVec4 &scaleFacDY,
 									 int targetType,
@@ -357,7 +363,7 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 
 	maxLevel = targetImage->maxLevel;
 
-	if (factor < 0) {
+	if (level < 0) { // Normal scale factor and LoD calculation
 		deltaDX.s = scaleFacDX.s*targetImage->widthLevel[0];
 		deltaDX.t = scaleFacDX.t*targetImage->heightLevel[0];
 		deltaDY.s = scaleFacDY.s*targetImage->widthLevel[0];
@@ -377,14 +383,20 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 			maxScaleFac = maxScaleFacY;
 			scaleFacLoser = maxScaleFacX;
 		}
+		w_ratio = frexp(maxScaleFac, &LoD);
+		w_ratio = w_ratio*2-1;
+		LoD--;
 	}
-	else { // factor > 0
-		maxScaleFac = factor;
+	else { // LoD specified
+		/* Always using minification filter, or the the effect of level of
+		   detail will be lost. (because magnification filter doesn't use
+		   level of detail)
+		*/
+		maxScaleFac = 2.0f; //force using minification filter
+		LoD = (int)floor(level);
+		w_ratio = level - LoD;
 	}
 
-	w_ratio = frexp(maxScaleFac, &LoD);
-	w_ratio = w_ratio*2-1;
-	LoD--;
 	LoD = CLAMP(LoD, 0, maxLevel);
 
 	if(maxScaleFac>1) {
@@ -425,10 +437,6 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 				color = TexColor[0];
 			break;
 
-//		case GL_LINEAR_MIPMAP_LINEAR:   //u,v,w trilinear filter
-//			color = TrilinearFilter(coord, LoD, w_ratio, tid);
-//			break;
-
 		case GL_LINEAR_MIPMAP_LINEAR:	//u,v,w trilinear filter
 			uint8_t sampleN;
 
@@ -439,10 +447,10 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 			 * has the configuration between quality and performance about
 			 * anisotropic filter.
 			 */
-			if (factor < 0)
+			if (level < 0)
 				sampleN = std::min((uint8_t)floor(maxScaleFac/scaleFacLoser),
 									maxAnisoFilterRatio);
-			else // scale factor has been specified, perform isometric filter
+			else // level of detail has been specified, perform isometric filter
 				sampleN = 1;
 
 			// Round down to nearest power of 2, the same reason mentioned above
@@ -450,6 +458,11 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 				sampleN = 2;
 			else if (sampleN > 4 && sampleN < 8)
 				sampleN = 4;
+
+			if (sampleN == 1) { //perform isometric filter only
+				color = TrilinearFilter(coord, LoD, w_ratio, tid);
+				break;
+			}
 
 			maxScaleFac = maxScaleFac/sampleN;
 
@@ -469,8 +482,6 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 				else if (sampleN == 2)
 					colorAni = TrilinearFilter(coord + mainAxis*(2*i - 1)/4,
 												  LoD, w_ratio, tid);
-				else //sampleN == 1, isometric filter
-					colorAni = TrilinearFilter(coord, LoD, w_ratio, tid);
 
 				color = color + colorAni;
 			}

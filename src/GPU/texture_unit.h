@@ -98,9 +98,9 @@ public:
  *	use texture cache or not.
  *
  *	@param coordIn 	The target texture coordinate.
- *	@param factor 	This target coordinate has a specific scale factor. If
- *	factor < 0, this parameter has no meaning and the scale factor will be
- *	calculator by texture unit itself.
+ *	@param level 	This target coordinate has a specific level of detail. If
+ *	level < 0, this parameter has no effect and the level of detail will be
+ *	calculated by texture unit itself.
  *	@param tid 		This target coordinate is belongs to which texContext.
  *
  *	@return the target texel's color
@@ -109,7 +109,7 @@ public:
 
 
     floatVec4	TextureSample(const floatVec4 &coordIn,
-							  float factor,
+							  float level,
 							  const floatVec4 &scaleFacDX,
 							  const floatVec4 &scaleFacDY,
 							  int targetType,
