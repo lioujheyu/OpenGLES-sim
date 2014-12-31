@@ -220,23 +220,25 @@ void GPU_Core::tileSplit(int x, int y, int level)
  *	@param sid Which shader core id will be used.
  *	@param pixIn Input pixel's pointer.
  */
-void GPU_Core::FragmentShaderEXE(int sid, pixel* pixIn0,
-										  pixel* pixIn1,
-										  pixel* pixIn2,
-										  pixel* pixIn3 )
+void GPU_Core::FragmentShaderEXE(int sid, int &startCnt)
 {
+	int i=0;
+
 	sCore[sid].instPool = FSinstPool;
 	sCore[sid].instCnt = FSinstCnt;
 	sCore[sid].uniformPool = uniformPool;
-
 	sCore[sid].Init();
-	sCore[sid].isEnable[0] = sCore[sid].isEnable[1] =
-		sCore[sid].isEnable[2] = sCore[sid].isEnable[3] = true;
-	sCore[sid].threadPtr[0] = pixIn0;
-	sCore[sid].threadPtr[1] = pixIn1;
-	sCore[sid].threadPtr[2] = pixIn2;
-	sCore[sid].threadPtr[3] = pixIn3;
+
+	for (i=0; i<SHADER_EXECUNIT; i++) {
+		if ( (startCnt + i) > pixBufferP )
+			break;
+
+        sCore[sid].isEnable[i] = true;
+        sCore[sid].threadPtr[i] = pixBuffer+startCnt+i;
+	}
+
 	sCore[sid].Run();
+	startCnt = startCnt + i;
 }
 
 void GPU_Core::PerFragmentOp(const pixel &pixInput)

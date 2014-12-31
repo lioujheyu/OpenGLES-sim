@@ -68,18 +68,19 @@ public:
 		texID = -1; texType = 0;
 		instPool = nullptr;
 		uniformPool = nullptr;
-		threadPtr[0] = threadPtr[1] = threadPtr[2] = threadPtr[3] = nullptr;
+		for (int i=0; i<SHADER_EXECUNIT; i++)
+			threadPtr[i] = nullptr;
 		curInst.Init();
 		Init();
 	}
 
 	TextureUnit texUnit;
 
-	bool isEnable[4];
+	bool isEnable[SHADER_EXECUNIT];
 	int instCnt; ///< Program Length
 	instruction const *instPool; ///< Instruction Pool pointer
 	floatVec4 const *uniformPool; ///< Uniform Pool pointer
-	unitThread* threadPtr[4];
+	unitThread* threadPtr[SHADER_EXECUNIT];
 
 	///Statistic
 	///@{
@@ -118,16 +119,16 @@ public:
 private:
 	int PC; ///<Program Counter
 	instruction	curInst; ///< Current Instruction
-	unitThread thread[4];
-	bool curCCState[4]; ///< Current branch condition
-	std::stack<bool> ccStack[4]; ///< Branch condition stack for nest IF block
+	unitThread thread[SHADER_EXECUNIT];
+	bool curCCState[SHADER_EXECUNIT]; ///< Current branch condition
+	std::stack<bool> ccStack[SHADER_EXECUNIT]; ///< Branch condition stack for nest IF block
 	std::stack<int> RepCntStack; ///< Repeat Counter for each nest REP block
 	std::stack<int> RepNumStack; ///< Repeat number for each nest REP block
 	std::stack<int> RepPCStack; ///< Start PC for each nest REP block
 
-	floatVec4 reg[MAX_SHADER_REG_VECTOR*4];
-	floatVec4 CCisSigned[4][2], CCisZero[4][2];
-	floatVec4 dst[4], src[4][3];
+	floatVec4 reg[MAX_SHADER_REG_VECTOR*SHADER_EXECUNIT];
+	floatVec4 CCisSigned[SHADER_EXECUNIT][2], CCisZero[SHADER_EXECUNIT][2];
+	floatVec4 dst[SHADER_EXECUNIT], src[SHADER_EXECUNIT][3];
 	int texID, texType;
 
 	DRAM *dram;

@@ -89,19 +89,14 @@ void GPU_Core::Run()
 					pixBufferP = 0;
 
 					tileSplit(x,y,START_SPLIT_LEVEL);
-					for (int i=0; i<pixBufferP/4; i++) {
-						///@todo Task scheduler for auto job dispatch
-						FragmentShaderEXE(1,
-										  &pixBuffer[i*4  ],
-										  &pixBuffer[i*4+1],
-										  &pixBuffer[i*4+2],
-										  &pixBuffer[i*4+3]);
 
-						PerFragmentOp(pixBuffer[i*4  ]);
-						PerFragmentOp(pixBuffer[i*4+1]);
-						PerFragmentOp(pixBuffer[i*4+2]);
-						PerFragmentOp(pixBuffer[i*4+3]);
+					int processedCount=0;
+					while (processedCount < pixBufferP) {
+						FragmentShaderEXE(1, processedCount);
 					}
+
+					for (int i=0; i<pixBufferP; i++)
+						PerFragmentOp(pixBuffer[i]);
 				}
 			}
 

@@ -48,6 +48,14 @@
  */
 #define MAX_SHADER_CORE					2
 
+/** @def SHADER_EXECUNIT
+ *	This option defines how many execution unit a shader core has. More
+ *	execution unit a shader core has, more thread can be concurrently executed.
+ *	It will significantly affect the texture cache performance and increase
+ *	the size of total register pool.
+ */
+#define SHADER_EXECUNIT					256
+
 #define MAX_ATTRIBUTE_NUMBER    		8
 #define MAX_VERTEX_UNIFORM_VECTORS		128
 #define MAX_FRAGMENT_UNIFORM_VECTORS	16
@@ -88,8 +96,8 @@
 
 ///@name Define the texture cache's block and entry size
 ///@{
-#define TEX_CACHE_BLOCK_SIZE 64
-#define TEX_CACHE_ENTRY_SIZE 64
+#define TEX_CACHE_BLOCK_SIZE 16
+#define TEX_CACHE_ENTRY_SIZE 16
 ///@}
 
 ///	@name Texture debugging option

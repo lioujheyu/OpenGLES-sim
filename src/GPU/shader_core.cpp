@@ -25,15 +25,17 @@
 void ShaderCore::Init()
 {
 	PC = 0;
-	isEnable[0] = isEnable[1] = isEnable[2] = isEnable[3] = false;
-	curCCState[0] = curCCState[1] = curCCState[2] = curCCState[3] = true;
+	for (int i=0; i<SHADER_EXECUNIT; i++) {
+		isEnable[i] = false;
+		curCCState[i] = true;
+	}
 }
 
 void ShaderCore::Run()
 {
 	int i;
 
-	for (i=0; i<4; i++) {
+	for (i=0; i<SHADER_EXECUNIT; i++) {
 		if (isEnable[i]) {
 			thread[i] = *threadPtr[i];
 		}
@@ -49,12 +51,12 @@ void ShaderCore::Run()
  * like instruction(DDX, DDY, TEX with auto scale factor computation)'s
  * result is corrupted.
  */
-		for (i=0; i<4; i++) {
+		for (i=0; i<SHADER_EXECUNIT; i++) {
 			if (isEnable[i])
 				FetchData(i);
 		}
 
-		for (i=0; i<4; i++) {
+		for (i=0; i<SHADER_EXECUNIT; i++) {
 			if (isEnable[i]){
 				Exec(i);
 				if (curCCState[i] == true) {
@@ -67,7 +69,7 @@ void ShaderCore::Run()
 		PC++;
 	}
 
-	for (i=0; i<4; i++) {
+	for (i=0; i<SHADER_EXECUNIT; i++) {
 		if (isEnable[i])
 			threadPtr[i]->isKilled = thread[i].isKilled;
 	}
@@ -77,6 +79,7 @@ void ShaderCore::Run()
 void ShaderCore::Exec(int idx)
 {
 	floatVec4 scaleFacDX, scaleFacDY;
+	int baseIdx = (idx>>2)<<2;
 
 	switch (curInst.op) {
 	//VECTORop
@@ -259,12 +262,12 @@ void ShaderCore::Exec(int idx)
  * The further discussion of finding the gradient of texture coordinate in
  * shader core like right now or in texture unit is needed.
  */
-		if (idx == 0 || idx == 1) {
-			scaleFacDX = src[1][0] - src[0][0];
+		if ( (idx%4) == 0 || (idx%4) == 1) {
+			scaleFacDX = src[baseIdx+1][0] - src[baseIdx][0];
 			scaleFacDY = src[idx+2][0] - src[idx][0];
 		}
-		else {
-			scaleFacDX = src[3][0] - src[2][0];
+		else { //(idx%4) == 2 | 3
+			scaleFacDX = src[baseIdx+3][0] - src[baseIdx+2][0];
 			scaleFacDY = src[idx][0] - src[idx-2][0];
 		}
 		dst[idx] = texUnit.TextureSample(src[idx][0],
@@ -437,7 +440,7 @@ void ShaderCore::FetchData(int idx)
 			break;
 
 		case INST_REG:
-			src[idx][i] = ReadByMask(reg[curInst.src[i].id*4 + idx],
+			src[idx][i] = ReadByMask(reg[curInst.src[i].id*SHADER_EXECUNIT + idx],
 									 curInst.src[i].modifier );
 			break;
 
@@ -482,7 +485,7 @@ void ShaderCore::WriteBack(int idx)
 		if (curInst.dst.id < 0)
 			WriteByMask(dst[idx], nullptr, curInst.dst.modifier, idx);
 		else
-			WriteByMask(dst[idx], &(reg[curInst.dst.id*4 + idx]), curInst.dst.modifier, idx);
+			WriteByMask(dst[idx], &(reg[curInst.dst.id*SHADER_EXECUNIT + idx]), curInst.dst.modifier, idx);
 		break;
 
 	case INST_COLOR:
