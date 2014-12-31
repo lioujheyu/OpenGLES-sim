@@ -53,30 +53,6 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 	uint8_t *texTmpPtr = NULL;
 	uint32_t tmpData;
 	unsigned short u,v;
-#ifdef NO_TEX_CACHE
-	floatVec4 color;
-
-	u = (unsigned short)coordIn.s;
-	v = (unsigned short)coordIn.t;
-
-	texTmpPtr = targetImage->data[level] +
-				(v*targetImage->widthLevel[level] + u)*4;
-
-	dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 1);
-	color.r = (float)(tmpData&0xff)/255;
-	color.g = (float)((tmpData>>8)&0xff)/255;
-	color.b = (float)((tmpData>>16)&0xff)/255;
-	color.a = (float)((tmpData>>24)&0xff)/255;
-
-	texTmpPtr+=4;
-
-	return color;
-#else
-	int i,j; //loop counter
-	uint32_t tag;
-	uint16_t entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
-	uint8_t tWay = 0;
-    bool isColdMiss = false;
 
 	if (targetImage->maxLevel == -1) {
 		fprintf(stderr,"TexUnit: Using Null tex2D\n");
@@ -103,21 +79,79 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 		return floatVec4(0.0, 0.0, 0.0, 0.0);
 	}
 
-	U_Super = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_SIZE_ROOT_LOG);
-	V_Super = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_SIZE_ROOT_LOG);
-	U_Block = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_SIZE_ROOT - 1);
-	V_Block = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_SIZE_ROOT - 1);
-	U_Offset = u & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
-	V_Offset = v & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
-	tag = (int)( (V_Super << 12) | (U_Super&0x0fff) );
+#ifdef NO_TEX_CACHE
+	floatVec4 color;
 
-	///@note Simply append all texture related selection bit after tag bit
-	tag = (tag << 3) | (imageSelection&0x7);
-	tag = (tag << 4) | (level&0xf);
-	tag = (tag << 1) | (tid&0x1);
+	texTmpPtr = targetImage->data[level] +
+				(v*targetImage->widthLevel[level] + u)*4;
 
-	entry = V_Block * TEX_CACHE_ENTRY_SIZE_ROOT + U_Block;
-	offset = V_Offset * TEX_CACHE_BLOCK_SIZE_ROOT + U_Offset;
+	dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 1);
+	color.r = (float)(tmpData&0xff)/255;
+	color.g = (float)((tmpData>>8)&0xff)/255;
+	color.b = (float)((tmpData>>16)&0xff)/255;
+	color.a = (float)((tmpData>>24)&0xff)/255;
+
+	texTmpPtr+=4;
+
+	return color;
+#else
+	int i,j; //loop counter
+	uint32_t tag;
+	uint16_t entry, offset, U_Block, V_Block, U_Offset, V_Offset, U_Super, V_Super;
+	uint8_t tWay = 0;
+    bool isColdMiss = false;
+
+/**
+ *	While level image size is smaller than cache block size, the 6D texture
+ *	addressing mode will be no longer required because all texel on this level
+ *	are guaranteed fall into a single cache block so that sequential access will
+ *	be enough. However, there will be more than one level image living on this
+ *	cache block in such situation. For example, if a texture has size in 32x32
+ *	and the cache block size is 64. So we have mip-map in
+ *	level 0: 32x32
+ *	level 1: 16x16
+ *	level 2: 8x8
+ *	...
+ *	All level beyond 1 will actually have image size smaller than single cache
+ *	block. For the reason to save memory usage. We can put level 2~4 in a single
+ *	cache block ( (4x4 + 2x2 + 1x1 = 21) < 64).
+ *
+ *	Therefore, as we access these level images, we have to generate cache offset
+ *	differ than normal since there are multiple level inside the cache block.
+ *	So does tags and entry. (But these two are much more easy to calculate)
+ */
+	if (targetImage->heightLevel[level] >= TEX_CACHE_BLOCK_SIZE_ROOT) {
+		U_Super = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_SIZE_ROOT_LOG);
+		V_Super = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG + TEX_CACHE_ENTRY_SIZE_ROOT_LOG);
+		U_Block = u >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_SIZE_ROOT - 1);
+		V_Block = v >> (TEX_CACHE_BLOCK_SIZE_ROOT_LOG) & (TEX_CACHE_ENTRY_SIZE_ROOT - 1);
+		U_Offset = u & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
+		V_Offset = v & (TEX_CACHE_BLOCK_SIZE_ROOT - 1);
+		tag = (int)( (V_Super << 12) | (U_Super&0x0fff) );
+
+		///@note Simply append all texture related selection bit after tag bit
+		tag = (tag << 3) | (imageSelection&0x7);
+		tag = (tag << 4) | (level&0xf);
+		tag = (tag << 1) | (tid&0x1);
+
+		entry = V_Block * TEX_CACHE_ENTRY_SIZE_ROOT + U_Block;
+		offset = V_Offset * TEX_CACHE_BLOCK_SIZE_ROOT + U_Offset;
+	}
+	else { //targetImage->heightLevel[levelCount] < TEX_CACHE_BLOCK_SIZE_ROOT
+        tag = imageSelection&0x7;
+        tag = (tag << 4) | ((targetImage->maxLevel - TEX_CACHE_BLOCK_SIZE_ROOT_LOG)&0xf);
+        tag = (tag << 1) | (tid&0x1);
+
+        entry = 0;
+        offset = 0;
+        for (i = TEX_CACHE_BLOCK_SIZE_ROOT_LOG-1;
+			 i > (int)log2(targetImage->heightLevel[level]);
+			 i--) {
+			//printf("%d", (int)log2(targetImage->heightLevel[level]));
+			offset += 1<<(i*2);
+        }
+        offset += (v*targetImage->widthLevel[level] + u);
+	}
 
 	for (i=0; i<TEX_WAY_ASSOCIATION; i++) {
 		if (TexCache.valid[entry][i] == true) {
@@ -141,9 +175,12 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 	if (TexCache.valid[entry][tWay] == false)
 		TexCache.valid[entry][tWay] = true;
 #	ifdef IMAGE_MEMORY_OPTIMIZE
-	texTmpPtr = targetImage->data[level] +
-	( (v>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG)*(targetImage->widthLevel[level]>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG)
-	 + (u>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG) )*TEX_CACHE_BLOCK_SIZE*4;
+	if (targetImage->heightLevel[level] >= TEX_CACHE_BLOCK_SIZE_ROOT)
+		texTmpPtr = targetImage->data[level] +
+		( (v>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG)*(targetImage->widthLevel[level]>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG)
+		+ (u>>TEX_CACHE_BLOCK_SIZE_ROOT_LOG) )*TEX_CACHE_BLOCK_SIZE*4;
+	else //targetImage->heightLevel[levelCount] < TEX_CACHE_BLOCK_SIZE_ROOT
+		texTmpPtr = targetImage->data[(targetImage->maxLevel - TEX_CACHE_BLOCK_SIZE_ROOT_LOG)&0xf];
 
 	for (i=0; i<TEX_CACHE_BLOCK_SIZE; i++) {
 		if (TEX_CACHE_BLOCK_SIZE > 16) // Limit maximum burst length to 16
@@ -156,31 +193,46 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 		TexCache.color[entry][i][tWay].a = (float)((tmpData>>24)&0xff)/255;
 	}
 #	else
-	for (j=0; j<TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
-		for (i=0; i<TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
-			texTmpPtr = targetImage->data[level] +
-						CalcTexAdd(U_Super,U_Block,i,
-								   V_Super,V_Block,j,
-								   targetImage->widthLevel[level]) * 4;
-			if (TEX_CACHE_BLOCK_SIZE_ROOT > 16) // Limit maximum burst length to 16
-				dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 16-(i&0xf));
-			else
-				dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, TEX_CACHE_BLOCK_SIZE_ROOT-i);
-//			dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 1);
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r =
-				(float)(tmpData&0xff)/255;
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g =
-				(float)((tmpData>>8)&0xff)/255;
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].b =
-				(float)((tmpData>>16)&0xff)/255;
-			TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].a =
-				(float)((tmpData>>24)&0xff)/255;
+    if (targetImage->heightLevel[level] >= TEX_CACHE_BLOCK_SIZE_ROOT) {
+		for (j=0; j<TEX_CACHE_BLOCK_SIZE_ROOT; j++) {
+			for (i=0; i<TEX_CACHE_BLOCK_SIZE_ROOT; i++) {
+				texTmpPtr = targetImage->data[level] +
+							CalcTexAdd(U_Super,U_Block,i,
+									V_Super,V_Block,j,
+									targetImage->widthLevel[level]) * 4;
+				if (TEX_CACHE_BLOCK_SIZE_ROOT > 16) // Limit maximum burst length to 16
+					dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 16-(i&0xf));
+				else
+					dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, TEX_CACHE_BLOCK_SIZE_ROOT-i);
+//				dram->LocalAccess(false, (size_t)texTmpPtr, tmpData, 4, 1);
+				TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].r =
+					(float)(tmpData&0xff)/255;
+				TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].g =
+					(float)((tmpData>>8)&0xff)/255;
+				TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].b =
+					(float)((tmpData>>16)&0xff)/255;
+				TexCache.color[entry][j*TEX_CACHE_BLOCK_SIZE_ROOT+i][tWay].a =
+					(float)((tmpData>>24)&0xff)/255;
 
-			texTmpPtr+=4;
+				texTmpPtr+=4;
+			}
 		}
-	}
-#	endif // IMAGE_MEMORY_OPTIMIZE
+    }
+    else { //targetImage->heightLevel[levelCount] < TEX_CACHE_BLOCK_SIZE_ROOT
+		texTmpPtr = targetImage->data[(targetImage->maxLevel - TEX_CACHE_BLOCK_SIZE_ROOT_LOG)&0xf];
 
+		for (i=0; i<TEX_CACHE_BLOCK_SIZE; i++) {
+			if (TEX_CACHE_BLOCK_SIZE > 16) // Limit maximum burst length to 16
+				dram->LocalAccess(false, (size_t)texTmpPtr+i*4, tmpData, 4, 16-(i&0xf));
+			else
+				dram->LocalAccess(false, (size_t)texTmpPtr+i*4, tmpData, 4, TEX_CACHE_BLOCK_SIZE-i);
+			TexCache.color[entry][i][tWay].r = (float)(tmpData&0xff)/255;
+			TexCache.color[entry][i][tWay].g = (float)((tmpData>>8)&0xff)/255;
+			TexCache.color[entry][i][tWay].b = (float)((tmpData>>16)&0xff)/255;
+			TexCache.color[entry][i][tWay].a = (float)((tmpData>>24)&0xff)/255;
+		}
+    }
+#	endif // IMAGE_MEMORY_OPTIMIZE
 
 #	ifdef SHOW_TEXCACHE_COLD_MISS
 	if (isColdMiss)
@@ -189,9 +241,9 @@ floatVec4 TextureUnit::GetTexColor(const floatVec4 &coordIn, int level, int tid)
 
 #	if defined(SHOW_TEXCACHE_MISS)
 	return floatVec4(0.0, 1.0, 0.0, 1.0);
-#	else
+#	endif //SHOW_TEXCACHE_MISS
+
 	return TexCache.color[entry][offset][tWay];
-#	endif
 
 #endif // NO_TEX_CACHE
 }
@@ -284,9 +336,9 @@ floatVec4 TextureUnit::TrilinearFilter(const floatVec4 &coordIn,
 	floatVec4 color[2];
 	int maxLevel = targetImage->maxLevel;
 
-	if (w_ratio == 0.0)
+	if (w_ratio <= 0.01)
 		color[0] = BilinearFilter(coordIn, level, tid);
-	if (w_ratio == 1.0)
+	else if (w_ratio >= 0.99)
 		color[0] = BilinearFilter(coordIn, std::min(level+1, maxLevel), tid);
 	else {
 		color[0] = BilinearFilter(coordIn, level, tid);
@@ -329,21 +381,21 @@ floatVec4 TextureUnit::TextureSample(const floatVec4 &coordIn,
 				coord.s = ((coordIn.s<0.0f)? coordIn.p : -coordIn.p)/fabs(coordIn.s)/2 + 0.5f;
 				coord.t = -coordIn.t/fabs(coordIn.s)/2 + 0.5f;
 			}
-			else {
+			else { // |coordIn.p| > |coordIn.s|
 				imageSelection = (coordIn.p<0.0f)? CUBE_NEG_Z : CUBE_POS_Z;
 				targetImage = (coordIn.p<0.0f)? &texCubeNZ[tid] : &texCubePZ[tid];
 				coord.s = ((coordIn.p<0.0f)? -coordIn.s : coordIn.s)/fabs(coordIn.p)/2 + 0.5f;
 				coord.t = -coordIn.t/fabs(coordIn.p)/2 + 0.5f;
 			}
 		}
-		else { // |coordIn.p| > |coordIn.s|
+		else { // |coordIn.t| > |coordIn.s|
 			if (fabs(coordIn.t) > fabs(coordIn.p)) {
 				imageSelection = (coordIn.t<0.0f)? CUBE_NEG_Y : CUBE_POS_Y;
 				targetImage = (coordIn.t<0.0f)? &texCubeNY[tid] : &texCubePY[tid];
 				coord.s = coordIn.s/fabs(coordIn.t)/2 + 0.5f;
 				coord.t = ((coordIn.t<0.0f)? -coordIn.p : coordIn.p)/fabs(coordIn.t)/2 + 0.5f;
 			}
-			else {
+			else { // |coordIn.p| > |coordIn.t|
 				imageSelection = (coordIn.p<0.0f)? CUBE_NEG_Z : CUBE_POS_Z;
 				targetImage = (coordIn.p<0.0f)? &texCubeNZ[tid] : &texCubePZ[tid];
 				coord.s = ((coordIn.p<0.0f)? -coordIn.s : coordIn.s)/fabs(coordIn.p)/2 + 0.5f;
