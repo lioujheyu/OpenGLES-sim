@@ -15,7 +15,6 @@
 
 #include "data/banana.h"
 #include "data/teapot.h"
-#include "data/dragon.h"
 
 bool LoadTexture(const char *filename, unsigned int *texture)
 {
@@ -740,83 +739,6 @@ void tutorial4()
     shader.unbind();
 }
 
-void draw_dragon_test()
-{
-	Shader shader;
-	//shader.init("shader_src/drawObjNormalMap.vert", "shader_src/drawObjNormalMap.frag");
-	shader.init("shader_src/StandardShading.vert", "shader_src/StandardShading.frag");
-	shader.bind();
-
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
-	glCullFace(GL_FRONT);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-    glViewport(0,0,1024,768);
-	glClearColor(0.0,0.0,0.0,1.0);
-	glClearDepthf(1.0);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-
-//	CalculateTangentArray(teapotNumVerts, teapotVerts, teapotNormals,
-//						  teapotTexCoords, teapotTangent, teapotBitangent);
-
-	glm::vec3 eye_pos    = glm::vec3(0.0f, 0.0f, 1.3f);
-	glm::vec3 light_pos  = glm::vec3(3.0f, 3.0f, 3.0f);
-    glm::mat4 ProjectionMatrix = glm::perspective(45.0f, 1024.0f / 768.0f, 0.1f, 100.f);
-    glm::mat4 ViewMatrix       = glm::lookAt(
-                                eye_pos, // in World Space
-                                glm::vec3(0.0016f,0.0f,0.0f), // and looks at the origin
-                                glm::vec3(0,1.0f,0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
-                                );
-	//glm::mat4 Model      = glm::scale(glm::mat4(1.0f), glm::vec3(6.0));
-	glm::mat4 ModelMatrix = glm::mat4(1.0);
-	glm::mat4 MVP         = ProjectionMatrix * ViewMatrix * ModelMatrix;
-    glm::vec3 lightPos = glm::vec3(4,4,4);
-
-	GLuint MatrixID = glGetUniformLocation(shader.id(), "MVP");
-	GLuint ViewMatrixID = glGetUniformLocation(shader.id(), "V");
-	GLuint ModelMatrixID = glGetUniformLocation(shader.id(), "M");
-    GLuint LightID = glGetUniformLocation(shader.id(), "LightPosition_worldspace");
-    GLuint TextureID  = glGetUniformLocation(shader.id(), "myTextureSampler");
-
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-    glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
-    glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
-    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
-    glUniform1i(TextureID, 0);
-
-
-	unsigned int texture[2];
-	glActiveTexture(GL_TEXTURE0);
-    if (LoadTexture("data/yellow.bmp", &texture[0]) == false) {
-		printf("Fail to load image\n");
-		exit(1);
-        }
-
-
-	int v_coord_loc     = glGetAttribLocation(shader.id(), "vertexPosition_modelspace");
-    int v_tex0_loc      = glGetAttribLocation(shader.id(), "vertexUV");
-	int v_normal_loc    = glGetAttribLocation(shader.id(), "vertexNormal_modelspace");
-
-    glVertexAttribPointer(v_coord_loc, 3, GL_FLOAT, GL_FALSE, 0, dragonVerts);
-    glEnableVertexAttribArray(v_coord_loc);
-
-    glVertexAttribPointer(v_normal_loc, 3, GL_FLOAT, GL_FALSE, 0, dragonNormals);
-    glEnableVertexAttribArray(v_normal_loc);
-
-    glVertexAttribPointer(v_tex0_loc, 2, GL_FLOAT, GL_FALSE, 0, dragonTexCoords);
-    glEnableVertexAttribArray(v_tex0_loc);
-
-	glDrawArrays(GL_TRIANGLES, 0, dragonNumVerts);
-//	glDrawArrays(GL_TRIANGLES, 0, 999);
-
-	glDeleteTextures(1, texture);
-
-	shader.unbind();
-}
-
 int main()
 {
     int choice;
@@ -848,7 +770,6 @@ int main()
 				\n(5) Cubemap              \
 				\n(6) Tutorial 3           \
 				\n(7) Tutorial 4           \
-				\n(8) Dragon               \
 				\n(0) Exit                 \
 				\nChose one test case: ");
 
@@ -886,9 +807,6 @@ int main()
 			break;
 		case 7:
 			tutorial4();
-			break;
-		case 8:
-			draw_dragon_test();
 			break;
 		case 0:
 		default:
