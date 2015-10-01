@@ -13,7 +13,7 @@ The GPU simulator includes a kind of unified shader based on the [NVGP4 instruct
 
 * * *
 
-The detail document can be found [here](http://lioujheyu.synology.me/~git/ogles1_1/)
+The detail document can be found [here](http://caslab.ee.ncku.edu.tw/~elvis/ogles-sim/)
 
 Cause this project is still under development, any unexpected situation is possible. Please email or report to me if you find any compiler error or bug.
 
